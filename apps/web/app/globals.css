@@ -1,0 +1,21 @@
+/* Modernist 토큰·컴포넌트가 먼저, 화면 레이아웃 층이 그 위. 순서를 바꾸지 말 것. */
+@import "@kca/ui/styles.css";
+@import "@kca/ui/app.css";
+
+/* 시안의 폰트 지정 — Archivo(라틴) + Noto Sans KR(한글) 병기, 에디토리얼 본문은 Noto Serif KR.
+   실제 파일은 next/font가 주입하는 --font-archivo / --font-noto-sans / --font-noto-serif. */
+:root {
+  --font-heading: var(--font-archivo), var(--font-noto-sans), system-ui, sans-serif;
+  --font-body: var(--font-archivo), var(--font-noto-sans), system-ui, sans-serif;
+  --font-serif: var(--font-noto-serif), "Noto Serif KR", serif;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}

@@ -1,0 +1,10 @@
+{
+  "name": "@kca/ui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Modernist 디자인 시스템 — 토큰 + 컴포넌트 클래스. 시안이 단일 진실 공급원.",
+  "exports": {
+    "./styles.css": "./styles.css",
+    "./app.css": "./app.css"
+  }
+}

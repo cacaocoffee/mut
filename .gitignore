@@ -1,0 +1,63 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# --- 모노레포 (apps/* · packages/*) ---
+# 위 루트 전용 패턴(/node_modules, /.next/)은 중첩 경로를 잡지 못한다
+node_modules/
+.next/
+out/
+dist/
+
+# Kotlin/Gradle (apps/api — SPEC-05 §2)
+.gradle/
+build/
+!src/**/build/
+*.class
+
+# AI 에이전트 운영 아티팩트
+.omc/
+.claude/settings.local.json
+
+# IDE
+.idea/
+*.iml
+.vscode/

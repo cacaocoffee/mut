@@ -1,0 +1,21 @@
+{
+  "name": "k-cocktail-archive",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @kca/web",
+    "build": "npm run build --workspace @kca/web",
+    "start": "npm run start --workspace @kca/web",
+    "lint": "npm run lint --workspace @kca/web",
+    "typecheck": "tsc -p apps/web --noEmit",
+    "check": "npm run check --workspace @kca/domain",
+    "verify": "npm run check && npm run lint && npm run build"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}

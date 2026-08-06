@@ -1,0 +1,17 @@
+{
+  "name": "@kca/domain",
+  "version": "0.1.0",
+  "private": true,
+  "description": "칵테일 도메인 타입 · 데이터 · 검색 로직. 프레임워크 비의존.",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.8"
+  },
+  "scripts": {
+    "check": "tsx check.ts"
+  }
+}

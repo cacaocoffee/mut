@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/modernist-1ca0109b-a410-44d5-823c-746f603e09fc/styles.css">
+<script src="_ds/modernist-1ca0109b-a410-44d5-823c-746f603e09fc/_ds_bundle.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@400;600&display=swap">
+<style>
+body{font-family:"Archivo","Noto Sans KR",system-ui,sans-serif}
+h1,h2,h3,h4,h5,h6{font-family:"Archivo","Noto Sans KR",system-ui,sans-serif}
+input[type=range]{accent-color:var(--color-accent)}
+</style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg);color:var(--color-text)">
+
+<div class="nav" style="position:sticky;top:0;z-index:20;background:var(--color-bg);padding-left:32px;padding-right:32px">
+<span class="nav-brand" style="display:flex;align-items:baseline;gap:10px">K-COCKTAIL ARCHIVE<span style="font-size:10px;letter-spacing:.14em;font-weight:400;color:var(--color-accent)">KR / EN 아카이브</span></span>
+<div style="display:flex;gap:4px">
+<button class="btn btn-secondary" style="{{ tabSearchStyle }}" onClick="{{ goSearch }}">01 탐색 SEARCH</button>
+<button class="btn btn-secondary" style="{{ tabDetailStyle }}" onClick="{{ goDetail }}">02 상세 DETAIL</button>
+<button class="btn btn-secondary" style="{{ tabFinderStyle }}" onClick="{{ goFinder }}">03 파인더 FINDER</button>
+</div>
+</div>
+
+<sc-if value="{{ isSearch }}" hint-placeholder-val="{{ true }}">
+<div style="padding:0 32px 64px">
+  <div style="display:grid;grid-template-columns:1fr auto;align-items:end;gap:24px;padding:36px 0 20px;border-bottom:2px solid var(--color-divider)">
+    <div>
+      <h6 style="margin:0 0 10px;color:var(--color-accent)">Multi-dimensional search</h6>
+      <h1 style="font-size:56px;margin:0">칵테일 탐색<span style="font-weight:400;font-size:26px;letter-spacing:0;margin-left:14px;color:var(--color-neutral-700)">Browse 24 entries</span></h1>
+    </div>
+    <div style="text-align:left;font-size:12px;line-height:1.5;color:var(--color-neutral-700);max-width:280px">당도 · 기주 · 맛/향 · 도수 4개 축으로 교차 검색합니다. 모든 수치는 표준 레시피 기준 실측값입니다.</div>
+  </div>
+
+  <div style="{{ layoutStyle }}">
+    <!-- FILTER PANEL -->
+    <div style="{{ panelStyle }}">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;padding-bottom:10px;border-bottom:2px solid var(--color-divider)">
+        <h6 style="margin:0">필터 FILTERS</h6>
+        <button class="btn btn-ghost" style="font-size:11px" onClick="{{ resetAll }}">초기화 RESET</button>
+      </div>
+
+      <div style="{{ groupStyle }}">
+        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700);margin-bottom:8px">당도 SWEETNESS</div>
+        <div class="seg" style="{{ segStyle }}">
+          <sc-for list="{{ sweetOpts }}" as="o" hint-placeholder-count="5">
+            <label class="seg-opt" style="{{ o.style }}" title="{{ o.en }}"><input type="radio" name="sweetlvl" checked="{{ o.on }}" onChange="{{ o.pick }}"><span style="display:block;font-weight:700;font-size:12px;white-space:nowrap">{{ o.ko }}</span><span style="display:block;font-size:9.5px;font-weight:400;letter-spacing:.06em;opacity:.65;white-space:nowrap;margin-left:auto">{{ o.en }}</span></label>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="{{ groupStyle }}">
+        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700);margin-bottom:8px">기주 BASE SPIRIT<span style="float:right;font-size:10px;letter-spacing:0;text-transform:none">복수 선택</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <sc-for list="{{ baseOpts }}" as="b" hint-placeholder-count="7">
+            <button class="btn" style="{{ b.style }}" onClick="{{ b.toggle }}">{{ b.ko }}<span style="font-weight:400;font-size:10px;opacity:.6;margin-left:5px">{{ b.count }}</span></button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="{{ groupStyle }}">
+        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700);margin-bottom:8px">맛 / 향 FLAVOR PROFILE</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <sc-for list="{{ flavorOpts }}" as="f" hint-placeholder-count="7">
+            <button class="tag" style="{{ f.style }}" onClick="{{ f.toggle }}">{{ f.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="{{ groupStyle }}">
+        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700);margin-bottom:4px">도수 ABV</div>
+        <div style="display:flex;align-items:baseline;gap:8px;font-variant-numeric:tabular-nums;margin-bottom:6px"><span style="font-size:28px;font-weight:800;line-height:1">{{ abvLabel }}</span><span style="font-size:11px;color:var(--color-neutral-700);white-space:nowrap">% vol 이하</span></div>
+        <input type="range" min="0" max="45" step="1" value="{{ abvMax }}" onChange="{{ setAbv }}" onInput="{{ setAbv }}" style="width:100%;margin:0">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--color-neutral-600);margin-top:2px"><span>0</span><span>20</span><span>45+</span></div>
+      </div>
+
+      <div style="{{ groupStyle }}">
+        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700);margin-bottom:6px">검색 KEYWORD</div>
+        <input class="input" type="text" placeholder="네그로니 / Negroni" value="{{ query }}" onChange="{{ setQuery }}" onInput="{{ setQuery }}">
+      </div>
+    </div>
+
+    <!-- GRID -->
+    <div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;padding-bottom:10px;border-bottom:2px solid var(--color-divider);margin-bottom:20px">
+        <div style="display:flex;align-items:baseline;gap:10px"><span style="font-size:22px;font-weight:800">{{ resultCount }}</span><span style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-700)">개 결과 · {{ activeSummary }}</span></div>
+        <span style="font-size:11px;color:var(--color-neutral-600)">정렬: 도수 낮은 순</span>
+      </div>
+
+      <div style="{{ gridStyle }}">
+        <sc-for list="{{ cards }}" as="c" hint-placeholder-count="9">
+          <div style="{{ c.cardStyle }}" onClick="{{ c.open }}">
+            <sc-if value="{{ photoMode }}" hint-placeholder-val="{{ true }}">
+              <div class="grayscale" style="position:relative;aspect-ratio:4/5;background:var(--color-neutral-300);display:flex;align-items:flex-end;padding:10px;overflow:hidden">
+                <div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,transparent 0 11px,color-mix(in srgb,var(--color-neutral-900) 7%,transparent) 11px 12px)"></div>
+                <div style="position:absolute;top:10px;left:10px;font-size:9px;letter-spacing:.12em;color:var(--color-neutral-700)">IMAGE 4:5</div>
+                <div style="position:relative;font-family:'Noto Serif KR',serif;font-size:15px;color:var(--color-neutral-900)">{{ c.en }}</div>
+              </div>
+            </sc-if>
+            <div style="padding:12px 12px 14px;display:flex;flex-direction:column;gap:9px;flex:1">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
+                <div>
+                  <div style="font-size:19px;font-weight:800;line-height:1.15">{{ c.ko }}</div>
+                  <div style="font-size:11px;letter-spacing:.06em;color:var(--color-neutral-700);text-transform:uppercase">{{ c.en }}</div>
+                </div>
+                <div style="text-align:right;font-variant-numeric:tabular-nums"><div style="font-size:20px;font-weight:800;line-height:1">{{ c.abv }}</div><div style="font-size:9px;letter-spacing:.1em;color:var(--color-neutral-600)">% ABV</div></div>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center">
+                <span class="tag tag-neutral" style="border:1px solid var(--color-divider)">{{ c.base }}</span>
+                <span class="tag" style="{{ c.sweetStyle }}">{{ c.sweetKo }}</span>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:4px">
+                <sc-for list="{{ c.flavors }}" as="f" hint-placeholder-count="3">
+                  <span style="font-size:10px;letter-spacing:.04em;padding:2px 6px;border:1px solid var(--color-divider);color:var(--color-neutral-800);white-space:nowrap">{{ f.label }}</span>
+                </sc-for>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;font-size:10.5px;color:var(--color-neutral-600);border-top:1px solid var(--color-divider);padding-top:7px;margin-top:auto">
+                <span>{{ c.method }} · {{ c.glass }}</span><span style="color:var(--color-accent)">상세 →</span>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:64px 0;text-align:left;border-bottom:1px solid var(--color-divider)"><div style="font-size:24px;font-weight:800;margin-bottom:6px">조건에 맞는 항목이 없습니다</div><div style="font-size:13px;color:var(--color-neutral-700)">도수 상한을 올리거나 맛/향 태그를 줄여보세요.</div></div>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+<div style="padding:0 32px 72px">
+  <!-- HERO -->
+  <div style="display:grid;grid-template-columns:minmax(360px,0.9fr) 1.1fr;gap:40px;padding:32px 0 28px;border-bottom:2px solid var(--color-divider)">
+    <div class="grayscale" style="position:relative;aspect-ratio:4/5;background:var(--color-neutral-300);min-height:420px">
+      <div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,transparent 0 15px,color-mix(in srgb,var(--color-neutral-900) 7%,transparent) 15px 16px)"></div>
+      <div style="position:absolute;top:14px;left:14px;font-size:10px;letter-spacing:.14em;color:var(--color-neutral-700)">HERO IMAGE 4:5 — PLACEHOLDER</div>
+      <div style="position:absolute;bottom:16px;left:16px;font-family:'Noto Serif KR',serif;font-size:30px;color:var(--color-neutral-900)">{{ d.en }}</div>
+    </div>
+    <div>
+      <button class="btn btn-ghost" style="font-size:11px;padding-left:0;margin-bottom:14px" onClick="{{ goSearch }}">← 탐색으로 BACK TO SEARCH</button>
+      <h6 style="color:var(--color-accent);margin:0 0 8px">{{ d.base }} BASE · {{ d.sweetEn }}</h6>
+      <h1 style="font-size:64px;margin:0 0 4px;letter-spacing:-.03em">{{ d.ko }}</h1>
+      <div style="font-family:'Noto Serif KR',serif;font-size:24px;color:var(--color-neutral-700);margin-bottom:16px">{{ d.en }}</div>
+      <p style="font-size:16px;line-height:1.6;max-width:52ch;color:var(--color-neutral-900)">{{ d.summary }}</p>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);border-top:2px solid var(--color-divider);border-bottom:2px solid var(--color-divider);margin-top:20px">
+        <sc-for list="{{ d.specs }}" as="s" hint-placeholder-count="4">
+          <div style="padding:14px 14px 14px 0;border-right:1px solid var(--color-divider)">
+            <div style="font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-600);margin-bottom:5px">{{ s.label }}</div>
+            <div style="font-size:19px;font-weight:800;line-height:1.1">{{ s.value }}</div>
+            <div style="font-size:10px;color:var(--color-neutral-600)">{{ s.sub }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECIPE + RADAR -->
+  <div style="display:grid;grid-template-columns:1.35fr 1fr;gap:44px;padding:32px 0 0">
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:12px;border-bottom:2px solid var(--color-divider)">
+        <h4 style="margin:0">재료 INGREDIENTS</h4>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="display:flex;align-items:center;border:1px solid var(--color-divider)">
+            <button class="btn" style="width:34px;height:32px;padding:0;font-size:16px" onClick="{{ dec }}">−</button>
+            <div style="min-width:104px;text-align:center;font-size:12px;border-left:1px solid var(--color-divider);border-right:1px solid var(--color-divider);padding:6px 8px"><span style="font-weight:800;font-size:15px">{{ servings }}</span> serving</div>
+            <button class="btn" style="width:34px;height:32px;padding:0;font-size:16px" onClick="{{ inc }}">＋</button>
+          </div>
+          <div class="seg">
+            <label class="seg-opt" style="{{ mlStyle }}"><input type="radio" name="unit" checked="{{ isMl }}" onChange="{{ useMl }}">ml</label>
+            <label class="seg-opt" style="{{ ozStyle }}"><input type="radio" name="unit" checked="{{ isOz }}" onChange="{{ useOz }}">oz</label>
+          </div>
+        </div>
+      </div>
+      <table class="table" style="margin-top:2px">
+        <thead><tr><th style="width:52%">재료</th><th style="width:24%;text-align:right">용량</th><th style="width:24%">비고</th></tr></thead>
+        <tbody>
+          <sc-for list="{{ rows }}" as="r" hint-placeholder-count="4">
+            <tr>
+              <td style="font-weight:500">{{ r.name }}<div style="font-size:10.5px;color:var(--color-neutral-600);letter-spacing:.04em">{{ r.en }}</div></td>
+              <td style="text-align:right;font-variant-numeric:tabular-nums;font-weight:800">{{ r.amount }}</td>
+              <td>
+                <sc-if value="{{ r.hasSub }}" hint-placeholder-val="{{ false }}">
+                  <button class="tag tag-outline" style="cursor:pointer;background:transparent;white-space:nowrap" onClick="{{ r.toggleSub }}">대체 가능 ⓘ</button>
+                </sc-if>
+              </td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+      <sc-if value="{{ subOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="background:var(--color-accent-100);border-left:2px solid var(--color-accent);padding:12px 14px;margin-top:12px">
+          <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-800);margin-bottom:4px">SUBSTITUTE · {{ subName }}</div>
+          <div style="font-size:13px;color:var(--color-accent-900)">{{ subText }}</div>
+        </div>
+      </sc-if>
+
+      <h4 style="margin:34px 0 0;padding-bottom:12px;border-bottom:2px solid var(--color-divider)">제조 순서 METHOD</h4>
+      <div style="display:flex;flex-direction:column;gap:0">
+        <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4">
+          <div style="display:grid;grid-template-columns:56px 1fr;gap:16px;padding:16px 0;border-bottom:1px solid var(--color-divider)">
+            <div style="font-size:26px;font-weight:800;line-height:1;color:var(--color-accent)">{{ s.n }}</div>
+            <div style="font-size:14px;line-height:1.55;padding-top:2px">{{ s.text }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div>
+      <h4 style="margin:0;padding-bottom:12px;border-bottom:2px solid var(--color-divider)">맛 프로필 FLAVOR PROFILE</h4>
+      <svg viewBox="0 0 260 250" style="width:100%;height:auto;margin-top:12px;overflow:visible">
+        <sc-for list="{{ radarGrid }}" as="g" hint-placeholder-count="4">
+          <polygon points="{{ g.pts }}" fill="none" stroke="{{ g.stroke }}" stroke-width="1"></polygon>
+        </sc-for>
+        <sc-for list="{{ radarAxes }}" as="a" hint-placeholder-count="5">
+          <line x1="{{ a.x1 }}" y1="{{ a.y1 }}" x2="{{ a.x2 }}" y2="{{ a.y2 }}" stroke="var(--color-divider)" stroke-width="1"></line>
+        </sc-for>
+        <polygon points="{{ radarPoly }}" fill="color-mix(in srgb, #ec3013 22%, transparent)" stroke="#ec3013" stroke-width="2"></polygon>
+        <sc-for list="{{ radarDots }}" as="p" hint-placeholder-count="5">
+          <circle cx="{{ p.x }}" cy="{{ p.y }}" r="3.5" fill="#ec3013"></circle>
+        </sc-for>
+        <sc-for list="{{ radarLabels }}" as="l" hint-placeholder-count="5">
+          <text x="{{ l.x }}" y="{{ l.y }}" text-anchor="{{ l.anchor }}" font-size="10" letter-spacing="0.08em" fill="#605d5d">{{ l.text }}</text>
+        </sc-for>
+      </svg>
+      <div style="border-top:2px solid var(--color-divider)">
+        <sc-for list="{{ profileRows }}" as="p" hint-placeholder-count="5">
+          <div style="display:grid;grid-template-columns:88px 1fr 28px;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--color-divider)">
+            <span style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--color-neutral-700)">{{ p.label }}</span>
+            <span style="height:6px;background:var(--color-neutral-300);display:block"><span style="display:block;height:6px;background:var(--color-accent);width:{{ p.pct }}"></span></span>
+            <span style="font-size:12px;font-weight:800;text-align:right;font-variant-numeric:tabular-nums">{{ p.val }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <h4 style="margin:34px 0 0;padding-bottom:12px;border-bottom:2px solid var(--color-divider)">기록 ORIGIN</h4>
+      <table class="table"><tbody>
+        <sc-for list="{{ originRows }}" as="o" hint-placeholder-count="3">
+          <tr><td style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-600);width:38%">{{ o.label }}</td><td style="font-weight:500">{{ o.value }}</td></tr>
+        </sc-for>
+      </tbody></table>
+    </div>
+  </div>
+
+  <!-- EDITORIAL -->
+  <div style="margin-top:52px;border-top:2px solid var(--color-divider);padding-top:32px;display:grid;grid-template-columns:1fr 1fr;gap:44px">
+    <div>
+      <h6 style="color:var(--color-accent);margin:0 0 14px">Story &amp; Origin</h6>
+      <h2 style="font-family:'Noto Serif KR',serif;font-weight:600;font-size:38px;line-height:1.2;letter-spacing:-.01em;margin:0 0 18px">{{ d.storyTitle }}</h2>
+      <p style="font-family:'Noto Serif KR',serif;font-size:16.5px;line-height:1.85;color:var(--color-neutral-900);max-width:46ch">{{ d.story1 }}</p>
+      <p style="font-family:'Noto Serif KR',serif;font-size:16.5px;line-height:1.85;color:var(--color-neutral-900);max-width:46ch">{{ d.story2 }}</p>
+    </div>
+    <div>
+      <figure class="grayscale" style="position:relative;aspect-ratio:3/2;background:var(--color-neutral-300)">
+        <div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,transparent 0 15px,color-mix(in srgb,var(--color-neutral-900) 7%,transparent) 15px 16px)"></div>
+        <div style="position:absolute;top:12px;left:12px;font-size:10px;letter-spacing:.14em;color:var(--color-neutral-700)">EDITORIAL IMAGE 3:2 — PLACEHOLDER</div>
+      </figure>
+      <figcaption style="margin-top:6px">에디토리얼 이미지 자리. 사진은 흑백(grayscale)으로 출력됩니다.</figcaption>
+      <div style="margin-top:24px;border-top:2px solid var(--color-divider);padding-top:16px">
+        <h6 style="margin:0 0 10px">같은 기주 RELATED</h6>
+        <div style="display:flex;flex-direction:column">
+          <sc-for list="{{ related }}" as="r" hint-placeholder-count="3">
+            <button class="btn" style="justify-content:space-between;width:100%;padding:12px 0;border-bottom:1px solid var(--color-divider);font-weight:400" onClick="{{ r.open }}">
+              <span style="font-weight:800;font-size:15px">{{ r.ko }}<span style="font-weight:400;font-size:11px;letter-spacing:.06em;color:var(--color-neutral-600);margin-left:8px">{{ r.en }}</span></span>
+              <span style="font-size:12px;font-variant-numeric:tabular-nums;color:var(--color-neutral-700)">{{ r.abv }}% · {{ r.sweetKo }}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isFinder }}" hint-placeholder-val="{{ false }}">
+<div style="padding:0 32px 72px;max-width:1120px">
+  <div style="padding:36px 0 20px;border-bottom:2px solid var(--color-divider)">
+    <h6 style="margin:0 0 10px;color:var(--color-accent)">Interactive finder</h6>
+    <h1 style="font-size:56px;margin:0">취향 파인더<span style="font-weight:400;font-size:26px;letter-spacing:0;margin-left:14px;color:var(--color-neutral-700)">4 questions</span></h1>
+  </div>
+
+  <sc-if value="{{ quizRunning }}" hint-placeholder-val="{{ true }}">
+  <div style="display:grid;grid-template-columns:220px 1fr;gap:44px;padding-top:32px">
+    <div>
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-600);margin-bottom:10px">진행 PROGRESS</div>
+      <div style="display:flex;flex-direction:column;gap:0;border-top:2px solid var(--color-divider)">
+        <sc-for list="{{ quizNav }}" as="q" hint-placeholder-count="4">
+          <div style="display:grid;grid-template-columns:22px 1fr;gap:10px;padding:11px 0;border-bottom:1px solid var(--color-divider);{{ q.style }}">
+            <span style="font-size:11px;font-weight:800">{{ q.n }}</span>
+            <span style="font-size:12px;line-height:1.35">{{ q.label }}<div style="font-size:11px;font-weight:800;margin-top:2px">{{ q.answer }}</div></span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="margin-top:20px;font-size:11px;color:var(--color-neutral-600)">현재 후보 <span style="font-weight:800;font-size:15px;color:var(--color-text)">{{ candidateCount }}</span>종</div>
+    </div>
+    <div>
+      <div style="border:2px solid var(--color-divider);background:var(--color-surface);padding:36px 36px 30px">
+        <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent);margin-bottom:16px">QUESTION {{ qNum }} / 4</div>
+        <h2 style="font-size:40px;line-height:1.15;margin:0 0 8px;max-width:24ch">{{ qTitle }}</h2>
+        <div style="font-size:13px;color:var(--color-neutral-700);margin-bottom:28px">{{ qHint }}</div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
+          <sc-for list="{{ qOpts }}" as="o" hint-placeholder-count="4">
+            <button class="btn" style="{{ o.style }}" onClick="{{ o.pick }}">
+              <span style="display:block;text-align:left"><span style="display:block;font-size:17px;font-weight:800">{{ o.ko }}</span><span style="display:block;font-size:11px;font-weight:400;letter-spacing:.06em;color:var(--color-neutral-700);margin-top:3px">{{ o.en }}</span></span>
+            </button>
+          </sc-for>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:28px;padding-top:16px;border-top:1px solid var(--color-divider)">
+          <button class="btn btn-secondary" style="{{ backStyle }}" onClick="{{ quizBack }}">← 이전</button>
+          <button class="btn btn-ghost" onClick="{{ quizReset }}">처음부터 RESTART</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ quizDone }}" hint-placeholder-val="{{ false }}">
+  <div style="padding-top:32px">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;padding-bottom:12px;border-bottom:2px solid var(--color-divider)">
+      <h4 style="margin:0">추천 결과 TOP 3<span style="font-weight:400;font-size:13px;color:var(--color-neutral-700);margin-left:12px">{{ answerSummary }}</span></h4>
+      <button class="btn btn-secondary" onClick="{{ quizReset }}">다시 하기 RESTART</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:24px">
+      <sc-for list="{{ results }}" as="r" hint-placeholder-count="3">
+        <div style="{{ r.style }}">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--color-divider)">
+            <span style="font-size:11px;letter-spacing:.12em;font-weight:800">RANK {{ r.rank }}</span>
+            <span style="font-variant-numeric:tabular-nums;font-size:26px;font-weight:800">{{ r.match }}<span style="font-size:12px">%</span></span>
+          </div>
+          <div class="grayscale" style="position:relative;aspect-ratio:4/3;background:var(--color-neutral-300)">
+            <div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,transparent 0 13px,color-mix(in srgb,var(--color-neutral-900) 7%,transparent) 13px 14px)"></div>
+            <div style="position:absolute;bottom:12px;left:14px;font-family:'Noto Serif KR',serif;font-size:17px;color:var(--color-neutral-900)">{{ r.en }}</div>
+          </div>
+          <div style="padding:14px 16px 16px">
+            <div style="font-size:22px;font-weight:800;line-height:1.15">{{ r.ko }}</div>
+            <div style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--color-neutral-700);margin-bottom:10px">{{ r.en }}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">
+              <span class="tag tag-neutral" style="border:1px solid var(--color-divider)">{{ r.base }}</span>
+              <span class="tag" style="{{ r.sweetStyle }}">{{ r.sweetKo }}</span>
+              <span class="tag tag-neutral" style="border:1px solid var(--color-divider)">{{ r.abv }}% ABV</span>
+            </div>
+            <div style="font-size:12.5px;line-height:1.55;color:var(--color-neutral-800);margin-bottom:12px">{{ r.why }}</div>
+            <button class="btn btn-primary btn-block" onClick="{{ r.open }}">레시피 보기 →</button>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;filterLayout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;sidebar&quot;,&quot;topbar&quot;],&quot;default&quot;:&quot;sidebar&quot;,&quot;tsType&quot;:&quot;'sidebar'|'topbar'&quot;,&quot;section&quot;:&quot;레이아웃&quot;},&quot;cardStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;photo&quot;,&quot;dense&quot;],&quot;default&quot;:&quot;photo&quot;,&quot;tsType&quot;:&quot;'photo'|'dense'&quot;,&quot;section&quot;:&quot;레이아웃&quot;}}">
+const FL = { citrus:'CITRUS 시트러스', herbal:'HERBAL 허브', smoky:'SMOKY 스모키', fruity:'FRUITY 과일', spicy:'SPICY 스파이스', bitter:'BITTER 비터', sour:'SOUR 산미' };
+const SW = [['드라이','Dry'],['세미 드라이','Semi-Dry'],['세미 스위트','Semi-Sweet'],['스위트','Sweet']];
+const BASES = ['진','보드카','위스키','럼','데킬라','전통주','무알콜'];
+
+function c(id, ko, en, base, abv, sw, flavors, glass, method, summary, ing, steps, origin, story) {
+  return { id, ko, en, base, abv, sw, flavors, glass, method, summary, ing, steps, origin, story };
+}
+
+const DATA = [
+  c('negroni','네그로니','Negroni','진',24,0,['bitter','herbal','citrus'],'올드 패션드','Stir','동량 배합의 교본. 캄파리의 쓴맛과 베르무트의 단맛이 진의 주니퍼 위에서 정확히 상쇄된다.',
+    [['진','Dry Gin',30],['캄파리','Campari',30,'아페롤 — 쓴맛이 절반으로 줄고 오렌지 향이 앞섭니다. 도수도 2% 정도 내려갑니다.'],['스위트 베르무트','Sweet Vermouth',30,'푼트 에 메스 — 쓴맛이 더 강해집니다. 반대로 카르파노 안티카는 바닐라 톤이 올라옵니다.'],['오렌지 필','Orange Peel',0,null,'1조각']],
+    ['믹싱 글라스에 얼음을 가득 채우고 세 재료를 붓는다.','20~25회 스터. 표면에 서리가 앉으면 충분하다.','큰 얼음을 넣은 올드 패션드 글라스에 스트레인한다.','오렌지 필의 껍질을 짜 오일을 뿌리고 글라스에 넣는다.'],
+    {y:'1919년경',p:'피렌체, 이탈리아',c:'카밀로 네그로니 백작 (구전)'},
+    ['쓴맛을 배우는 첫 잔','아메리카노에 소다 대신 진을 넣어달라는 주문에서 시작됐다는 이야기는 확인된 문서가 없다. 다만 1919년 피렌체의 카페 카소니에서 이 배합이 팔리고 있었다는 정황은 여러 기록에서 겹친다.','세 재료를 같은 양으로 쓰는 구조 덕분에 네그로니는 레시피가 아니라 비율로 기억된다. 진을 45ml로 올리면 드라이해지고, 베르무트를 45ml로 올리면 디저트에 가까워진다. 아카이브에서는 1:1:1을 기준값으로 둔다.']),
+  c('martini','마티니','Dry Martini','진',30,0,['herbal','citrus'],'칵테일','Stir','드라이 베르무트의 양이 전부를 결정한다. 온도는 −3℃ 이하로 유지한다.',
+    [['진','Dry Gin',60],['드라이 베르무트','Dry Vermouth',10,'릴레 블랑 — 단맛과 감귤 향이 조금 붙습니다.'],['오렌지 비터스','Orange Bitters',0,null,'1 dash'],['레몬 필','Lemon Peel',0,null,'1조각']],
+    ['믹싱 글라스와 잔을 미리 얼려둔다.','얼음과 재료를 넣고 25회 스터한다.','얼린 칵테일 글라스에 더블 스트레인한다.','레몬 필로 오일을 뿌린다. 올리브를 쓰면 짠맛 계열로 바뀐다.'],
+    {y:'1888년 이전',p:'뉴욕, 미국',c:'불명 — 마티네즈에서 파생'},
+    ['가장 적게 넣는 기술','마티니의 역사는 베르무트가 줄어드는 역사다. 19세기 마티네즈는 단맛이 분명했고, 20세기 중반에 이르러 베르무트는 잔을 적시는 정도로 남았다.','아카이브 기준값은 6:1이다. 여기서 베르무트를 20ml까지 올리면 50-50, 5ml 이하로 내리면 사실상 차가운 진이다.']),
+  c('gimlet','김렛','Gimlet','진',26,1,['citrus','sour'],'칵테일','Shake','라임 코디얼의 단맛과 진의 골격이 만나는 가장 단순한 사워.',
+    [['진','Dry Gin',60],['라임 주스','Lime Juice',20],['설탕 시럽','Simple Syrup 1:1',15,'라임 코디얼 — 원형에 가깝고 단맛이 둥글어집니다.']],
+    ['셰이커에 재료를 넣고 얼음을 채운다.','12초 하드 셰이크.','얼린 칵테일 글라스에 더블 스트레인한다.'],
+    {y:'1928년 기록',p:'런던, 영국',c:'영국 해군 관행에서 유래'},
+    ['비타민C의 칵테일','라임 코디얼은 원래 항해 중 비타민 결핍을 막기 위한 보급품이었다. 진과 섞은 것은 그 다음 일이다.','생라임과 시럽으로 만들면 산미가 날카롭고, 코디얼로 만들면 향이 둥글다. 두 방식은 다른 음료로 취급해도 무리가 없다.']),
+  c('gintonic','진토닉','Gin & Tonic','진',12,1,['citrus','bitter'],'하이볼','Build','희석의 정확도가 맛을 만든다. 얼음은 크고 단단할수록 좋다.',
+    [['진','Dry Gin',45],['토닉워터','Tonic Water',120],['라임 웨지','Lime Wedge',0,null,'1조각']],
+    ['하이볼 글라스에 얼음을 가득 채워 잔을 식힌다.','진을 붓고 토닉을 글라스 벽면을 따라 천천히 따른다.','바 스푼으로 한 번만 들어올린다. 탄산을 지키는 것이 목적이다.'],
+    {y:'1850년대',p:'인도 주둔 영국군',c:'키니네 복용 관행'},
+    ['약이었던 배합','토닉의 키니네는 말라리아 예방약이었다. 쓴맛을 견디기 위해 진과 설탕, 라임을 더한 것이 이 잔의 시작이다.','토닉의 당도가 완성도를 좌우한다. 아카이브는 진 1 : 토닉 2.5~3을 기준으로 잡는다.']),
+  c('southside','사우스사이드','Southside','진',22,1,['herbal','citrus'],'칵테일','Shake','민트를 넣은 진 사워. 모히토의 진 버전으로 읽어도 된다.',
+    [['진','Dry Gin',50],['레몬 주스','Lemon Juice',20],['설탕 시럽','Simple Syrup',18],['민트','Mint Leaves',0,null,'8장']],
+    ['셰이커에 민트를 넣고 가볍게 눌러 향만 낸다.','나머지 재료와 얼음을 넣고 10초 셰이크.','더블 스트레인해 민트 잎 하나를 띄운다.'],
+    {y:'1920년대',p:'시카고 / 뉴욕',c:'금주법 시대 클럽'},
+    ['금주법의 잔','거칠던 밀주 진의 맛을 감추기 위해 민트와 레몬을 썼다는 설명이 오래 따라다닌다.','민트를 세게 눌러 으깨면 풀비린내가 난다. 향만 깨우는 정도가 기준이다.']),
+  c('mule','모스코 뮬','Moscow Mule','보드카',12,2,['spicy','citrus'],'구리 머그','Build','진저비어의 매운맛이 중심. 보드카는 뼈대만 세운다.',
+    [['보드카','Vodka',45],['라임 주스','Lime Juice',15],['진저비어','Ginger Beer',120,'진저에일 — 매운맛이 크게 줄어듭니다. 생강 시럽 5ml를 더해 보완합니다.']],
+    ['머그에 얼음을 채우고 보드카와 라임을 붓는다.','진저비어로 채운 뒤 한 번만 젓는다.','라임 웨지를 올린다.'],
+    {y:'1941년',p:'로스앤젤레스, 미국',c:'잭 모건 · 존 마틴'},
+    ['재고 처리의 성공작','팔리지 않던 보드카와 진저비어를 묶어 팔기 위한 상업적 발명이었다.','구리 머그는 마케팅에서 왔지만, 열전도가 빨라 실제로 잔이 더 차게 느껴진다.']),
+  c('espresso','에스프레소 마티니','Espresso Martini','보드카',20,2,['bitter','fruity'],'칵테일','Shake','크레마 층이 완성도의 지표. 커피는 뽑은 직후에 쓴다.',
+    [['보드카','Vodka',45],['에스프레소','Espresso',30],['커피 리큐어','Coffee Liqueur',15,'깔루아 대신 미스터 블랙 — 단맛이 줄고 커피 강도가 올라갑니다.'],['설탕 시럽','Simple Syrup',5]],
+    ['에스프레소를 뽑아 곧바로 셰이커에 넣는다.','얼음을 채우고 15초 강하게 셰이크한다.','더블 스트레인하고 크레마가 자리 잡을 때까지 20초 둔다.','커피 원두 세 알을 올린다.'],
+    {y:'1983년',p:'런던, 영국',c:'딕 브래드셀'},
+    ['깨워달라는 주문','한 손님이 정신을 차리게 해달라고 부탁한 데서 나왔다는 일화가 널리 알려져 있다.','거품은 커피의 오일과 이산화탄소에서 나온다. 뽑고 1분이 지난 에스프레소로는 같은 층이 생기지 않는다.']),
+  c('bloody','블러디 메리','Bloody Mary','보드카',12,0,['spicy','sour'],'하이볼','Build','짠맛·감칠맛 계열. 단맛이 거의 없는 유일한 브런치 잔.',
+    [['보드카','Vodka',45],['토마토 주스','Tomato Juice',120],['레몬 주스','Lemon Juice',15],['우스터소스 · 타바스코','Worcestershire · Tabasco',0,null,'각 2 dash']],
+    ['하이볼 글라스에 얼음을 채운다.','모든 재료를 넣고 롤링(잔 사이를 오가며 섞기)한다.','셀러리와 후추로 마무리한다.'],
+    {y:'1921년경',p:'파리 → 뉴욕',c:'페르낭 프티오'},
+    ['식사에 가까운 잔','스파이스와 산·염을 함께 쓰는 구조라 칵테일보다 수프의 조리 논리에 가깝다.','정답 레시피가 없는 대신 균형 원칙이 있다. 산 : 염 : 매운맛을 각각 따로 조절한다.']),
+  c('cosmo','코즈모폴리탄','Cosmopolitan','보드카',22,2,['fruity','citrus'],'칵테일','Shake','크랜베리의 색과 트리플 섹의 오렌지 향. 산미가 축이 된다.',
+    [['시트론 보드카','Citron Vodka',45],['쿠앵트로','Cointreau',15,'트리플 섹 — 단맛이 더 직선적이고 향의 층이 얇아집니다.'],['라임 주스','Lime Juice',15],['크랜베리 주스','Cranberry Juice',30]],
+    ['모든 재료와 얼음을 셰이커에 넣는다.','10초 셰이크.','얼린 칵테일 글라스에 더블 스트레인하고 오렌지 필로 오일을 뿌린다.'],
+    {y:'1987년',p:'샌프란시스코, 미국',c:'토비 체키니 (통설)'},
+    ['색이 만든 유행','1990년대에 이 잔이 팔린 이유의 절반은 맛이 아니라 색이었다.','크랜베리를 60ml까지 늘리면 주스에 가까워진다. 30ml가 산미와 색을 모두 지키는 지점이다.']),
+  c('oldfashioned','올드 패션드','Old Fashioned','위스키',32,1,['spicy','bitter'],'올드 패션드','Stir','술·설탕·비터스·물. 칵테일의 정의 그 자체.',
+    [['버번 또는 라이','Bourbon / Rye',60,'라이 위스키 — 스파이스가 앞서고 단맛이 마릅니다.'],['설탕 시럽','Rich Syrup 2:1',7],['앙고스투라 비터스','Angostura Bitters',0,null,'2 dash'],['오렌지 필','Orange Peel',0,null,'1조각']],
+    ['잔에 시럽과 비터스를 넣고 섞는다.','위스키를 절반 붓고 얼음 하나로 젓는다.','남은 위스키와 큰 얼음을 넣고 20회 젓는다.','오렌지 필로 오일을 뿌린다.'],
+    {y:'1880년대',p:'루이빌, 미국',c:'펜던니스 클럽 (통설)'},
+    ['원형이라는 이름','\u201c옛날식으로\u201d라는 주문이 그대로 이름이 됐다. 즉 이 잔은 어떤 칵테일보다 오래된 구조를 가리킨다.','희석이 유일한 변수다. 큰 얼음 하나로 천천히 마시는 전제로 설계된 배합이다.']),
+  c('manhattan','맨해튼','Manhattan','위스키',30,1,['bitter','fruity'],'칵테일','Stir','라이의 스파이스와 스위트 베르무트. 네그로니와 마티니 사이.',
+    [['라이 위스키','Rye Whiskey',60],['스위트 베르무트','Sweet Vermouth',30],['앙고스투라 비터스','Angostura Bitters',0,null,'2 dash'],['마라스키노 체리','Cherry',0,null,'1개']],
+    ['믹싱 글라스에 재료와 얼음을 넣는다.','25회 스터.','얼린 칵테일 글라스에 스트레인하고 체리를 넣는다.'],
+    {y:'1880년대',p:'뉴욕, 미국',c:'맨해튼 클럽 (통설)'},
+    ['비율의 문제','2:1은 기준이고, 1:1은 퍼펙트에 가깝다. 베르무트의 상태가 이 잔의 수명을 결정한다.','개봉한 베르무트는 냉장 보관해도 3주가 한계다. 맨해튼이 실패하는 대부분의 이유가 여기에 있다.']),
+  c('whiskeysour','위스키 사워','Whiskey Sour','위스키',20,2,['sour','citrus'],'쿠페','Shake','사워 공식(술 2 : 산 1 : 당 1)의 표준 예시.',
+    [['버번','Bourbon',50],['레몬 주스','Lemon Juice',25],['설탕 시럽','Simple Syrup',20],['달걀 흰자','Egg White',0,'아쿠아파바 15ml — 비건 대체가 가능하고 거품이 더 안정적입니다.','15ml']],
+    ['얼음 없이 재료를 넣고 15초 드라이 셰이크한다.','얼음을 넣고 다시 12초 셰이크한다.','쿠페 글라스에 더블 스트레인하고 비터스로 표면에 점을 찍는다.'],
+    {y:'1862년 수록',p:'미국',c:'제리 토머스 저서'},
+    ['공식으로서의 사워','사워는 이름이 아니라 비율이다. 술과 산, 당의 삼각형만 지키면 재료는 교체 가능하다.','흰자는 맛보다 질감을 위한 재료다. 넣지 않으면 산미가 더 뚜렷해진다.']),
+  c('penicillin','페니실린','Penicillin','위스키',22,2,['smoky','spicy'],'올드 패션드','Shake','생강·꿀·레몬에 아일라 위스키의 연기를 얹은 현대 고전.',
+    [['블렌디드 스코치','Blended Scotch',50],['아일라 싱글몰트','Islay Single Malt',7],['레몬 주스','Lemon Juice',22],['생강 꿀 시럽','Honey-Ginger Syrup',22,'꿀 시럽 + 생강즙 5ml로 즉석 대체가 가능합니다.']],
+    ['아일라를 뺀 재료를 셰이크한다.','얼음을 넣은 잔에 스트레인한다.','아일라 위스키를 표면에 띄운다(플로트).','생강 절임을 올린다.'],
+    {y:'2005년',p:'뉴욕, 미국',c:'샘 로스'},
+    ['현대의 고전','2000년대 이후 만들어진 칵테일 중 가장 널리 복제된 배합이다.','연기를 섞지 않고 위에 띄우는 것이 핵심이다. 첫 향과 끝 맛이 분리된다.']),
+  c('boulevardier','불바디에','Boulevardier','위스키',26,1,['bitter','fruity'],'올드 패션드','Stir','네그로니의 위스키 버전. 진보다 무게가 있고 단맛이 길다.',
+    [['버번 또는 라이','Bourbon / Rye',45],['캄파리','Campari',30],['스위트 베르무트','Sweet Vermouth',30]],
+    ['믹싱 글라스에 재료와 얼음을 넣는다.','25회 스터.','큰 얼음 위에 스트레인하고 오렌지 필을 짠다.'],
+    {y:'1927년',p:'파리, 프랑스',c:'어스킨 그웬 (잡지 편집자)'},
+    ['잡지에서 나온 잔','파리에서 발행된 소책자에 실린 배합이 그대로 이름과 함께 남았다.','위스키를 45ml로 올려 캄파리보다 우위에 두는 것이 현행 표준이다.']),
+  c('daiquiri','다이키리','Daiquiri','럼',24,1,['citrus','sour'],'쿠페','Shake','럼의 품질이 그대로 드러난다. 세 재료 뒤에 숨을 곳이 없다.',
+    [['화이트 럼','White Rum',60],['라임 주스','Lime Juice',25],['설탕 시럽','Simple Syrup',18]],
+    ['재료와 얼음을 셰이커에 넣는다.','12초 하드 셰이크.','얼린 쿠페 글라스에 더블 스트레인한다.'],
+    {y:'1898년경',p:'산티아고, 쿠바',c:'제닝스 콕스 (통설)'},
+    ['바텐더의 시험지','바를 평가할 때 다이키리를 주문하는 관행은 이 잔이 기술을 감추지 못하기 때문이다.','시럽 18ml는 라임의 산도에 따라 조정한다. 라임이 날카로운 계절에는 20ml까지 올린다.']),
+  c('mojito','모히토','Mojito','럼',13,2,['herbal','citrus'],'하이볼','Build','민트 향, 라임 산미, 탄산의 세 층이 분리되어 있어야 한다.',
+    [['화이트 럼','White Rum',45],['라임 주스','Lime Juice',20],['설탕 시럽','Simple Syrup',20],['민트','Mint',0,null,'10장'],['소다','Soda Water',60]],
+    ['잔에 민트와 시럽을 넣고 가볍게 누른다.','라임과 럼을 붓고 크러시드 아이스를 채운다.','스푼으로 아래에서 위로 한 번 들어올린다.','소다로 채우고 민트 다발을 올린다.'],
+    {y:'19세기',p:'하바나, 쿠바',c:'불명'},
+    ['눌러 으깨지 않는다','민트를 으깨면 엽록소의 쓴맛이 나온다. 향이 올라올 정도로만 압을 준다.','크러시드 아이스는 희석 속도가 빠르다. 그래서 시럽이 20ml까지 들어간다.']),
+  c('maitai','마이 타이','Mai Tai','럼',26,2,['fruity','citrus'],'올드 패션드','Shake','오르자(아몬드 시럽)가 향의 중심. 과일 주스는 들어가지 않는다.',
+    [['자메이카 럼','Jamaican Rum',30],['아그리콜 럼','Rhum Agricole',30],['오렌지 큐라소','Orange Curaçao',15,'쿠앵트로 — 색이 맑아지고 단맛이 가벼워집니다.'],['오르자 시럽','Orgeat',15],['라임 주스','Lime Juice',22]],
+    ['크러시드 아이스와 재료를 셰이커에 넣고 짧게 흔든다.','잔에 얼음까지 그대로 붓는다.','짜낸 라임 껍질과 민트를 올린다.'],
+    {y:'1944년',p:'오클랜드, 미국',c:'빅터 버제론'},
+    ['파인애플은 없다','대량 판매용 마이 타이가 과일 주스로 채워지며 원형과 멀어졌다. 원 배합에 파인애플은 없다.','두 종류의 럼을 쓰는 이유는 무게(자메이카)와 풀 향(아그리콜)을 동시에 얻기 위해서다.']),
+  c('darknstormy','다크 앤 스토미','Dark \u2019n\u2019 Stormy','럼',14,2,['spicy','fruity'],'하이볼','Build','층을 만들어 마시는 구조. 섞지 않고 낸다.',
+    [['다크 럼','Dark Rum',60],['진저비어','Ginger Beer',120],['라임 웨지','Lime Wedge',0,null,'1조각']],
+    ['잔에 얼음과 진저비어를 먼저 붓는다.','다크 럼을 스푼 뒤로 흘려 위에 띄운다.','라임을 곁들여 그대로 낸다.'],
+    {y:'20세기 초',p:'버뮤다',c:'고슬링스 럼'},
+    ['상표가 된 배합','버뮤다에서는 이 이름과 배합이 상표로 관리된다.','럼을 띄우면 첫 모금은 생강, 마지막은 당밀이다. 섞으면 이 대비가 사라진다.']),
+  c('margarita','마르가리타','Margarita','데킬라',24,1,['citrus','sour'],'쿠페','Shake','소금·산·단맛 세 축의 균형. 데킬라는 100% 아가베를 쓴다.',
+    [['블랑코 데킬라','Blanco Tequila',50],['쿠앵트로','Cointreau',20,'트리플 섹 — 향의 폭이 좁아집니다. 아가베 시럽 10ml로 바꾸면 토미스 스타일이 됩니다.'],['라임 주스','Lime Juice',25],['소금','Salt Rim',0,null,'림 절반']],
+    ['잔 테두리 절반에만 소금을 묻힌다.','재료와 얼음을 넣고 12초 셰이크.','더블 스트레인하고 라임 휠을 올린다.'],
+    {y:'1930~40년대',p:'멕시코 / 미국 국경',c:'다수의 주장'},
+    ['소금은 절반만','림 전체에 소금을 묻히면 선택권이 사라진다. 절반만 묻히는 것이 현행 관행이다.','쿠앵트로를 아가베 시럽으로 바꾸면 데킬라의 식물성 향이 훨씬 선명해진다.']),
+  c('paloma','팔로마','Paloma','데킬라',14,2,['citrus','fruity'],'하이볼','Build','멕시코에서 실제로 가장 많이 마시는 데킬라 롱드링크.',
+    [['블랑코 데킬라','Blanco Tequila',50],['자몽 소다','Grapefruit Soda',120,'생자몽 60ml + 소다 60ml + 시럽 5ml로 대체하면 단맛이 크게 줄어듭니다.'],['라임 주스','Lime Juice',15],['소금','Salt',0,null,'1핀치']],
+    ['잔에 얼음을 채우고 데킬라와 라임을 넣는다.','자몽 소다로 채운다.','소금 한 꼬집을 넣고 한 번 젓는다.'],
+    {y:'1950년대',p:'멕시코',c:'불명'},
+    ['소금 한 꼬집','소금은 짠맛을 위해서가 아니라 자몽의 쓴맛을 눌러 단맛을 끌어올리기 위해 들어간다.','생자몽으로 만들면 완전히 다른 잔이 된다. 아카이브는 두 방식을 모두 표준으로 본다.']),
+  c('sojuhighball','소주 하이볼','Soju Highball','전통주',9,1,['citrus'],'하이볼','Build','증류식 소주의 곡물 향을 탄산으로 늘린 구조. 희석률이 관건.',
+    [['증류식 소주','Distilled Soju',45,'40도대 소주를 쓰면 30ml로 줄입니다.'],['탄산수','Soda Water',120],['레몬 필','Lemon Peel',0,null,'1조각']],
+    ['잔과 소주를 미리 차게 둔다.','얼음을 가득 채우고 소주를 붓는다.','탄산수를 벽면을 따라 붓고 한 번만 들어올린다.','레몬 필의 오일을 뿌린다.'],
+    {y:'2010년대',p:'서울, 한국',c:'국내 바 씬'},
+    ['희석의 문화','일본식 하이볼 문법이 증류식 소주에 그대로 옮겨오면서 정착한 형식이다.','25도 소주는 1:2.5, 40도대는 1:4를 기준으로 잡는다. 곡물 향이 남는 선이다.']),
+  c('munbae','문배 올드 패션드','Munbae Old Fashioned','전통주',28,1,['smoky','spicy'],'올드 패션드','Stir','문배주의 배·수수 향을 올드 패션드 구조에 넣은 응용 배합.',
+    [['문배주 40도','Munbaeju 40%',60],['조청 시럽','Jocheong Syrup',8,'꿀 시럽 — 곡물 향이 줄고 꽃 향이 붙습니다.'],['앙고스투라 비터스','Angostura Bitters',0,null,'2 dash'],['배 껍질','Pear Peel',0,null,'1조각']],
+    ['잔에 조청 시럽과 비터스를 넣고 섞는다.','문배주를 붓고 큰 얼음으로 20회 젓는다.','배 껍질의 향을 뿌리고 넣는다.'],
+    {y:'2010년대 응용',p:'한국',c:'아카이브 편집부 배합'},
+    ['전통주의 좌표','문배주는 배를 넣지 않는데도 배 향이 난다. 이 향은 수수와 좁쌀의 발효에서 온다.','조청은 설탕보다 점도가 높아 5~8ml에서 이미 충분한 무게가 붙는다.']),
+  c('makgeolli','막걸리 콜라다','Makgeolli Colada','전통주',8,3,['fruity'],'하이볼','Shake','막걸리의 유산 향과 코코넛·파인애플. 가장 단 항목.',
+    [['막걸리','Makgeolli',90],['화이트 럼','White Rum',20,'생략하면 무알콜에 가까운 3% 대가 됩니다.'],['코코넛 크림','Coconut Cream',25],['파인애플 주스','Pineapple Juice',40]],
+    ['막걸리를 흔들어 침전물을 고르게 섞는다.','모든 재료를 얼음과 함께 짧게 셰이크한다.','크러시드 아이스 위에 붓고 파인애플을 올린다.'],
+    {y:'2020년대',p:'한국',c:'아카이브 편집부 배합'},
+    ['단맛의 상한','아카이브의 24개 항목 중 당도가 가장 높다. 디저트 자리에 놓기 위한 배합이다.','막걸리는 살균/비살균에 따라 산미 차이가 크다. 비살균 제품은 파인애플을 30ml로 줄인다.']),
+  c('shrub','시트러스 슈럽','Citrus Shrub (NA)','무알콜',0,2,['citrus','sour'],'하이볼','Build','식초 기반 시럽으로 산미의 층을 만든 무알콜 항목.',
+    [['시트러스 슈럽 시럽','Citrus Shrub Syrup',35,'애플사이다 비니거 15ml + 설탕 시럽 20ml로 즉석 조합이 가능합니다.'],['탄산수','Soda Water',140],['자몽 주스','Grapefruit Juice',30],['로즈마리','Rosemary',0,null,'1줄기']],
+    ['잔에 얼음을 채우고 슈럽과 자몽을 붓는다.','탄산수로 채우고 한 번 젓는다.','로즈마리를 손바닥에 쳐 향을 내고 올린다.'],
+    {y:'17세기 보존법',p:'유럽 → 현대 바',c:'식초 보존 전통'},
+    ['알코올 없는 골격','무알콜 음료가 심심해지는 이유는 대개 산미와 쓴맛이 없기 때문이다. 식초는 그 자리를 메운다.','식초의 양이 3ml만 넘어도 균형이 무너진다. 슈럽 시럽으로 미리 배합해 쓰는 편이 안정적이다.'])
+];
+
+const PROFILES = {
+  negroni:[2,1,5,4,4], martini:[1,1,2,4,5], gimlet:[3,4,1,2,4], gintonic:[2,2,3,3,2], southside:[3,4,1,4,3],
+  mule:[3,3,1,3,2], espresso:[3,1,4,4,3], bloody:[1,3,2,3,2], cosmo:[3,4,1,3,3],
+  oldfashioned:[2,1,3,4,5], manhattan:[3,1,3,4,5], whiskeysour:[3,5,1,3,3], penicillin:[3,4,2,5,3], boulevardier:[3,1,4,4,4],
+  daiquiri:[3,4,1,3,4], mojito:[3,3,1,4,2], maitai:[4,4,1,5,4], darknstormy:[4,2,1,3,2],
+  margarita:[3,5,1,3,4], paloma:[3,3,2,3,2], sojuhighball:[2,1,1,3,2], munbae:[2,1,3,5,5], makgeolli:[5,2,1,3,1], shrub:[3,4,2,4,0]
+};
+const AXES = ['SWEET','SOUR','BITTER','AROMA','PUNCH'];
+const AXES_KO = ['단맛','산미','쓴맛','향 강도','알코올'];
+
+const QUESTIONS = [
+  { key:'abv', title:'오늘 원하는 도수는 어느 정도인가요?', hint:'잔당 알코올 총량 기준으로 후보를 좁힙니다.',
+    opts:[{ko:'무알콜',en:'Non-alcoholic · 0%',v:0},{ko:'가볍게',en:'Light · ~14%',v:14},{ko:'적당히',en:'Medium · ~25%',v:25},{ko:'독하게',en:'Strong · 25%+',v:99}] },
+  { key:'sweet', title:'단맛은 얼마나 들어가길 원하시나요?', hint:'당도는 4단계로 색인되어 있습니다.',
+    opts:[{ko:'단맛 절대 사절',en:'Dry',v:0},{ko:'살짝 달콤',en:'Semi-Dry / Semi-Sweet',v:1},{ko:'달콤함 선호',en:'Sweet',v:3},{ko:'상관없음',en:'Any',v:-1}] },
+  { key:'flavor', title:'어떤 향에 끌리시나요?', hint:'맛/향 태그와 교차 대조합니다.',
+    opts:[{ko:'스모키',en:'Smoky / Peaty',v:'smoky'},{ko:'시트러스',en:'Citrus / Sour',v:'citrus'},{ko:'허브 · 풀',en:'Herbal',v:'herbal'},{ko:'커피 · 견과 · 쓴맛',en:'Bitter / Roasted',v:'bitter'}] },
+  { key:'base', title:'선호하는 기주가 있나요?', hint:'마지막 축입니다. 상관없음을 고르면 전 항목에서 추천합니다.',
+    opts:[{ko:'상관없음',en:'Any base',v:'any'},{ko:'진 · 보드카',en:'Gin / Vodka',v:'clear'},{ko:'위스키',en:'Whiskey',v:'위스키'},{ko:'럼 · 데킬라 · 전통주',en:'Rum / Tequila / Korean',v:'warm'}] }
+];
+
+class Component extends DCLogic {
+  state = { screen:'search', sweet:-1, bases:[], flavors:[], abvMax:45, query:'', sel:'negroni', servings:1, unit:'ml', subOpen:null, qi:0, ans:{} };
+
+  fmt(ml, mult) {
+    const t = ml * mult;
+    if (this.state.unit === 'ml') return Math.round(t * 10) / 10 + ' ml';
+    const oz = t / 30;
+    return (Math.round(oz * 100) / 100).toFixed(2).replace(/0$/, '').replace(/\.$/, '') + ' oz';
+  }
+  sweetStyle(lvl) {
+    const map = ['background:var(--color-neutral-200);color:var(--color-neutral-900);border:1px solid var(--color-neutral-400)',
+      'background:var(--color-accent-2-100);color:var(--color-accent-2-800);border:1px solid var(--color-accent-2-300)',
+      'background:var(--color-accent-200);color:var(--color-accent-800);border:1px solid var(--color-accent-300)',
+      'background:var(--color-accent);color:var(--color-bg);border:1px solid var(--color-accent)'];
+    return map[lvl] + ';white-space:nowrap';
+  }
+  filtered() {
+    const s = this.state, q = s.query.trim().toLowerCase();
+    return DATA.filter(x =>
+      (s.sweet < 0 || x.sw === s.sweet) &&
+      (!s.bases.length || s.bases.indexOf(x.base) >= 0) &&
+      (!s.flavors.length || s.flavors.every(f => x.flavors.indexOf(f) >= 0)) &&
+      x.abv <= s.abvMax &&
+      (!q || x.ko.toLowerCase().indexOf(q) >= 0 || x.en.toLowerCase().indexOf(q) >= 0)
+    ).sort((a, b) => a.abv - b.abv);
+  }
+  quizCandidates() {
+    const a = this.state.ans;
+    return DATA.filter(x => {
+      if (a.abv !== undefined) {
+        if (a.abv === 0 && x.abv > 0) return false;
+        if (a.abv === 14 && (x.abv === 0 || x.abv > 16)) return false;
+        if (a.abv === 25 && (x.abv < 12 || x.abv > 27)) return false;
+        if (a.abv === 99 && x.abv < 24) return false;
+      }
+      if (a.sweet !== undefined && a.sweet >= 0) {
+        if (a.sweet === 0 && x.sw !== 0) return false;
+        if (a.sweet === 1 && (x.sw < 1 || x.sw > 2)) return false;
+        if (a.sweet === 3 && x.sw < 2) return false;
+      }
+      if (a.base) {
+        if (a.base === 'clear' && ['진','보드카'].indexOf(x.base) < 0) return false;
+        if (a.base === '위스키' && x.base !== '위스키') return false;
+        if (a.base === 'warm' && ['럼','데킬라','전통주'].indexOf(x.base) < 0) return false;
+      }
+      return true;
+    });
+  }
+  score(x) {
+    const a = this.state.ans; let s = 62;
+    if (a.flavor && x.flavors.indexOf(a.flavor) >= 0) s += 22;
+    else if (a.flavor === 'citrus' && x.flavors.indexOf('sour') >= 0) s += 14;
+    else if (a.flavor === 'bitter' && x.flavors.indexOf('smoky') >= 0) s += 10;
+    if (a.sweet !== undefined && a.sweet >= 0) {
+      const target = a.sweet === 1 ? 1.5 : a.sweet;
+      s += Math.max(0, 10 - Math.abs(x.sw - target) * 5);
+    }
+    if (a.abv === 99 && x.abv >= 28) s += 6;
+    if (a.abv === 0 && x.abv === 0) s += 8;
+    if (a.base && a.base !== 'any') s += 4;
+    return Math.min(98, Math.round(s));
+  }
+
+  renderVals() {
+    const s = this.state, self = this;
+    const P = this.props;
+    const layout = P.filterLayout || 'sidebar';
+    const photoMode = (P.cardStyle || 'photo') === 'photo';
+    const tab = k => 'padding:7px 12px;font-size:12px;' + (s.screen === k
+      ? 'background:var(--color-accent);color:var(--color-bg);border-color:var(--color-accent)'
+      : 'border-color:var(--color-divider)');
+
+    const list = this.filtered();
+    const d = DATA.filter(x => x.id === s.sel)[0] || DATA[0];
+    const prof = PROFILES[d.id] || [3,3,3,3,3];
+
+    // radar geometry
+    const cx = 130, cy = 118, R = 88;
+    const pt = (i, v) => {
+      const ang = (-90 + i * 72) * Math.PI / 180;
+      return [cx + Math.cos(ang) * R * v / 5, cy + Math.sin(ang) * R * v / 5];
+    };
+    const ring = k => AXES.map((_, i) => pt(i, k).map(n => Math.round(n * 10) / 10).join(',')).join(' ');
+    const dots = prof.map((v, i) => { const p = pt(i, v); return { x: Math.round(p[0]), y: Math.round(p[1]) }; });
+
+    const rows = d.ing.map((ig, i) => ({
+      name: ig[0], en: ig[1],
+      amount: ig[4] ? ig[4] : (ig[2] ? this.fmt(ig[2], s.servings) : '—'),
+      hasSub: !!ig[3], toggleSub: () => this.setState({ subOpen: s.subOpen === i ? null : i })
+    }));
+    const openSub = s.subOpen !== null && d.ing[s.subOpen] ? d.ing[s.subOpen] : null;
+
+    const cand = this.quizCandidates();
+    const ranked = cand.map(x => ({ x, m: this.score(x) })).sort((a, b) => b.m - a.m).slice(0, 3);
+    const q = QUESTIONS[s.qi] || QUESTIONS[0];
+
+    return {
+      isSearch: s.screen === 'search', isDetail: s.screen === 'detail', isFinder: s.screen === 'finder',
+      tabSearchStyle: tab('search'), tabDetailStyle: tab('detail'), tabFinderStyle: tab('finder'),
+      goSearch: () => this.setState({ screen:'search' }),
+      goDetail: () => this.setState({ screen:'detail' }),
+      goFinder: () => this.setState({ screen:'finder' }),
+
+      layoutStyle: layout === 'sidebar'
+        ? 'display:grid;grid-template-columns:296px 1fr;gap:40px;padding-top:28px;align-items:start'
+        : 'display:block;padding-top:28px',
+      panelStyle: layout === 'sidebar'
+        ? 'position:sticky;top:78px;display:flex;flex-direction:column;gap:0;border-right:2px solid var(--color-divider);padding-right:24px'
+        : 'display:grid;grid-template-columns:1.15fr .9fr 1.15fr .8fr .8fr;gap:0 24px;border-bottom:2px solid var(--color-divider);padding-bottom:20px;margin-bottom:28px;align-items:start',
+      groupStyle: layout === 'sidebar'
+        ? 'padding:18px 0;border-bottom:1px solid var(--color-divider)'
+        : 'padding:16px 0 0',
+      gridStyle: 'display:grid;grid-template-columns:repeat(' + (layout === 'sidebar' ? 3 : 4) + ',1fr);gap:24px',
+      photoMode,
+
+      segStyle: 'display:grid;grid-template-columns:1fr;width:100%',
+      sweetOpts: [{ ko:'전체', en:'All', on:s.sweet < 0, i:-1 }].concat(SW.map((w, i) => ({ ko:w[0], en:w[1], on:s.sweet === i, i })))
+        .map((o, idx) => ({ ko:o.ko, en:o.en, on:o.on,
+          style: 'padding:8px 10px;border-left:0;justify-content:flex-start;gap:10px' + (idx ? ';border-top:1px solid var(--color-divider)' : ''),
+          pick: () => self.setState({ sweet:o.i }) })),
+      baseOpts: BASES.map(b => ({
+        ko:b, count: DATA.filter(x => x.base === b).length,
+        style: 'flex:none;white-space:nowrap;font-size:12px;padding:6px 11px;border:1px solid ' + (s.bases.indexOf(b) >= 0
+          ? 'var(--color-accent);background:var(--color-accent);color:var(--color-bg)'
+          : 'var(--color-divider)'),
+        toggle: () => self.setState({ bases: s.bases.indexOf(b) >= 0 ? s.bases.filter(x => x !== b) : s.bases.concat([b]) })
+      })),
+      flavorOpts: Object.keys(FL).map(k => ({
+        label: FL[k],
+        style: 'flex:none;white-space:nowrap;cursor:pointer;font-size:10.5px;letter-spacing:.05em;padding:5px 9px;border:1px solid ' + (s.flavors.indexOf(k) >= 0
+          ? 'var(--color-accent);background:var(--color-accent-100);color:var(--color-accent-800)'
+          : 'var(--color-divider);background:transparent;color:var(--color-neutral-800)'),
+        toggle: () => self.setState({ flavors: s.flavors.indexOf(k) >= 0 ? s.flavors.filter(x => x !== k) : s.flavors.concat([k]) })
+      })),
+      abvMax: s.abvMax, abvLabel: s.abvMax >= 45 ? '45+' : String(s.abvMax),
+      setAbv: e => this.setState({ abvMax: Number(e.target.value) }),
+      query: s.query, setQuery: e => this.setState({ query: e.target.value }),
+      resetAll: () => this.setState({ sweet:-1, bases:[], flavors:[], abvMax:45, query:'' }),
+      resultCount: list.length, noResults: list.length === 0,
+      activeSummary: [
+        s.sweet < 0 ? '당도 전체' : SW[s.sweet][1],
+        s.bases.length ? s.bases.join('/') : '기주 전체',
+        s.flavors.length ? s.flavors.length + '개 향' : '향 전체',
+        'ABV ≤ ' + (s.abvMax >= 45 ? '45+' : s.abvMax) + '%'
+      ].join(' · '),
+      cards: list.map(x => ({
+        ko:x.ko, en:x.en, base:x.base, abv:x.abv, method:x.method, glass:x.glass,
+        sweetKo: SW[x.sw][0], sweetStyle: this.sweetStyle(x.sw),
+        flavors: x.flavors.slice(0, 3).map(f => ({ label: FL[f] })),
+        cardStyle: 'cursor:pointer;display:flex;flex-direction:column;background:var(--color-surface);border:1px solid var(--color-divider);'
+          + (photoMode ? '' : 'border-left:2px solid var(--color-accent);'),
+        open: () => this.setState({ screen:'detail', sel:x.id, servings:1, subOpen:null })
+      })),
+
+      d: {
+        ko:d.ko, en:d.en, base:d.base, summary:d.summary, sweetEn:SW[d.sw][1],
+        storyTitle:d.story[0], story1:d.story[1], story2:d.story[2],
+        specs: [
+          { label:'ABV', value:d.abv + '%', sub:'표준 배합 기준' },
+          { label:'GLASSWARE', value:d.glass, sub:'권장 잔' },
+          { label:'TECHNIQUE', value:d.method, sub:d.method === 'Stir' ? '휘저어 섞기' : d.method === 'Shake' ? '흔들어 섞기' : '잔에서 조립' },
+          { label:'SWEETNESS', value:SW[d.sw][1], sub:SW[d.sw][0] + ' · 4단계 중 ' + (d.sw + 1) }
+        ]
+      },
+      servings: s.servings,
+      inc: () => this.setState({ servings: Math.min(8, s.servings + 1) }),
+      dec: () => this.setState({ servings: Math.max(1, s.servings - 1) }),
+      isMl: s.unit === 'ml', isOz: s.unit === 'oz',
+      mlStyle: s.unit === 'ml' ? 'background:var(--color-accent);color:var(--color-bg)' : '',
+      ozStyle: s.unit === 'oz' ? 'background:var(--color-accent);color:var(--color-bg)' : '',
+      useMl: () => this.setState({ unit:'ml' }), useOz: () => this.setState({ unit:'oz' }),
+      rows,
+      subOpen: !!openSub, subName: openSub ? openSub[0] : '', subText: openSub ? openSub[3] : '',
+      steps: d.steps.map((t, i) => ({ n: String(i + 1).padStart(2, '0'), text: t })),
+      radarGrid: [1,2,3,4,5].map(k => ({ pts: ring(k), stroke: k === 5 ? 'var(--color-divider)' : 'var(--color-neutral-300)' })),
+      radarAxes: AXES.map((_, i) => { const p = pt(i, 5); return { x1:cx, y1:cy, x2:Math.round(p[0]), y2:Math.round(p[1]) }; }),
+      radarPoly: dots.map(p => p.x + ',' + p.y).join(' '),
+      radarDots: dots,
+      radarLabels: AXES.map((a, i) => {
+        const ang = (-90 + i * 72) * Math.PI / 180;
+        const x = cx + Math.cos(ang) * (R + 26), y = cy + Math.sin(ang) * (R + 20) + 4;
+        return { x: Math.round(x), y: Math.round(y), text: a, anchor: Math.abs(Math.cos(ang)) < 0.2 ? 'middle' : (Math.cos(ang) > 0 ? 'start' : 'end') };
+      }),
+      profileRows: prof.map((v, i) => ({ label: AXES_KO[i] + ' ' + AXES[i], val: v + '/5', pct: (v / 5 * 100) + '%' })),
+      originRows: [
+        { label:'최초 기록', value:d.origin.y },
+        { label:'지역', value:d.origin.p },
+        { label:'고안자', value:d.origin.c },
+        { label:'분류', value:d.base + ' 베이스 · ' + d.method + ' · ' + SW[d.sw][1] }
+      ],
+      related: DATA.filter(x => x.base === d.base && x.id !== d.id).slice(0, 4).map(x => ({
+        ko:x.ko, en:x.en, abv:x.abv, sweetKo:SW[x.sw][1],
+        open: () => this.setState({ sel:x.id, servings:1, subOpen:null })
+      })),
+
+      quizRunning: s.qi < 4, quizDone: s.qi >= 4,
+      qNum: String(Math.min(s.qi + 1, 4)), qTitle: q.title, qHint: q.hint,
+      qOpts: q.opts.map(o => ({
+        ko:o.ko, en:o.en,
+        style: 'align-items:flex-start;justify-content:flex-start;text-align:left;padding:16px 18px;border:1px solid ' + (s.ans[q.key] === o.v
+          ? 'var(--color-accent);background:var(--color-accent-100)'
+          : 'var(--color-divider);background:var(--color-bg)'),
+        pick: () => { const a = Object.assign({}, s.ans); a[q.key] = o.v; self.setState({ ans:a, qi:s.qi + 1 }); }
+      })),
+      quizNav: QUESTIONS.map((qq, i) => {
+        const v = s.ans[qq.key];
+        const picked = v !== undefined ? (qq.opts.filter(o => o.v === v)[0] || {}).ko : '—';
+        return { n: String(i + 1).padStart(2, '0'), label: qq.title.replace(/\?$/, ''), answer: picked,
+          style: i === s.qi ? 'color:var(--color-accent)' : (v === undefined ? 'opacity:.45' : '') };
+      }),
+      candidateCount: cand.length,
+      backStyle: s.qi === 0 ? 'opacity:.35;pointer-events:none' : '',
+      quizBack: () => this.setState({ qi: Math.max(0, s.qi - 1) }),
+      quizReset: () => this.setState({ qi:0, ans:{} }),
+      answerSummary: QUESTIONS.map(qq => { const v = s.ans[qq.key]; const o = qq.opts.filter(x => x.v === v)[0]; return o ? o.ko : null; }).filter(Boolean).join(' · '),
+      results: ranked.map((r, i) => ({
+        rank: String(i + 1), match: r.m, ko:r.x.ko, en:r.x.en, base:r.x.base, abv:r.x.abv,
+        sweetKo: SW[r.x.sw][1], sweetStyle: this.sweetStyle(r.x.sw),
+        why: '선택한 ' + (s.ans.flavor ? FL[s.ans.flavor].split(' ')[1] + ' 계열' : '조건') + '과 ' + SW[r.x.sw][1] + ' 당도, ' + r.x.abv + '% 도수가 조건 범위에 들어옵니다.',
+        style: 'display:flex;flex-direction:column;background:var(--color-surface);border:' + (i === 0 ? '2px solid var(--color-accent)' : '1px solid var(--color-divider)'),
+        open: () => this.setState({ screen:'detail', sel:r.x.id, servings:1, subOpen:null })
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>
