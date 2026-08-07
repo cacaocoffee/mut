@@ -14,8 +14,13 @@ migration: V009
 owns:
   - apps/api/src/main/kotlin/kr/kcocktail/cocktail/domain/**
   - apps/api/src/main/kotlin/kr/kcocktail/cocktail/repository/**
+  - apps/api/src/main/kotlin/kr/kcocktail/cocktail/api/CocktailFacade.kt
   - apps/api/src/main/resources/db/migration/V009__*.sql
 ---
+
+> **소유 경로 주의**: `cocktail/api/` 는 **파일 단위로 나눈다.** `CocktailFacade.kt`(이 이슈) · `PublishGate.kt`(013). 디렉터리 통째 소유 금지.
+>
+> **`CocktailFacade` 를 이 이슈가 만드는 이유**: ISSUE-023(재료 사전의 "이 재료를 쓰는 칵테일")·**031**(북마크 대상 조회)이 `cocktail` 테이블을 직접 조인할 수 없다 (`PRIN-T03`). 두 이슈가 막히지 않으려면 조회 계약이 먼저 있어야 한다.
 
 ## 근거
 

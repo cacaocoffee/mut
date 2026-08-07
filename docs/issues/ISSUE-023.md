@@ -5,7 +5,7 @@ domain: INGREDIENT
 layer: api
 wave: 4
 status: TODO
-depends_on: [ISSUE-008]
+depends_on: [ISSUE-008, ISSUE-009]
 fr: [FR-INGREDIENT-002, FR-INGREDIENT-005]
 r: [R-F1.3-1, R-F1.3-3, R-F2.1-3]
 inv: [INV-INGREDIENT-02]

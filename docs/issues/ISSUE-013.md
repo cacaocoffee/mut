@@ -13,8 +13,13 @@ nfr: [NFR-D-02]
 migration: V013
 owns:
   - apps/api/src/main/kotlin/kr/kcocktail/cocktail/publish/**
+  - apps/api/src/main/kotlin/kr/kcocktail/cocktail/api/PublishGate.kt
   - apps/api/src/main/resources/db/migration/V013__*.sql
 ---
+
+> **소유 경로 주의**: `cocktail/api/CocktailFacade.kt` 는 ISSUE-009 소유다. **파일 단위로 나눈다.**
+>
+> **`PublishGate` 가 `cocktail.api` 에 있어야 하는 이유**: ISSUE-016(불변식 배치 검증)이 `admin` 모듈에서 이것을 호출한다. `cocktail/publish/**` 안에만 두면 **모듈 경계 테스트(001)가 016을 막는다.**
 
 ## 근거
 
@@ -111,6 +116,14 @@ owns:
 
 32. `PublishGate가_순수_함수다` — DB 없이 호출 가능
 33. `배치_검증이_같은_함수를_쓴다` — 이슈 016이 재사용. 시그니처 고정
+34. `PublishGate가_cocktail_api에_공개된다` — `admin` 모듈(016)이 경계 위반 없이 호출
+
+### 도메인 이벤트 (SPEC-05 §3 — 이슈 017이 구독)
+
+35. `발행_성공시_CocktailPublished_이벤트가_발행된다`
+36. `이벤트에_색인에_필요한_필드가_담긴다` — slug·nameKo·nameEn·aliases
+37. `게이트_실패시_이벤트가_발행되지_않는다`
+38. `cocktail_모듈이_search를_참조하지_않는다` — 경계 테스트 (이슈 001)
 
 ## GREEN
 
@@ -173,7 +186,7 @@ object PublishGate {
 
 ## DoD
 
-- [ ] RED 33항 전부 통과
+- [ ] RED 38항 전부 통과
 - [ ] **`violations`가 전부 반환** (RED 15·16 — `FR-ADMIN-003`, SPEC-07 §3.4)
 - [ ] `PublishGate` 가 **순수 함수**이고 이슈 016이 재사용할 시그니처 (RED 32·33)
 - [ ] 게이트 우회 경로 부재 (RED 29·30 — `NFR-D-02`)

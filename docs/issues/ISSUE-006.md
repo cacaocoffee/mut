@@ -38,18 +38,33 @@ owns:
 | `draft` 콘텐츠 조회 | — | — | ○ | — | ○ |
 | 칵테일 · 바 · 재료 생성/수정 | — | — | ○ | — | ○ |
 | **발행 / 회수** | — | — | ○ | — | ○ |
-| 시그니처 메뉴 편집 (`source=editor`) | — | — | ○ | — | ○ |
-| 전체 메뉴판 편집 (`source=partner`) | — | — | — | ★ | ○ |
-| 바 정보 직접 수정 | — | — | ○ | ★ (`verified`+) | ○ |
-| 바 정보 **수정 요청** | — | — | — | ★ (`listed`) | — |
-| 파트너 통계 조회 | — | — | — | ★ | ○ |
-| **제휴 등급 변경** | — | — | **—** | — | ○ |
+| ~~시그니처 메뉴 편집~~ | — | — | ○ | — | ○ |
+| ~~전체 메뉴판 편집~~ | — | — | — | ★ | ○ |
+| ~~바 정보 직접 수정~~ | — | — | ○ | ★ | ○ |
+| ~~바 정보 수정 요청~~ | — | — | — | ★ | — |
+| ~~파트너 통계 조회~~ | — | — | — | ★ | ○ |
+| ~~제휴 등급 변경~~ | — | — | **—** | — | ○ |
 | 재료 마스터 승인 | — | — | — | — | ○ |
 | 검증 태스크 처리 | — | — | ○ | — | ○ |
 | 감사 로그 조회 | — | — | — | — | ○ |
 | 북마크 · 컬렉션 | — | ◐ | ◐ | ◐ | ◐ |
-| 내 술장 | — | ◐ | ◐ | ◐ | ◐ |
+| ~~내 술장~~ | — | ◐ | ◐ | ◐ | ◐ |
 | **노출 규칙 변경** | — | — | — | — | **—** |
+
+### ⚠️ Phase 1a 범위 축소 (사용자 결정, 2026-08-07)
+
+**취소선 6행과 `partner_owner` 열 전체는 Phase 1b로 미룬다.** 근거:
+
+- **바 도메인이 없다.** 시그니처 메뉴·전체 메뉴판·바 정보·파트너 통계·제휴 등급은 전부 `bar`·`partner_contract` 테이블을 전제한다 (SPEC-01 §4.2 — 1b)
+- **`partner_owner`가 소유할 대상이 없다.** SPEC-08 §3의 `bar_owner` 스코프·IDOR 방어는 1b에 실물이 생긴 뒤라야 검증된다
+- **`내 술장`은 Phase 2** (`FR-STOCK-*`, SPEC-03 §8.1)
+- SPEC-08 §9: `admin` 계정이 **2~3개 규모**라 2단계 인증도 후순위. 에디터는 사용자 본인과 주변인
+
+**1a에서 구현하는 것**: 3역할(비로그인 · `member` · `editor` · `admin`) × 9행 = **약 30조합**
+
+`member`는 남는다 — **`FR-USER-001`(소셜 로그인)·`FR-USER-004`(저장·컬렉션)가 Phase 1a P0**이기 때문이다 (SPEC-01 §4.1 USER 6건).
+
+**enum·타입에는 `partner_owner`를 정의해 둔다** (SPEC-08 §1의 4역할). 나중에 늘리면 클라이언트가 깨진다.
 
 **SPEC-08 §2.1 — 마지막 줄이 요점이다**
 
@@ -70,7 +85,8 @@ owns:
 
 ### 매트릭스 전수 (SPEC-08 §2 — 이 이슈의 요체)
 
-1. `권한매트릭스_전수_검증` — 위 표 16행 × 5열 = **80조합 파라미터라이즈드**. 표를 테스트 데이터로 옮기고 허용/거부가 정확히 일치
+1. `권한매트릭스_1a분_전수_검증` — 취소선 제외 **9행 × 4열(비로그인·member·editor·admin) = 약 30조합** 파라미터라이즈드. 표를 테스트 데이터로 옮기고 허용/거부가 정확히 일치
+   - **`partner_owner` 열과 취소선 6행은 1b** — 테스트를 작성해 두고 `@Disabled` + `EPICS-1B-PHASE2.md` 참조 주석
 2. `역할이_누적되지_않는다` — `editor`가 `admin` 전용 액션(등급 변경·재료 승인·감사 조회) 시도 → 403
 3. `복수역할_보유시_합집합으로_평가된다` — `editor`+`admin` 둘 다 있으면 양쪽 가능
 4. `매트릭스에_없는_조합은_기본_거부다` — allowlist 방식
@@ -86,27 +102,30 @@ owns:
 
 ### editor ≠ admin (SPEC-08 §2.2)
 
-11. `editor는_제휴등급을_변경할_수_없다` — **중립성 장치**
-12. `editor는_재료_마스터를_승인할_수_없다`
-13. `editor는_감사로그를_조회할_수_없다`
-14. `admin은_발행도_할_수_있다` — 매트릭스상 `○`
+11. `editor는_재료_마스터를_승인할_수_없다`
+12. `editor는_감사로그를_조회할_수_없다`
+13. `admin은_발행도_할_수_있다` — 매트릭스상 `○`
+14. `editor는_제휴등급을_변경할_수_없다` — **중립성 장치** (SPEC-08 §2.2). **1b** — `@Disabled`
 
 ### 노출 규칙 (SPEC-08 §2.1, `PRIN-P02`)
 
 15. `노출규칙_변경_엔드포인트가_존재하지_않는다` — admin 포함 **누구도** 못 바꾼다. 라우트 스캔으로 부재 확인
 16. `권한_enum에_노출규칙_관련_액션이_없다`
 
-### IDOR 구조 (SPEC-08 §3.2 — Phase 1b 대비)
+### IDOR — **Phase 1b로 이월** (사용자 결정)
 
-17. `소유_검증_실패는_404를_반환한다` (`NFR-SEC-03`) — `bar_owner` 테이블은 1b지만 **판정 인터페이스는 지금** 정의
-18. `403을_반환하지_않는다` — 존재 노출 방지
+> SPEC-08 §3의 `bar_owner` 스코프·IDOR 방어는 **`bar` 실물이 생긴 뒤**라야 검증된다.
+> 이 이슈에서는 **403/404 구분 규칙만** 남기고(RED 6·7·12가 그것을 쓴다), `OwnershipGuard`는 만들지 않는다.
+> **`EPICS-1B-PHASE2.md` 1B-E8**이 이어받는다.
 
-> RED 17·18은 `bar` 도메인이 없어 실동작 테스트가 불가하다. **`OwnershipGuard` 인터페이스와 404 변환 규칙만 구현**하고 실제 검증은 `@Disabled` + Phase 1b 주석.
+17. `403과_404_구분_규칙이_정의돼_있다` — 존재가 비밀이면 404, 액션 권한만 없으면 403
 
-### 본인 것 (`◐`)
+### 본인 것 (`◐`) — `member`가 1a에 남는 이유
 
-19. `member는_자기_북마크만_조회한다` — 북마크는 이슈 031, 여기서는 스코프 판정기만
-20. `타인의_북마크_접근은_404다`
+> **`FR-USER-001`·`FR-USER-004`가 Phase 1a P0**다 (SPEC-01 §4.1 USER 6건). `partner_owner`와 달리 `member`는 미룰 수 없다.
+
+18. `member는_자기_북마크만_조회한다` — 북마크는 이슈 031, 여기서는 스코프 판정기만
+19. `타인의_북마크_접근은_404다`
 
 ## GREEN
 
@@ -116,13 +135,17 @@ owns:
 enum class Role { MEMBER, EDITOR, PARTNER_OWNER, ADMIN }
 
 enum class Action {                       // SPEC-08 §2 표의 각 행
+    // ── Phase 1a ──
     VIEW_PUBLISHED, VIEW_DRAFT,
     WRITE_CONTENT, PUBLISH,
-    EDIT_SIGNATURE_MENU, EDIT_FULL_MENU,
-    EDIT_BAR_INFO, REQUEST_BAR_EDIT,
-    VIEW_PARTNER_STATS, CHANGE_TIER,
     APPROVE_INGREDIENT, RESOLVE_TASK, VIEW_AUDIT_LOG,
-    OWN_BOOKMARK, OWN_STOCK
+    OWN_BOOKMARK,
+
+    // ── Phase 1b·2 (enum 에는 지금 정의. 매트릭스 평가는 @Disabled) ──
+    EDIT_SIGNATURE_MENU, EDIT_FULL_MENU,      // 1b
+    EDIT_BAR_INFO, REQUEST_BAR_EDIT,          // 1b
+    VIEW_PARTNER_STATS, CHANGE_TIER,          // 1b
+    OWN_STOCK,                                // Phase 2
     // 노출 규칙 액션은 존재하지 않는다 — PRIN-P02 (RED 16)
 }
 
@@ -160,8 +183,10 @@ class NotFoundForUnauthorized : RuntimeException()
 
 ## DoD
 
-- [ ] RED 20항 통과 (17·18은 인터페이스 수준)
-- [ ] `PermissionMatrix` 가 SPEC-08 §2 표와 1:1, **80조합 전수 테스트** (RED 1)
+- [ ] RED 19항 통과 (14는 1b라 `@Disabled`)
+- [ ] `PermissionMatrix` 가 SPEC-08 §2 표의 **1a분과 1:1, 약 30조합 전수 테스트** (RED 1)
+- [ ] **`partner_owner`·바 관련 6행이 `@Disabled` + `EPICS-1B-PHASE2.md` 참조 주석**
+- [ ] `Role` enum에 `PARTNER_OWNER` **정의는 있음** (나중에 늘리면 클라이언트가 깨진다)
 - [ ] 노출 규칙 액션이 enum에 **부재** (RED 16 — `PRIN-P02`)
-- [ ] 403/404 구분 규칙이 코드로 표현됨
-- [ ] 커밋: `feat(user): 권한 매트릭스 4역할 (SPEC-08 §2, PRIN-P02)`
+- [ ] 403/404 구분 규칙이 코드로 표현됨 (RED 17)
+- [ ] 커밋: `feat(user): 권한 매트릭스 1a 범위 (SPEC-08 §2, PRIN-P02)`

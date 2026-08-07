@@ -118,6 +118,15 @@ ingredient_brand           -- 브랜드 언급의 광고성 구분 (INV-INGREDIE
 23. `공개_응답에_내부_id가_없다`
 24. `삭제_대신_상태_전이거나_참조가_있으면_거부된다` ⚖️ — `ingredient`는 SPEC-06 §4.1의 `REVOKE DELETE` 목록에 **없다**. 레시피가 참조 중이면 FK가 막는다. 보수적으로 **참조 있으면 거부**
 
+### 도메인 이벤트 (SPEC-05 §3 — 이슈 017이 구독)
+
+> **부수효과는 도메인 이벤트로 발행하고 리스너가 처리한다.** `ingredient` 가 `search` 를 호출하면 **순환이 생긴다** — `008 → 017 → 014 → 013 → 010 → 008`.
+
+25. `재료_저장시_IngredientSaved_이벤트가_발행된다`
+26. `이벤트에_entityId와_slug와_name과_aliases가_담긴다` — 색인에 필요한 것
+27. `이_모듈이_search를_참조하지_않는다` — 경계 테스트 (이슈 001)
+28. `이벤트_발행이_저장_트랜잭션과_같이_커밋된다`
+
 ## GREEN
 
 ### `V008__ingredient.sql`
@@ -198,7 +207,7 @@ interface IngredientFacade {                    // PRIN-T03 — 타 모듈은 �
 
 ## DoD
 
-- [ ] RED 24항 전부 통과
+- [ ] RED 28항 전부 통과
 - [ ] `garnish` 기본값 `false` (RED 2 — `R-F2.2-5`)
 - [ ] `INV-INGREDIENT-01` 이 DB CHECK + 앱 양쪽 (SPEC-06 §4 서두 근거, GAPS에 문서 차이 기록)
 - [ ] `IngredientFacade` 가 `ingredient.api` 로 공개, 엔티티 미노출 (경계 테스트)

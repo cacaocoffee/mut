@@ -13,8 +13,15 @@ nfr: []
 migration: V017
 owns:
   - apps/api/src/main/kotlin/kr/kcocktail/search/index/**
+  - apps/api/src/main/kotlin/kr/kcocktail/search/api/SearchIndexSync.kt
   - apps/api/src/main/resources/db/migration/V017__*.sql
 ---
+
+> **소유 경로 주의**: `SearchIndexSync` 를 `search.api` 로 공개한다.
+>
+> ⚠️ **의존 방향 — 이 이슈가 구독한다.** `ingredient`(008)·`cocktail`(013·014)이 `search`를 호출하면 **순환이 생긴다**(008 → 017 → 014 → 013 → 010 → 008).
+> **SPEC-05 §3**: "부수효과(알림·집계·검증 태스크 생성)는 **도메인 이벤트로 발행하고 리스너가 처리**한다."
+> → 각 도메인은 **이벤트만 발행**하고 이 이슈가 **리스너를 등록**한다. `SearchIndexSync`는 리스너가 쓰는 내부 계약이지 타 모듈이 호출하는 표면이 아니다.
 
 ## 근거
 
@@ -144,18 +151,29 @@ object Chosung {
 
 **DB 없이 전수 테스트 가능하다** — RED 1~9가 전부 단위 테스트. 한글 초성 추출은 경계가 많아(복합 초성·받침·정규화) 이 부분이 이 이슈의 실질적 난이도다.
 
-### 동기화 지점
+### 동기화 지점 — **이벤트 구독** (SPEC-05 §3)
 
 ```kotlin
-interface SearchIndexSync {                 // search/api
-    fun sync(doc: SearchDocument)
-    fun remove(entityType: String, entityId: Long)
+// search/internal — 리스너. 타 모듈이 호출하지 않는다
+@Component
+class SearchIndexListener(private val sync: SearchIndexSync) {
+    @EventListener fun on(e: CocktailPublished) { ... }
+    @EventListener fun on(e: CocktailUnpublished) { ... }
+    @EventListener fun on(e: IngredientSaved) { ... }
 }
 ```
 
-칵테일(이슈 013·014)·재료(이슈 008)가 저장 시 호출한다. **`search` 모듈이 `cocktail`을 참조하지 않는다** — 반대로 호출받는다 (경계 테스트 ISSUE-001 RED 6, SPEC-05 §3에서 `SEARCH ──reads──▶` 방향이지만 **동기화는 쓰기라 방향이 반대**다).
+**각 도메인은 이벤트만 발행하고 `search`를 모른다.** SPEC-05 §3의 두 규칙이 동시에 지켜진다:
 
-⚖️ SPEC-05 §3의 `SEARCH ──reads──▶ COCKTAIL` 과 이 동기화 방향이 어긋나 보인다. **해석**: 조회는 SEARCH가 읽고, 색인 갱신은 각 도메인이 `SearchIndexSync` 인터페이스로 밀어 넣는다(의존 역전). 경계 테스트가 이 방향을 허용하도록 규칙에 반영 + GAPS 등재.
+| 규칙 | 어떻게 |
+|---|---|
+| `SEARCH ──reads──▶ COCKTAIL · INGREDIENT` | 조회 시 SEARCH가 읽는다 (이슈 024) |
+| 부수효과는 **도메인 이벤트 → 리스너** | 색인 갱신을 리스너가 한다 |
+| 순환 의존 금지 | `cocktail`·`ingredient` 가 `search` 를 참조하지 않는다 |
+
+**호출 방식(의존 역전)으로 하면 순환이 생긴다** — `008 → 017 → 014 → 013 → 010 → 008`. 이벤트가 그것을 끊는다.
+
+⚠️ **이 이슈가 이벤트를 정의하지 않는다.** `CocktailPublished`·`IngredientSaved`는 발행 측(013·014·008) 소유다. **008·013·014의 GREEN에 이벤트 발행이 없으면 착수 전에 확인**한다.
 
 ### 가중치 (RED 27, G-13)
 

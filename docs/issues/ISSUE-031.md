@@ -5,7 +5,7 @@ domain: USER
 layer: api
 wave: 6
 status: TODO
-depends_on: [ISSUE-030]
+depends_on: [ISSUE-030, ISSUE-009]
 fr: [FR-USER-004]
 r: [R-F5-2]
 inv: []
