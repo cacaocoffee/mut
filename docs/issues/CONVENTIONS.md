@@ -1,16 +1,32 @@
 # 이슈 작업 규약
 
-> 멀티 세션 AI 개발의 전제: **각 세션은 자기 이슈 파일 하나와 [SPEC-00](../spec/SPEC-00_개발원칙.md)만 읽고도 작업할 수 있어야 한다.**
+> 멀티 세션 AI 개발의 전제: **각 세션은 자기 이슈 하나와 [SPEC-00](../spec/SPEC-00_개발원칙.md)만 읽고도 작업할 수 있어야 한다.**
 > 이 문서는 그 작업이 서로를 밟지 않게 하는 규칙이다. 이슈를 집기 전에 한 번 읽는다.
+
+---
+
+## 0. 이슈는 GitHub 에 있다
+
+**정본은 [GitHub Issues](https://github.com/cacaocoffee/k-cocktail-archive/issues) 다.** 저장소 안의 `ISSUE-*.md` 는 이관 후 지웠다 —
+상태를 두 곳에 적으면 반드시 어긋나기 때문이다. [`INDEX.md`](INDEX.md) 는 웨이브 편성·의존 DAG·결합점만 남긴 **지도**다.
+
+```bash
+gh issue list  --label wave-0 --state open       # 착수 가능한 것 찾기
+gh issue view  15                                 # 이슈 본문 (= 근거·RED·GREEN·DoD)
+gh issue view  15 --json body --jq .body > /tmp/issue.md
+```
+
+GitHub 번호 = `ISSUE-NNN` **+ 2**. `ISSUE-A00` 만 `#1`.
+진행률은 [마일스톤](https://github.com/cacaocoffee/k-cocktail-archive/milestones)이 웨이브별로 보여준다.
 
 ---
 
 ## 1. 작업 흐름
 
 ```
-INDEX.md 에서 이슈 선택        status: TODO + depends_on 전부 DONE
+GitHub Issues 에서 이슈 선택      열려 있고 + 의존 이슈가 전부 닫힘
         ↓
-INDEX.md 의 status → IN_PROGRESS 로 바꾸고 먼저 커밋      ← 중복 착수 방지
+gh issue edit N --add-label status:in-progress    ← 중복 착수 방지. 제일 먼저
         ↓
 브랜치 생성  feat/ISSUE-012-publish-gate
         ↓
@@ -18,10 +34,18 @@ RED   이슈의 "RED" 목록을 테스트로 옮긴다 → 실패 확인
         ↓
 GREEN 최소 구현 → 통과
         ↓
-DoD 체크 → INDEX.md status: DONE (같은 커밋)
+PR 열기  본문에 "Closes #14"  → CI 초록 → 머지 (이슈가 자동으로 닫힌다)
 ```
 
-**중복 착수 방지가 최우선이다.** 이슈를 집는 순간 `INDEX.md`의 status를 바꾸고 그것부터 커밋한다.
+**중복 착수 방지가 최우선이다.** 이슈를 집는 순간 `status:in-progress` 라벨부터 붙인다.
+
+| 상태 | 표현 |
+|---|---|
+| 착수 가능 | 열려 있고 라벨 없음 |
+| 작업 중 | `status:in-progress` — **집지 않는다** |
+| 리뷰 대기 | `status:review` (PR 열림) |
+| 완료 | **닫힘** — 머지가 닫는다 |
+| 막힘 | `blocked` + 본문에 G-번호 |
 
 ---
 
@@ -116,6 +140,33 @@ Phase 1a에는 PARTNER가 없지만, 관련 코드를 스치는 이슈는 이 �
 - **TDD 커밋 분리 권장**: `test(...)` RED → `feat(...)` GREEN
 - Claude/Anthropic 어트리뷰션 트레일러·푸터는 넣지 않는다
 
+### 5.1 PR
+
+`main` 에 직접 커밋하지 않는다. 이슈 하나 = 브랜치 하나 = PR 하나.
+
+```bash
+gh pr create --title "feat(cocktail): 발행 게이트 6종 (ISSUE-013)" --body "$(cat <<'EOF'
+Closes #15
+
+## RED → GREEN
+| RED | 결과 |
+|---|---|
+| 1. … | ✅ |
+
+## 확인
+- `./gradlew check` 초록
+- `npm run verify` 초록
+
+## DoD 미달 항목
+(없으면 "없음". 있으면 무엇을 왜 남겼는지)
+EOF
+)"
+```
+
+- **`Closes #N` 을 반드시 넣는다** — 머지가 이슈를 닫는다. 손으로 닫지 않는다
+- **CI 가 초록이 아니면 머지하지 않는다.** `apps/api/**` 는 `api.yml`, 프론트는 각자의 워크플로
+- 머지는 `--squash` 하지 않는다 — TDD 의 RED→GREEN 커밋 분리가 기록으로 남아야 한다
+
 ---
 
 ## 5.5 미결은 [`DECISIONS.md`](DECISIONS.md) 한 곳에 있다
@@ -154,26 +205,13 @@ Phase 1a에는 PARTNER가 없지만, 관련 코드를 스치는 이슈는 이 �
 
 ---
 
-## 7. 이슈 파일 형식
+## 7. 이슈 본문 형식
+
+GitHub 이슈 본문은 아래 순서로 돼 있다. **새 이슈도 이 형식을 따른다.**
 
 ```markdown
----
-id: ISSUE-012
-title: 발행 게이트 6종
-domain: COCKTAIL
-layer: api                # api | web | contract | infra
-wave: 3
-status: TODO              # TODO | IN_PROGRESS | REVIEW | DONE | BLOCKED
-depends_on: [ISSUE-009, ISSUE-010]
-fr: [FR-COCKTAIL-010, FR-COCKTAIL-011, FR-COCKTAIL-012, FR-COCKTAIL-013]
-r: [R-F1.1-2, R-F1.1-3, R-F1.3-2]
-inv: [GATE-COCKTAIL-01, GATE-COCKTAIL-02]
-nfr: [NFR-D-02]
-migration: V012
-owns:
-  - apps/api/src/main/kotlin/kr/kcocktail/cocktail/publish/**
-  - apps/api/src/main/resources/db/migration/V012__*.sql
----
+| | |          ← 메타 표: wave · layer · domain · 의존(#번호) · migration · FR/R/INV/NFR
+<details>owns</details>   ← 이 이슈만 만지는 경로
 
 ## 근거          ← 인용. 스펙을 다시 열지 않아도 되게
 ## RED           ← 먼저 실패시킬 테스트 (번호 = 테스트 함수)
@@ -181,15 +219,8 @@ owns:
 ## DoD           ← 체크박스
 ```
 
-`status` 값:
-
-| 값 | 의미 |
-|---|---|
-| `TODO` | 착수 가능 (의존이 전부 DONE) |
-| `IN_PROGRESS` | 누가 작업 중 — 집지 않는다 |
-| `REVIEW` | 구현 완료, 리뷰 대기 |
-| `DONE` | 머지됨. 의존 이슈들이 해금됨 |
-| `BLOCKED` | `GAPS.md`의 미해소 항목 때문에 멈춤 (G-번호 명시) |
+메타는 라벨로도 붙는다 — `wave-N` · `layer:*` · `domain:*` · `status:*` · `blocked`.
+**`migration:` 은 예약된 Flyway 번호다** (§4). 즉흥으로 붙이지 않는다.
 
 ---
 
@@ -197,7 +228,8 @@ owns:
 
 ```bash
 git status --short --branch      # 어느 브랜치인가, 잔여 변경이 있는가
-cat docs/issues/INDEX.md         # 내 이슈가 아직 IN_PROGRESS 인가
+gh issue view <N>                # 내 이슈가 아직 status:in-progress 인가
+gh pr status                     # 내 PR 이 이미 열려 있는가
 ```
 
 컴팩션이나 세션 재개 후 **바로 편집하지 않는다.** 브랜치와 이슈 상태를 먼저 확인한다.

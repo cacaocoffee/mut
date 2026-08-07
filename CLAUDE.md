@@ -3,6 +3,20 @@
 > 이 파일은 세션 시작 시 자동으로 읽힌다. 새 규칙은 여기에 적는다.
 > `apps/web/AGENTS.md`와 `apps/web/CLAUDE.md`는 `next dev`가 생성·갱신하는 파일이라 손대지 않는다.
 
+## 작업은 GitHub 이슈에서 집는다
+
+원격: **`cacaocoffee/k-cocktail-archive`** (private). 커밋 author 는 `cacaocoffee <cacaocoffee16@gmail.com>`.
+
+```bash
+gh issue list --state open --label wave-0     # 착수 가능한 것
+gh issue view 15                               # 근거 · RED · GREEN · DoD 가 본문에 있다
+```
+
+**규약은 [`docs/issues/CONVENTIONS.md`](docs/issues/CONVENTIONS.md) 다. 이슈를 집기 전에 읽는다.**
+웨이브 편성·의존 DAG·결합점은 [`docs/issues/INDEX.md`](docs/issues/INDEX.md), 미결 171건은 [`docs/issues/DECISIONS.md`](docs/issues/DECISIONS.md).
+
+`main` 에 직접 커밋하지 않는다 — 브랜치 → PR(`Closes #N`) → CI 초록 → 머지.
+
 ## 출처가 넷이다. 하나만 열어라
 
 성격이 다른 네 출처가 있고 다 읽으면 4,000줄이 넘는다.

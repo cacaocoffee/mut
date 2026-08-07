@@ -224,8 +224,8 @@ SCREENS-03·04를 "Phase 2"로 분류한 것이 오류였다. 범위의 정본�
 
 | FR | 대응 | 이슈 |
 |---|---|---|
-| `FR-COCKTAIL-027` · `FR-USER-004` | **API만 1a**, 전용 화면은 1b. 최소 저장·공유 버튼은 상세 화면에 | [031](./issues/ISSUE-031.md) · [038](./issues/ISSUE-038.md) |
-| `FR-SEARCH-004` | 프로토타입 화면이 이미 있다 — **SCREENS-03을 "기존 화면 문서화"로** 작성 | [041](./issues/ISSUE-041.md) |
+| `FR-COCKTAIL-027` · `FR-USER-004` | **API만 1a**, 전용 화면은 1b. 최소 저장·공유 버튼은 상세 화면에 | [031](https://github.com/cacaocoffee/k-cocktail-archive/issues/33) · [038](https://github.com/cacaocoffee/k-cocktail-archive/issues/40) |
+| `FR-SEARCH-004` | 프로토타입 화면이 이미 있다 — **SCREENS-03을 "기존 화면 문서화"로** 작성 | [041](https://github.com/cacaocoffee/k-cocktail-archive/issues/43) |
 
 남은 대기는 **바·파트너(1b)** 와 **마이 전용 화면(1b로 이월)** 이다.
 

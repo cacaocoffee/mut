@@ -401,7 +401,7 @@ ADR-0001이 각주로 경고했지만 강제되지 않았다. `accent-700`(6.41:
 **나머지는 사업 결정이라 스펙으로 풀리지 않는다.**
 
 **진행 (2026-08-07)** — **에디터 채용 형태 해소**: 사용자 본인 + 주변인이 맡는다.
-`GATE-COCKTAIL-01`이 막는 `tasting_note` 작성 담당이 확보됐다 ([이슈 036](../issues/ISSUE-036.md)).
+`GATE-COCKTAIL-01`이 막는 `tasting_note` 작성 담당이 확보됐다 ([이슈 036](https://github.com/cacaocoffee/k-cocktail-archive/issues/38)).
 나머지 9건은 여전히 사업 결정이다.
 
 ---
@@ -446,7 +446,7 @@ TRACE-00은 스스로를 "구현 경로를 갖는지 확인하는 문서"라 규
 | **나** | **저장·컬렉션은 API만 1a, 화면은 1b** | `FR-USER-004`의 "공유 링크 생성"까지 API로 충족. **파인더는 프로토타입 화면이 이미 있어 SCREENS-03을 "기존 화면 문서화"로 가볍게** |
 | 다 | 해당 FR을 Phase 2로 내린다 | SPEC-01 §4.1 개정 — 범위 축소 |
 
-**나안을 택했다** — [이슈 031](../issues/ISSUE-031.md)을 API 범위로 축소하고 화면은 1b로 넘긴다.
+**나안을 택했다** — [이슈 031](https://github.com/cacaocoffee/k-cocktail-archive/issues/33)을 API 범위로 축소하고 화면은 1b로 넘긴다.
 
 ### G-19
 
@@ -465,7 +465,7 @@ TRACE-00 §3.5의 `FR-USER-002` ERD 칸에 `ingredient_brand.is_sponsored` 병�
 **그건 태스크 발생 조건이지 큐 저장소가 아니다.** 큐를 구현하려면 테이블이 필요하다.
 [SPEC-06 §4.3](../spec/SPEC-06_데이터모델_ERD.md)이 "위반 건을 관리자 태스크로 올린다"고 한 것도 저장소를 전제한다.
 
-→ [이슈 016](../issues/ISSUE-016.md)·[022](../issues/ISSUE-022.md)가 만들되 **SPEC-06 개정이 선행**돼야 한다.
+→ [이슈 016](https://github.com/cacaocoffee/k-cocktail-archive/issues/18)·[022](https://github.com/cacaocoffee/k-cocktail-archive/issues/24)가 만들되 **SPEC-06 개정이 선행**돼야 한다.
 
 **부수 발견** — [TRACE-00 §3.5](../TRACE-00_추적매트릭스.md)의 `FR-USER-002` ERD 칸이 `article.is_sponsored` 하나뿐이다.
 `article`은 Phase 2라 **1a에 경로가 없어 보인다.** FR 본문은 "`R-F1.3-3`의 광고성 구분 표기와 같은 지점에서 처리한다"고 했으므로
@@ -483,12 +483,12 @@ TRACE-00 §3.5의 `FR-USER-002` ERD 칸에 `ingredient_brand.is_sponsored` 병�
 
 SPEC-07 §1.3이 "스코프 상세는 SPEC-08"이라고 **명시적으로 위임**했으므로 SPEC-08이 이긴다.
 SPEC-08 §2.2의 권한 분리(중립성 장치) 논리와도 맞는다.
-→ **`admin` 승인으로 구현**([이슈 026](../issues/ISSUE-026.md)). **SPEC-03 문구를 고칠지 결정 필요.**
+→ **`admin` 승인으로 구현**([이슈 026](https://github.com/cacaocoffee/k-cocktail-archive/issues/28)). **SPEC-03 문구를 고칠지 결정 필요.**
 
 **② 카테고리 소개 문구** — `FR-COCKTAIL-031`은 **P1**인데 `NFR-S-07`은 **"발행 차단"**(배포 차단급)이다.
 P1 기능이 P0 발행을 막는 구조다.
 → 보수적으로 **구조는 1a에 만들되 없어도 발행은 된다**로 구현. `NFR-S-07`의 차단은 P1 착수 시 적용
-([이슈 022](../issues/ISSUE-022.md)·[039](../issues/ISSUE-039.md)). **둘 중 하나의 우선순위를 맞춰야 한다.**
+([이슈 022](https://github.com/cacaocoffee/k-cocktail-archive/issues/24)·[039](https://github.com/cacaocoffee/k-cocktail-archive/issues/41)). **둘 중 하나의 우선순위를 맞춰야 한다.**
 
 ### G-21
 
