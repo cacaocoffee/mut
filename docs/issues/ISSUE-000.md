@@ -4,7 +4,7 @@ title: apps/api Gradle 스캐폴딩 (Kotlin · Spring Boot 3.x)
 domain: —
 layer: infra
 wave: 0
-status: TODO
+status: IN_PROGRESS
 depends_on: [ISSUE-A00]
 fr: []
 r: []
