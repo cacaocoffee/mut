@@ -92,7 +92,7 @@ owns:
 
 ### 실패 격리 (`NFR-R-04`)
 
-26. `레이트리밋_저장소_장애가_요청을_막지_않는다` ⚖️ — fail-open vs fail-closed. **보수적으로 공개 조회는 fail-open, 어드민 쓰기는 fail-closed** + GAPS 등재
+26. `레이트리밋_저장소_장애가_요청을_막지_않는다` **결정** — fail-open vs fail-closed. **공개 조회는 fail-open, 어드민 쓰기는 fail-closed**
 
 ## GREEN
 
@@ -148,5 +148,5 @@ RED 25가 "렌더링 시점에 의존하지 않는다"를 강제한다.
 - [ ] `RateLimitPolicy` 가 SPEC-08 §6 표와 1:1, 5종 전수 (RED 10~15)
 - [ ] CSRF 면제가 `/events` **하나뿐**이고 코드 상수 (RED 7·9)
 - [ ] sanitize가 **저장 시점** (RED 25)
-- [ ] ⚖️ 레이트리밋 저장소 장애 시 fail 정책 `GAPS.md` 등재
+- [ ] **결정** 레이트리밋 저장소 장애 시 fail 정책 `GAPS.md` 등재
 - [ ] 커밋: `feat(user): CSRF·레이트 리밋·저장 시점 sanitize (SPEC-08 §4.3·§6·§7)`

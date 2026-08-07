@@ -68,7 +68,7 @@ owns:
 1. `sessionId가_UUID로_생성된다`
 2. `sessionId가_30분_무활동시_갱신된다`
 3. `활동이_있으면_유지된다`
-4. `sessionId가_localStorage_또는_쿠키에_저장된다` ⚖️ + GAPS
+4. `sessionId가_localStorage_또는_쿠키에_저장된다` **결정**
 5. `비로그인은_userId가_null이다`
 
 ### 공통 필드 (SPEC-10 §3)
@@ -111,7 +111,7 @@ owns:
 
 33. `전송_실패가_사용자_흐름을_막지_않는다`
 34. `전송_실패가_UI_에러로_보이지_않는다`
-35. `전송_실패가_콘솔_에러를_쏟지_않는다` ⚖️ — 조용히 (SPEC-10 §2). 보수적으로 **debug 레벨** + GAPS
+35. `전송_실패가_콘솔_에러를_쏟지_않는다` **결정** — 조용히 (SPEC-10 §2). **debug 레벨**
 36. `네트워크_차단_환경에서_페이지가_정상_동작한다` — 광고 차단기
 
 ### 멱등 (`PRIN-T07`)
@@ -149,7 +149,7 @@ const SESSION_TTL = 30 * 60 * 1000;
 function getSessionId(): string { /* localStorage + lastActivity 검사 */ }
 ```
 
-⚖️ `localStorage` vs 쿠키: SPEC에 없다. **보수적으로 `sessionStorage`가 아닌 `localStorage`**(탭 간 공유) + GAPS.
+**결정** `localStorage` vs 쿠키: SPEC에 없다. **`sessionStorage`가 아닌 `localStorage`**(탭 간 공유) + GAPS.
 
 ### 구현 순서 (SPEC-10 §9)
 
@@ -185,5 +185,5 @@ try { navigator.sendBeacon(url, body); } catch { /* SPEC-10 §2 — 삼킨다 */
 - [ ] `referrerType` 분류만 전송, 원본 URL 미전송 (RED 13)
 - [ ] **전송 실패가 사용자 흐름을 막지 않음** (RED 33~36 — `NFR-R-04`)
 - [ ] 1b 이벤트 미구현 (SPEC-10 §5)
-- [ ] ⚖️ 2건(세션 저장소·실패 로그 레벨) `GAPS.md` 등재
+- [ ] 미결은 [`DECISIONS.md`](DECISIONS.md) §1 확정분을 따른다 — **이슈에서 판단하지 않는다**
 - [ ] 커밋: `feat(web): Phase 1a 이벤트 7종 (SPEC-10 §4·§9)`

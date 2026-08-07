@@ -113,7 +113,7 @@ owns:
 ### 이미지 (⚠️ G-07)
 
 42. `이미지_업로드가_있는가` ⚖️ — **이미지 저장소 미정**(G-07). SPEC-07 §2.7의 `POST /admin/media`는 저장소에 종속.
-    → **보수적으로 Phase 1a는 이미지 없이 발행 가능**하게. `NFR-O-01`의 인수 시나리오에 이미지가 필수가 아님을 확인 + **GAPS 등재**
+    → **Phase 1a는 이미지 없이 발행 가능**하게. `NFR-O-01`의 인수 시나리오에 이미지가 필수가 아님을 확인 + **GAPS 등재**
 
 ### 디자인 시스템
 
@@ -186,5 +186,5 @@ const FORBIDDEN_FIELDS = ["boostLimit", "homeSlotRatio", "sponsorLabelVisible"];
 - [ ] UI 검증 우회 시 서버가 막음 (RED 23 — `PRIN-T05`)
 - [ ] `editor`에게 승인·감사 메뉴 미노출 (RED 34·40 — SPEC-08 §2.2)
 - [ ] `packages/ui` 무수정 (RED 44)
-- [ ] ⚖️ 1건(이미지 업로드 G-07) `GAPS.md` 등재
+- [ ] 미결은 [`DECISIONS.md`](DECISIONS.md) §1 확정분을 따른다 — **이슈에서 판단하지 않는다**
 - [ ] 커밋: `feat(web): 어드민 에디터 UI (FR-ADMIN-001·002·003·006, NFR-O-01)`

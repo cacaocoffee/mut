@@ -134,7 +134,7 @@ owns:
 25. `focus_visible이_2px_accent다` (`NFR-A-05`)
 26. `기본_포커스_링을_제거만_하지_않았다`
 27. `색만으로_정보를_전달하지_않는다` (`NFR-A-08`)
-28. `차트에_role_img와_aria_label이_있다` (`NFR-A-07`) — 맛 레이더는 **P1**이라 Phase 1a에 없을 수 있다 ⚖️
+28. `차트에_role_img와_aria_label이_있다` (`NFR-A-07`) — 맛 레이더는 **P1**이라 Phase 1a에 없을 수 있다 **결정**
 29. `차트_수치가_표로도_제공된다` (`NFR-A-07`)
 30. `prefers_reduced_motion을_존중한다` (`NFR-A-09`) — 경고
 

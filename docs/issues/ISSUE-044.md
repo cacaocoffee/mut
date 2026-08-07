@@ -30,7 +30,7 @@ owns:
 
 **SPEC-04 §9.2 수동 릴리즈 체크리스트**: `NFR-S-06` 포함
 
-**SPEC-08 §8 법적 요구**: 브랜디드 콘텐츠 주류광고 고지 — OG 이미지에도 적용되나 ⚖️ (Phase 1a에 브랜디드 콘텐츠 없음)
+**SPEC-08 §8 법적 요구**: 브랜디드 콘텐츠 주류광고 고지 — OG 이미지에도 적용되나 **결정** (Phase 1a에 브랜디드 콘텐츠 없음)
 
 ### Schema.org Recipe에 담을 것
 
@@ -42,10 +42,10 @@ owns:
 | `description` | `summary` |
 | `recipeIngredient` | 재료 목록 (용량 + 이름) |
 | `recipeInstructions` | 스텝 |
-| `recipeCategory` | 분류 3축 ⚖️ |
+| `recipeCategory` | 분류 3축 **결정** |
 | `recipeYield` | 1잔 |
 | `image` | 히어로 |
-| `keywords` | 향·맛 태그 ⚖️ |
+| `keywords` | 향·맛 태그 **결정** |
 
 ⚠️ **`nutrition`·`aggregateRating`을 넣지 않는다** — `PRIN-P04`("별점을 쌓지 않는다")가 총점을 금지했다. **`aggregateRating`은 없다.**
 
@@ -73,22 +73,22 @@ owns:
 15. `og_image가_있다`
 16. `og_url이_절대_URL이다`
 17. `og_type이_설정된다`
-18. `twitter_card가_설정되는가` ⚖️ — `R-F5-5`는 **카카오톡**만 명시. 보수적으로 **추가** + GAPS
+18. `twitter_card가_설정되는가` **결정** — `R-F5-5`는 **카카오톡**만 명시. **추가**
 19. **`카카오톡_카드_미리보기가_뜬다`** (`NFR-S-06` — 수동 확인)
 20. `모든_공개_페이지에_OG가_있다` (`NFR-S-06`) — 상세·카테고리·홈
-21. `OG_이미지_크기가_권장값이다` ⚖️ — 카카오 권장 800×400 등 + GAPS
+21. `OG_이미지_크기가_권장값이다` **결정** — 카카오 권장 800×400 등
 
 ### OG 이미지
 
 22. `칵테일마다_고유한_OG_이미지가_있다` ⚖️ — 동적 생성 vs 히어로 이미지 재사용.
     ⚠️ **히어로 이미지가 없다** — `media_asset`이 미구현(G-07 이미지 저장소 미정).
-    → **보수적으로 정적 기본 이미지 + 텍스트 오버레이 동적 생성**(`opengraph-image.tsx`) + **GAPS 등재**
+    → **정적 기본 이미지 + 텍스트 오버레이 동적 생성**(`opengraph-image.tsx`) + **GAPS 등재**
 23. `이미지가_없어도_OG가_깨지지_않는다` — 기본 이미지 폴백
 24. `이미지_생성이_빌드를_느리게_하지_않는다`
 
 ### 법적 (`NFR-L-01` 정신)
 
-25. `OG_description에_과음_경고가_필요한가` ⚖️ — `NFR-L-01`은 "페이지 하단"이라 OG는 대상 밖. 보수적으로 **미포함** + GAPS
+25. `OG_description에_과음_경고가_필요한가` **결정** — `NFR-L-01`은 "페이지 하단"이라 OG는 대상 밖. **미포함**
 
 ### 성능 (`NFR-P-01`)
 
@@ -152,5 +152,5 @@ export default async function Image({ params }) {
 - [ ] **카카오톡 카드 미리보기 수동 확인** + README에 갱신 절차 (RED 19 — `NFR-S-06`)
 - [ ] 모든 공개 페이지에 OG (RED 20)
 - [ ] `packages/ui` 무수정
-- [ ] ⚖️ 5건(twitter card·이미지 크기·OG 이미지 전략 G-07·OG 경고 문구·기본 폴백) `GAPS.md` 등재
+- [ ] 미결은 [`DECISIONS.md`](DECISIONS.md) §1 확정분을 따른다 — **이슈에서 판단하지 않는다**
 - [ ] 커밋: `feat(web): Schema.org Recipe·OG 태그 (FR-COCKTAIL-026, FR-USER-005, NFR-S-05·S-06)`

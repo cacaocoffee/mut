@@ -81,7 +81,7 @@ type Sweetness = "dry" | "semi_dry" | "semi_sweet" | "sweet";   // 문자열
 ### 한국어 레이블 (전환의 실질 과제)
 
 11. `화면에_한국어가_표시된다` — 회귀 없음
-12. `레이블_출처가_한_곳이다` ⚖️ — API 응답(`labelKo`) vs 프론트 상수 맵. **보수적으로 API 응답**(`PRIN-T02` — 정본은 Kotlin) + GAPS
+12. `레이블_출처가_한_곳이다` **결정** — API 응답(`labelKo`) vs 프론트 상수 맵. **API 응답**(`PRIN-T02` — 정본은 Kotlin)
 13. `레이블이_없는_값이_없다` — 10+9+10+5+4종 전수
 
 ### 기존 로직 보존 (SPEC-01 §6)
@@ -95,9 +95,9 @@ type Sweetness = "dry" | "semi_dry" | "semi_sweet" | "sweet";   // 문자열
 
 ### data.ts (이슈 036 연계)
 
-20. `data_ts가_어떻게_되는가` ⚖️ — 이관 후에도 **테스트 픽스처**로 쓸모가 있다. **보수적으로 유지하되 화면이 참조하지 않게** + GAPS
+20. `data_ts가_어떻게_되는가` **결정** — 이관 후에도 **테스트 픽스처**로 쓸모가 있다. **유지하되 화면이 참조하지 않게**
 21. `화면이_data_ts를_직접_import하지_않는다` — API 경유
-22. `npm_run_check가_여전히_data_ts를_본다` ⚖️ — 코퍼스 검증 대상이 DB로 옮겨갔다(이슈 016). **보수적으로 둘 다 유지** + GAPS
+22. `npm_run_check가_여전히_data_ts를_본다` **결정** — 코퍼스 검증 대상이 DB로 옮겨갔다(이슈 016). **둘 다 유지**
 
 ### 드리프트 (`PRIN-T02`)
 
@@ -138,7 +138,7 @@ export interface FilterState { ... }
 
 ### 한국어 레이블 (RED 11~13)
 
-⚖️ 두 안:
+**결정** 두 안:
 
 **A. API 응답에 포함** — `{ "base": { "slug": "gin", "labelKo": "진" } }`
 - `PRIN-T02` 정신에 맞다(정본은 Kotlin)
@@ -148,7 +148,7 @@ export interface FilterState { ... }
 - 가볍다
 - **손으로 쓴 것이라 `PRIN-T02` 위반 소지**
 
-**보수적으로 A**: `GET /categories`(이슈 022)가 이미 `labelKo`를 준다. 화면은 그것을 캐시해 쓴다. GAPS 등재.
+**A**: `GET /categories`(이슈 022)가 이미 `labelKo`를 준다. 화면은 그것을 캐시해 쓴다. GAPS 등재.
 
 ### `data.ts` (RED 20~22)
 
@@ -167,5 +167,5 @@ export interface FilterState { ... }
 - [ ] 값이 슬러그, 카테고리 URL 불변 (RED 6·10 — `PRIN-D02`)
 - [ ] `search.ts`·`validate.ts`·`packages/ui` 보존 (RED 14·17·19 — SPEC-01 §6)
 - [ ] 기존 3화면 회귀 없음 (RED 25·26)
-- [ ] ⚖️ 4건(레이블 출처·`data.ts` 존치·`check` 대상·픽스처) `GAPS.md` 등재
+- [ ] 미결은 [`DECISIONS.md`](DECISIONS.md) §1 확정분을 따른다 — **이슈에서 판단하지 않는다**
 - [ ] 커밋: `refactor(domain): types.ts → OpenAPI 생성물 교체 (PRIN-T02, SPEC-01 §6)`

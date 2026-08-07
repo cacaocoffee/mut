@@ -53,7 +53,7 @@ owns:
 2. `없는_slug는_404`
 3. `draft는_404다` — 403이 아니다 (SPEC-07 §5)
 4. `archived도_404다`
-5. `editor는_draft를_조회할_수_있다` ⚖️ — SPEC-08 §2 "draft 콘텐츠 조회 = editor ○". **공개 엔드포인트가 아니라 어드민 경로**(이슈 025)로 봐야 한다. 보수적으로 공개 경로는 항상 404 + GAPS
+5. `editor는_draft를_조회할_수_있다` **결정** — SPEC-08 §2 "draft 콘텐츠 조회 = editor ○". **공개 엔드포인트가 아니라 어드민 경로**(이슈 025)로 봐야 한다. 공개 경로는 항상 404
 
 ### 필수 블록 (`FR-COCKTAIL-017`)
 
@@ -81,13 +81,13 @@ owns:
 21. `Phase_1a에는_standard만_존재한다` — `bar_signature`는 1b
 22. `재료에_대체재_정보가_포함된다` (`FR-COCKTAIL-021`)
 23. `재료에_amount_label이_포함된다` — 배수 계산 제외 표기 (`FR-COCKTAIL-019`)
-24. `재료에_counts_for_stock이_포함되는가` ⚖️ — Phase 2 역검색용. 지금 노출하면 쓸데없다. **보수적으로 미노출** + GAPS
+24. `재료에_counts_for_stock이_포함되는가` **결정** — Phase 2 역검색용. 지금 노출하면 쓸데없다. **미노출**
 
 ### 노출 범위 (SPEC-07 §5)
 
 25. `내부_id가_없다`
 26. `abv_calculated와_abv_override가_없다` — `abv` 하나만
-27. `is_classic_같은_내부_플래그가_노출되는가` ⚖️ — 클래식 배지 표시에 필요할 수 있다. 보수적으로 **노출** (콘텐츠 성격)
+27. `is_classic_같은_내부_플래그가_노출되는가` **결정** — 클래식 배지 표시에 필요할 수 있다. **노출** (콘텐츠 성격)
 28. `status가_노출되지_않는다` — published만 나오므로 무의미
 
 ### 캐싱 (SPEC-07 §1.6)
@@ -155,5 +155,5 @@ data class CocktailDetail(
 - [ ] `abv` 표시값 하나만, 내부 `id` 없음 (RED 25·26 — SPEC-07 §5)
 - [ ] `draft`·`archived` 404 (RED 3·4)
 - [ ] N+1 없음, ETag 동작
-- [ ] ⚖️ 4건(editor draft 조회·`counts_for_stock` 노출·`is_classic` 노출·`status` 노출) `GAPS.md` 등재
+- [ ] 미결은 [`DECISIONS.md`](DECISIONS.md) §1 확정분을 따른다 — **이슈에서 판단하지 않는다**
 - [ ] 커밋: `feat(cocktail): 상세 조회 API (FR-COCKTAIL-017·018, SPEC-07 §5)`

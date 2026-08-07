@@ -88,7 +88,7 @@ owns:
 13. `상수값이_SPEC과_일치한다` — 1 / 0.30
 
 > ⚠️ RED 10~13은 **PARTNER 도메인이 없어 상수를 둘 곳이 없다.**
-> **보수적 판단**: Phase 1a에서는 상수를 **정의하지 않는다**(쓰이지 않는 상수는 죽은 코드). 대신 RED 10~13을 `@Disabled` + **"Phase 1b ISSUE-XXX에서 해제"** 주석으로 남긴다. `EPICS-1B-PHASE2.md`에 이 항목을 명시한다.
+> **판단**: Phase 1a에서는 상수를 **정의하지 않는다**(쓰이지 않는 상수는 죽은 코드). 대신 RED 10~13을 `@Disabled` + **"Phase 1b ISSUE-XXX에서 해제"** 주석으로 남긴다. `EPICS-1B-PHASE2.md`에 이 항목을 명시한다.
 
 ### 라벨 강제 (`NFR-L-02`, `INV-PARTNER-04`)
 

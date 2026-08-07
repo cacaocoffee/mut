@@ -58,7 +58,7 @@ owns:
 ### 축별 필터 (`FR-SEARCH-001` 6종)
 
 1. `base_필터가_동작한다`
-2. `style_필터가_동작한다` — `styles` 조인 (`style_primary`가 아니라 **보유 전체**) ⚖️ + GAPS
+2. `style_필터가_동작한다` — `styles` 조인 (`style_primary`가 아니라 **보유 전체**) **결정**
 3. `method_필터가_동작한다`
 4. `sweet_필터가_동작한다`
 5. `abv_구간_필터가_동작한다`
@@ -71,7 +71,7 @@ owns:
 9. `style이_복수면_OR다`
 10. `method가_복수면_OR다`
 11. `abv가_복수면_OR다`
-12. `sweet는_단일값이다` — 복수 지정 시 400 또는 첫 값만 ⚖️
+12. `sweet는_단일값이다` — 복수 지정 시 400 또는 첫 값만 **결정**
 13. **`flavor가_복수면_AND다`** — `citrus,herbal` → **둘 다** 가진 것만
 14. `축이_다르면_AND로_결합된다` — `base=gin&style=sour` → 진 **그리고** 사워
 
@@ -147,7 +147,7 @@ enum class AbvBand(val slug: String, val range: ClosedFloatingPointRange<Double>
 }
 ```
 
-**경계를 명시적으로 결정한다** (RED 20). `low`가 `0 < abv <= 10` 인지 `0 <= abv < 10` 인지 문서에 없다 — ADR-0003을 확인하고, 없으면 **보수적으로 `(하한, 상한]`** + GAPS.
+**경계를 명시적으로 결정한다** (RED 20). `low`가 `0 < abv <= 10` 인지 `0 <= abv < 10` 인지 문서에 없다 — ADR-0003을 확인하고, 없으면 **`(하한, 상한]`** + GAPS.
 
 ### `noindex` (RED 25)
 
@@ -170,5 +170,5 @@ fun list(...): ResponseEntity<PageResponse<CocktailListItem>> =
 - [ ] 도수 4구간, 연속 파라미터 부재 (RED 15·21 — ADR-0003)
 - [ ] `X-Robots-Tag: noindex` (RED 25 — `NFR-S-02`)
 - [ ] 인덱스 사용 확인 (RED 32)
-- [ ] ⚖️ 3건(style 필터 대상·sweet 복수·도수 경계) `GAPS.md` 등재
+- [ ] 미결은 [`DECISIONS.md`](DECISIONS.md) §1 확정분을 따른다 — **이슈에서 판단하지 않는다**
 - [ ] 커밋: `feat(search): 칵테일 목록·필터 (FR-SEARCH-001·003·005, SPEC-07 §3.1)`

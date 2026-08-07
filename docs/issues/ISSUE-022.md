@@ -65,21 +65,21 @@ owns:
 
 ### 코퍼스 존재 여부
 
-10. `발행분이_있는_카테고리만_반환하는가` ⚖️ — `generateStaticParams`가 빈 페이지를 만들면 안 된다. **보수적으로 건수 0인 축값은 제외** + GAPS
+10. `발행분이_있는_카테고리만_반환하는가` **결정** — `generateStaticParams`가 빈 페이지를 만들면 안 된다. **건수 0인 축값은 제외**
 11. `건수가_정확하다` — 발행분 기준
 12. `draft만_있는_카테고리는_제외된다`
-13. `enum_전체_목록도_별도로_제공하는가` ⚖️ — 필터 UI는 전체가 필요할 수 있다. **보수적으로 `?include=all` 옵션** 또는 별도 필드 + GAPS
+13. `enum_전체_목록도_별도로_제공하는가` **결정** — 필터 UI는 전체가 필요할 수 있다. **`?include=all` 옵션** 또는 별도 필드
 
 ### style 축의 특수성
 
-14. `style_카테고리는_style_primary_기준이다` ⚖️ — 아니면 `styles` 전체. **`R-C-3`이 primary를 대표로 규정**했으므로 primary 기준. + GAPS
+14. `style_카테고리는_style_primary_기준이다` **결정** — 아니면 `styles` 전체. **`R-C-3`이 primary를 대표로 규정**했으므로 primary 기준.
 15. `styles에만_있고_primary가_아닌_값도_카테고리가_되는가` — RED 14의 반대면
 
 ### 소개 문구 (`FR-COCKTAIL-031`, `NFR-S-07`)
 
 16. `카테고리마다_소개_문구_필드가_있다`
 17. `소개_문구가_없으면_어떻게_되는가` ⚖️ — `NFR-S-07`은 "**발행 차단**"이라 하지만 `FR-COCKTAIL-031`은 **P1**이다. 충돌.
-    **보수적 해석**: 문구 저장 구조는 지금 만들되(P0 스키마), 없어도 카테고리 페이지는 나온다. `NFR-S-07`의 발행 차단은 **P1 착수 시** 적용. + GAPS 등재
+    **보수적 해석**: 문구 저장 구조는 지금 만들되(P0 스키마), 없어도 카테고리 페이지는 나온다. `NFR-S-07`의 발행 차단은 **P1 착수 시** 적용.
 
 ### 색인 (`NFR-S-02`)
 
@@ -149,5 +149,5 @@ fun categoryPath(axis: Axis, slug: String): String = "/cocktails/${axis.slug}/$s
 - [ ] 축 조합 경로 생성 **불가 구조** (RED 8 — `R-C-2`, `NFR-S-03`)
 - [ ] slug가 ADR-0002 확정값 (RED 6)
 - [ ] **`category_intro` 테이블 추가 + `GAPS.md`에 SPEC-06 누락 등재**, frontmatter `migration: V022`로 갱신
-- [ ] ⚖️ 5건(빈 카테고리·enum 전체 제공·style 기준·소개 문구 P0/P1 충돌) `GAPS.md` 등재
+- [ ] 미결은 [`DECISIONS.md`](DECISIONS.md) §1 확정분을 따른다 — **이슈에서 판단하지 않는다**
 - [ ] 커밋: `feat(cocktail): 3축 카테고리 API (FR-COCKTAIL-029·030, R-C-2, PRIN-P06)`

@@ -78,16 +78,16 @@ owns:
 
 22. `발행된_칵테일만_반환된다`
 23. `draft_칵테일이_없다`
-24. `표준_레시피_기준이다` ⚖️ — `bar_signature`(1b)에만 쓰인 재료도 셀지. **보수적으로 standard만** + GAPS
-25. `선택_재료도_포함되는가` ⚖️ — `is_optional=true`. 보수적으로 **포함하되 표시** + GAPS
-26. `대체재로만_등장하는_칵테일도_포함되는가` ⚖️ — `substitute_ingredient_id`. 보수적으로 **제외** + GAPS
+24. `표준_레시피_기준이다` **결정** — `bar_signature`(1b)에만 쓰인 재료도 셀지. **standard만**
+25. `선택_재료도_포함되는가` **결정** — `is_optional=true`. **포함하되 표시**
+26. `대체재로만_등장하는_칵테일도_포함되는가` **결정** — `substitute_ingredient_id`. **제외**
 27. `페이징된다`
 28. `인덱스를_탄다` — `recipe_ingredient(ingredient_id)` EXPLAIN (SPEC-06 §5)
 
 ### 캐싱·색인
 
 29. `ETag와_Cache_Control이_붙는다`
-30. `noindex가_붙지_않는다` ⚖️ — 재료 사전은 색인 가치가 있다. SPEC-05 §4 렌더링 표에 `/ingredients` 경로가 **없다**. + GAPS 등재
+30. `noindex가_붙지_않는다` **결정** — 재료 사전은 색인 가치가 있다. SPEC-05 §4 렌더링 표에 `/ingredients` 경로가 **없다**.
 
 ## GREEN
 
@@ -134,16 +134,16 @@ WHERE ri.ingredient_id = :id
 
 `cocktail` 테이블을 `ingredient` 모듈이 직접 조인한다 — **경계 위반이다** (`PRIN-T03`).
 
-⚖️ **해법 2안**:
+**결정** **해법 2안**:
 1. `cocktail.api`에 `CocktailFacade.findByIngredient(id)` 를 두고 호출 — 경계 준수, 쿼리 2번
 2. `SEARCH` 모듈이 담당 — SPEC-05 §3의 `SEARCH ──reads──▶ COCKTAIL · INGREDIENT` 방향에 부합
 
-**보수적으로 1안**(`CocktailFacade`)을 택한다. SPEC-05 §3이 "조회 전용 서비스가 담당해 순환을 끊는다"고 했으나 여기엔 순환이 없다. GAPS 등재.
+**1안**(`CocktailFacade`)을 택한다. SPEC-05 §3이 "조회 전용 서비스가 담당해 순환을 끊는다"고 했으나 여기엔 순환이 없다. GAPS 등재.
 
 **하지 말 것**:
 - 재료 승인 — 이슈 026
 - 역검색 (내 술장) — Phase 2
-- 재료 사전 화면 — FE (Phase 1a 화면 목록에 명시 없음 ⚖️ + GAPS)
+- 재료 사전 화면 — FE (Phase 1a 화면 목록에 명시 없음 **결정**)
 
 ## DoD
 
@@ -153,5 +153,5 @@ WHERE ri.ingredient_id = :id
 - [ ] **⚠️ 1a 데이터에 `is_sponsored = true` 가 0건** — 구조는 만들되 켜지 않는다. 켜면 ADR-0004의 주류 광고 접점이 생겨 `NFR-L-05` 선행이 필요하다 (이슈 008 DoD와 쌍)
 - [ ] `CocktailFacade` 경유로 모듈 경계 준수 (경계 테스트 통과)
 - [ ] 인덱스 사용 (RED 28)
-- [ ] ⚖️ 5건(standard 한정·선택 재료·대체재 등장·색인 여부·모듈 경계 해법) `GAPS.md` 등재
+- [ ] 미결은 [`DECISIONS.md`](DECISIONS.md) §1 확정분을 따른다 — **이슈에서 판단하지 않는다**
 - [ ] 커밋: `feat(ingredient): 재료 사전 조회 (FR-INGREDIENT-002·005, R-F1.3-1·R-F1.3-3)`

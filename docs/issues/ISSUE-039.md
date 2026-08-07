@@ -77,7 +77,7 @@ owns:
 
 19. `카테고리마다_소개_문구가_렌더된다`
 20. `문구가_카테고리마다_다르다` — 고유성
-21. `문구가_없으면_어떻게_되는가` ⚖️ — `NFR-S-07`은 "발행 차단"인데 `FR-COCKTAIL-031`은 **P1**. 이슈 022 RED 17과 **같은 판단**: 구조는 만들되 없어도 페이지는 나온다 + GAPS
+21. `문구가_없으면_어떻게_되는가` ⚖️ — `NFR-S-07`은 "발행 차단"인데 `FR-COCKTAIL-031`은 **P1**. 이슈 022 RED 17과 **같은 판단**: 구조는 만들되 없어도 페이지는 나온다
 22. `문구가_초기_HTML에_있다` — 색인 대상
 
 ### 사이트맵 (`NFR-S-04`)
@@ -147,7 +147,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
 이슈 022의 `category_intro` 테이블에서 온다. **`GET /categories` 응답의 `intro` 필드.**
 
-없으면 ⚖️ 보수적으로 **페이지는 렌더하되 CI 경고**. `NFR-S-07`의 "발행 차단"은 P1 착수 시 (이슈 022와 동일 판단).
+없으면 **결정** **페이지는 렌더하되 CI 경고**. `NFR-S-07`의 "발행 차단"은 P1 착수 시 (이슈 022와 동일 판단).
 
 **하지 말 것**:
 - 필터 UI — 이슈 040
@@ -162,5 +162,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 - [ ] 3축 외 카테고리 디렉터리 부재 (RED 4 — `PRIN-P06`)
 - [ ] SSG + ISR, 색인됨 (RED 12·16 — `NFR-S-01·S-02`)
 - [ ] 슬러그가 ADR-0002 확정값 (RED 5 — `PRIN-D02`)
-- [ ] ⚖️ 1건(소개 문구 P0/P1 충돌 — 이슈 022와 동일) `GAPS.md` 등재
+- [ ] 미결은 [`DECISIONS.md`](DECISIONS.md) §1 확정분을 따른다 — **이슈에서 판단하지 않는다**
 - [ ] 커밋: `feat(web): 카테고리 페이지 SSG (FR-COCKTAIL-029·030·031, R-C-2, NFR-S-03)`

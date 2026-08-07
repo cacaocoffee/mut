@@ -48,7 +48,7 @@ owns:
 | `styles[]` + `stylePrimary` | `cocktail_style` 조인 테이블 + 복합 FK | 행 분해 |
 | `flavors[]` | `cocktail_aroma_tag` 조인 | 행 분해 |
 | `steps: string[]` | `recipe_step(step_no, text)` | 인덱스 부여 |
-| `story: {title, paragraphs}` | `story TEXT` | 직렬화 ⚖️ |
+| `story: {title, paragraphs}` | `story TEXT` | 직렬화 **결정** |
 | `profile: [5개 숫자]` | **스키마에 없다** | ⚠️ **누락** — `FR-COCKTAIL-023`(P1 레이더)의 데이터 |
 | `origin: {year, place, creator}` | `origin_year`·`origin_place`·`origin_creator` | 분해 |
 | `summary` | `summary TEXT NOT NULL` | 그대로 |
@@ -65,10 +65,10 @@ owns:
 1. `프로토타입_재료명에서_마스터가_생성된다` — 24종의 인라인 재료 → `ingredient` 행
 2. `동일_재료가_중복_생성되지_않는다` — `ko` 기준 정규화
 3. `재료에_slug가_부여된다`
-4. `재료_카테고리가_지정된다` — 7종 중. **자동 추론 불가한 것은 수동 매핑표** ⚖️
+4. `재료_카테고리가_지정된다` — 7종 중. **자동 추론 불가한 것은 수동 매핑표** **결정**
 5. `garnish_재료의_counts_for_stock이_false다` (이슈 008 RED 2)
-6. `domestic_availability가_지정된다` — NOT NULL. **기본값 `common`** ⚖️ + GAPS
-7. `재료가_is_approved_true로_시드된다` — 시드는 승인된 상태 ⚖️
+6. `domestic_availability가_지정된다` — NOT NULL. **기본값 `common`** **결정**
+7. `재료가_is_approved_true로_시드된다` — 시드는 승인된 상태 **결정**
 
 ### 값 변환
 
@@ -105,19 +105,19 @@ owns:
 
 ### 도수 (`INV-COCKTAIL-06`, 이슈 011)
 
-29. `abv가_이관된다` — 프로토타입은 실측값이라 `abv_override`로 ⚖️
+29. `abv가_이관된다` — 프로토타입은 실측값이라 `abv_override`로 **결정**
 30. `무알콜은_abv가_0이다`
 31. `abv_0인데_기주가_무알콜이_아닌_항목이_없다`
 
 ### 멱등 (`R__` repeatable)
 
 32. `시드를_두_번_적용해도_중복되지_않는다` — repeatable 마이그레이션의 성질
-33. `기존_데이터를_덮어쓰지_않는다` ⚖️ — 운영 데이터 보호. **보수적으로 없을 때만 삽입** + GAPS
+33. `기존_데이터를_덮어쓰지_않는다` **결정** — 운영 데이터 보호. **없을 때만 삽입**
 
 ### 손실 항목
 
 34. `profile_5축이_어디로_가는가` ⚖️ — **SPEC-06에 컬럼이 없다.** `FR-COCKTAIL-023`(P1 레이더)의 데이터인데 스키마 누락. **GAPS 등재 필수** — Phase 1a는 P1이라 버려도 되지만 **데이터를 잃으면 다시 못 만든다**
-35. `story_구조가_보존되는가` ⚖️ — `{title, paragraphs[2]}` → `TEXT`. 마크다운 직렬화 + GAPS
+35. `story_구조가_보존되는가` **결정** — `{title, paragraphs[2]}` → `TEXT`. 마크다운 직렬화
 
 ## GREEN
 
@@ -133,7 +133,7 @@ owns:
 
 **2번이 사람의 일이다.** `PRIN-P03`("만들어보지 않은 것은 쓰지 않는다")이 `tasting_note`를 발행 필수로 만든 이유가 이것이다. 자동 생성하면 원칙 위반이다.
 
-⚖️ **24종을 `draft`로 넣고 `tasting_note` 작성 후 발행**하는 것이 정직하다. **보수적으로 그렇게 한다** + GAPS 등재.
+⚖️ **24종을 `draft`로 넣고 `tasting_note` 작성 후 발행**하는 것이 정직하다. **그렇게 한다**.
 
 ### 변환 스크립트
 
@@ -147,7 +147,7 @@ scripts/seed-from-prototype.ts   # data.ts → SQL 생성
 
 Flyway repeatable. 체크섬이 바뀌면 재적용된다 — 시드 수정 시 자동 반영.
 
-⚖️ **운영에서 위험하다** (RED 33): 시드가 운영 데이터를 덮어쓰면 안 된다.
+**결정** **운영에서 위험하다** (RED 33): 시드가 운영 데이터를 덮어쓰면 안 된다.
 **보수적으로**: `INSERT ... ON CONFLICT (slug) DO NOTHING`.
 
 ### `profile` 처리 (RED 34)
@@ -157,7 +157,7 @@ Flyway repeatable. 체크섬이 바뀌면 재적용된다 — 시드 수정 시 
 2. `cocktail`에 컬럼 추가 — SPEC-06 개정 필요
 3. JSONB로 임시 보관
 
-**보수적으로 2안**: SPEC-06 §3.1에 `flavor_profile SMALLINT[5]` 추가를 `GAPS.md`에 올리고, **데이터는 지금 넣는다**. 나중에 다시 만들 수 없는 자료다.
+**2안**: SPEC-06 §3.1에 `flavor_profile SMALLINT[5]` 추가를 `GAPS.md`에 올리고, **데이터는 지금 넣는다**. 나중에 다시 만들 수 없는 자료다.
 
 **하지 말 것**:
 - `tasting_note` 자동 생성 (`PRIN-P03` 위반)
@@ -171,5 +171,5 @@ Flyway repeatable. 체크섬이 바뀌면 재적용된다 — 시드 수정 시 
 - [ ] `BASE_SLUGS` 10종 일치 (RED 9 — ADR-0002)
 - [ ] 시드 멱등 (RED 32·33)
 - [ ] 변환 스크립트 커밋
-- [ ] ⚖️ 6건(재료 카테고리 매핑·유통 기본값·승인 상태·`profile` 누락·`story` 구조·draft 선삽입) `GAPS.md` 등재. **`profile`은 SPEC-06 개정 제안 포함**
+- [ ] 미결은 [`DECISIONS.md`](DECISIONS.md) §1 확정분을 따른다 — **이슈에서 판단하지 않는다**
 - [ ] 커밋: `feat(api): 프로토타입 24종 Postgres 시드 이관 (SPEC-01 §6, SPEC-06 §6)`

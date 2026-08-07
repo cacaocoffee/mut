@@ -102,9 +102,9 @@ GET  /auth/{provider}/callback    → state 검증 → 세션 발급
 ### 최초 로그인
 
 24. `최초_로그인시_user_행이_생성된다`
-25. `기본_역할이_member다` ⚖️ — SPEC에 명시 없음. 보수적으로 `member` 부여 + GAPS
+25. `기본_역할이_member다` **결정** — SPEC에 명시 없음. `member` 부여
 26. `display_name이_provider에서_온다`
-27. `display_name이_없으면_어떻게_되는가` ⚖️ — NOT NULL이다. **보수적으로 provider 기본값 또는 생성 실패** + GAPS
+27. `display_name이_없으면_어떻게_되는가` **결정** — NOT NULL이다. **provider 기본값 또는 생성 실패**
 
 ### 세션 (이슈 005 연계)
 
@@ -126,7 +126,7 @@ GET  /auth/{provider}/callback    → state 검증 → 세션 발급
 ### 보안
 
 36. `redirect_uri가_화이트리스트다` — 오픈 리다이렉트 방지
-37. `provider_토큰이_저장되지_않는다` ⚖️ — 갱신 토큰 보관 여부. **보수적으로 저장 안 함**(필요 없다 — 세션이 우리 것) + GAPS
+37. `provider_토큰이_저장되지_않는다` **결정** — 갱신 토큰 보관 여부. **저장 안 함**(필요 없다 — 세션이 우리 것)
 38. `provider_응답이_로그에_남지_않는다` — 개인정보
 
 ## GREEN
@@ -181,7 +181,7 @@ userRepository.findByProviderAndProviderUid(provider, profile.providerUid)
 **하지 말 것**:
 - 이메일 가입 — 후순위 (`R-F5-3`)
 - 회원 탈퇴 실제 구현 — 이슈 005 RED 23~26의 `@Disabled` 해제는 북마크(031)·이벤트(034) 이후
-- 프로필 편집 — Phase 1a 범위 밖 ⚖️
+- 프로필 편집 — Phase 1a 범위 밖 **결정**
 
 ## DoD
 
@@ -191,5 +191,5 @@ userRepository.findByProviderAndProviderUid(provider, profile.providerUid)
 - [ ] 이메일 없이 가입 완료 (RED 21 — 애플)
 - [ ] scope가 SPEC-08 §5.1 목록 내 (RED 34)
 - [ ] `SocialAuthProvider` 어댑터로 벤더 격리 (RED 16 — `PRIN-T06`)
-- [ ] ⚖️ 4건(기본 역할·display_name 부재·provider 토큰·프로필 편집) `GAPS.md` 등재
+- [ ] 미결은 [`DECISIONS.md`](DECISIONS.md) §1 확정분을 따른다 — **이슈에서 판단하지 않는다**
 - [ ] 커밋: `feat(user): 소셜 로그인 3종 OAuth PKCE (FR-USER-001, SPEC-08 §4.2, PRIN-T06)`

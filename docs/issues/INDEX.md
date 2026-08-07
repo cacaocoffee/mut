@@ -1,6 +1,9 @@
 # 이슈 보드 — Phase 1a (칵테일 아카이브 단독)
 
-> 착수 전 [`CONVENTIONS.md`](CONVENTIONS.md)를 읽는다.
+> 착수 전 [`CONVENTIONS.md`](CONVENTIONS.md)와 [`DECISIONS.md`](DECISIONS.md)를 읽는다.
+>
+> **미결은 이슈가 아니라 [`DECISIONS.md`](DECISIONS.md)에 있다.** 171건을 §1 확정(그대로 구현) / §2 대기(`BLOCKED`) / §3 착수 후로 나눠 놨다.
+> 이슈 본문의 "보수적으로 X"는 §1의 근거이지 판단 요청이 아니다 — **멈추지 말고 구현한다.**
 > **이슈를 집으면 이 파일의 status를 먼저 바꾸고 커밋한다** — 중복 착수 방지.
 
 범위 근거: [`SPEC-01 §4.1`](../spec/SPEC-01_시스템개요_범위.md) — **P0 56건 전수 커버 / 이슈 47개**.

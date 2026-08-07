@@ -69,14 +69,14 @@ owns:
 2. `최초_발행_후_slug_변경이_거부된다` — 422 + `code=INV-COCKTAIL-05`
 3. `published에서_draft로_되돌린_뒤에도_slug를_못_바꾼다` — "**최초 발행 이후**"
 4. `archived_상태에서도_slug를_못_바꾼다`
-5. `slug_변경_시도가_감사에_기록된다` — 거부돼도 시도는 남긴다 ⚖️ (`NFR-D-04` "즉시 조사"의 근거) + GAPS
+5. `slug_변경_시도가_감사에_기록된다` — 거부돼도 시도는 남긴다 **결정** (`NFR-D-04` "즉시 조사"의 근거)
 6. `다른_칵테일이_쓰던_slug를_재사용할_수_없다` (`PRIN-D02` "재사용하지 않는다") — 논리적으로 삭제가 없으니 UNIQUE가 보장하나, **archived 것도 점유 유지**를 명시적으로 검증
 7. `slug_변경_마이그레이션이_없다` (SPEC-06 §6) — 마이그레이션 파일 스캔
 
 ### 상태 전이 (SPEC-02 §8.1)
 
 8. `전이_매트릭스_전수` — `draft→published`(게이트) · `published→draft` · `published→archived` · `archived→draft` 허용 / 그 외 거부
-9. `draft에서_archived로_직행할_수_있는가` ⚖️ — 도식에 없다. **보수적으로 거부** + GAPS
+9. `draft에서_archived로_직행할_수_있는가` **결정** — 도식에 없다. **거부**
 10. `전이가_전부_감사에_기록된다`
 11. `되돌려도_색인된_URL은_유지된다` — slug 불변으로 성립 (RED 3)
 
@@ -89,7 +89,7 @@ owns:
 16. `actor_user_id가_기록된다`
 17. `at이_기록된다`
 18. `entity_type과_entity_id가_기록된다`
-19. `감사_로그가_수정되지_않는다` ⚖️ — SPEC-06 §4.1의 `REVOKE DELETE` 목록에 `audit_log`는 **없다**. `PRIN-T08`의 취지상 append-only가 맞다. **보수적으로 UPDATE·DELETE 권한 회수** + GAPS 등재
+19. `감사_로그가_수정되지_않는다` **결정** — SPEC-06 §4.1의 `REVOKE DELETE` 목록에 `audit_log`는 **없다**. `PRIN-T08`의 취지상 append-only가 맞다. **UPDATE·DELETE 권한 회수**
 20. `감사_조회_인덱스가_있다` — `(entity_type, entity_id, at)`
 21. `탈퇴한_사용자의_actor_user_id가_유지된다` (SPEC-08 §5.3)
 22. `Phase_1b_2용_action_값이_미리_정의돼_있다` — `tier_change`·`rank_change`·`verify`. 나중에 enum을 늘리면 클라이언트가 깨진다
@@ -128,7 +128,7 @@ CREATE TABLE audit_log (
 );
 CREATE INDEX ON audit_log (entity_type, entity_id, at);   -- SPEC-06 §5
 
-REVOKE UPDATE, DELETE ON audit_log FROM kcocktail_app;    -- RED 19 (⚖️ 문서 이탈 — GAPS)
+REVOKE UPDATE, DELETE ON audit_log FROM kcocktail_app;    -- RED 19 (**결정** 문서 이탈 — GAPS)
 ```
 
 `action` CHECK에 SPEC-06 §3.8의 5종 + 전이에 필요한 `archive`·`restore` + `slug_change_attempt`(RED 5)를 넣는다. **SPEC-06 표를 넘어서는 값이므로 GAPS에 근거를 남긴다.**
@@ -182,5 +182,5 @@ object CocktailTransition {         // SPEC-02 §8.1 — 선언적
 - [ ] `audit_log` UPDATE/DELETE 권한 회수 (RED 19)
 - [ ] 전이가 감사와 **같은 트랜잭션** (RED 29·30)
 - [ ] **회수·보관·별칭 변경이 이벤트를 발행** (RED 25~27 — 이슈 017이 구독)
-- [ ] ⚖️ 4건(변경 시도 기록·`draft→archived`·audit 불변·action 확장) `GAPS.md` 등재
+- [ ] 미결은 [`DECISIONS.md`](DECISIONS.md) §1 확정분을 따른다 — **이슈에서 판단하지 않는다**
 - [ ] 커밋: `feat(cocktail): slug 불변·상태 전이·감사 로그 (FR-COCKTAIL-014·015, PRIN-D02·T08)`

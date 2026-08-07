@@ -80,7 +80,7 @@ owns:
 10. `GATE_06_import_only_재료가_있으면_대체재_명시_필수`
 11. `GATE_06_unavailable_재료가_있으면_대체재_명시_필수`
 12. `GATE_06_common_specialty만_있으면_대체재_불요`
-13. `GATE_06_대체재는_substitute_ingredient_id_또는_substitute_note로_충족` ⚖️ — 둘 중 하나면 되는지 보수적 판단 + GAPS
+13. `GATE_06_대체재는_substitute_ingredient_id_또는_substitute_note로_충족` **결정** — 둘 중 하나면 되는지 판단
 14. `게이트_6종_전부_통과하면_발행된다`
 
 ### violations 전부 반환 (`FR-ADMIN-003`, SPEC-07 §3.4)
@@ -95,7 +95,7 @@ owns:
 
 20. `draft에서_published로_전이한다`
 21. `이미_published면_409` (SPEC-07 §3.4)
-22. `archived에서_직접_published로_갈_수_있는가` ⚖️ — SPEC-02 §8.1 도식은 `draft ↔ published → archived`. **archived → draft → published** 경로만 허용하는 것이 보수적. + GAPS
+22. `archived에서_직접_published로_갈_수_있는가` **결정** — SPEC-02 §8.1 도식은 `draft ↔ published → archived`. **archived → draft → published** 경로만 허용하는 것이 보수적.
 23. `published에서_draft로_되돌릴_수_있다` (SPEC-02 §8.1 "되돌리기가 가능")
 24. `회수시에는_게이트를_검사하지_않는다`
 
@@ -191,5 +191,5 @@ object PublishGate {
 - [ ] `PublishGate` 가 **순수 함수**이고 이슈 016이 재사용할 시그니처 (RED 32·33)
 - [ ] 게이트 우회 경로 부재 (RED 29·30 — `NFR-D-02`)
 - [ ] `validate.ts` 유지, 정본이 Kotlin임을 주석으로 명시
-- [ ] ⚖️ 2건(대체재 충족 기준·archived 전이) `GAPS.md` 등재
+- [ ] 미결은 [`DECISIONS.md`](DECISIONS.md) §1 확정분을 따른다 — **이슈에서 판단하지 않는다**
 - [ ] 커밋: `feat(cocktail): 발행 게이트 6종 서버 강제 (FR-COCKTAIL-010~013, GATE-COCKTAIL-01~06, PRIN-P03·T05)`

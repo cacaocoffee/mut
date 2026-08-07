@@ -78,8 +78,8 @@ abv             NUMERIC(4,1)   GENERATED — COALESCE(abv_override, abv_calculat
 
 12. `counts_for_stock_false_재료는_계산에서_제외된다` — **가니시**
 13. `amount가_없는_재료는_계산에서_제외된다` — `top_up`·`1조각`
-14. `단위가_ml이_아닌_재료는_계산에서_제외된다` ⚖️ — `dash`·`barspoon`은 용량이 작아 무시. **보수적으로 제외** + GAPS
-15. `is_optional_재료는_포함되는가` ⚖️ — 표준 레시피 기준이므로 **포함**. 보수적 + GAPS
+14. `단위가_ml이_아닌_재료는_계산에서_제외된다` **결정** — `dash`·`barspoon`은 용량이 작아 무시. **제외**
+15. `is_optional_재료는_포함되는가` **결정** — 표준 레시피 기준이므로 **포함**. 보수적
 16. `계산_대상_재료가_0개면_계산값이_null이다` — 0이 아니라 null
 
 ### 오버라이드
@@ -95,7 +95,7 @@ abv             NUMERIC(4,1)   GENERATED — COALESCE(abv_override, abv_calculat
 22. `재료_추가시_abv_calculated가_재계산된다`
 23. `재료_용량_변경시_재계산된다`
 24. `기법_변경시_재계산된다` — Shake → Stir
-25. `재료의_마스터_도수가_바뀌면_재계산이_필요하다고_표시된다` ⚖️ — 전체 재계산은 배치. **보수적으로 검증 태스크 생성**(이슈 028) + GAPS
+25. `재료의_마스터_도수가_바뀌면_재계산이_필요하다고_표시된다` **결정** — 전체 재계산은 배치. **검증 태스크 생성**(이슈 028)
 
 ### 무알콜 정합 (`INV-COCKTAIL-06`)
 
@@ -162,5 +162,5 @@ object AbvCalculator {
 - [ ] 희석률 3종이 SPEC-02 §2.4 표와 일치, `Blend`·`Etc`는 계산 안 함
 - [ ] 가니시 제외 (RED 12 — `FR-COCKTAIL-006`)
 - [ ] 공개 응답에 `abv` 하나만 (RED 29 — SPEC-07 §5)
-- [ ] ⚖️ 4건(비-ml 단위·선택 재료·마스터 도수 변경·재계산 시점) `GAPS.md` 등재
+- [ ] 미결은 [`DECISIONS.md`](DECISIONS.md) §1 확정분을 따른다 — **이슈에서 판단하지 않는다**
 - [ ] 커밋: `feat(cocktail): 도수 자동계산·오버라이드 (FR-COCKTAIL-006, R-F1.1-4)`

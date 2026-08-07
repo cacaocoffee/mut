@@ -136,7 +136,7 @@ class AdminCocktailController(
 [커밋 후]   search_document 동기화 → 재생성 훅
 ```
 
-⚖️ 이슈 017 RED 18에서 "동기화 실패 시 롤백?"을 보수적으로 **같은 트랜잭션**으로 정했다. 그러면 위 순서는:
+**결정** 이슈 017 RED 18에서 "동기화 실패 시 롤백?"을 **같은 트랜잭션**으로 정했다. 그러면 위 순서는:
 
 ```
 [트랜잭션]  게이트 → 저장 → audit_log → search_document 동기화

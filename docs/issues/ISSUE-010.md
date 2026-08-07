@@ -72,7 +72,7 @@ CREATE UNIQUE INDEX uq_recipe_standard
 3. `standard_레시피_2개는_DB가_거부한다` — **부분 유니크 인덱스** (SPEC-06 §3.1)
 4. `bar_signature는_여러개_가능`
 5. `standard가_없는_칵테일은_발행할_수_없다` — 게이트는 이슈 013, 여기서는 조회 함수 제공
-6. `bar_signature는_author_bar_id가_필수다` ⚖️ — Phase 1b에 `bar` 테이블이 생긴다. 지금은 컬럼만 두고 FK는 1b
+6. `bar_signature는_author_bar_id가_필수다` **결정** — Phase 1b에 `bar` 테이블이 생긴다. 지금은 컬럼만 두고 FK는 1b
 7. `user_타입은_author_user_id가_필수다` — v2
 
 ### 재료 참조 (`PRIN-D01`, `R-F1.1-1`)
@@ -80,7 +80,7 @@ CREATE UNIQUE INDEX uq_recipe_standard
 8. `ingredient_id가_NOT_NULL이다` — 프리텍스트 금지 (`NFR-D-03`)
 9. `프리텍스트_재료명_컬럼이_존재하지_않는다` — 스키마 단언. **있으면 반드시 쓰인다**
 10. `존재하지_않는_ingredient_id는_FK가_거부한다`
-11. `미승인_재료도_draft_레시피에는_넣을_수_있다` ⚖️ (이슈 008 RED 17과 같은 판단)
+11. `미승인_재료도_draft_레시피에는_넣을_수_있다` — [DECISIONS §1.1](DECISIONS.md)
 
 ### 단위·역할 (SPEC-02 §2.7)
 
@@ -196,5 +196,5 @@ fun RecipeIngredient.isScalable(): Boolean = amountLabel == null && amount != nu
 - [ ] 프리텍스트 재료 컬럼 **부재** (RED 9 — `PRIN-D01`)
 - [ ] `counts_for_stock` 기본값이 `IngredientFacade` 경유 (모듈 경계)
 - [ ] `recipe_ingredient(ingredient_id)` 인덱스 (RED 28)
-- [ ] ⚖️ 2건(`bar_signature` FK 시점·미승인 재료) `GAPS.md` 등재
+- [ ] 미결은 [`DECISIONS.md`](DECISIONS.md) §1 확정분을 따른다 — **이슈에서 판단하지 않는다**
 - [ ] 커밋: `feat(cocktail): 레시피·재료·스텝 (FR-COCKTAIL-003·004·005, PRIN-D01·D03, INV-COCKTAIL-07)`
