@@ -42,6 +42,8 @@ dependencies {
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.testcontainers:junit-jupiter:1.20.4")
     testImplementation("org.testcontainers:postgresql:1.20.4")
+    // ISSUE-001 — 모듈 경계 (PRIN-T03, SPEC-05 §3)
+    testImplementation("com.tngtech.archunit:archunit:1.3.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
