@@ -1,0 +1,15 @@
+# ISSUE-000 RED 2 — 컨텍스트 로드는 DB 없이 뜬다.
+# 실제 스키마 검증은 Testcontainers 를 쓰는 테스트가 한다 (이슈 002 부터).
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+      - org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration
+  flyway:
+    enabled: false
+
+logging:
+  level:
+    root: WARN

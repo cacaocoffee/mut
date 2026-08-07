@@ -1,0 +1,5 @@
+# Gradle wrapper — 배치 파일은 CRLF 여야 Windows 에서 돈다.
+# gradlew(sh)와 jar 는 손대지 않는다.
+*.bat           text eol=crlf
+gradlew         text eol=lf
+*.jar           binary

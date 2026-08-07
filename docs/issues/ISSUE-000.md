@@ -4,7 +4,7 @@ title: apps/api Gradle 스캐폴딩 (Kotlin · Spring Boot 3.x)
 domain: —
 layer: infra
 wave: 0
-status: TODO
+status: DONE
 depends_on: [ISSUE-A00]
 fr: []
 r: []
@@ -112,9 +112,27 @@ kr/kcocktail/<domain>/
 
 ## DoD
 
-- [ ] RED 7항 전부 통과
-- [ ] 10개 패키지(9 도메인 + common) 각각에 5개 하위 디렉터리 존재
-- [ ] `apps/api/README.md`에 로컬 실행 방법 (Docker 전제 명시)
-- [ ] `npm run build`(웹)와 `./gradlew build`(API)가 서로 독립 (RED 6·7)
-- [ ] CI 초록
-- [ ] 커밋: `chore(api): Kotlin·Spring Boot 스캐폴딩 (PRIN-T01·T03, SPEC-05 §2)`
+- [x] RED 7항 전부 통과 — `./gradlew clean check` **8/8 PASSED**
+- [x] 10개 패키지(9 도메인 + common) 각각에 5개 하위 디렉터리 존재 — `.gitkeep` 50개
+- [x] `apps/api/README.md`에 로컬 실행 방법 (Docker 전제 명시)
+- [x] `npm run build`(웹)와 `./gradlew build`(API)가 서로 독립 (RED 6·7)
+- [x] CI — `.github/workflows/api.yml` 배치. **원격 저장소가 아직 없어 실행 검증은 최초 push 시점**으로 미룬다 (G-07 호스팅 미정과 같은 줄기)
+- [x] 커밋: `chore(api): Kotlin·Spring Boot 스캐폴딩 (PRIN-T01·T03, SPEC-05 §2)`
+
+## 남긴 것 — 다음 세션이 알아야 할 사실
+
+### Testcontainers 소켓 자동 탐색을 빌드에 넣었다
+
+`build.gradle.kts` 의 `detectDockerHost()` 가 소켓을 찾아 테스트 JVM 환경에 주입한다. **개발자가 각자 `DOCKER_HOST` 를 설정하지 않는다.** 배경은 `apps/api/README.md` §Docker 소켓 자동 탐색.
+
+macOS Docker Desktop 에서 `/var/run/docker.sock` 은 Engine API 를 거부하는 CLI 소켓이라 `docker ps` 는 되는데 Testcontainers 만 죽는다. 실제 엔진은 `docker.raw.sock` 이다. 비표준 소켓일 때는 Ryuk 을 끈다 — 리눅스·CI 에서는 켠 채로 둔다.
+
+> ⚠️ **저장소 밖 파일을 하나 고쳤다.** `~/.testcontainers.properties` 에 Testcontainers 가 과거에 써 둔 `docker.client.strategy=UnixSocketClientProviderStrategy` 가 깨진 소켓을 강제하고 있어 그 줄을 지웠다. 백업: `~/.testcontainers.properties.bak-20260807`. 다른 기계에서 같은 증상이 나면 README 의 마지막 절을 본다.
+
+### 컴파일 에러는 RED 가 아니다 (CONVENTIONS §3.1)
+
+`kotlin.test` 미해결로 테스트가 "실패"했던 것을 RED 로 착각할 뻔했다. `testImplementation(kotlin("test"))` + `kotlin("test-junit5")` 를 넣어 해소했다.
+
+### `boundaryTest` 태스크는 비어 있다
+
+`check` 가 `boundaryTest` 에 의존하도록 배선만 해 뒀다. `@Tag("boundary")` 가 붙은 테스트가 아직 없어 통과한다 — **이슈 001 이 채운다.**
