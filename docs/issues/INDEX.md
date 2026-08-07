@@ -53,7 +53,7 @@ Phase 1b(BAR 14 · PARTNER 7)와 Phase 2 이후는 [`EPICS-1B-PHASE2.md`](EPICS-
 
 | ID | 제목 | layer | status | 의존 | 근거 |
 |---|---|---|---|---|---|
-| **[A00](ISSUE-A00.md)** | **스펙 정합 — SPEC-06 2건 보강·충돌 2건 해소** | **docs** | **TODO** | — | **G-18~G-21** |
+| [A00](ISSUE-A00.md) | 스펙 정합 — SPEC-06 보강·충돌 해소·`NFR-L-05` 분해 | docs | **DONE** | — | G-18~G-22 |
 | [000](ISSUE-000.md) | `apps/api` Gradle 스캐폴딩 (Kotlin·Spring Boot 3.x) | infra | TODO | **A00** | `PRIN-T01` SPEC-05 §2 |
 | [001](ISSUE-001.md) | 모듈 경계 테스트 | infra | TODO | 000 | `PRIN-T03` |
 | [002](ISSUE-002.md) | Flyway 기반 + 공통 컬럼 규약 + `pg_trgm` | infra | TODO | 000 | SPEC-06 §1·§6 |

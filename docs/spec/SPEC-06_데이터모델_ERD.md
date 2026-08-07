@@ -132,6 +132,11 @@ PRD 11장이 `styles[]` · `aroma_tags[]`로 적었지만 물리 설계는 **조
 | `hero_media_id` | `BIGINT` | FK → `media_asset` | |
 | `status` | `VARCHAR(12)` | NOT NULL, CHECK | `draft`·`published`·`archived` |
 | `published_at` | `TIMESTAMPTZ` | | |
+| `flavor_profile` | `SMALLINT[5]` | | 단맛·산미·쓴맛·향 강도·알코올 각 0~5 (`FR-COCKTAIL-023`) |
+
+`flavor_profile`은 `FR-COCKTAIL-023`(맛 프로필 레이더, P1)의 데이터다. **기능은 P1이지만 컬럼은 Phase 1a에 둔다** —
+프로토타입 `packages/domain/src/data.ts`의 24종이 이미 이 값을 갖고 있고, **이관 때 버리면 다시 만들 수 없다**
+([G-19](../prd/GAPS.md#g-19) · 이슈 036). 배열이지만 고정 길이 5의 표시 전용이라 조인 테이블로 쪼개지 않는다(§1.4 예외).
 
 `abv`를 생성 컬럼으로 둔 이유는 **조회·필터가 항상 표시값을 봐야 하기 때문**이다.
 매 쿼리에서 `COALESCE`를 쓰면 인덱스가 안 붙는다.
@@ -425,6 +430,37 @@ CONSTRAINT ck_menu_source CHECK (
 | `at` | `TIMESTAMPTZ` | |
 
 `PRIN-T08`의 4종 대상을 전부 받는다.
+
+#### `verification_task` — 검증 태스크 큐
+
+`FR-ADMIN-004`(**P0**)가 요구하는 저장소다. [G-19](../prd/GAPS.md#g-19)에서 누락이 확인돼 추가했다.
+§4.3이 "위반 건을 관리자 태스크로 올린다"고 한 것도 이 테이블을 전제한다.
+
+| 컬럼 | 타입 | 비고 |
+|---|---|---|
+| `task_type` | `VARCHAR(32)` | CHECK — `invariant_violation`(1a) · `hours_expired`(1b) · `instagram_signal`(1b) |
+| `entity_type` `entity_id` | | 대상 |
+| `code` | `VARCHAR(40)` | `INV-`/`GATE-` ID |
+| `detail` | `JSONB` | |
+| `status` | `VARCHAR(12)` | CHECK — `open`·`resolved`·`dismissed` |
+| `detected_at` `resolved_at` `resolved_by` | | |
+| | | **UNIQUE (`task_type`, `entity_type`, `entity_id`, `code`)** — 멱등 (`PRIN-T07`) |
+
+**세 종류가 한 테이블을 쓴다.** 불변식 위반(§4.3 배치) · 바 정보 만료(`FR-BAR-004`, 1b) · 인스타 폐업 신호(SPEC-05 §8, 1b).
+`task_type`으로 구분하며, **유니크 제약이 배치 재실행 시 중복 생성을 막는다.**
+
+#### `category_intro` — 카테고리 소개 문구
+
+`FR-COCKTAIL-031`(P1) + **`NFR-S-07`(발행 차단)** 이 요구한다. 카테고리는 테이블이 아니라 enum이라 문구를 둘 곳이 필요하다.
+
+| 컬럼 | 타입 | |
+|---|---|---|
+| `axis` | `VARCHAR(8)` | CHECK — `base`·`style`·`method` |
+| `slug` | `VARCHAR(24)` | 3축 슬러그 (ADR-0002) |
+| `intro` | `TEXT` | |
+| | | PK (`axis`, `slug`) |
+
+> `slug`는 `cocktail`의 축 값을 가리키지만 **FK를 걸지 않는다** — 축 값은 Kotlin enum이 정본이고(`PRIN-T02`) DB에 마스터 테이블이 없다.
 
 #### `analytics_event`
 

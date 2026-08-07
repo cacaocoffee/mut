@@ -4,7 +4,7 @@ title: 스펙 정합 — SPEC-06 테이블 2건 보강 · 문서 충돌 2건 해
 domain: —
 layer: docs
 wave: 0
-status: TODO
+status: DONE
 depends_on: []
 fr: []
 r: []
