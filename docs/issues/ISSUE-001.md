@@ -4,7 +4,7 @@ title: 모듈 경계 테스트
 domain: —
 layer: infra
 wave: 0
-status: TODO
+status: IN_PROGRESS
 depends_on: [ISSUE-000]
 fr: []
 r: []
