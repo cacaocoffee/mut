@@ -150,6 +150,7 @@ WHERE ri.ingredient_id = :id
 - [ ] RED 30항 전부 통과
 - [ ] `FR-INGREDIENT-002`의 **6개 항목 전부** (RED 13)
 - [ ] `isSponsored` 항상 존재·억제 불가 (RED 20·21 — `NFR-L-02`)
+- [ ] **⚠️ 1a 데이터에 `is_sponsored = true` 가 0건** — 구조는 만들되 켜지 않는다. 켜면 ADR-0004의 주류 광고 접점이 생겨 `NFR-L-05` 선행이 필요하다 (이슈 008 DoD와 쌍)
 - [ ] `CocktailFacade` 경유로 모듈 경계 준수 (경계 테스트 통과)
 - [ ] 인덱스 사용 (RED 28)
 - [ ] ⚖️ 5건(standard 한정·선택 재료·대체재 등장·색인 여부·모듈 경계 해법) `GAPS.md` 등재

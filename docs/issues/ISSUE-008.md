@@ -211,5 +211,6 @@ interface IngredientFacade {                    // PRIN-T03 — 타 모듈은 �
 - [ ] `garnish` 기본값 `false` (RED 2 — `R-F2.2-5`)
 - [ ] `INV-INGREDIENT-01` 이 DB CHECK + 앱 양쪽 (SPEC-06 §4 서두 근거, GAPS에 문서 차이 기록)
 - [ ] `IngredientFacade` 가 `ingredient.api` 로 공개, 엔티티 미노출 (경계 테스트)
+- [ ] **⚠️ 1a에서 `is_sponsored = true` 를 켜지 않는다** — 켜는 순간 ADR-0004가 지목한 **주류 광고 규제 접점**이 생긴다. 켜려면 `NFR-L-05`(법률 검토) 선행. 컬럼·플래그는 만들되 **데이터는 전부 `false`**
 - [ ] ⚖️ 3건(미승인 재료 사용·300개 상한·삭제 정책) `GAPS.md` 등재
 - [ ] 커밋: `feat(ingredient): 재료 마스터·국내유통 불변식 (FR-INGREDIENT-001·003·004·006, PRIN-D01·P05)`

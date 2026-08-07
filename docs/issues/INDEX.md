@@ -50,7 +50,8 @@ Phase 1b(BAR 14 · PARTNER 7)와 Phase 2 이후는 [`EPICS-1B-PHASE2.md`](EPICS-
 
 | ID | 제목 | layer | status | 의존 | 근거 |
 |---|---|---|---|---|---|
-| [000](ISSUE-000.md) | `apps/api` Gradle 스캐폴딩 (Kotlin·Spring Boot 3.x) | infra | TODO | — | `PRIN-T01` SPEC-05 §2 |
+| **[A00](ISSUE-A00.md)** | **스펙 정합 — SPEC-06 2건 보강·충돌 2건 해소** | **docs** | **TODO** | — | **G-18~G-21** |
+| [000](ISSUE-000.md) | `apps/api` Gradle 스캐폴딩 (Kotlin·Spring Boot 3.x) | infra | TODO | **A00** | `PRIN-T01` SPEC-05 §2 |
 | [001](ISSUE-001.md) | 모듈 경계 테스트 | infra | TODO | 000 | `PRIN-T03` |
 | [002](ISSUE-002.md) | Flyway 기반 + 공통 컬럼 규약 + `pg_trgm` | infra | TODO | 000 | SPEC-06 §1·§6 |
 | [003](ISSUE-003.md) | REST 규약 — Problem Details·`violations`·페이징·ETag·멱등 | api | TODO | 000 | SPEC-07 §1 |
@@ -195,6 +196,29 @@ Wave 4가 최대 병렬 구간(4세션), Wave 8이 그다음(4세션)이다.
 |---|---|---|
 | **에디터** | **사용자 본인 + 주변인** | G-17의 "에디터 채용 형태"가 부분 해소. `tasting_note` 작성 담당 확보 — [`ISSUE-036`](ISSUE-036.md)의 최대 리스크가 풀렸다 |
 | **인증·권한 범위** | **`partner_owner`·바 관련 6행을 1b로** | [`ISSUE-006`](ISSUE-006.md) 80조합 → 약 30조합, IDOR 방어 이월. `member`는 남는다 (`FR-USER-001`·`004`가 1a P0) |
+| **법률 검토 시점** | **개발 착수를 막지 않는다. 오픈 전 1회** | `NFR-L-05`는 **정식 오픈 차단이지 개발 차단이 아니다** (SPEC-04 §9.3) |
+
+### 법률 검토 — 1a는 규제 접점 없이 완주한다
+
+[ADR-0004](../decisions/ADR-0004-age-gate.md)가 지목한 유일한 접점은 **주류 광고 규제**이고, 그 대상은 **브랜디드 콘텐츠**다.
+
+| 접점 | Phase 1a 실태 |
+|---|---|
+| `article.is_sponsored` | CONTENT는 **Phase 2** |
+| `signature` 등급 브랜디드 콘텐츠 | PARTNER는 **1b** |
+| `ingredient_brand.is_sponsored` | 컬럼은 1a에 있으나 — **프로토타입 `data.ts`에 브랜드 정보가 없어 시드가 0건**, 기본값 `false` |
+
+→ **`is_sponsored`를 켜지 않으면 1a 내내 접점이 0이다.** [`ISSUE-008`](ISSUE-008.md)·[`ISSUE-023`](ISSUE-023.md) DoD에 "1a에서 켜지 않는다"를 박아 뒀다.
+
+**검토가 필요해지는 트리거 3개** (날짜가 아니다):
+
+1. `is_sponsored = true` 인 주류 브랜드를 **처음 넣을 때**
+2. **정식 오픈** — `NFR-L-05` + `NFR-L-04`(처방침·약관 문안, SPEC-08 §9 미정)
+3. **브랜디드 콘텐츠 착수** (Phase 2)
+
+검토 항목은 SPEC-08 §8의 3건 — ①전면 성인 인증 요구 여부 ②브랜디드 콘텐츠 주류광고 기준 ③`audit_log` 보존의 파기 예외 적법성. **③은 실사용자가 붙는 오픈 후에 걸린다** (`ISSUE-014`·`029`·`031`이 이미 그렇게 구현).
+
+**뒤집혔을 때**: 코드 손실은 작다(FE 4개 — 038·039·044·046). **가설 손실이 크다** — SPEC-01 §8.1의 "유기 검색 유입이 실제로 발생"을 검증할 수 없게 된다 (ADR-0004 "되돌리는 조건").
 
 > ⚠️ **`tasting_note`는 개발이 아니라 콘텐츠 작업이다.** `GATE-COCKTAIL-01`이 발행을 막고 `PRIN-P03`이 AI 생성을 금지한다.
 > 24종 이관에 24건, 100종 목표면 **100건**이 사람 손이다. **46개 이슈가 끝나도 이게 없으면 발행이 0건**이고 SPEC-01 §8.1의 성공 판정을 못 받는다.

@@ -5,7 +5,7 @@ domain: —
 layer: infra
 wave: 0
 status: TODO
-depends_on: []
+depends_on: [ISSUE-A00]
 fr: []
 r: []
 inv: []

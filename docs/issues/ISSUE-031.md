@@ -1,6 +1,6 @@
 ---
 id: ISSUE-031
-title: 북마크 · 컬렉션 · 공유 링크
+title: 북마크 · 컬렉션 · 공유 링크 (API만)
 domain: USER
 layer: api
 wave: 6
@@ -15,6 +15,15 @@ owns:
   - apps/api/src/main/kotlin/kr/kcocktail/user/bookmark/**
   - apps/api/src/main/resources/db/migration/V031__*.sql
 ---
+
+## ⚠️ 범위 — API만 (G-18, 2026-08-07)
+
+**화면은 Phase 1b로 넘긴다.** `SCREENS-04 마이·저장`이 미작성이고([G-09](../prd/GAPS.md#g-09)), 명세 없이 만들면 다시 만든다.
+
+[G-18](../prd/GAPS.md#g-18)에서 발견: TRACE-00 §4가 "Phase 1a 화면 명세가 닫혔다"고 했으나 **`FR-COCKTAIL-027`·`FR-USER-004`가 미작성 SCREENS-04에 걸려 있다.**
+
+`FR-USER-004`의 요구("컬렉션으로 묶어 저장하고 공유 링크를 생성")는 **API로 충족된다.**
+저장 버튼·컬렉션 화면은 [`ISSUE-038`](ISSUE-038.md) 상세 화면의 액션 블록에 최소 형태로만 두고(`FR-COCKTAIL-027`), 전용 화면은 SCREENS-04 작성 후.
 
 ## 근거
 
@@ -167,5 +176,6 @@ val bySlug = cocktailFacade.findPublishedByIds(cocktailIds)
 - [ ] **이슈 005 RED 24의 `@Disabled` 해제** (탈퇴 CASCADE)
 - [ ] `target_id` FK 부재 근거 주석 (SPEC-06 §3.5)
 - [ ] `CocktailFacade` 경유 (모듈 경계)
-- [ ] ⚖️ 6건(중복 처리·소유자 노출·토큰 해제·dangling 참조·id 노출·화면 미정 G-09) `GAPS.md` 등재
+- [ ] **화면을 만들지 않는다** — SCREENS-04 미작성 (G-09·G-18). 최소 저장 버튼은 이슈 038
+- [ ] ⚖️ 5건(중복 처리·소유자 노출·토큰 해제·dangling 참조·id 노출) `GAPS.md` 등재
 - [ ] 커밋: `feat(user): 북마크·컬렉션·공유 링크 (FR-USER-004, R-F5-2)`

@@ -14,7 +14,16 @@ migration: —
 owns:
   - apps/web/components/finder-screen.tsx
   - apps/web/app/finder/**
+  - docs/screens/SCREENS-03_파인더.md
 ---
+
+## ⚠️ 화면 명세 (G-18, 2026-08-07)
+
+`SCREENS-03 파인더`가 **미작성**이다([G-09](../prd/GAPS.md#g-09)). TRACE-00 §4는 이걸 "Phase 2"로 분류했지만 **`FR-SEARCH-004`는 1a P0**다 ([G-18](../prd/GAPS.md#g-18)).
+
+**다만 `apps/web/components/finder-screen.tsx`에 동작하는 화면이 이미 있다.** 새로 설계하는 게 아니라 **데이터 출처만 API로 바꾸는 작업**이라 명세 없이도 진행할 수 있다.
+
+→ 이 이슈의 산출물에 **`SCREENS-03`을 "기존 화면 문서화" 수준으로 작성**하는 것을 포함한다. 설계가 아니라 기록이다.
 
 ## 근거
 
@@ -141,5 +150,6 @@ SPEC-05 §4 표에 `/finder`가 없다. **CSR로 두되 셸은 정적**으로. �
 - [ ] 파인더 결과와 탐색 결과 일치 (RED 14)
 - [ ] `finder_step` 계측, `step=4` 완주 판정 (RED 15~17 — SPEC-10 §4.4)
 - [ ] 키보드 전 단계 진행 (RED 19 — `NFR-A-04` 배포 차단)
+- [ ] **`SCREENS-03` 작성** — 기존 화면 문서화 수준 (G-09·G-18 부분 해소)
 - [ ] ⚖️ 2건(단계 URL 반영·렌더링/색인 전략) `GAPS.md` 등재
 - [ ] 커밋: `feat(web): 파인더 화면 도수 구간 공유 (FR-SEARCH-004, ADR-0003)`
