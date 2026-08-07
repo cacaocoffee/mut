@@ -144,9 +144,18 @@ Phase 1b(BAR 14 · PARTNER 7)와 Phase 2 이후는 [`EPICS-1B-PHASE2.md`](EPICS-
 | [042](ISSUE-042.md) | 통합 검색 화면 | TODO | 024,037 | FR-SEARCH-008 |
 | [043](ISSUE-043.md) | 상세 인터랙션 — 잔 수·단위·대체재 | TODO | 038 | FR-COCKTAIL-019·020·021 |
 | [044](ISSUE-044.md) | Schema.org `Recipe` + OG 태그 | TODO | 038 | FR-COCKTAIL-026, FR-USER-005 |
-| [045](ISSUE-045.md) | `/admin` 에디터 UI | TODO | 025,037 | FR-ADMIN-001, `NFR-O-01` |
-| [035](ISSUE-035.md) | Phase 1a 이벤트 7종 심기 | TODO | 034,038,040,041,042,043 | SPEC-10 §4·§9 |
-| [046](ISSUE-046.md) | 접근성·성능 릴리즈 게이트 | TODO | 038~045 | `NFR-A`·`NFR-P` |
+| [045](ISSUE-045.md) | 어드민 셸 — 접근 제어·**노출 규칙 부재** | TODO | 025,037 | FR-ADMIN-001·006, `PRIN-P02` |
+| [047](ISSUE-047.md) | 어드민 — 칵테일 편집·**발행 조건 패널** | TODO | 045 | FR-ADMIN-002·003, **`NFR-O-01`** |
+| [048](ISSUE-048.md) | 어드민 — 승인·태스크·감사 화면 | TODO | 045,026,028,029 | FR-ADMIN-004·005·007 |
+| [035](ISSUE-035.md) | 계측 기반 + `cocktail_view`·`search_miss` | TODO | 034,038,042 | SPEC-10 §9 **2단계** |
+| [049](ISSUE-049.md) | 계측 3~4단계 이벤트 5종 | TODO | 035,040,041,043 | SPEC-10 §9 **3~4단계** |
+| [046](ISSUE-046.md) | **CI 자동 게이트** — Lighthouse·axe·사이트맵 | TODO | 038,039,040,042,047 | SPEC-04 §9.1 |
+| [050](ISSUE-050.md) | 수동 체크리스트 + **`.btn-primary` 결정** | **BLOCKED** | 046,048,049 | SPEC-04 §9.2·§9.3 · **G-16** |
+
+> **Wave 8 분할** — 한 세션 크기를 넘던 셋을 쪼갰다.
+> `045`(RED 44) → **045 셸 / 047 편집 / 048 관리화면**
+> `035`(RED 42) → **035 기반+2단계 / 049 3~4단계** (SPEC-10 §9의 순서 그대로)
+> `046`(RED 40) → **046 CI 자동 / 050 수동+결정**
 
 ---
 

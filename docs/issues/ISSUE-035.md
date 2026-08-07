@@ -1,65 +1,62 @@
 ---
 id: ISSUE-035
-title: Phase 1a 이벤트 7종 심기
+title: 계측 기반 + cocktail_view · search_miss
 domain: —
 layer: web
 wave: 8
 status: TODO
-depends_on: [ISSUE-034, ISSUE-038, ISSUE-040, ISSUE-041, ISSUE-042, ISSUE-043]
+depends_on: [ISSUE-034, ISSUE-038, ISSUE-042]
 fr: []
 r: []
 inv: []
 nfr: [NFR-R-04]
 migration: —
 owns:
-  - apps/web/lib/analytics/**
+  - apps/web/lib/analytics/core/**
 ---
+
+> **분할됨** — SPEC-10 §9가 준 순서를 그대로 따른다.
+> 이 이슈는 **기반 + 2단계**(가장 값싸고 가장 쓸모 있다). 3~4단계는 [049](ISSUE-049.md).
+>
+> **소유 경로 주의**: 계측 호출은 화면 파일(038·042 소유)에 들어간다.
+> 이 이슈는 **그 이슈들이 `DONE`인 뒤 착수**하므로 동시 작업이 아니다 (CONVENTIONS §4의 취지).
 
 ## 근거
 
-**SPEC-10 §4 Phase 1a 이벤트** — 바 없이 성립하는 것들. **이게 지금 심을 전부다.**
+**SPEC-10 §1 왜 지금 쓰나**
 
-### 4.1 `cocktail_view`
-`cocktailSlug` · `entryPoint`(`search`·`category`·`related`·`finder`·`external`)
-> 어떤 칵테일이 실제로 읽히나. 카테고리 페이지가 유입을 만드나. **`entryPoint`가 `external`인 비율이 곧 SEO 성과다.**
-
-### 4.2 `filter_apply`
-`axis`(`sweet`·`base`·`style`·`flavor`·`abv`·`query`) · `value` · `resultCount` · `activeAxisCount`
-> 축이 여섯인데 실제로 뭘 쓰나. **안 쓰는 축은 UI에서 내릴 수 있다.** `resultCount`가 0인 비율이 높은 축은 **패싯 카운트가 제 역할을 못 하고 있다는 신호**다.
-
-### 4.3 `search_miss` ★ — **Phase 1a에서 가장 쓸모 있는 이벤트다**
-`query` · `matchedCount`(0) · `hadChosung`
-> 에디터 1명이 하루 3~5종을 쓰는 상황에서 **"다음에 뭘 등재할까"에 데이터로 답한다.** 검색됐는데 없는 칵테일이 곧 **수요가 확인된 콘텐츠 후보**다.
-> `hadChosung`을 따로 두는 이유 — 초성 검색이 0건이면 콘텐츠가 없는 게 아니라 **초성 색인이 고장난 것**일 수 있다.
-
-### 4.4 `finder_step`
-`step`(1~4) · `answered` · `candidateCount`
-> `finder_complete`는 별도 이벤트로 두지 않는다. **`step=4` 도달로 완주를 판정한다.**
-> 어느 질문에서 이탈하나. `candidateCount`가 1~2로 급감하면 질문이 너무 좁게 거른다.
-
-### 4.5 `recipe_interact`
-`cocktailSlug` · `action`(`servings_change`·`unit_toggle`·`substitute_open`) · `detail`
-> 상세 화면에서 실제로 뭘 만지나. **아무도 안 쓰는 컨트롤은 화면을 복잡하게만 한다.**
-
-### 4.6 `bookmark_add` · `share_click`
-`targetType`(`cocktail`) · `targetSlug` · `channel`(`share_click`만 — `kakao`·`link`·`system`)
+> **이벤트는 소급이 안 된다.** 나중에 심으면 그 기간의 데이터가 **영원히 없다.**
+> 지금 화면이 셋뿐이라 심을 지점도 적다. **코드가 커진 뒤에는 호출 지점을 찾아 흩뿌려야 한다.**
 
 **SPEC-10 §9 구현 순서**
 
-| 순서 | 무엇 | 왜 |
+| 순서 | 무엇 | 이슈 |
 |---|---|---|
-| 1 | `POST /events` + `analytics_event` | 이슈 034 |
-| 2 | **`cocktail_view` · `search_miss`** | **가장 값싸고 가장 쓸모 있다** |
-| 3 | `filter_apply` · `finder_step` | UI 정리 근거 |
-| 4 | `recipe_interact` · `bookmark_add` · `share_click` | |
+| 1 | `POST /events` + `analytics_event` | 034 |
+| **2** | **`cocktail_view` · `search_miss`** — **가장 값싸고 가장 쓸모 있다** | **이 이슈** |
+| 3 | `filter_apply` · `finder_step` | 049 |
+| 4 | `recipe_interact` · `bookmark_add` · `share_click` | 049 |
 
 > **2번까지만 해도 "유기 검색이 들어오나"와 "다음에 뭘 쓸까"에 답할 수 있다.** Phase 1a에서 알아야 할 것의 대부분이 여기 있다.
 
-**SPEC-10 §3 공통 필드**: `sessionId`(UUID, **30분 무활동 시 갱신**) · `path`(**쿼리스트링 제외**) · `referrerType`(분류값)
-**SPEC-10 §2**: **배치 전송** — 페이지당 여러 이벤트를 모아 한 번에. **실패해도 조용히**
-**`NFR-R-04`**: 이벤트 수집 실패가 사용자 흐름을 막지 않는다 — 배포 차단
+**SPEC-10 §2 원칙** — 개인 식별 금지 · **멱등**(`PRIN-T07`) · **실패해도 조용히** · **배치 전송**
 
-**SPEC-10 §6 지표 매핑** — 1a에서 검증 가능한 지표는 **셋뿐**: 등록 수 · MAU(`DISTINCT sessionId`) · **유기 검색 비중**(`referrerType='organic'`)
+**SPEC-10 §3 공통 필드**: `eventType` · `sessionId`(UUID, **30분 무활동 시 갱신**) · `userId` · `occurredAt` · `path`(**쿼리스트링 제외**) · `referrerType` · `payload`
+
+> `referrerType`을 **원본 URL이 아니라 분류값으로** 저장한다. **원본 URL은 개인정보가 섞일 수 있다.**
+> 값: `organic` · `internal` · `social` · `direct` · `unknown`
+
+### §4.1 `cocktail_view`
+`cocktailSlug` · `entryPoint`(`search`·`category`·`related`·`finder`·`external`)
+> **`entryPoint`가 `external`인 비율이 곧 SEO 성과다.**
+
+### §4.3 `search_miss` ★ — Phase 1a에서 가장 쓸모 있는 이벤트
+`query` · `matchedCount`(0) · `hadChosung`
+> 검색됐는데 없는 칵테일이 곧 **수요가 확인된 콘텐츠 후보**다.
+> `hadChosung`을 따로 두는 이유 — 초성 검색이 0건이면 콘텐츠가 없는 게 아니라 **초성 색인이 고장난 것**일 수 있다.
+
+**SPEC-10 §6**: 1a에서 검증 가능한 지표 셋 — 등록 수 · MAU(`DISTINCT sessionId`) · **유기 검색 비중**
+**`NFR-R-04`**: 이벤트 수집 실패가 사용자 흐름을 막지 않는다 — 배포 차단
 
 ## RED
 
@@ -68,122 +65,80 @@ owns:
 1. `sessionId가_UUID로_생성된다`
 2. `sessionId가_30분_무활동시_갱신된다`
 3. `활동이_있으면_유지된다`
-4. `sessionId가_localStorage_또는_쿠키에_저장된다` **결정**
+4. `localStorage에_저장된다` — 탭 간 공유 ([DECISIONS §1.11](DECISIONS.md))
 5. `비로그인은_userId가_null이다`
 
 ### 공통 필드 (SPEC-10 §3)
 
 6. `path에_쿼리스트링이_없다`
 7. `referrerType이_5종_중_하나로_분류된다`
-8. `유기_검색이_organic으로_분류된다` — 검색엔진 referrer
+8. `유기_검색이_organic으로_분류된다`
 9. `내부_이동이_internal이다`
 10. `소셜이_social이다`
 11. `referrer가_없으면_direct다`
 12. `분류_불가는_unknown이다`
-13. `원본_referrer_URL을_보내지_않는다` (SPEC-10 §3 — 개인정보)
+13. `원본_referrer_URL을_보내지_않는다` — 개인정보
 
-### 7종 이벤트 (SPEC-10 §4)
+### `cocktail_view` (SPEC-10 §4.1)
 
-14. `cocktail_view가_상세_진입시_발생한다`
-15. `entryPoint가_정확하다` — 5종 각각 (`search`·`category`·`related`·`finder`·`external`)
-16. `external_진입이_구분된다` — **SEO 성과 측정** (SPEC-10 §4.1)
-17. `filter_apply가_필터_변경시_발생한다`
-18. `axis와_value와_resultCount가_담긴다`
-19. `activeAxisCount가_정확하다`
-20. **`search_miss가_결과_0건일_때_발생한다`**
-21. `hadChosung이_정확하다` — 초성 검색 구분 (SPEC-10 §4.3)
-22. `matchedCount가_0이다`
-23. `finder_step이_각_단계에서_발생한다`
-24. `step_4_도달이_완주다` — `finder_complete` 별도 이벤트 없음 (SPEC-10 §4.4)
-25. `candidateCount가_담긴다`
-26. `recipe_interact가_3종_액션에서_발생한다` — `servings_change`·`unit_toggle`·`substitute_open`
-27. `bookmark_add가_저장시_발생한다`
-28. `share_click이_공유시_발생한다`
-29. `share_click에_channel이_담긴다` — `kakao`·`link`·`system`
+14. `상세_진입시_발생한다`
+15. `entryPoint_5종이_정확하다` — `search`·`category`·`related`·`finder`·`external`
+16. **`external_진입이_구분된다`** — **SEO 성과 측정**
+
+### `search_miss` ★ (SPEC-10 §4.3)
+
+17. **`결과_0건일_때_발생한다`**
+18. `hadChosung이_서버_응답에서_온다` — **프론트가 다시 판정하지 않는다** (이슈 024)
+19. `matchedCount가_0이다`
+20. `초성_0건과_일반_0건이_구분된다` — 두 원인을 나눠야 한다
 
 ### 배치 전송 (SPEC-10 §2)
 
-30. `여러_이벤트가_모여_한_번에_전송된다`
-31. `페이지_이탈시_남은_이벤트가_전송된다` — `sendBeacon` 또는 `visibilitychange`
-32. `50건_상한을_넘지_않는다` (이슈 034 RED 6)
+21. `여러_이벤트가_모여_한_번에_전송된다`
+22. `페이지_이탈시_남은_이벤트가_전송된다` — `sendBeacon`
+23. `50건_상한을_넘지_않는다` (이슈 034)
 
-### 실패 격리 (`NFR-R-04`, SPEC-10 §2)
+### 실패 격리 (`NFR-R-04`)
 
-33. `전송_실패가_사용자_흐름을_막지_않는다`
-34. `전송_실패가_UI_에러로_보이지_않는다`
-35. `전송_실패가_콘솔_에러를_쏟지_않는다` **결정** — 조용히 (SPEC-10 §2). **debug 레벨**
-36. `네트워크_차단_환경에서_페이지가_정상_동작한다` — 광고 차단기
+24. `전송_실패가_사용자_흐름을_막지_않는다`
+25. `전송_실패가_UI_에러로_보이지_않는다`
+26. `실패_로그가_debug_레벨이다` ([DECISIONS §1.11](DECISIONS.md))
+27. `광고차단기_환경에서_페이지가_정상_동작한다`
 
 ### 멱등 (`PRIN-T07`)
 
-37. `Idempotency_Key가_배치마다_생성된다`
-38. `재시도가_같은_키를_쓴다`
+28. `Idempotency_Key가_배치마다_생성된다`
+29. `재시도가_같은_키를_쓴다`
 
 ### 하지 않는 것 (SPEC-10 §10)
 
-39. `마우스_궤적을_수집하지_않는다`
-40. `스크롤_히트맵을_수집하지_않는다`
-41. `좌표를_수집하지_않는다` (이슈 033)
-42. `개별_행동_리플레이가_없다`
+30. `마우스_궤적·스크롤_히트맵을_수집하지_않는다`
+31. `좌표를_수집하지_않는다` (이슈 033)
+32. `1b_이벤트를_구현하지_않는다` — `bar_view`·`cross_nav`·`partner_action` (SPEC-10 §5)
 
 ## GREEN
 
-### `apps/web/lib/analytics/`
-
 ```ts
-// SPEC-10 §2 — 배치 전송, 실패해도 조용히
+// apps/web/lib/analytics/core/ — SPEC-10 §2: 배치 전송, 실패해도 조용히
 class EventQueue {
-  private queue: AnalyticsEvent[] = [];
-  push(e: AnalyticsEvent) { this.queue.push(e); this.scheduleFlush(); }
-  private flush() {
-    // navigator.sendBeacon 우선, 실패해도 삼킨다 (NFR-R-04)
-  }
+  push(e: AnalyticsEvent) { /* 모았다가 flush */ }
+  private flush() { try { navigator.sendBeacon(url, body) } catch { /* 삼킨다 */ } }
 }
 ```
 
-### 세션 (RED 1~4)
+이슈 049가 이 큐를 **그대로 재사용**한다. 전송 로직은 여기 한 곳뿐이다.
 
-```ts
-// SPEC-10 §3 — 30분 무활동 시 갱신
-const SESSION_TTL = 30 * 60 * 1000;
-function getSessionId(): string { /* localStorage + lastActivity 검사 */ }
-```
+### `search_miss` (RED 17~20) — 가장 중요
 
-**결정** `localStorage` vs 쿠키: SPEC에 없다. **`sessionStorage`가 아닌 `localStorage`**(탭 간 공유) + GAPS.
+이슈 024가 응답에 `matchedCount`·`hadChosung`을 담는다. **프론트는 그것을 그대로 옮긴다** — 판정을 다시 하지 않는다. 서버와 다른 답을 내면 SPEC-10 §4.3의 "두 원인 구분"이 무너진다.
 
-### 구현 순서 (SPEC-10 §9)
-
-**이 이슈를 한 번에 다 하지 않아도 된다.** SPEC-10 §9가 순서를 줬다:
-
-1. `cocktail_view` · `search_miss` ← **여기까지만 해도 1a 목표의 대부분**
-2. `filter_apply` · `finder_step`
-3. `recipe_interact` · `bookmark_add` · `share_click`
-
-착수 시 이 순서로 커밋을 나누면 중간에 멈춰도 가치가 남는다.
-
-### `search_miss` (RED 20~22) — 가장 중요
-
-이슈 024가 응답에 `matchedCount`·`hadChosung`을 담는다. **프론트는 그것을 그대로 이벤트로 옮긴다** — 판정을 프론트가 다시 하지 않는다.
-
-### 실패 격리 (RED 33~36)
-
-```ts
-try { navigator.sendBeacon(url, body); } catch { /* SPEC-10 §2 — 삼킨다 */ }
-```
-
-**광고 차단기가 `/events`를 막는 것이 흔하다** (RED 36). 그래도 페이지는 멀쩡해야 한다.
-
-**하지 말 것**:
-- 1b 이벤트(`bar_view`·`cross_nav`·`partner_action`) — SPEC-10 §5 "**지금 구현하지 않는다**"
-- 외부 분석 도구 — 병행 가능하나 범위 밖
-- A/B 테스트 — SPEC-10 §10
+**하지 말 것**: 3~4단계 이벤트 5종 — 이슈 049 · 1b 이벤트 (SPEC-10 §5 "지금 구현하지 않는다")
 
 ## DoD
 
-- [ ] RED 42항 전부 통과
-- [ ] **`cocktail_view`·`search_miss` 우선 구현** (SPEC-10 §9 — 커밋 분리)
-- [ ] `referrerType` 분류만 전송, 원본 URL 미전송 (RED 13)
-- [ ] **전송 실패가 사용자 흐름을 막지 않음** (RED 33~36 — `NFR-R-04`)
-- [ ] 1b 이벤트 미구현 (SPEC-10 §5)
-- [ ] 미결은 [`DECISIONS.md`](DECISIONS.md) §1 확정분을 따른다 — **이슈에서 판단하지 않는다**
-- [ ] 커밋: `feat(web): Phase 1a 이벤트 7종 (SPEC-10 §4·§9)`
+- [ ] RED 32항 전부 통과
+- [ ] **`cocktail_view`·`search_miss` 동작** — SPEC-10 §9의 2단계
+- [ ] `hadChosung`이 서버 응답 (RED 18)
+- [ ] 전송 실패가 흐름을 막지 않음 (RED 24~27 — `NFR-R-04`)
+- [ ] `EventQueue`가 049가 재사용할 형태로 공개
+- [ ] 커밋: `feat(web): 계측 기반·cocktail_view·search_miss (SPEC-10 §4.1·§4.3·§9)`
