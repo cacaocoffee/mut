@@ -126,15 +126,14 @@ CREATE TABLE verification_task (
   UNIQUE (task_type, entity_type, entity_id, code) DEFERRABLE INITIALLY IMMEDIATE
 );
 CREATE INDEX ON verification_task (status, detected_at DESC);
-
-CREATE TABLE batch_run (
-  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  batch_code VARCHAR(40) NOT NULL,
-  started_at TIMESTAMPTZ NOT NULL, ended_at TIMESTAMPTZ,
-  scanned_count INT, violation_count INT,
-  status VARCHAR(12) NOT NULL, detail JSONB
-);
 ```
+
+> **`batch_run` 테이블을 만들지 않는다** (2026-08-07 결정, [G-21](../prd/GAPS.md#g-21)).
+> [SPEC-05 §8](../spec/SPEC-05_아키텍처.md)은 배치 4종을 정의하지만 **실행 이력을 요구하지 않는다.**
+> 분해 과정에서 근거 없이 들어간 것이라 뺀다 — **요구 없는 테이블을 만들지 않는다.**
+>
+> 배치 실행 여부는 **Spring Batch의 `BATCH_JOB_EXECUTION` 메타 테이블**이 이미 남긴다 (SPEC-05 §8이 Spring Batch를 지정).
+> 별도 이력이 필요해지면 그때 SPEC-05에 근거를 추가하고 만든다.
 
 유니크 제약이 멱등을 보장한다 (RED 22·23). 해소된 태스크는 `status='resolved'` 로 남기되, 같은 위반이 재발하면 **새 태스크가 아니라 재오픈**한다.
 
