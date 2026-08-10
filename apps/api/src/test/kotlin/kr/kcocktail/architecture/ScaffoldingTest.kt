@@ -3,6 +3,8 @@ package kr.kcocktail.architecture
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import java.io.File
+import java.nio.file.Files
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
@@ -63,12 +65,88 @@ class ScaffoldingTest {
         assertTrue("gradle" !in webPkg.lowercase(), "apps/web 스크립트가 gradle 을 호출한다")
     }
 
+    // ── SPEC-06 §6 — 마이그레이션은 한 곳이다 (이슈 000-1) ─────────────────
+    //
+    // 원래 이 테스트는 이름과 달리 db/migration 이 **존재하는지**만 봤다.
+    // 두 번째 디렉터리가 생겨도 초록이었다. §6 이 요구한 것은 단일성이다.
+    //
+    // 흩어지면 Flyway 가 버전 순서를 보장하지 못하고, 그때는 이미 여러 이슈의
+    // 마이그레이션이 쌓인 뒤라 되돌리기 어렵다. 규칙이 필요해지기 직전이 지금이다.
+
+    private val migrationDir = File(repoRoot, MIGRATION_PATH)
+
     @Test
-    fun `Flyway 마이그레이션 디렉터리가 단일 위치다`() {
-        // SPEC-06 §6 — 버전 순서를 Flyway 가 보장하려면 한 곳이어야 한다
-        assertTrue(
-            File(repoRoot, "apps/api/src/main/resources/db/migration").isDirectory,
-            "db/migration 디렉터리 없음",
+    fun `db_migration 디렉터리가 저장소에 하나뿐이다`() {
+        assertTrue(migrationDir.isDirectory, "$MIGRATION_PATH 없음")
+
+        assertEquals(
+            listOf(migrationDir.canonicalPath),
+            findMigrationDirs(File(repoRoot, "apps/api")).map { it.canonicalPath }.sorted(),
+            "마이그레이션 디렉터리가 둘 이상이다",
         )
+    }
+
+    @Test
+    fun `마이그레이션 파일은 그 디렉터리 밖에 없다`() {
+        val strays = File(repoRoot, "apps/api")
+            .walkTopDown()
+            .onEnter { it.name !in SKIP_DIRS }
+            .filter { it.isFile && it.name.matches(MIGRATION_FILE) }
+            .filter { it.parentFile.canonicalPath != migrationDir.canonicalPath }
+            .map { it.relativeTo(repoRoot).path }
+            .sorted()
+            .toList()
+
+        // 첫 건에서 멈추지 않는다 — 옮길 파일이 여럿이면 한 번에 보여야 한다.
+        assertTrue(strays.isEmpty(), "$MIGRATION_PATH 밖의 마이그레이션 파일:\n  ${strays.joinToString("\n  ")}")
+    }
+
+    /**
+     * 규칙이 실제로 잡는지.
+     *
+     * 위 두 테스트는 위반이 없으면 항상 통과한다 — **아무것도 안 해도 초록이다.**
+     * 원래 구현이 정확히 그 상태였다. 임시 트리에 두 번째 디렉터리를 만들어 검출을 확인한다.
+     */
+    @Test
+    fun `위반 픽스처가 실제로 검출된다`() {
+        val fake = Files.createTempDirectory("migration-fixture").toFile()
+        try {
+            File(fake, MIGRATION_PATH.removePrefix("apps/api/")).mkdirs()
+            File(fake, "src/main/resources/other/db/migration").mkdirs()
+
+            assertEquals(
+                2, findMigrationDirs(fake).size,
+                "두 번째 db/migration 을 못 잡는다 — 규칙이 죽어 있다",
+            )
+        } finally {
+            fake.deleteRecursively()
+        }
+    }
+
+    /** `V001` 이 두 개면 Flyway 가 기동에 실패한다. 컨테이너를 띄우기 전에 파일명으로 잡는다. */
+    @Test
+    fun `버전 번호가 중복되지 않는다`() {
+        val duplicates = migrationDir.listFiles().orEmpty()
+            .mapNotNull { VERSIONED_FILE.find(it.name)?.groupValues?.get(1) }
+            .groupingBy { it }.eachCount()
+            .filterValues { it > 1 }
+            .keys.sorted()
+
+        assertTrue(duplicates.isEmpty(), "중복된 마이그레이션 버전: $duplicates")
+    }
+
+    private fun findMigrationDirs(root: File): List<File> = root.walkTopDown()
+        .onEnter { it.name !in SKIP_DIRS }
+        .filter { it.isDirectory && it.name == "migration" && it.parentFile?.name == "db" }
+        .toList()
+
+    private companion object {
+        const val MIGRATION_PATH = "apps/api/src/main/resources/db/migration"
+
+        /** 빌드 산출물에도 마이그레이션이 복사된다. 소스 트리만 본다. */
+        val SKIP_DIRS = setOf("build", ".gradle", "node_modules", ".git")
+
+        val MIGRATION_FILE = Regex("""^[VR].*\.sql$""")
+        val VERSIONED_FILE = Regex("""^V(\d+(?:[._]\d+)*)__""")
     }
 }
