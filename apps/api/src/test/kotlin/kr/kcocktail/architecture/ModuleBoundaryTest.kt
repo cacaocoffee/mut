@@ -39,7 +39,7 @@ class ModuleBoundaryTest {
      */
     @Test
     fun `RED1 - 모듈간 repository 직접참조 금지`() {
-        val rule = { c: JavaClasses -> crossModuleRefs(c).failing { it.toLayer == REPOSITORY } }
+        val rule = { c: JavaClasses -> crossDomainRefs(c).failing { it.toLayer == REPOSITORY } }
 
         assertThat(rule(production())).isEmpty()
         assertThat(rule(fixture()))
@@ -53,7 +53,7 @@ class ModuleBoundaryTest {
      */
     @Test
     fun `RED2 - 모듈간 entity 직접참조 금지`() {
-        val rule = { c: JavaClasses -> crossModuleRefs(c).failing { it.toLayer == DOMAIN } }
+        val rule = { c: JavaClasses -> crossDomainRefs(c).failing { it.toLayer == DOMAIN } }
 
         assertThat(rule(production())).isEmpty()
         assertThat(rule(fixture()))
@@ -66,7 +66,7 @@ class ModuleBoundaryTest {
      */
     @Test
     fun `RED3 - 모듈간 참조는 api 패키지만`() {
-        val rule = { c: JavaClasses -> crossModuleRefs(c).failing { it.toLayer != API } }
+        val rule = { c: JavaClasses -> crossDomainRefs(c).failing { it.toLayer != API } }
 
         assertThat(rule(production())).isEmpty()
         assertThat(rule(fixture()))
@@ -89,6 +89,35 @@ class ModuleBoundaryTest {
         assertThat(rule(production())).isEmpty()
         assertThat(rule(fixture()))
             .anySatisfy { assertThat(it).contains("CommonToDomainFixture") }
+
+        // common 의 커널 패키지(entity)도 그래프에 보여야 한다. LAYERS 에서 빠지면
+        // 여기 클래스가 무엇을 참조하든 조용히 통과한다 (ISSUE-002 에서 드러난 구멍).
+        assertThat(rule(fixture()))
+            .`as`("common/entity 도 규칙의 사정권이다")
+            .anySatisfy { assertThat(it).contains("EntityLayerViolationFixture") }
+    }
+
+    /**
+     * 반대 방향 증명 — **커널 상속은 위반이 아니다.**
+     *
+     * `common` 은 모두가 참조하라고 있는 자리다 (SPEC-06 §1.2 의 공통 컬럼이 여기서 온다).
+     * 규칙 1~3 이 이것을 잡기 시작하면 실체 테이블을 만드는 모든 이슈가 막힌다.
+     */
+    @Test
+    fun `공용 커널 참조는 규칙 1~3 에 걸리지 않는다`() {
+        val rules = listOf<(JavaClasses) -> List<String>>(
+            { c -> crossDomainRefs(c).failing { it.toLayer == REPOSITORY } },
+            { c -> crossDomainRefs(c).failing { it.toLayer == DOMAIN } },
+            { c -> crossDomainRefs(c).failing { it.toLayer != API } },
+        )
+
+        assertThat(rules.flatMap { it(fixture()) })
+            .`as`("BaseEntity 상속이 잡히면 안 된다")
+            .noneSatisfy { assertThat(it).contains("ExtendsKernelFixture") }
+
+        // 커널 참조가 그래프에 실제로 잡히긴 하는지 — 안 보이면 위 단언이 공허하다.
+        assertThat(allRefs(fixture()).map(Ref::toString))
+            .anySatisfy { assertThat(it).contains("ExtendsKernelFixture", "common.entity") }
     }
 
     /**
@@ -177,9 +206,9 @@ class ModuleBoundaryTest {
 
         assertThat(
             mapOf(
-                "1 모듈간 repository" to crossModuleRefs(classes).failing { it.toLayer == REPOSITORY },
-                "2 모듈간 entity" to crossModuleRefs(classes).failing { it.toLayer == DOMAIN },
-                "3 api 경유만" to crossModuleRefs(classes).failing { it.toLayer != API },
+                "1 모듈간 repository" to crossDomainRefs(classes).failing { it.toLayer == REPOSITORY },
+                "2 모듈간 entity" to crossDomainRefs(classes).failing { it.toLayer == DOMAIN },
+                "3 api 경유만" to crossDomainRefs(classes).failing { it.toLayer != API },
                 "4 common 단방향" to crossModuleRefs(classes)
                     .failing { it.fromModule == COMMON && it.toModule in DOMAIN_MODULES },
                 "5 web→repository" to allRefs(classes)
@@ -202,11 +231,18 @@ private const val FIXTURE_ROOT = "kr.kcocktail.architecture.fixture"
 private const val API = "api"
 private const val WEB = "web"
 private const val DOMAIN = "domain"
+
+/**
+ * `common` 의 커널 패키지. SPEC-05 §2 의 5개 계층에는 없지만 여기 등록해야
+ * 경계 그래프에 **보인다** — 빠뜨리면 `common/entity` 의 클래스가 무엇을 참조하든 조용히 통과한다.
+ * (ISSUE-002 가 `BaseEntity` 를 넣으며 드러났다)
+ */
+private const val ENTITY = "entity"
 private const val REPOSITORY = "repository"
 private const val INTERNAL = "internal"
 private const val COMMON = "common"
 
-private val LAYERS = setOf(API, WEB, DOMAIN, REPOSITORY, INTERNAL)
+private val LAYERS = setOf(API, WEB, DOMAIN, REPOSITORY, INTERNAL, ENTITY)
 
 /** SPEC-05 §2 의 9개 도메인 모듈. Phase 1a 에 쓰는 것은 5개뿐이지만 경계는 전부 세운다. */
 private val DOMAIN_MODULES =
@@ -278,6 +314,16 @@ private fun allRefs(classes: JavaClasses): List<Ref> = classes.flatMap { origin 
 
 private fun crossModuleRefs(classes: JavaClasses): List<Ref> =
     allRefs(classes).filter { it.fromModule != it.toModule }
+
+/**
+ * 모듈 간 참조에서 **공용 커널로 가는 것을 뺀다.**
+ *
+ * `common` 은 모두가 참조하라고 있는 자리다 — `BaseEntity` 상속, 공용 예외, 감사 훅.
+ * 규칙 1~3(`api` 경유만)을 여기까지 들이대면 실체 테이블을 만드는 모든 이슈가 막힌다.
+ * `common` 이 **되참조**하는 쪽은 규칙 4 가 따로 막는다.
+ */
+private fun crossDomainRefs(classes: JavaClasses): List<Ref> =
+    crossModuleRefs(classes).filter { it.toModule != COMMON }
 
 private fun List<Ref>.failing(violates: (Ref) -> Boolean): List<String> =
     filter(violates).map(Ref::toString).distinct().sorted()
