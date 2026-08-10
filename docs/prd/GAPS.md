@@ -534,6 +534,28 @@ P1 기능이 P0 발행을 막는 구조다.
 
 ---
 
+### G-23
+
+**분류 축 2종의 표현이 프로토타입과 계약에서 다르다** *(전환 전 확인 완료)*
+
+`PRIN-T02`가 Kotlin을 정본으로 세우면서 `packages/domain/src/types.ts`와 대조했다.
+**멤버는 5개 축 전부 일치한다.** 다만 두 축의 **표현**이 다르고, 이슈 037이 그것을 옮긴다.
+
+| 축 | 프로토타입 `types.ts` | 계약 (Kotlin → OpenAPI) | 왜 계약을 따르나 |
+|---|---|---|---|
+| `Technique` | `"Build" \| "Shake" \| …` PascalCase | `build` · `shake` · … 슬러그 | [SPEC-06 §3.1](../spec/SPEC-06_데이터모델_ERD.md)의 `method VARCHAR(12)`가 슬러그를 저장한다 |
+| `SweetLevel` | `0 \| 1 \| 2 \| 3` 숫자 | `dry` · `semi_dry` · `semi_sweet` · `sweet` | 같은 문서의 `sweetness VARCHAR(12)` CHECK. **숫자는 의미가 위치에 숨어 마이그레이션에서 뒤집힌다** |
+
+`SweetLevel`은 전환용으로 Kotlin enum이 `level: Int`를 함께 들고 있다.
+
+**해결 (2026-08-10)** — 이슈 004가 `scripts/taxonomy-parity.mjs`를 만들어 대조를 자동화했다.
+알려진 차이는 스크립트의 `KNOWN`에 근거와 함께 등록돼 있고, **목록에 없는 차이가 생기면 실패한다.**
+`npm run check`에 포함된다.
+
+> 전환 시점에 발견했다면 화면 넷을 동시에 고쳐야 했다. 계약을 먼저 세운 값어치가 여기 있다.
+
+---
+
 ## 다음 할 일
 
 DB · CMS · 백엔드 스택이 확정되면서 SPEC-05·06·07이 나왔고, 병목이 다시 옮겨갔다.

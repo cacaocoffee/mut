@@ -29,6 +29,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-batch") // SPEC-05 §8
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+
+    // PRIN-T02 — OpenAPI 가 계약의 정본이다. UI 는 쓰지 않는다 (타입만 뽑는다)
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.6.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
     // SPEC-06 §6 — Flyway. 앞으로만 간다
@@ -94,6 +97,24 @@ tasks.withType<Test> {
             environment("TESTCONTAINERS_RYUK_DISABLED", "true")
         }
     }
+}
+
+/**
+ * PRIN-T02 — OpenAPI 스펙을 커밋 파일로 갱신한다 (ISSUE-004).
+ *
+ * springdoc 의 Gradle 플러그인은 앱을 실제로 기동해 /v3/api-docs 를 긁는다.
+ * 그러려면 빌드가 DB 를 붙잡아야 하고 포트·기동 시간·헬스체크가 전부 실패 지점이 된다.
+ * 이미 있는 Testcontainers 위에서 MockMvc 로 같은 문서를 뽑는 편이 단순하다.
+ *
+ * 드리프트 판정 자체는 `check` 안에 있다 — CI 스텝에만 두면 로컬에서는
+ * 아무도 모른 채 낡은 생성물을 커밋한다.
+ */
+tasks.register<Test>("generateOpenApiDocs") {
+    description = "openapi.json 을 현재 코드로 갱신한다 (PRIN-T02)"
+    group = "documentation"
+    useJUnitPlatform { includeTags("contract") }
+    systemProperty("openapi.write", "true")
+    outputs.upToDateWhen { false } // 항상 다시 뽑는다
 }
 
 // 이슈 001 이 채운다. 지금은 태그가 붙은 테스트가 없어 통과한다.
