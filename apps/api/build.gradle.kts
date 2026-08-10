@@ -34,6 +34,9 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.6.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
+    // SPEC-08 §9 — "Phase 1 은 DB 세션으로 충분." Redis 를 지금 들이지 않는다 (ISSUE-005)
+    implementation("org.springframework.session:spring-session-jdbc")
+
     // SPEC-06 §6 — Flyway. 앞으로만 간다
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-database-postgresql")

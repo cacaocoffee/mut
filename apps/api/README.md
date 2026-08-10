@@ -69,6 +69,52 @@ REVOKE DELETE ON cocktail FROM kcocktail_app;
 
 빠뜨리면 `SchemaLintTest` 가 잡는다. 목록의 정본은 그 테스트의 `SchemaLint.PROTECTED_TABLES` 다.
 
+## 세션 (SPEC-08 §4.1)
+
+서버 세션이다. 쿠키에는 세션 ID 만 담긴다 — 사용자 정보를 담지 않는다.
+
+| 속성 | 값 | 왜 |
+|---|---|---|
+| `httpOnly` | 항상 | JS 가 못 읽는다 → XSS 로 탈취되지 않는다 (`NFR-SEC-01`) |
+| `Secure` | `KC_SESSION_SECURE` | 로컬 `http://localhost` 에서만 `false` |
+| `SameSite` | `Lax` | 크로스 사이트 POST 는 막고 링크 이동은 살린다 |
+| 저장소 | Spring Session **JDBC** | SPEC-08 §9 — Phase 1 은 DB 로 충분. Redis 는 인스턴스가 늘면 |
+
+### 수명이 역할에 달렸다
+
+| 역할 | 수명 | 성격 |
+|---|---|---|
+| 일반 | 30일 | **rolling** — 활동하면 갱신 |
+| `editor` · `admin` | 8시간 | **절대** — 활동해도 연장되지 않음 |
+
+**"절대"가 요점이다.** Spring Session 의 `maxInactiveInterval` 은 마지막 접근 이후 시간이라
+8시간마다 한 번씩만 눌러도 세션이 영원히 산다. 그래서 발급 시각을 세션 속성에 넣고
+`AbsoluteExpiryFilter` 가 그걸 본다.
+
+복수 역할이면 **짧은 쪽이 이긴다** (DECISIONS §1). 소셜 로그인 기본 역할이 `member` 라
+에디터는 거의 항상 둘을 갖는다 — 긴 쪽을 택하면 8시간 규칙이 사실상 아무에게도 적용되지 않는다.
+
+역할은 **매 요청에 DB 에서 읽는다** (SPEC-08 §3.3). 세션에 캐시하면 회수한 권한이
+세션 수명만큼 살아남는다.
+
+### ⚠️ 호스팅 제약 (G-07)
+
+**쿠키를 공유하려면 프론트와 API 가 같은 상위 도메인이어야 한다.**
+
+```
+www.example.kr   ← 프론트
+api.example.kr   ← API        같은 example.kr
+```
+
+SPEC-07 §1.2 가 인증 방식으로 호스팅에 제약을 걸었다 — **호스팅을 정할 때 이 조건을 먼저 본다.**
+서로 다른 도메인이면 쿠키 세션을 쓸 수 없고, 그때는 인증 방식 자체를 다시 골라야 한다.
+
+| 환경변수 | 기본값 | 비고 |
+|---|---|---|
+| `KC_SESSION_SECURE` | `true` | 로컬만 `false` |
+| `KC_SESSION_COOKIE_DOMAIN` | (비움) | 서브도메인 공유가 필요하면 `.example.kr` |
+| `KC_SESSION_COOKIE_NAME` | `KCSESSION` | |
+
 ## 구조 (SPEC-05 §2)
 
 ```

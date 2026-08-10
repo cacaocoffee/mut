@@ -16,8 +16,20 @@ import java.sql.Connection
  */
 object SchemaLint {
 
-    /** Flyway 가 자기 형식으로 쓰는 테이블이다. 우리 규약의 대상이 아니다. */
-    private const val FLYWAY_HISTORY = "flyway_schema_history"
+    /**
+     * **우리가 스키마를 정하지 않는 테이블.** SPEC-06 §1 규약의 대상이 아니다.
+     *
+     * 라이브러리의 계약이라 컬럼을 더하면 그쪽 쿼리가 깨진다. 억제가 쌓이는 것이 보이도록
+     * 별도 파일이 아니라 여기에 둔다 — 목록이 길어지면 라이브러리를 너무 많이 들인 것이다.
+     */
+    private val FOREIGN_TABLES = listOf(
+        "flyway_schema_history",                                 // Flyway
+        "spring_session", "spring_session_attributes",           // Spring Session JDBC (ISSUE-005)
+    )
+
+    /** SQL 에 그대로 박는다. 상수라 주입 위험이 없다. */
+    private val NOT_FOREIGN =
+        "table_name NOT IN (${FOREIGN_TABLES.joinToString(", ") { "'$it'" }})"
 
     /**
      * 단수형인데 `s` 로 끝나는 이름들. 규칙 4 의 예외다.
@@ -41,20 +53,37 @@ object SchemaLint {
 
     // ── 규칙 ────────────────────────────────────────────────────────────────
 
-    /** SPEC-06 §1.2 — 모든 실체 테이블에 `id` · `created_at` · `updated_at`. */
+    /**
+     * SPEC-06 §1.2 — 모든 **실체** 테이블에 `id` · `created_at` · `updated_at`.
+     *
+     * ## 연관 테이블은 대상이 아니다
+     *
+     * `user_role` · `cocktail_style` 처럼 **복합 PK 를 가진 표**는 실체가 아니라 관계다.
+     * 대리키 `id` 를 붙이면 복합 PK 가 의미를 잃고 같은 조합이 두 번 들어간다 —
+     * 규약을 지키려다 무결성을 깨는 꼴이다.
+     *
+     * 이름 목록이 아니라 **구조**로 판정한다. 목록은 새 테이블마다 빠뜨린다.
+     */
     fun missingCommonColumns(conn: Connection, schema: String): List<String> = conn.query(
         """
         SELECT t.table_name || ' 에 ' || required.name || ' 없음'
         FROM information_schema.tables t
         CROSS JOIN (VALUES ('id'), ('created_at'), ('updated_at')) AS required(name)
-        WHERE t.table_schema = ? AND t.table_type = 'BASE TABLE' AND t.table_name <> ?
+        WHERE t.table_schema = ? AND t.table_type = 'BASE TABLE' AND t.$NOT_FOREIGN
+          -- 복합 PK = 연관 테이블. 실체가 아니라 관계다.
+          AND (
+              SELECT count(*) FROM pg_index i
+              WHERE i.indrelid = (quote_ident(t.table_schema) || '.' || quote_ident(t.table_name))::regclass
+                AND i.indisprimary
+                AND array_length(i.indkey, 1) > 1
+          ) = 0
           AND NOT EXISTS (
               SELECT 1 FROM information_schema.columns c
               WHERE c.table_schema = t.table_schema AND c.table_name = t.table_name
                 AND c.column_name = required.name)
         ORDER BY 1
         """,
-        schema, FLYWAY_HISTORY,
+        schema,
     )
 
     /** SPEC-06 §1.2 — `id BIGINT GENERATED ALWAYS AS IDENTITY`. `serial` 은 시퀀스를 남긴다. */
@@ -63,11 +92,11 @@ object SchemaLint {
         SELECT table_name || '.id 가 GENERATED ALWAYS AS IDENTITY 아님 (identity=' ||
                is_identity || ', generation=' || coalesce(identity_generation, '-') || ')'
         FROM information_schema.columns
-        WHERE table_schema = ? AND column_name = 'id' AND table_name <> ?
+        WHERE table_schema = ? AND column_name = 'id' AND $NOT_FOREIGN
           AND (is_identity <> 'YES' OR identity_generation <> 'ALWAYS')
         ORDER BY 1
         """,
-        schema, FLYWAY_HISTORY,
+        schema,
     )
 
     /**
@@ -79,7 +108,7 @@ object SchemaLint {
         """
         SELECT t.table_name || ' 에 set_updated_at 트리거 없음'
         FROM information_schema.tables t
-        WHERE t.table_schema = ? AND t.table_type = 'BASE TABLE' AND t.table_name <> ?
+        WHERE t.table_schema = ? AND t.table_type = 'BASE TABLE' AND t.$NOT_FOREIGN
           AND EXISTS (
               SELECT 1 FROM information_schema.columns c
               WHERE c.table_schema = t.table_schema AND c.table_name = t.table_name
@@ -94,7 +123,7 @@ object SchemaLint {
                 AND p.proname = 'set_updated_at' AND NOT tg.tgisinternal)
         ORDER BY 1
         """,
-        schema, FLYWAY_HISTORY,
+        schema,
     )
 
     /** SPEC-06 §1.1 — 테이블은 `snake_case` **단수형**. */
@@ -102,11 +131,11 @@ object SchemaLint {
         """
         SELECT table_name
         FROM information_schema.tables
-        WHERE table_schema = ? AND table_type = 'BASE TABLE' AND table_name <> ?
+        WHERE table_schema = ? AND table_type = 'BASE TABLE' AND $NOT_FOREIGN
           AND (table_name !~ '^[a-z][a-z0-9_]*$' OR table_name LIKE '%s')
         ORDER BY 1
         """,
-        schema, FLYWAY_HISTORY,
+        schema,
     ).filterNot { it in SINGULAR_ENDING_IN_S }
         .map { "$it — snake_case 단수형이 아니다" }
 
@@ -115,11 +144,11 @@ object SchemaLint {
         """
         SELECT table_name || '.' || column_name || ' — 불리언인데 is_/has_ 접두가 아니다'
         FROM information_schema.columns
-        WHERE table_schema = ? AND table_name <> ? AND data_type = 'boolean'
+        WHERE table_schema = ? AND $NOT_FOREIGN AND data_type = 'boolean'
           AND column_name !~ '^(is|has)_'
         ORDER BY 1
         """,
-        schema, FLYWAY_HISTORY,
+        schema,
     )
 
     /** SPEC-06 §1.1 — 시각은 `_at` 접미, 날짜는 `_on` 접미. */
@@ -128,12 +157,12 @@ object SchemaLint {
         SELECT table_name || '.' || column_name || ' (' || data_type || ') — ' ||
                CASE WHEN data_type = 'date' THEN '_on 접미가 아니다' ELSE '_at 접미가 아니다' END
         FROM information_schema.columns
-        WHERE table_schema = ? AND table_name <> ?
+        WHERE table_schema = ? AND $NOT_FOREIGN
           AND ((data_type LIKE 'timestamp%' AND column_name !~ '_at$')
             OR (data_type = 'date' AND column_name !~ '_on$'))
         ORDER BY 1
         """,
-        schema, FLYWAY_HISTORY,
+        schema,
     )
 
     /**
@@ -158,11 +187,11 @@ object SchemaLint {
         """
         SELECT table_name || '.' || column_name || ' — timestamptz 가 아니다'
         FROM information_schema.columns
-        WHERE table_schema = ? AND table_name <> ?
+        WHERE table_schema = ? AND $NOT_FOREIGN
           AND data_type = 'timestamp without time zone'
         ORDER BY 1
         """,
-        schema, FLYWAY_HISTORY,
+        schema,
     )
 
     /**

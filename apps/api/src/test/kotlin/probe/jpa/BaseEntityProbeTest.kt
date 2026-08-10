@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityManagerFactory
 import kr.kcocktail.KcocktailApplication
 import kr.kcocktail.common.entity.BaseEntity
+import kr.kcocktail.user.domain.User
 import kr.kcocktail.support.PostgresSupport
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.within
@@ -41,7 +42,9 @@ import java.time.temporal.ChronoUnit
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 // probe 패키지가 kr.kcocktail 밖이라 Spring 이 @SpringBootApplication 을 못 찾는다. 명시한다.
 @ContextConfiguration(classes = [KcocktailApplication::class])
-@EntityScan(basePackageClasses = [BaseEntityProbe::class])
+// @EntityScan 은 기본 스캔을 **대체한다.** 프로브만 적으면 도메인 엔티티가 관리 대상에서
+// 빠지고, 그것을 쓰는 리포지토리가 "Not a managed type" 으로 죽는다.
+@EntityScan(basePackageClasses = [BaseEntityProbe::class, User::class])
 class BaseEntityProbeTest {
 
     @Autowired

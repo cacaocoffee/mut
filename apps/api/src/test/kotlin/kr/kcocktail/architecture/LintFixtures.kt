@@ -78,6 +78,19 @@ object LintFixtures {
         INSERT INTO $SCHEMA.protected_row DEFAULT VALUES;
         INSERT INTO $SCHEMA.unprotected_row DEFAULT VALUES;
 
+        -- 연관 테이블 — 복합 PK 라 공통 컬럼 규약 대상이 아니다 (SPEC-06 §1.2 "실체 테이블").
+        -- id 를 붙이면 복합 PK 가 의미를 잃고 같은 조합이 두 번 들어간다.
+        CREATE TABLE $SCHEMA.good_link (
+            left_id   BIGINT NOT NULL,
+            right_id  BIGINT NOT NULL,
+            PRIMARY KEY (left_id, right_id)
+        );
+
+        -- 단일 PK 인데 공통 컬럼이 없다 = 실체 테이블인데 규약을 어겼다. 잡혀야 한다.
+        CREATE TABLE $SCHEMA.bad_entity (
+            code TEXT PRIMARY KEY
+        );
+
         -- 앱 역할에 런타임과 같은 권한을 준 뒤, 보호 테이블에서만 DELETE 를 회수한다.
         GRANT USAGE ON SCHEMA $SCHEMA TO kcocktail_app;
         GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA $SCHEMA TO kcocktail_app;
