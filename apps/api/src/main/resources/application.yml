@@ -17,6 +17,11 @@ spring:
     # 마이그레이션 롤과 앱 롤을 나눈다 (이슈 002)
     user: ${DB_MIGRATE_USER:${DB_USER:kcocktail_app}}
     password: ${DB_MIGRATE_PASSWORD:${DB_PASSWORD:}}
+  session:
+    store-type: jdbc             # SPEC-08 §9 — Redis 는 인스턴스가 늘면 재검토
+    jdbc:
+      initialize-schema: never   # 스키마 정본은 Flyway V005 다 (SPEC-06 §6)
+    timeout: 30d                 # 기본값. editor·admin 은 필터가 8시간으로 줄인다
   batch:
     job:
       enabled: false             # SPEC-05 §8 — 기동 시 자동 실행하지 않는다
@@ -39,3 +44,12 @@ management:
 logging:
   level:
     root: INFO
+
+# ISSUE-005 — 세션 쿠키 (SPEC-08 §4.1)
+# 도메인은 환경변수다. 호스팅이 미정이고(G-07), SPEC-07 §1.2 가
+# "프론트와 API 가 같은 상위 도메인"을 요구한다.
+kcocktail:
+  session:
+    cookie-name: ${KC_SESSION_COOKIE_NAME:KCSESSION}
+    secure: ${KC_SESSION_SECURE:true}
+    cookie-domain: ${KC_SESSION_COOKIE_DOMAIN:}

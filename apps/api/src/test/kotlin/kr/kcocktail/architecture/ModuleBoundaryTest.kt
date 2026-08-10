@@ -90,8 +90,8 @@ class ModuleBoundaryTest {
         assertThat(rule(fixture()))
             .anySatisfy { assertThat(it).contains("CommonToDomainFixture") }
 
-        // common 의 커널 패키지(entity)도 그래프에 보여야 한다. LAYERS 에서 빠지면
-        // 여기 클래스가 무엇을 참조하든 조용히 통과한다 (ISSUE-002 에서 드러난 구멍).
+        // common 의 커널 패키지도 그래프에 보여야 한다. 계층을 목록으로 인식하면
+        // 새 하위 패키지가 생길 때마다 조용히 사라진다 (ISSUE-002 · 005 에서 연달아 겪었다).
         assertThat(rule(fixture()))
             .`as`("common/entity 도 규칙의 사정권이다")
             .anySatisfy { assertThat(it).contains("EntityLayerViolationFixture") }
@@ -191,6 +191,29 @@ class ModuleBoundaryTest {
             .anySatisfy { assertThat(it).contains("content", "3개") }
     }
 
+    /**
+     * 계층을 **목록이 아니라 규칙으로** 인식하는지.
+     *
+     * 알려진 이름만 인식하면 새 하위 패키지가 그래프에서 조용히 사라진다.
+     * `common/entity`(ISSUE-002)·`common/security`(ISSUE-005)에서 연달아 겪은 함정이라
+     * 재발을 여기서 막는다.
+     */
+    @Test
+    fun `모듈 아래 어떤 패키지든 그래프에 보인다`() {
+        val seen = allRefs(production()).flatMap { listOf(it.fromLayer, it.toLayer) }.toSet()
+
+        assertThat(seen)
+            .`as`("5계층 밖의 커널 패키지도 좌표를 갖는다")
+            .contains("security")
+
+        // 실재하는 패키지가 좌표를 못 얻으면 그 안의 클래스는 규칙 밖이다.
+        assertThat(production().filter { coordinateOf(it.packageName) == null }.map { it.name })
+            .`as`("kr.kcocktail 아래인데 좌표가 없는 클래스")
+            .allSatisfy { name ->
+                assertThat(name).matches("^kr\\.kcocktail\\.[A-Z].*")
+            }
+    }
+
     /** RED 9 — 기준선. 위 8개가 현재 코드베이스에서 전부 통과한다. */
     @Test
     fun `RED9 - 8개 규칙이 현재 코드베이스에서 통과한다`() {
@@ -232,17 +255,10 @@ private const val API = "api"
 private const val WEB = "web"
 private const val DOMAIN = "domain"
 
-/**
- * `common` 의 커널 패키지. SPEC-05 §2 의 5개 계층에는 없지만 여기 등록해야
- * 경계 그래프에 **보인다** — 빠뜨리면 `common/entity` 의 클래스가 무엇을 참조하든 조용히 통과한다.
- * (ISSUE-002 가 `BaseEntity` 를 넣으며 드러났다)
- */
+/** `common` 의 커널 패키지들. 목록이 아니라 규칙으로 인식한다 — 아래 [coordinateOf] 참조. */
 private const val ENTITY = "entity"
 private const val REPOSITORY = "repository"
-private const val INTERNAL = "internal"
 private const val COMMON = "common"
-
-private val LAYERS = setOf(API, WEB, DOMAIN, REPOSITORY, INTERNAL, ENTITY)
 
 /** SPEC-05 §2 의 9개 도메인 모듈. Phase 1a 에 쓰는 것은 5개뿐이지만 경계는 전부 세운다. */
 private val DOMAIN_MODULES =
@@ -288,16 +304,21 @@ private data class Ref(
 /**
  * 패키지 이름에서 `<module>.<layer>` 좌표를 찾는다.
  *
- * 루트에 상관없이 동작해야 한다 — 프로덕션은 `kr.kcocktail.cocktail.domain`,
+ * ## 계층은 목록으로 인식하지 않는다
+ *
+ * **모듈 바로 다음 세그먼트가 곧 계층이다.** 알려진 이름만 인식하면 새 하위 패키지가
+ * 생길 때마다 그래프에서 **조용히 사라진다** — 그 안의 클래스가 무엇을 참조하든 통과한다.
+ * `common/entity`(ISSUE-002)와 `common/security`(ISSUE-005)에서 연달아 겪었다.
+ * 목록을 늘리는 대신 규칙을 바꾼다.
+ *
+ * 루트에 상관없이 동작한다 — 프로덕션은 `kr.kcocktail.cocktail.domain`,
  * 픽스처는 `kr.kcocktail.architecture.fixture.cocktail.domain` 이다.
  * `kcocktail` 은 세그먼트 전체가 일치하지 않으므로 `cocktail` 로 오인되지 않는다.
  */
 private fun coordinateOf(packageName: String): Coordinate? {
     val segments = packageName.split('.')
     for (i in 0 until segments.size - 1) {
-        if (segments[i] in MODULES && segments[i + 1] in LAYERS) {
-            return Coordinate(segments[i], segments[i + 1])
-        }
+        if (segments[i] in MODULES) return Coordinate(segments[i], segments[i + 1])
     }
     return null
 }

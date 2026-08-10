@@ -81,6 +81,27 @@ class SchemaLintTest {
     fun `RED4 - 모든 실체테이블에 id created_at updated_at 이 있다`() =
         assertRule(SchemaLint::missingCommonColumns, catches = "cocktails 에 created_at 없음")
 
+    /**
+     * 규약 대상은 **실체** 테이블이다 (SPEC-06 §1.2).
+     *
+     * `user_role` 처럼 복합 PK 를 가진 연관 테이블에 대리키를 붙이면 복합 PK 가 의미를 잃고
+     * 같은 조합이 두 번 들어간다 — 규약을 지키려다 무결성을 깬다.
+     *
+     * 예외가 **과하지도 모자라지도 않은지** 양쪽으로 본다.
+     */
+    @Test
+    fun `연관 테이블은 공통 컬럼 규약 대상이 아니다`() {
+        val violations = fixtureViolations(SchemaLint::missingCommonColumns)
+
+        assertThat(violations)
+            .`as`("복합 PK 는 관계다 — 잡으면 안 된다")
+            .noneSatisfy { assertThat(it).contains("good_link") }
+
+        assertThat(violations)
+            .`as`("단일 PK 인데 공통 컬럼이 없으면 실체 테이블의 위반이다")
+            .anySatisfy { assertThat(it).contains("bad_entity") }
+    }
+
     @Test
     fun `RED5 - id 는 GENERATED ALWAYS AS IDENTITY 다`() =
         assertRule(SchemaLint::idNotAlwaysIdentity, catches = "cocktails.id")
