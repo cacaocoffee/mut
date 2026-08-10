@@ -1,0 +1,70 @@
+# ISSUE-004 — 계약 드리프트 게이트 (PRIN-T02)
+#
+# > 계약이 깨지면 빌드가 깨져야 한다. 런타임에 발견하지 않는다.
+#
+# Kotlin 을 고치면 openapi.json 이 바뀌고, openapi.json 이 바뀌면 생성 TS 가 바뀐다.
+# 셋 중 하나만 커밋하면 여기서 걸린다.
+#
+# api.yml 과 분리한 이유: 이 워크플로는 apps/api 와 packages/domain **양쪽**을 본다.
+# 어느 한쪽만 고쳐도 계약은 어긋날 수 있다.
+name: contract
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/api/**"
+      - "packages/domain/**"
+      - "scripts/generate-types.mjs"
+      - "scripts/taxonomy-parity.mjs"
+      - ".github/workflows/contract.yml"
+  pull_request:
+    paths:
+      - "apps/api/**"
+      - "packages/domain/**"
+      - "scripts/generate-types.mjs"
+      - "scripts/taxonomy-parity.mjs"
+      - ".github/workflows/contract.yml"
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21" # PRIN-T01
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - run: npm ci
+
+      # Kotlin → openapi.json. Testcontainers 로 PG16 을 띄운다.
+      - name: 계약 재생성
+        working-directory: apps/api
+        run: ./gradlew generateOpenApiDocs --no-daemon
+
+      # openapi.json → packages/domain/src/generated/api.ts
+      - name: 생성 타입 재생성
+        run: npm run generate:types
+
+      # 분류 축이 프로토타입 types.ts 와 어긋나지 않는가 (G-23 의 알려진 차이는 등록돼 있다)
+      - name: 분류 축 대조
+        run: node scripts/taxonomy-parity.mjs
+
+      # 생성물이 최신이 아니면 여기서 멈춘다. 이 스텝이 이 워크플로의 존재 이유다.
+      - name: 드리프트 확인
+        run: |
+          if ! git diff --exit-code; then
+            echo "::error::생성물이 최신이 아니다. 아래를 돌리고 함께 커밋한다."
+            echo "  cd apps/api && ./gradlew generateOpenApiDocs"
+            echo "  npm run generate:types"
+            exit 1
+          fi

@@ -1,0 +1,89 @@
+{
+  "components" : {
+    "schemas" : {
+      "BaseSpirit" : {
+        "description" : "축 1 · 기주 (단일값 필수, R-C-1)",
+        "enum" : [ "gin", "vodka", "whisky", "rum", "agave", "brandy", "liqueur", "wine", "korean", "non-alcoholic" ],
+        "type" : "string",
+        "x-labels" : {
+          "agave" : "데킬라 · 메즈칼",
+          "brandy" : "브랜디",
+          "gin" : "진",
+          "korean" : "전통주",
+          "liqueur" : "리큐르",
+          "non-alcoholic" : "무알콜",
+          "rum" : "럼",
+          "vodka" : "보드카",
+          "whisky" : "위스키",
+          "wine" : "와인 · 스파클링"
+        }
+      },
+      "FlavorKey" : {
+        "description" : "향 태그 1~3개 (R-F1.2-1). 카테고리가 아니다",
+        "enum" : [ "citrus", "sour", "fruity", "floral", "herbal", "spicy", "smoky", "bitter", "nutty", "creamy" ],
+        "type" : "string",
+        "x-labels" : {
+          "bitter" : "쓴맛",
+          "citrus" : "시트러스",
+          "creamy" : "크리미",
+          "floral" : "플로럴",
+          "fruity" : "프루티",
+          "herbal" : "허브",
+          "nutty" : "너티",
+          "smoky" : "스모키",
+          "sour" : "산미",
+          "spicy" : "스파이시"
+        }
+      },
+      "StyleKey" : {
+        "description" : "축 2 · 스타일 (복수, style_primary 필수)",
+        "enum" : [ "highball", "sour", "spirit-forward", "spritz", "tiki", "creamy", "hot", "frozen", "shot" ],
+        "type" : "string",
+        "x-labels" : {
+          "creamy" : "크리미",
+          "frozen" : "프로즌",
+          "highball" : "하이볼",
+          "hot" : "핫",
+          "shot" : "샷",
+          "sour" : "사워",
+          "spirit-forward" : "스피릿 포워드",
+          "spritz" : "스프리츠",
+          "tiki" : "티키"
+        }
+      },
+      "SweetLevel" : {
+        "description" : "당도 4단계",
+        "enum" : [ "dry", "semi_dry", "semi_sweet", "sweet" ],
+        "type" : "string",
+        "x-labels" : {
+          "dry" : "드라이",
+          "semi_dry" : "세미 드라이",
+          "semi_sweet" : "세미 스위트",
+          "sweet" : "스위트"
+        }
+      },
+      "Technique" : {
+        "description" : "축 3 · 메이킹 방법 (단일값 필수)",
+        "enum" : [ "build", "shake", "stir", "blend", "etc" ],
+        "type" : "string",
+        "x-labels" : {
+          "blend" : "블렌드",
+          "build" : "빌드",
+          "etc" : "기타",
+          "shake" : "셰이크",
+          "stir" : "스터"
+        }
+      }
+    }
+  },
+  "info" : {
+    "title" : "OpenAPI definition",
+    "version" : "v0"
+  },
+  "openapi" : "3.0.1",
+  "paths" : { },
+  "servers" : [ {
+    "description" : "Generated server url",
+    "url" : "http://localhost"
+  } ]
+}
