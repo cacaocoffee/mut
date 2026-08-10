@@ -1,10 +1,9 @@
-package kr.kcocktail.common.entity
+package probe.jpa
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
 import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityManagerFactory
-import jakarta.persistence.Table
+import kr.kcocktail.KcocktailApplication
+import kr.kcocktail.common.entity.BaseEntity
 import kr.kcocktail.support.PostgresSupport
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.within
@@ -14,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import java.time.Instant
@@ -39,8 +39,10 @@ import java.time.temporal.ChronoUnit
  */
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@EntityScan(basePackageClasses = [BaseEntityTest.Probe::class])
-class BaseEntityTest {
+// probe 패키지가 kr.kcocktail 밖이라 Spring 이 @SpringBootApplication 을 못 찾는다. 명시한다.
+@ContextConfiguration(classes = [KcocktailApplication::class])
+@EntityScan(basePackageClasses = [BaseEntityProbe::class])
+class BaseEntityProbeTest {
 
     @Autowired
     private lateinit var emf: EntityManagerFactory
@@ -65,7 +67,7 @@ class BaseEntityTest {
 
         // 트리거가 now() 를 쓴다. 같은 순간에 수정하면 값이 그대로다.
         Thread.sleep(20)
-        inTransaction { em -> em.find(Probe::class.java, id).label = "수정" }
+        inTransaction { em -> em.find(BaseEntityProbe::class.java, id).label = "수정" }
 
         val after = reload(id)
         assertThat(after.label).isEqualTo("수정")
@@ -114,12 +116,12 @@ class BaseEntityTest {
     // ── 헬퍼 ───────────────────────────────────────────────────────────────
 
     private fun persist(label: String): Long {
-        val probe = Probe(label)
+        val probe = BaseEntityProbe(label)
         inTransaction { em -> em.persist(probe) }
         return probe.id
     }
 
-    private fun reload(id: Long): Probe = withEm { it.find(Probe::class.java, id) }
+    private fun reload(id: Long): BaseEntityProbe = withEm { it.find(BaseEntityProbe::class.java, id) }
 
     private fun inTransaction(block: (EntityManager) -> Unit) = withEm { em ->
         em.transaction.begin()
@@ -142,20 +144,9 @@ class BaseEntityTest {
             close()
         }
 
-    /**
-     * [BaseEntity] 검증용 프로브다. 도메인 엔티티가 아니다.
-     * SPEC-06 §1 을 전부 지킨 모양이라 규약의 참조 구현이기도 하다.
-     */
-    @Entity
-    @Table(name = TABLE, schema = SCHEMA)
-    class Probe(
-        @Column(name = "label", nullable = false)
-        var label: String = "",
-    ) : BaseEntity()
-
     companion object {
-        const val SCHEMA = "entity_probe"
-        const val TABLE = "probe"
+        const val SCHEMA = BaseEntityProbe.SCHEMA
+        const val TABLE = BaseEntityProbe.TABLE
 
         @JvmStatic
         @DynamicPropertySource
