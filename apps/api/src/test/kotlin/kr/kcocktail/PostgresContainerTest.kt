@@ -1,5 +1,6 @@
 package kr.kcocktail
 
+import kr.kcocktail.support.PostgresSupport
 import org.junit.jupiter.api.Test
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
@@ -20,7 +21,7 @@ class PostgresContainerTest {
     companion object {
         @Container
         @JvmStatic
-        val postgres = PostgreSQLContainer("postgres:16-alpine") // PRIN-T01
+        val postgres = PostgreSQLContainer(PostgresSupport.IMAGE) // PRIN-T01
     }
 
     @Test
