@@ -27,11 +27,17 @@ import java.sql.DriverManager
  */
 object PostgresSupport {
 
+    /**
+     * PG16 (`PRIN-T01`). **이름의 정본은 여기다** — CI 워크플로가 같은 태그를 미리 받는다
+     * (`.github/workflows/` 아래). 두 곳이 어긋나면 CI 가 받아 둔 것과 다른 이미지를 끌어온다.
+     */
+    const val IMAGE = "postgres:16-alpine"
+
     private const val APP_USER = "app_test"
     private const val APP_PASSWORD = "app_test"
 
     val container: PostgreSQLContainer<*> =
-        PostgreSQLContainer("postgres:16-alpine")
+        PostgreSQLContainer(IMAGE)
             .withDatabaseName("kcocktail")
             .withUsername("postgres")
             .withPassword("postgres")

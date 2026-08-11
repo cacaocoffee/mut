@@ -46,6 +46,20 @@ jobs:
 
       - run: npm ci
 
+      # Testcontainers 가 테스트 안에서 이미지를 받으면 받기 지연이 곧 테스트 실패로 나타난다.
+      # 실제로 PR #62 에서 ContainerFetchException 으로 202건이 통째로 무너졌다 —
+      # 코드 문제가 아닌데 로그만 보면 그렇게 보이지 않는다.
+      # 미리 받아 두면 실패 지점이 여기로 드러나고 재시도도 할 수 있다.
+      - name: PG16 이미지 미리 받기
+        run: |
+          for i in 1 2 3; do
+            docker pull postgres:16-alpine && exit 0
+            echo "::warning::이미지 받기 실패, 재시도 $i/3"
+            sleep 15
+          done
+          echo "::error::postgres:16-alpine 을 받지 못했다"
+          exit 1
+
       # Kotlin → openapi.json. Testcontainers 로 PG16 을 띄운다.
       - name: 계약 재생성
         working-directory: apps/api
