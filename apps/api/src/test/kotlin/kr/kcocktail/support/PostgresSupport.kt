@@ -36,11 +36,22 @@ object PostgresSupport {
     private const val APP_USER = "app_test"
     private const val APP_PASSWORD = "app_test"
 
+    /**
+     * `max_connections` 를 올려 둔 이유가 있다.
+     *
+     * `@SpringBootTest` 는 **프로파일·프로퍼티 조합마다 컨텍스트를 따로** 만들고,
+     * 컨텍스트마다 Hikari 풀(기본 10)을 하나씩 든다. 이슈가 쌓여 컨텍스트가 열을 넘으면
+     * PG16 기본값 100 을 넘어서고, 그때 터지는 것은 **새로 추가한 테스트가 아니라
+     * 하필 마지막에 붙은 아무 테스트**다 — 원인과 증상이 멀어 진단이 오래 걸린다.
+     *
+     * 컨테이너는 테스트 전체가 하나를 공유하므로 여유를 두는 편이 싸다.
+     */
     val container: PostgreSQLContainer<*> =
         PostgreSQLContainer(IMAGE)
             .withDatabaseName("kcocktail")
             .withUsername("postgres")
             .withPassword("postgres")
+            .withCommand("postgres", "-c", "max_connections=400")
             .also { it.start() }
 
     /** Flyway 를 한 번만 돌린다. 여러 테스트가 불러도 안전하다. */

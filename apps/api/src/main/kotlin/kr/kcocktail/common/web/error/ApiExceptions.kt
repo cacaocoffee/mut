@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus
  * 요구했다 — 첫 실패에서 멈추면 에디터가 저장·실패를 여섯 번 반복한다.
  * 실제 게이트 검사는 이슈 013 이 채우고, 여기서는 **전부 담을 수 있는 구조**를 만든다.
  */
-class DomainViolationException(
+open class DomainViolationException(
     val violations: List<Violation>,
     override val message: String = "도메인 규칙을 위반했습니다",
 ) : RuntimeException(message) {

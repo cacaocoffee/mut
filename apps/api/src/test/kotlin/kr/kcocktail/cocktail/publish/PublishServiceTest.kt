@@ -3,6 +3,7 @@ package kr.kcocktail.cocktail.publish
 import kr.kcocktail.cocktail.api.CocktailPublished
 import kr.kcocktail.cocktail.api.PublishGate
 import kr.kcocktail.cocktail.domain.CocktailStatus
+import kr.kcocktail.cocktail.lifecycle.CocktailTransition
 import kr.kcocktail.common.web.error.ConflictException
 import kr.kcocktail.common.web.error.DomainViolationException
 import kr.kcocktail.support.PostgresSupport
@@ -130,7 +131,7 @@ class PublishServiceTest {
                 Triple(CocktailStatus.ARCHIVED, CocktailStatus.PUBLISHED, false),
             ).map<Triple<CocktailStatus, CocktailStatus, Boolean>, () -> Unit> { (from, to, allowed) ->
                 {
-                    assertThat(PublishTransition.isAllowed(from, to))
+                    assertThat(CocktailTransition.isAllowed(from, to))
                         .`as`("%s → %s", from.slug, to.slug)
                         .isEqualTo(allowed)
                 }

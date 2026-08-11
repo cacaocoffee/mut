@@ -44,8 +44,7 @@ import java.time.Instant
 @Entity
 @Table(name = "cocktail")
 class Cocktail(
-    @Column(name = "slug", nullable = false, length = 120, updatable = false)
-    val slug: String,
+    slug: String,
 
     @Column(name = "name_ko", nullable = false, length = 120)
     var nameKo: String,
@@ -106,6 +105,18 @@ class Cocktail(
     var abvOverride: BigDecimal? = null,
 ) : BaseEntity() {
 
+    /**
+     * 공개 식별자 (SPEC-07 §1.1). **최초 발행 이후 불변**이다 —
+     * 노출되는 순간 URL 이고, 바꾸면 리다이렉트 부채가 된다 (`PRIN-D02` · `INV-COCKTAIL-05`).
+     *
+     * 세터를 닫아 둔 것은 실수가 아니다. 바꾸는 길은 [changeSlug] 하나뿐이고,
+     * 그 길이 [isSlugLocked] 를 본다 — 우회 경로를 두면 `NFR-D-04`("변경 이력 0건")를
+     * 감시할 자리가 사라진다.
+     */
+    @Column(name = "slug", nullable = false, length = 120)
+    var slug: String = slug
+        private set
+
     /** 생성 컬럼이다. DB 가 `COALESCE(abv_override, abv_calculated)` 로 채운다. */
     @Column(name = "abv", insertable = false, updatable = false)
     var abv: BigDecimal? = null
@@ -163,6 +174,26 @@ class Cocktail(
     fun setAromaTags(values: Set<FlavorKey>) {
         aromaRows.removeIf { it.tag !in values }
         values.filterNot { it in aromaTags }.forEach { aromaRows += CocktailAromaTag(this, it.slug) }
+    }
+
+    // ── slug 잠금 (`INV-COCKTAIL-05` · `PRIN-D02`) ──────────────────────────
+
+    /**
+     * **`status` 가 아니라 `published_at` 을 본다.**
+     *
+     * 회수해서 `draft` 로 돌아가도 잠긴 채여야 한다 — `FR-COCKTAIL-014` 가
+     * "**최초 발행 이후**" 라고 했고, 한 번 나간 URL 은 회수해도 남의 북마크와 색인에 남는다.
+     * `status` 를 기준으로 삼으면 "회수 → 슬러그 변경 → 재발행" 으로 규칙을 빠져나간다.
+     */
+    val isSlugLocked: Boolean get() = publishedAt != null
+
+    /**
+     * @throws SlugLockedException 최초 발행 이후. 잡아서 감사에 남기는 것은 서비스 몫이다
+     *   (`NFR-D-04` — 거부된 시도도 조사 근거가 된다)
+     */
+    fun changeSlug(newSlug: String) {
+        if (isSlugLocked) throw SlugLockedException(slug, newSlug)
+        slug = newSlug
     }
 
     /** 상태 전이 규칙과 감사 로그는 이슈 014 다. 여기서는 값을 옮기는 것까지. */

@@ -624,6 +624,34 @@ CONSTRAINT ck_ingredient__substitute CHECK (
 
 ---
 
+### G-26
+
+**`audit_log`가 SPEC-06 §3.8·§4.1을 세 군데서 넘어선다** *(전부 더 강한 방향)*
+
+이슈 014가 감사 로그를 만들며 문서 밖으로 나간 지점이다. 셋 다 `PRIN-T08`의
+취지("되돌릴 수 있어야 하고, 다툼이 생겼을 때 근거가 돼야 한다")를 따라간 결과다.
+
+| # | 문서 | 구현 | 왜 |
+|---|---|---|---|
+| 1 | §3.8 `action` 5종 | **8종** | SPEC-02 §8.1의 전이는 넷인데 표는 `publish`·`unpublish` 둘뿐이다. `archive`·`restore`를 넣지 않으면 전이의 절반이 기록되지 않는다 |
+| 2 | — | `slug_change_attempt` **추가** | `NFR-D-04`가 "슬러그 변경 이력 0건, 발견 시 **즉시 조사**"를 요구한다. **거부된 시도**가 남지 않으면 조사할 대상이 영영 없다 |
+| 3 | §4.1 보호 목록에 `audit_log` 없음 | **UPDATE·DELETE 회수** | 고칠 수 있는 이력은 이력이 아니다. §4.1은 `DELETE`만 다루지만 `UPDATE`로 고쳐도 결과는 같다 |
+
+`archived → draft`를 `unpublish`가 아니라 `restore`로 나눈 이유: 사후 조사에서
+"내렸다"와 "다시 꺼냈다"는 뜻이 다르다. 한 값으로 합치면 재구성(`NFR-O-05`)이 뭉개진다.
+
+**`actor_user_id`에 FK를 걸지 않았다** — SPEC-08 §5.3이 "`user` 행 즉시 삭제"와
+"`audit_log.actor_user_id` 유지"를 **동시에** 요구한다. FK가 있으면 둘 다 못 한다:
+삭제가 FK 위반으로 막히거나, `ON DELETE`가 이력을 지운다. SPEC-06 §3.8의 컬럼 표도
+FK를 명시하지 않았으므로 느슨한 참조로 갔다. **문서 충돌이라 스펙 쪽 정리가 필요하다.**
+
+> ⚠️ `ViolationCode.INV_COCKTAIL_05`는 `HttpStatus.CONFLICT`로 선언돼 있지만
+> `ApiExceptionHandler`가 `DomainViolationException`을 항상 `422`로 내보내 **그 값이 쓰이지 않는다.**
+> 이슈 014의 RED 2가 요구한 것도 `422`라 지금 동작은 맞다. 다만 enum이 들고 있는 상태값이
+> 죽은 정보라, 어드민 엔드포인트(이슈 025)가 붙을 때 정리한다.
+
+---
+
 ## 다음 할 일
 
 DB · CMS · 백엔드 스택이 확정되면서 SPEC-05·06·07이 나왔고, 병목이 다시 옮겨갔다.
