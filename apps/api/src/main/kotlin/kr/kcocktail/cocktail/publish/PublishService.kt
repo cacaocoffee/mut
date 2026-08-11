@@ -1,15 +1,20 @@
 package kr.kcocktail.cocktail.publish
 
+import kr.kcocktail.cocktail.api.CocktailArchived
 import kr.kcocktail.cocktail.api.CocktailPublished
+import kr.kcocktail.cocktail.api.CocktailUnpublished
 import kr.kcocktail.cocktail.api.IngredientSnapshot
 import kr.kcocktail.cocktail.api.PublishCandidate
 import kr.kcocktail.cocktail.api.PublishGate
 import kr.kcocktail.cocktail.api.RecipeSnapshot
 import kr.kcocktail.cocktail.domain.Cocktail
 import kr.kcocktail.cocktail.domain.CocktailStatus
+import kr.kcocktail.cocktail.lifecycle.CocktailLifecycleService.Companion.ENTITY_TYPE
+import kr.kcocktail.cocktail.lifecycle.CocktailTransition
 import kr.kcocktail.cocktail.recipe.RecipeRepository
 import kr.kcocktail.cocktail.recipe.RecipeVersionType
 import kr.kcocktail.cocktail.repository.CocktailRepository
+import kr.kcocktail.common.audit.AuditRecorder
 import kr.kcocktail.common.web.error.ConflictException
 import kr.kcocktail.common.web.error.DomainViolationException
 import kr.kcocktail.common.web.error.ResourceNotFoundException
@@ -42,6 +47,7 @@ class PublishService(
     private val ingredients: IngredientFacade,
     private val events: ApplicationEventPublisher,
     private val regeneration: RegenerationHook,
+    private val auditor: AuditRecorder,
     private val clock: Clock,
 ) {
 
@@ -67,7 +73,9 @@ class PublishService(
         val violations = PublishGate.check(candidateOf(cocktail))
         if (violations.isNotEmpty()) throw DomainViolationException(violations)
 
+        val from = cocktail.status
         cocktail.markPublished(clock.instant())
+        audit(cocktail, from, CocktailStatus.PUBLISHED)
 
         // 색인 동기화 실패는 발행을 롤백한다 (DECISIONS §1.7) — 재생성 훅과 다르다.
         // 검색 정확성에 직결되므로 같은 트랜잭션에서 발행한다.
@@ -106,26 +114,55 @@ class PublishService(
     @Transactional
     fun unpublish(cocktailId: Long) {
         val cocktail = load(cocktailId)
-        requireTransition(cocktail.status, CocktailStatus.DRAFT)
+        val from = cocktail.status
+        requireTransition(from, CocktailStatus.DRAFT)
+
         cocktail.markDraft()
+        audit(cocktail, from, CocktailStatus.DRAFT)
+
+        // `archived → draft` 는 이미 색인에 없다. 내려야 하는 것은 `published → draft` 뿐이다.
+        if (from == CocktailStatus.PUBLISHED) {
+            events.publishEvent(CocktailUnpublished(cocktail.id, cocktail.slug))
+        }
     }
 
     @Transactional
     fun archive(cocktailId: Long) {
         val cocktail = load(cocktailId)
-        requireTransition(cocktail.status, CocktailStatus.ARCHIVED)
+        val from = cocktail.status
+        requireTransition(from, CocktailStatus.ARCHIVED)
+
         cocktail.markArchived()
+        audit(cocktail, from, CocktailStatus.ARCHIVED)
+
+        events.publishEvent(CocktailArchived(cocktail.id, cocktail.slug))
     }
 
     /** 배치 검증(이슈 016)이 쓴다. 저장하지 않고 판정만 한다. */
     @Transactional(readOnly = true)
     fun inspect(cocktailId: Long) = PublishGate.check(candidateOf(load(cocktailId)))
 
+    /**
+     * 전이는 **전부** 감사에 남는다 (`PRIN-T08` · SPEC-02 §8.1).
+     *
+     * 같은 트랜잭션이다 (`AuditRecorder` 가 `MANDATORY`). 전이가 롤백되면 기록도 없고,
+     * **기록에 실패하면 전이도 실패한다** — 감사 없는 발행은 없다.
+     */
+    private fun audit(cocktail: Cocktail, from: CocktailStatus, to: CocktailStatus) {
+        auditor.record(
+            entityType = ENTITY_TYPE,
+            entityId = cocktail.id,
+            action = CocktailTransition.auditAction(from, to),
+            before = mapOf("status" to from.slug),
+            after = mapOf("status" to to.slug, "publishedAt" to cocktail.publishedAt?.toString()),
+        )
+    }
+
     private fun requireTransition(from: CocktailStatus, to: CocktailStatus) {
-        if (!PublishTransition.isAllowed(from, to)) {
+        if (!CocktailTransition.isAllowed(from, to)) {
             throw ConflictException(
                 "허용되지 않는 상태 전이입니다: ${from.slug} → ${to.slug} " +
-                    "(가능: ${PublishTransition.allowedFrom(from).joinToString { it.slug }})",
+                    "(가능: ${CocktailTransition.allowedFrom(from).joinToString { it.slug }})",
             )
         }
     }

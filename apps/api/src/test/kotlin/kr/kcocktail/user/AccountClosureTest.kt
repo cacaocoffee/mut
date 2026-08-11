@@ -69,9 +69,35 @@ class AccountClosureTest {
     @Disabled("북마크 테이블은 이슈 031 (#33) 이 만든다")
     fun `RED24 - 탈퇴시 북마크가 CASCADE 삭제된다`() = Unit
 
+    /**
+     * RED 25 — **탈퇴해도 감사의 주체는 남는다** (SPEC-08 §5.3, 이슈 014 가 풀었다).
+     *
+     * 콘텐츠 발행 이력은 법적 근거이자 신뢰 기록이다. 개인을 식별할 수 없게 만드는 것과
+     * 일어난 일을 없던 것으로 만드는 것은 다르다.
+     *
+     * 이것이 가능한 이유는 `audit_log.actor_user_id` 에 **FK 가 없어서**다.
+     * FK 가 있으면 삭제가 막히거나 `ON DELETE` 가 이력을 지운다 — 둘 다 §5.3 위반이다.
+     */
     @Test
-    @Disabled("audit_log 는 이슈 014 (#16) 가 만든다 — actor_user_id 는 유지한다")
-    fun `RED25 - 탈퇴해도 audit_log actor_user_id 는 유지된다`() = Unit
+    fun `RED25 - 탈퇴해도 audit_log actor_user_id 는 유지된다`() {
+        val id = insertUser("audited-actor")
+        jdbc.update(
+            """
+            INSERT INTO audit_log (entity_type, entity_id, action, actor_user_id, before, after)
+            VALUES ('cocktail', 1, 'publish', ?, '{"status":"draft"}'::jsonb, '{"status":"published"}'::jsonb)
+            """.trimIndent(),
+            id,
+        )
+
+        closure.close(id)
+
+        assertThat(count("""SELECT count(*) FROM "user" WHERE id = $id"""))
+            .`as`("사용자는 지워졌다")
+            .isZero()
+        assertThat(count("SELECT count(*) FROM audit_log WHERE actor_user_id = $id"))
+            .`as`("누가 발행했는지는 남는다")
+            .isEqualTo(1)
+    }
 
     @Test
     @Disabled("analytics_event 는 이슈 034 (#36) 가 만든다 — user_id 를 NULL 로 익명화한다")
