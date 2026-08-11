@@ -16,7 +16,13 @@ gh issue view  15                                 # 이슈 본문 (= 근거·RED
 gh issue view  15 --json body --jq .body > /tmp/issue.md
 ```
 
-GitHub 번호 = `ISSUE-NNN` **+ 2**. `ISSUE-A00` 만 `#1`.
+**번호 대응은 ISSUE-050(#52)까지만 `+2` 다.** `ISSUE-A00` 만 `#1`.
+초기 일괄 등록 이후에는 PR 이 같은 번호대를 먹으므로 규칙이 성립하지 않는다 —
+`ISSUE-051` 은 `#53` 이 아니라 **`#69`** 다. 새 이슈는 **제목의 `[NNN]` 으로 찾는다.**
+
+```bash
+gh issue list --search "in:title [051]"
+```
 진행률은 [마일스톤](https://github.com/cacaocoffee/k-cocktail-archive/milestones)이 웨이브별로 보여준다.
 
 ---
@@ -121,7 +127,21 @@ SPEC-05 §2: `npm workspaces`는 `apps/web`과 `packages/*`만 관리하고 `app
 | **Flyway 마이그레이션** | 이슈 번호 = 마이그레이션 번호. `V012__publish_gate.sql`. 여러 개면 `V012_1`, `V012_2`. **즉흥으로 붙이지 않는다** — frontmatter의 `migration:` 이 예약 번호 |
 | **OpenAPI 생성물** | `packages/domain/src/generated/**` 은 **누구도 손으로 고치지 않는다.** 생성 스크립트만 건드린다 (이슈 004 소유) |
 | **모듈 경계** | `owns:` 밖은 읽기만. 타 모듈은 공개 인터페이스(`XxxFacade`)로만 호출 (`PRIN-T03`). 리포지토리·엔티티 직접 참조는 경계 테스트가 막는다 |
-| **`packages/ui`** | **수정 금지.** ADR-0001이 시안 정본으로 규정했다. 대비 문제(NFR-A)를 발견해도 `styles.css`를 고치지 않고 GAPS에 올린다 |
+| **`packages/ui`** | 파일마다 다르다 — 아래 표 (`ADR-0005`). 한 줄로 요약하면 **`styles.css`는 절차를 밟을 때만, `app.css`는 일반 코드와 같다** |
+
+#### `packages/ui` 세 층 ([ADR-0005](../decisions/ADR-0005-ui-package-scope.md))
+
+| 무엇 | 성격 | 고칠 수 있나 |
+|---|---|---|
+| `docs/design/source/**` | 시안 원본 (Claude Design 내보내기) | **아니오.** 읽기 전용 |
+| `packages/ui/styles.css` | 시안 정본 — 토큰 · 컴포넌트 클래스 | **GAPS 등재 → ADR → 되돌리는 조건**, 3단을 다 밟을 때만 |
+| `packages/ui/app.css` | 우리가 쓴 화면 레이아웃 · 반응형 층 | **예.** 일반 코드와 같다 |
+
+`app.css`가 시안 밖인 근거는 ADR-0001 결정 2다 — 시안에 없는 모션 값을 거기 두면서
+"시안 정본을 원본과 어긋나게 두지 않기 위해서"라고 적었다.
+
+대비 문제(`NFR-A`)를 `styles.css`에서 발견하면 여전히 GAPS로 간다 (예: `.btn-primary` 3.76:1 → [이슈 050](https://github.com/cacaocoffee/k-cocktail-archive/issues/52)).
+**절차가 열렸다는 뜻이지 프리패스가 아니다.**
 
 ### 4.1 `PRIN-P02` — 만들면 안 되는 것
 
@@ -199,7 +219,8 @@ EOF
 | 스펙에 답이 없다 (추측이 필요하다) | **구현 중단.** `GAPS.md` 등재 + 보고 |
 | 스펙 두 곳이 충돌한다 | SPEC-00이 최상위 (§9). 그 아래끼리면 `GAPS.md` |
 | 원칙을 어겨야 한다 | GAPS 등재 → **ADR 작성** → 되돌리는 조건 명시 |
-| `packages/ui` 를 고쳐야 한다 | ADR-0001 위반. GAPS로 (예: `NFR-A` §2.4 `.btn-primary`) |
+| `packages/ui/styles.css` 를 고쳐야 한다 | GAPS 등재 → ADR → 되돌리는 조건. 3단을 다 밟는다 (§4). 예: `NFR-A` §2.4 `.btn-primary` |
+| `packages/ui/app.css` 를 고쳐야 한다 | 그냥 고친다. 시안 정본이 아니다 ([ADR-0005](../decisions/ADR-0005-ui-package-scope.md)) |
 
 현재 미결 2건은 [`GAPS.md`](../prd/GAPS.md) 참조 — **호스팅·이미지 저장소(G-07)** 와 **사업 결정(G-17)**. 둘 다 문서로 풀 수 없다.
 

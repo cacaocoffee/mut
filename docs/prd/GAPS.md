@@ -652,6 +652,55 @@ FK를 명시하지 않았으므로 느슨한 참조로 갔다. **문서 충돌�
 
 ---
 
+### G-27
+
+**규약 세 곳이 `packages/ui`의 수정 범위를 다르게 말한다** *(ADR-0005로 해소)*
+
+외부 디자인 감사 스킬(hallmark)로 `apps/web`을 훑어 18건이 나왔다. **13건이 `packages/ui` 안**에 있었고,
+착수하려니 어느 규약을 따라야 할지가 갈렸다.
+
+| 출처 | `packages/ui/app.css` 를 뭐라고 하나 |
+|---|---|
+| [CONVENTIONS §4](../issues/CONVENTIONS.md) | `packages/ui` **통째로 수정 금지** |
+| [`docs/design/README.md`](../design/README.md) | 「화면 레이아웃 · **반응형**」 층 |
+| [ADR-0001](../decisions/ADR-0001-design-system.md) 결정 2 | `--dur`를 **일부러 `app.css`에 뒀다** — "시안 정본을 원본과 어긋나게 두지 않기 위해서" |
+
+ADR-0001과 디자인 README는 `app.css`를 **우리가 쓴 층**으로 취급하는데 CONVENTIONS만 패키지 전체를 잠갔다.
+반응형 수정은 `app.css`가 존재하는 이유 그 자체인데도 막힌다.
+
+**해결 (2026-08-11)** — [ADR-0005](../decisions/ADR-0005-ui-package-scope.md).
+
+```
+docs/design/source/**      읽기 전용 — 시안 원본
+packages/ui/styles.css     시안 정본 — GAPS → ADR → 되돌리는 조건, 3단 절차를 밟을 때만
+packages/ui/app.css        프로젝트 소유 — 일반 코드와 같다
+```
+
+CONVENTIONS §4의 한 줄을 이 표로 교체했다. **`styles.css`의 3단 절차는 그대로 남는다** — 충돌 해소이지 완화가 아니다.
+
+**함께 결정한 것 — 시안 정본 개정 3건.** ADR-0005 결정 3이 성격을 갈라 적었다.
+
+| 무엇 | 성격 | 시안 원본 드리프트 |
+|---|---|---|
+| 램프 `hex` → `oklch()` | 표기 변경 (렌더 동일, `color-parity.mjs`가 강제) | 없음 |
+| 한글 담는 칸 12px 바닥 | 접근성 — [G-16](#g-16)과 같은 원인(시안이 한글 미검증) | 있음 (부분) |
+| **내비 마스트헤드 재구성** | **취향** — 근거는 외부 스킬의 의견이고 측정된 것이 아니다 | **있음** |
+
+⚠️ **셋째는 시안이 의도한 형태를 덮는다.** 시안 원본 `K-Cocktail-Archive.dc.html:23-30`이
+브랜드 좌측 + 번호 탭 3개 우측을 명시적으로 그렸고 현재 구현은 거기 충실했다.
+제품 소유자 지시로 진행하되 **`styles.css`의 `.nav`는 건드리지 않아** 되돌리는 비용을 낮게 뒀다.
+되돌리는 조건은 `cross_nav` 계측이다 (ADR-0005).
+
+**이슈** — [#69](https://github.com/cacaocoffee/k-cocktail-archive/issues/69) 반응형 바닥 ·
+[#70](https://github.com/cacaocoffee/k-cocktail-archive/issues/70) 토큰 규율 ·
+[#71](https://github.com/cacaocoffee/k-cocktail-archive/issues/71) 아이브로우·내비 ·
+[#72](https://github.com/cacaocoffee/k-cocktail-archive/issues/72) 램프·한글 바닥
+
+> **남는 위험** — 형태 드리프트에는 자동 검증이 없다. 램프 값만 `color-parity.mjs`가 잡는다.
+> 개정이 쌓이면 `docs/design/source/`는 점점 참조 문서가 아니게 된다.
+
+---
+
 ## 다음 할 일
 
 DB · CMS · 백엔드 스택이 확정되면서 SPEC-05·06·07이 나왔고, 병목이 다시 옮겨갔다.
