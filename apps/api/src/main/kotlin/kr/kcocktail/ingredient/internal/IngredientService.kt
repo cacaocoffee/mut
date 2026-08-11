@@ -140,6 +140,7 @@ private fun Ingredient.toView() = IngredientView(
     nameEn = nameEn,
     categorySlug = category.slug,
     availabilitySlug = domesticAvailability.slug,
+    abv = abv,
     isApproved = isApproved,
     countsForStockByDefault = defaultCountsForStock,
     requiresSubstitute = requiresSubstitute,

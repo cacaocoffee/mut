@@ -41,6 +41,13 @@ data class IngredientView(
     val nameEn: String,
     val categorySlug: String,
     val availabilitySlug: String,
+
+    /**
+     * 도수 자동 계산의 입력 (`FR-COCKTAIL-006`, 이슈 011).
+     * 주스처럼 0 이거나 아직 안 채운 재료는 `null` 이다.
+     */
+    val abv: java.math.BigDecimal?,
+
     val isApproved: Boolean,
     val countsForStockByDefault: Boolean,
     val requiresSubstitute: Boolean,
