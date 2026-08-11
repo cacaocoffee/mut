@@ -3,6 +3,12 @@ import { BASES, COCKTAILS, FLAVOR_KEYS, STYLE_KEYS, TECHNIQUES } from "./data";
 /**
  * 코퍼스 불변식. PRD가 하드 제약이라고 못박은 것들이라 어기면 빌드를 세운다.
  * 24종일 때는 눈으로 보이지만 500종이 되면 이것 말고는 확인할 방법이 없다.
+ *
+ * **규칙의 정본은 이제 Kotlin이다** (ISSUE-013, `PRIN-T05`).
+ * 발행 게이트와 도메인 불변식은 서버 트랜잭션 안에서 강제한다 —
+ * `apps/api/.../cocktail/api/PublishGate.kt` 가 `GATE-COCKTAIL-01~06` 의 정본이고,
+ * 여기는 시드 코퍼스를 지키는 **보조 수단이지 근거가 아니다.**
+ * 두 곳이 어긋나면 Kotlin이 맞다.
  */
 export function validateCorpus(): string[] {
   const errors: string[] = [];

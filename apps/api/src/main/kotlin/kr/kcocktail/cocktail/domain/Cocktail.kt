@@ -171,6 +171,11 @@ class Cocktail(
         publishedAt = at
     }
 
+    /** 회수. `published_at` 은 지우지 않는다 — 언제 발행했었는지가 기록이다. */
+    fun markDraft() {
+        statusSlug = CocktailStatus.DRAFT.slug
+    }
+
     fun markArchived() {
         statusSlug = CocktailStatus.ARCHIVED.slug
     }
