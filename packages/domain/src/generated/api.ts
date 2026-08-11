@@ -14,7 +14,24 @@
  * Do not make direct changes to the file.
  */
 
-export type paths = Record<string, never>;
+export interface paths {
+    "/api/v1/auth/csrf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["issue"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+}
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
@@ -23,6 +40,10 @@ export interface components {
          * @enum {string}
          */
         BaseSpirit: "gin" | "vodka" | "whisky" | "rum" | "agave" | "brandy" | "liqueur" | "wine" | "korean" | "non-alcoholic";
+        CsrfTokenResponse: {
+            headerName: string;
+            token: string;
+        };
         /**
          * @description 향 태그 1~3개 (R-F1.2-1). 카테고리가 아니다
          * @enum {string}
@@ -51,4 +72,25 @@ export interface components {
     pathItems: never;
 }
 export type $defs = Record<string, never>;
-export type operations = Record<string, never>;
+export interface operations {
+    issue: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CsrfTokenResponse"];
+                };
+            };
+        };
+    };
+}

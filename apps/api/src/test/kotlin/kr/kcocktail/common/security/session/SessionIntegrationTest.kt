@@ -8,12 +8,9 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.context.annotation.Bean
 import org.springframework.http.HttpHeaders
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
@@ -27,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController
 import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpSession
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
@@ -94,7 +92,7 @@ class SessionIntegrationTest {
         val cookie = login(userId = 1, Role.MEMBER)
         assertThat(whoAmI(cookie)).isEqualTo("1")
 
-        mvc.post("/probe/session/logout") { cookie(cookie) }.andReturn()
+        mvc.post("/probe/session/logout") { cookie(cookie); with(csrf()) }.andReturn()
 
         assertThat(whoAmI(cookie)).`as`("같은 쿠키로 더는 안 된다").isEmpty()
         assertThat(sessionCount()).isZero()
@@ -160,7 +158,7 @@ class SessionIntegrationTest {
     // ── 헬퍼 ───────────────────────────────────────────────────────────────
 
     private fun setCookie(): String =
-        mvc.post("/probe/session/login") { param("userId", "99") }
+        mvc.post("/probe/session/login") { param("userId", "99"); with(csrf()) }
             .andReturn().response.getHeader(HttpHeaders.SET_COOKIE)
             ?: error("Set-Cookie 가 없다 — 세션이 만들어지지 않았다")
 
@@ -173,7 +171,7 @@ class SessionIntegrationTest {
      */
     private fun login(userId: Long, vararg granted: Role): Cookie {
         roles[userId] = granted.toSet()
-        val response = mvc.post("/probe/session/login") { param("userId", "$userId") }
+        val response = mvc.post("/probe/session/login") { param("userId", "$userId"); with(csrf()) }
             .andReturn().response
         return response.getCookie(COOKIE_NAME)
             ?: error("세션 쿠키가 없다 — 세션이 만들어지지 않았다")
@@ -191,14 +189,6 @@ class SessionIntegrationTest {
         Int::class.java,
     ) ?: error("세션이 저장되지 않았다")
 
-    @TestConfiguration
-    class OpenSecurity {
-        @Bean
-        fun openChain(http: HttpSecurity): SecurityFilterChain = http
-            .csrf { it.disable() } // CSRF 는 이슈 007
-            .authorizeHttpRequests { it.anyRequest().permitAll() }
-            .build()
-    }
 
     companion object {
         const val COOKIE_NAME = "KCSESSION"
