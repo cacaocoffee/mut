@@ -38,10 +38,17 @@ class IngredientServiceTest {
     @Autowired private lateinit var facade: IngredientFacade
     @Autowired private lateinit var jdbc: JdbcTemplate
 
+    /**
+     * 컨테이너를 테스트 전체가 공유하므로(`PostgresSupport`) 앞선 테스트가 남긴 행이
+     * 여기 정리를 막는다 — `recipe_ingredient` 가 `ingredient` 를 FK 로 잡는다.
+     *
+     * `TRUNCATE ... CASCADE` 로 **참조하는 쪽까지** 걷어낸다. `DELETE` 로는
+     * 참조 순서를 손으로 맞춰야 하고, 테이블이 늘 때마다 여기를 고쳐야 한다.
+     */
     @BeforeEach
     fun clear() {
         RecordingIndexListener.received.clear()
-        jdbc.execute("DELETE FROM ingredient")
+        jdbc.execute("TRUNCATE ingredient CASCADE")
     }
 
     // ── RED 25~28 : 도메인 이벤트 ─────────────────────────────────────────
