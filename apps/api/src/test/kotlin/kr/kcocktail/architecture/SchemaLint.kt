@@ -40,6 +40,23 @@ object SchemaLint {
     private val SINGULAR_ENDING_IN_S = setOf("glass", "status", "press")
 
     /**
+     * `is_`/`has_` 가 아니어도 술어로 읽히는 불리언. 규칙 5 의 예외다.
+     *
+     * **SPEC-06 이 스스로와 충돌하는 지점**이다 — §1.1 은 접두를 요구하는데
+     * 같은 문서 §3.1 의 `recipe_ingredient` 표가 `counts_for_stock` 으로 명시했고,
+     * SPEC-02 §2.7 도 같은 이름이다. 더 구체적인 쪽(컬럼 정의)을 따르되,
+     * §1.1 의 취지("이름만 보고 불리언인 줄 안다")는 이 이름도 만족한다 —
+     * 3인칭 동사구라 술어로 읽힌다. GAPS G-25.
+     *
+     * 억제가 쌓이는 것이 보이도록 여기 둔다. 늘어나면 §1.1 을 고쳐야 한다는 신호다.
+     */
+    private val PREDICATE_BOOLEANS = listOf("counts_for_stock")
+
+    /** SQL 에 그대로 박는다. 상수라 주입 위험이 없다 ([NOT_FOREIGN] 과 같은 방식). */
+    private val NOT_PREDICATE_BOOLEAN =
+        "column_name NOT IN (${PREDICATE_BOOLEANS.joinToString(", ") { "'$it'" }})"
+
+    /**
      * SPEC-06 §4.1 · `INV-BAR-03` — 물리 삭제 금지 대상.
      *
      * **이 상수가 목록의 정본이다.** 넷 다 Phase 1a 에 아직 없다.
@@ -146,6 +163,7 @@ object SchemaLint {
         FROM information_schema.columns
         WHERE table_schema = ? AND $NOT_FOREIGN AND data_type = 'boolean'
           AND column_name !~ '^(is|has)_'
+          AND $NOT_PREDICATE_BOOLEAN
         ORDER BY 1
         """,
         schema,
