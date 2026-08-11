@@ -556,6 +556,44 @@ P1 기능이 P0 발행을 막는 구조다.
 
 ---
 
+### G-24
+
+**`INV-INGREDIENT-01`을 SPEC-06 §4.3은 "앱 강제"로 분류했지만 DB로도 강제한다** *(더 강한 방향)*
+
+[SPEC-06 §4.3](../spec/SPEC-06_데이터모델_ERD.md)이 `INV-INGREDIENT-01`·`02`를
+"조건부라 DB 제약으로 표현 불가"로 분류했다. `01`은 **표현 가능하다.**
+
+```sql
+CONSTRAINT ck_ingredient__substitute CHECK (
+    domestic_availability NOT IN ('import_only','unavailable')
+    OR (substitute_note IS NOT NULL AND substitute_note ~ '\S')
+)
+```
+
+같은 문서 §4 서두가 **"DB로 강제할 수 있는 것은 DB에서 한다"**고 했으므로 §4.3의 분류보다
+서두의 원칙이 우선한다고 보고 **양쪽 다** 걸었다 (`PRIN-T05`).
+
+| 어디서 | 왜 |
+|---|---|
+| 앱 (`Ingredient.validate`) | 에디터에게 **어느 항목이 왜** 막혔는지 알려 준다. DB 제약 위반은 `violations`를 못 만든다 (`FR-ADMIN-003`) |
+| DB (`CHECK`) | 배치·마이그레이션은 앱을 거치지 않는다 |
+
+**해결 (2026-08-11)** — 이슈 008이 양쪽에 걸었다. 문서를 고치지 않은 이유는
+**규칙이 더 강해진 방향**이라 스펙 위반이 아니기 때문이다. ADR까지는 만들지 않았다.
+
+> ⚠️ **`INV-INGREDIENT-02`(브랜드 광고성 표기)는 여전히 앱 강제다.** "특정 브랜드 언급"의
+> 판정이 데이터가 아니라 편집 판단이라 CHECK로 옮길 수 없다. `is_sponsored`가 `NOT NULL`인 것까지가
+> DB가 할 수 있는 전부다.
+
+구현 중 두 가지를 잡았다.
+
+- **`trim()`은 공백만 지운다.** 탭·개행으로 채운 값이 통과했다. 코틀린 `isNullOrBlank()`는
+  둘 다 잡으므로 앱이 DB보다 엄격해질 뻔했다 → `~ '\S'`로 바꿨다
+- **`NULL ~ '\S'`는 `NULL`이고 CHECK는 `NULL`을 통과로 친다.** 안내를 아예 안 적은 경우가
+  새어 나갔다 → `IS NOT NULL`을 명시했다 (3값 논리)
+
+---
+
 ## 다음 할 일
 
 DB · CMS · 백엔드 스택이 확정되면서 SPEC-05·06·07이 나왔고, 병목이 다시 옮겨갔다.

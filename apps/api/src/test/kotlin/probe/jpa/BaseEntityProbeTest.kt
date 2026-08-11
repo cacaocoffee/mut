@@ -4,7 +4,6 @@ import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityManagerFactory
 import kr.kcocktail.KcocktailApplication
 import kr.kcocktail.common.entity.BaseEntity
-import kr.kcocktail.user.domain.User
 import kr.kcocktail.support.PostgresSupport
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.within
@@ -44,7 +43,11 @@ import java.time.temporal.ChronoUnit
 @ContextConfiguration(classes = [KcocktailApplication::class])
 // @EntityScan 은 기본 스캔을 **대체한다.** 프로브만 적으면 도메인 엔티티가 관리 대상에서
 // 빠지고, 그것을 쓰는 리포지토리가 "Not a managed type" 으로 죽는다.
-@EntityScan(basePackageClasses = [BaseEntityProbe::class, User::class])
+//
+// 클래스를 하나씩 적지 않는다 — 모듈이 생길 때마다 여기를 고쳐야 하고,
+// 고치는 것을 잊으면 **그 모듈과 무관한 이 테스트가** 빨개진다 (ISSUE-005·008 에서 연달아 겪었다).
+// 앱 루트를 통째로 잡고 프로브 패키지만 더한다.
+@EntityScan(basePackages = ["kr.kcocktail", "probe.jpa"])
 class BaseEntityProbeTest {
 
     @Autowired
