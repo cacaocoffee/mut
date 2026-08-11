@@ -49,6 +49,10 @@ logging:
 # 도메인은 환경변수다. 호스팅이 미정이고(G-07), SPEC-07 §1.2 가
 # "프론트와 API 가 같은 상위 도메인"을 요구한다.
 kcocktail:
+  # SPEC-08 §6 — 기본값은 스펙 표 그대로. 사고 시 배포 없이 조이라고 열어 둔다.
+  rate-limit:
+    enabled: ${KC_RATE_LIMIT_ENABLED:true}
+    limits: {}
   session:
     cookie-name: ${KC_SESSION_COOKIE_NAME:KCSESSION}
     secure: ${KC_SESSION_SECURE:true}

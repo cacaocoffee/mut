@@ -10,12 +10,8 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.context.annotation.Bean
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.web.SecurityFilterChain
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
@@ -405,18 +401,6 @@ class RestConventionTest {
     private fun pageOf(result: MvcResult): Map<String, Any> =
         bodyOf(result)["page"] as Map<String, Any>
 
-    /**
-     * 인증은 이슈 005·006·007 의 몫이다. 이 이슈는 **예외 → 상태 코드 매핑**까지라
-     * 시큐리티를 열어 두고 프로브가 예외를 직접 던진다.
-     */
-    @TestConfiguration
-    class OpenSecurity {
-        @Bean
-        fun openChain(http: HttpSecurity): SecurityFilterChain = http
-            .csrf { it.disable() } // CSRF 는 이슈 007
-            .authorizeHttpRequests { it.anyRequest().permitAll() }
-            .build()
-    }
 
     companion object {
         const val BASE = ApiPaths.BASE
