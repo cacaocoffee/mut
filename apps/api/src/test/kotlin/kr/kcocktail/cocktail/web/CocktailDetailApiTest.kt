@@ -754,6 +754,8 @@ class CountingIngredientFacade(
         return delegate.requiresSubstitute(ingredientId)
     }
 
+    override fun findApprovedBySlug(slug: String) = delegate.findApprovedBySlug(slug)
+
     companion object {
         val bulkCalls = AtomicInteger(0)
         val singleCalls = AtomicInteger(0)

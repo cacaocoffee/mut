@@ -128,6 +128,9 @@ class RecipeAssemblerTest {
         override fun findApproved(ids: Collection<Long>): List<IngredientView> = emptyList()
         override fun findAll(ids: Collection<Long>): List<IngredientView> = emptyList()
         override fun requiresSubstitute(ingredientId: Long): Boolean = false
+
+        /** 이 테스트는 슬러그 조회를 쓰지 않는다 — 재료 사전(이슈 023)의 경로다. */
+        override fun findApprovedBySlug(slug: String): kr.kcocktail.ingredient.api.IngredientView? = null
     }
 
     private companion object {
