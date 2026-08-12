@@ -120,6 +120,27 @@ tasks.register<Test>("generateOpenApiDocs") {
     outputs.upToDateWhen { false } // 항상 다시 뽑는다
 }
 
+/**
+ * `NFR-D-01` 배포 게이트 (ISSUE-016). `npm run check` 의 서버판이다.
+ *
+ * 발행분을 전수 스캔해 불변식 위반이 있으면 **비정상 종료**한다 — CI 가 그 코드로 배포를 막는다.
+ * 웹 서버를 띄우지 않는 이유: 배포 전에 한 번 돌고 죽는 것이라 포트도 필터도 필요 없다.
+ *
+ * DB 를 붙잡으므로 `check` 에 매달지 않는다. 로컬에서 `./gradlew verifyInvariants` 로 부르고,
+ * CI 는 배포 직전 스텝에서 실제 DB 를 가리켜 돌린다.
+ */
+tasks.register<JavaExec>("verifyInvariants") {
+    description = "발행분 불변식 전수 검증 — 위반이 있으면 exit 1 (NFR-D-01)"
+    group = "verification"
+    mainClass.set("kr.kcocktail.KcocktailApplicationKt")
+    classpath = sourceSets["main"].runtimeClasspath
+    args(
+        "--kcocktail.verification.cli=true",
+        "--kcocktail.verification.scheduled=false",
+        "--spring.main.web-application-type=none",
+    )
+}
+
 // 이슈 001 이 채운다. 지금은 태그가 붙은 테스트가 없어 통과한다.
 tasks.register<Test>("boundaryTest") {
     description = "모듈 경계 테스트 (PRIN-T03 · NFR-032 상당)"
