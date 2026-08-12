@@ -2,44 +2,44 @@
 @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap');
 
 :root {
-  --color-bg: #f3f2f2;
-  --color-surface: #eae9e9;
-  --color-text: #201e1d;
-  --color-accent: #ec3013;
-  --color-accent-2: #e15b47;
-  --color-divider: color-mix(in srgb, #201e1d 40%, transparent);
+  --color-bg: oklch(96.19% 0.0011 17.18);
+  --color-surface: oklch(93.48% 0.0011 17.18);
+  --color-text: oklch(23.69% 0.0036 48.57);
+  --color-accent: oklch(61.12% 0.2252 31.45);
+  --color-accent-2: oklch(64.05% 0.1714 30.84);
+  --color-divider: color-mix(in srgb, var(--color-text) 40%, transparent);
 
   /* Tonal ramps — generated in OKLCH on one shared lightness scale, so the
      same step of any role matches the others in visual value. */
-  --color-neutral-100: #f8f4f4;
-  --color-neutral-200: #eae7e7;
-  --color-neutral-300: #d7d3d3;
-  --color-neutral-400: #bab6b6;
-  --color-neutral-500: #9b9797;
-  --color-neutral-600: #7d7979;
-  --color-neutral-700: #605d5d;
-  --color-neutral-800: #444141;
-  --color-neutral-900: #2d2b2b;
+  --color-neutral-100: oklch(97.02% 0.0043 17.23);
+  --color-neutral-200: oklch(93.03% 0.0032 17.22);
+  --color-neutral-300: oklch(87.00% 0.0044 17.24);
+  --color-neutral-400: oklch(77.95% 0.0045 17.25);
+  --color-neutral-500: oklch(67.98% 0.0047 17.27);
+  --color-neutral-600: oklch(57.96% 0.0049 17.30);
+  --color-neutral-700: oklch(48.11% 0.0038 17.29);
+  --color-neutral-800: oklch(37.83% 0.0041 17.34);
+  --color-neutral-900: oklch(29.12% 0.0029 17.32);
 
-  --color-accent-100: #fff2ef;
-  --color-accent-200: #ffe0d9;
-  --color-accent-300: #ffc4b8;
-  --color-accent-400: #ff9783;
-  --color-accent-500: #ff563c;
-  --color-accent-600: #dd2b0f;
-  --color-accent-700: #ae1800;
-  --color-accent-800: #7c1405;
-  --color-accent-900: #4d170e;
+  --color-accent-100: oklch(97.05% 0.0146 33.07);
+  --color-accent-200: oklch(93.03% 0.0357 32.80);
+  --color-accent-300: oklch(87.00% 0.0701 31.63);
+  --color-accent-400: oklch(78.05% 0.1291 31.76);
+  --color-accent-500: oklch(68.01% 0.2093 31.50);
+  --color-accent-600: oklch(58.07% 0.2152 31.47);
+  --color-accent-700: oklch(48.06% 0.1850 31.42);
+  --color-accent-800: oklch(37.98% 0.1402 31.44);
+  --color-accent-900: oklch(29.07% 0.0837 31.84);
 
-  --color-accent-2-100: #fff2ef;
-  --color-accent-2-200: #ffe0da;
-  --color-accent-2-300: #ffc4b9;
-  --color-accent-2-400: #ff9784;
-  --color-accent-2-500: #ef6853;
-  --color-accent-2-600: #c94b39;
-  --color-accent-2-700: #9e3526;
-  --color-accent-2-800: #71261b;
-  --color-accent-2-900: #471d16;
+  --color-accent-2-100: oklch(97.05% 0.0146 33.07);
+  --color-accent-2-200: oklch(93.06% 0.0354 30.75);
+  --color-accent-2-300: oklch(87.03% 0.0698 30.59);
+  --color-accent-2-400: oklch(78.07% 0.1288 31.22);
+  --color-accent-2-500: oklch(68.03% 0.1711 30.92);
+  --color-accent-2-600: oklch(58.07% 0.1641 30.76);
+  --color-accent-2-700: oklch(47.98% 0.1425 30.95);
+  --color-accent-2-800: oklch(38.02% 0.1085 30.96);
+  --color-accent-2-900: oklch(29.08% 0.0663 31.15);
 
   --font-heading: "Archivo", system-ui, sans-serif;
   --font-heading-weight: 800;
@@ -58,9 +58,9 @@
 
   /* Elevation — derived from the ground: soft ink-tinted shadows on a
      light theme, a hairline edge + ambient darkness on a dark one. */
-  --shadow-sm: 0 1px 2px color-mix(in srgb, #2d2b2b 14%, transparent);
-  --shadow-md: 0 3px 10px color-mix(in srgb, #2d2b2b 16%, transparent);
-  --shadow-lg: 0 12px 32px color-mix(in srgb, #2d2b2b 22%, transparent);
+  --shadow-sm: 0 1px 2px color-mix(in srgb, var(--color-neutral-900) 14%, transparent);
+  --shadow-md: 0 3px 10px color-mix(in srgb, var(--color-neutral-900) 16%, transparent);
+  --shadow-lg: 0 12px 32px color-mix(in srgb, var(--color-neutral-900) 22%, transparent);
 }
 
 body {

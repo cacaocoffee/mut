@@ -77,6 +77,14 @@ const NUMERIC = [".results-count", ".spec-strip", ".cocktail-card__abv", ".profi
  */
 const APP_PROVIDED = ["--font-archivo", "--font-noto-sans", "--font-noto-serif"];
 
+/**
+ * 한글을 담는 칸 — 12px 바닥 (게이트 13).
+ * 라틴 캡션이면 10px 도 성립하지만 한글은 x-height 가 커서 획이 뭉갠다.
+ * 라틴 전용 레이블(.spec-strip dt · .seg-stack .en)은 여기 없다 — 그 자리는 9.5px 로 둔다.
+ */
+const HANGUL_BEARING = [".chip-tag", ".cocktail-card__foot"];
+const HANGUL_MIN_PX = 12;
+
 const EXCEPTIONS = [
   // 형식: { gate, selector, why }
   // 예외를 넣기 전에 규칙이 틀린 것은 아닌지 먼저 의심한다.
@@ -206,6 +214,24 @@ for (const rel of FILES) {
       }
     }
 
+    // 12. oklch_only — 시안 정본에 hex 리터럴이 없다. 색은 oklch() 로 적는다.
+    //     값 자체가 시안과 같은지는 scripts/color-parity.mjs 가 왕복으로 강제한다.
+    if (rel === "packages/ui/styles.css" && /#[0-9a-fA-F]{6}\b/.test(r.decls)) {
+      fail("oklch_only", rel, r.line, sel,
+        "시안 정본에 hex 리터럴 — oklch() 로 적거나 토큰을 참조한다");
+    }
+
+    // 13. hangul_min_size — 한글은 x-height 가 커서 10px 대에서 획이 뭉갠다.
+    for (const name of matchedNames(sel, HANGUL_BEARING)) {
+      const fs = prop(r.decls, "font-size");
+      if (!fs) continue;
+      const px = parseFloat(fs);
+      if (/px/.test(fs) && px < HANGUL_MIN_PX) {
+        fail("hangul_min_size", rel, r.line, sel,
+          `${name} 은 한글을 담는데 font-size: ${fs} — ${HANGUL_MIN_PX}px 이상으로 둔다`);
+      }
+    }
+
     // 7. tabular_nums — 자릿수가 흔들리면 눈에 띈다.
     for (const name of matchedNames(sel, NUMERIC)) {
       seen.add(`num:${name}`);
@@ -247,6 +273,17 @@ if (!seen.has("site-nav")) {
 } else if (!seen.has("site-nav:fits")) {
   fail("nav_fits", "packages/ui/app.css", 0, ".site-nav",
     ".site-nav 가 접히지도 쌓이지도 않는다 — 320px 에서 브랜드 + 탭 3개가 한 줄에 안 들어간다");
+}
+
+// 14. no_fullwidth_glyph — 전각 기호는 반각 짝과 폭이 달라 나란히 두면 안 맞는다.
+//     ＋(U+FF0B)와 −(U+2212)를 스테퍼 양쪽에 쓰고 있었다.
+for (const rel of USAGE_ALSO.concat(["apps/web/components/recipe-panel.tsx"])) {
+  let text;
+  try { text = readFileSync(join(ROOT, rel), "utf8"); } catch { continue; }
+  for (const m of text.matchAll(/[！-～]/g)) {
+    fail("no_fullwidth_glyph", rel, text.slice(0, m.index).split("\n").length, m[0],
+      `전각 '${m[0]}' (U+${m[0].codePointAt(0).toString(16).toUpperCase()}) — 반각으로 통일한다`);
+  }
 }
 
 // 11. no_decorative_eyebrow — 서수가 아닌 <h6> 커커는 장식이다.
@@ -316,7 +353,7 @@ for (const name of NUMERIC) {
 
 if (findings.length === 0) {
   const n = FILES.length;
-  console.log(`css-guard: 10개 게이트 통과 (${n}개 파일)`);
+  console.log(`css-guard: 13개 게이트 통과 (${n}개 파일)`);
   if (EXCEPTIONS.length) console.log(`  등록된 예외 ${EXCEPTIONS.length}건`);
   process.exit(0);
 }

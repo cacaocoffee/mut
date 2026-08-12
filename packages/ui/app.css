@@ -176,8 +176,14 @@
   color: var(--color-neutral-700);
   margin-bottom: var(--space-2);
 }
+.filter-label {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
 .filter-label .hint {
-  float: right;
+  /* float 이었다 — 부모를 flex 로 바꿔 정렬을 배치에 맡긴다 */
+  margin-left: auto;
   font-size: 10px;
   letter-spacing: 0;
   text-transform: none;
@@ -210,13 +216,17 @@
   opacity: 0.32;
 }
 /* 맛·향 태그 */
+/* 12px 바닥 — 이 칸은 맛/향 **한글** 레이블을 담는다. 10.5px 는 라틴 캡션이면
+   성립하지만 한글은 x-height 가 커서 그 크기에서 획이 뭉갠다. 시안이 라틴 목업으로
+   짜였고 한글을 검증하지 않았다 — G-16 이 대비에서 겪은 것과 같은 원인이다 (ISSUE-054).
+   커진 만큼 세로 패딩을 줄여 칩 높이를 유지한다. */
 .chip-tag {
   flex: none;
   white-space: nowrap;
   cursor: pointer;
-  font-size: 10.5px;
+  font-size: 12px;
   letter-spacing: 0.05em;
-  padding: 5px 9px;
+  padding: 4px 9px;
   border: 1px solid var(--color-divider);
   background: transparent;
   color: var(--color-neutral-800);
@@ -372,11 +382,12 @@
   color: var(--color-neutral-800);
   white-space: nowrap;
 }
+/* 12px 바닥 — `{기법} · {잔}` 이 한글이다. 위 .chip-tag 와 같은 이유. */
 .cocktail-card__foot {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  font-size: 10.5px;
+  font-size: 12px;
   color: var(--color-neutral-700);
   border-top: 1px solid var(--color-divider);
   padding-top: 7px;
@@ -559,6 +570,10 @@
   color: var(--color-neutral-700);
   letter-spacing: 0.04em;
 }
+/* 감사가 이 왼쪽 액센트 줄을 "side-stripe 카드" 안티패턴으로 지목했다. **고치지 않는다.**
+   그 안티패턴은 4~6px 두께의 장식 줄을 말하는데 여기는 2px 이고, 시안 README 가
+   "구분선의 세기가 조직화를 전담한다"고 규정한 이 시스템의 언어 안에 있다.
+   ADR-0005 결과 항목대로 — 감사 지적을 스펙 근거 없이 반영하지 않는다 (ISSUE-054). */
 .substitute-note {
   background: var(--color-accent-100);
   border-left: 2px solid var(--color-accent);

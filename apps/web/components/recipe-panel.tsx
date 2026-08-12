@@ -43,7 +43,9 @@ export function RecipePanel({ cocktail }: { cocktail: Cocktail }) {
               disabled={servings === MAX_SERVINGS}
               aria-label="잔 수 늘리기"
             >
-              ＋
+              {/* 반각 + (U+002B). 전각 플러스(U+FF0B)였는데 짝인 −(U+2212)와 폭이 달라
+                  두 버튼이 광학적으로 안 맞았다 (ISSUE-054). */}
+              +
             </button>
           </div>
           <div className="seg">
@@ -89,7 +91,9 @@ export function RecipePanel({ cocktail }: { cocktail: Cocktail }) {
                     aria-expanded={openSub === i}
                     onClick={() => setOpenSub(openSub === i ? null : i)}
                   >
-                    대체 가능 ⓘ
+                    {/* ⓘ 를 뺐다 — OS 마다 다르게 그려지는 글리프를 아이콘 자리에 쓰고 있었다.
+                        텍스트와 aria-expanded 만으로 어포던스가 성립한다 (ISSUE-054). */}
+                    대체 가능
                   </button>
                 ) : null}
               </td>
