@@ -26,12 +26,13 @@ export function SiteNav() {
       <span className="nav-brand">
         K-COCKTAIL ARCHIVE<small>KR / EN 아카이브</small>
       </span>
+      {/* btn-secondary 를 뺐다 — 테두리 상자였는데 이제 밑줄 인디케이터다 (ISSUE-055) */}
       <div className="tabs">
         {tabs.map((t) => (
           <Link
             key={t.href}
             href={t.href}
-            className="btn btn-secondary tab"
+            className="btn tab"
             aria-current={t.match(pathname) ? "page" : undefined}
           >
             {t.ko} <span className="en">{t.en}</span>
