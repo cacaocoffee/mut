@@ -1,6 +1,21 @@
 {
   "components" : {
     "schemas" : {
+      "Actions" : {
+        "properties" : {
+          "bookmarkTargetSlug" : {
+            "type" : "string"
+          },
+          "bookmarkTargetType" : {
+            "type" : "string"
+          },
+          "sharePath" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "bookmarkTargetSlug", "bookmarkTargetType", "sharePath" ],
+        "type" : "object"
+      },
       "BaseSpirit" : {
         "description" : "축 1 · 기주 (단일값 필수, R-C-1)",
         "enum" : [ "gin", "vodka", "whisky", "rum", "agave", "brandy", "liqueur", "wine", "korean", "non-alcoholic" ],
@@ -17,6 +32,21 @@
           "whisky" : "위스키",
           "wine" : "와인 · 스파클링"
         }
+      },
+      "Brand" : {
+        "properties" : {
+          "isSponsored" : {
+            "type" : "boolean"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "purchaseUrl" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "isSponsored", "name" ],
+        "type" : "object"
       },
       "CategoriesResponse" : {
         "properties" : {
@@ -59,6 +89,78 @@
           }
         },
         "required" : [ "count", "labelKo", "slug" ],
+        "type" : "object"
+      },
+      "Classification" : {
+        "properties" : {
+          "base" : {
+            "$ref" : "#/components/schemas/TaxonRef"
+          },
+          "method" : {
+            "$ref" : "#/components/schemas/TaxonRef"
+          },
+          "stylePrimary" : {
+            "$ref" : "#/components/schemas/TaxonRef"
+          },
+          "styles" : {
+            "items" : {
+              "$ref" : "#/components/schemas/TaxonRef"
+            },
+            "type" : "array"
+          }
+        },
+        "required" : [ "base", "method", "stylePrimary", "styles" ],
+        "type" : "object"
+      },
+      "CocktailDetail" : {
+        "properties" : {
+          "actions" : {
+            "$ref" : "#/components/schemas/Actions"
+          },
+          "classification" : {
+            "$ref" : "#/components/schemas/Classification"
+          },
+          "hero" : {
+            "$ref" : "#/components/schemas/Hero"
+          },
+          "ingredients" : {
+            "items" : {
+              "$ref" : "#/components/schemas/IngredientLine"
+            },
+            "type" : "array"
+          },
+          "isClassic" : {
+            "type" : "boolean"
+          },
+          "origin" : {
+            "$ref" : "#/components/schemas/Origin"
+          },
+          "purchaseGuide" : {
+            "items" : {
+              "$ref" : "#/components/schemas/PurchaseGuideItem"
+            },
+            "type" : "array"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "spec" : {
+            "$ref" : "#/components/schemas/Spec"
+          },
+          "steps" : {
+            "items" : {
+              "$ref" : "#/components/schemas/Step"
+            },
+            "type" : "array"
+          },
+          "story" : {
+            "type" : "string"
+          },
+          "tastingNote" : {
+            "$ref" : "#/components/schemas/TastingNote"
+          }
+        },
+        "required" : [ "actions", "classification", "hero", "ingredients", "isClassic", "purchaseGuide", "slug", "spec", "steps", "tastingNote" ],
         "type" : "object"
       },
       "CocktailListItem" : {
@@ -141,6 +243,74 @@
           "spicy" : "스파이시"
         }
       },
+      "Hero" : {
+        "properties" : {
+          "imageUrl" : {
+            "type" : "string"
+          },
+          "nameEn" : {
+            "type" : "string"
+          },
+          "nameKo" : {
+            "type" : "string"
+          },
+          "summary" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "nameEn", "nameKo", "summary" ],
+        "type" : "object"
+      },
+      "IngredientLine" : {
+        "properties" : {
+          "amount" : {
+            "type" : "number"
+          },
+          "amountLabel" : {
+            "type" : "string"
+          },
+          "isOptional" : {
+            "type" : "boolean"
+          },
+          "isScalable" : {
+            "type" : "boolean"
+          },
+          "nameEn" : {
+            "type" : "string"
+          },
+          "nameKo" : {
+            "type" : "string"
+          },
+          "role" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "substitute" : {
+            "$ref" : "#/components/schemas/Substitute"
+          },
+          "unit" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "isOptional", "isScalable", "nameEn", "nameKo", "slug" ],
+        "type" : "object"
+      },
+      "Origin" : {
+        "properties" : {
+          "creator" : {
+            "type" : "string"
+          },
+          "place" : {
+            "type" : "string"
+          },
+          "year" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
       "PageMeta" : {
         "properties" : {
           "number" : {
@@ -202,6 +372,76 @@
         "required" : [ "items", "page" ],
         "type" : "object"
       },
+      "PurchaseGuideItem" : {
+        "properties" : {
+          "availability" : {
+            "$ref" : "#/components/schemas/TaxonRef"
+          },
+          "brands" : {
+            "items" : {
+              "$ref" : "#/components/schemas/Brand"
+            },
+            "type" : "array"
+          },
+          "nameKo" : {
+            "type" : "string"
+          },
+          "priceBand" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "substituteNote" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "availability", "brands", "nameKo", "slug" ],
+        "type" : "object"
+      },
+      "RecipeVersion" : {
+        "properties" : {
+          "ingredients" : {
+            "items" : {
+              "$ref" : "#/components/schemas/IngredientLine"
+            },
+            "type" : "array"
+          },
+          "isDefault" : {
+            "type" : "boolean"
+          },
+          "note" : {
+            "type" : "string"
+          },
+          "servingCount" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "steps" : {
+            "items" : {
+              "$ref" : "#/components/schemas/Step"
+            },
+            "type" : "array"
+          },
+          "versionType" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "ingredients", "isDefault", "servingCount", "steps", "versionType" ],
+        "type" : "object"
+      },
+      "RecipeVersions" : {
+        "properties" : {
+          "items" : {
+            "items" : {
+              "$ref" : "#/components/schemas/RecipeVersion"
+            },
+            "type" : "array"
+          }
+        },
+        "required" : [ "items" ],
+        "type" : "object"
+      },
       "SortOrder" : {
         "properties" : {
           "ascending" : {
@@ -212,6 +452,41 @@
           }
         },
         "required" : [ "ascending", "property" ],
+        "type" : "object"
+      },
+      "Spec" : {
+        "properties" : {
+          "abv" : {
+            "type" : "number"
+          },
+          "glassType" : {
+            "type" : "string"
+          },
+          "prepTimeMin" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "sweetness" : {
+            "$ref" : "#/components/schemas/TaxonRef"
+          }
+        },
+        "required" : [ "glassType", "sweetness" ],
+        "type" : "object"
+      },
+      "Step" : {
+        "properties" : {
+          "stepNo" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "techniqueRef" : {
+            "type" : "string"
+          },
+          "text" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "stepNo", "text" ],
         "type" : "object"
       },
       "StyleKey" : {
@@ -230,6 +505,20 @@
           "tiki" : "티키"
         }
       },
+      "Substitute" : {
+        "properties" : {
+          "nameKo" : {
+            "type" : "string"
+          },
+          "note" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
       "SweetLevel" : {
         "description" : "당도 4단계",
         "enum" : [ "dry", "semi_dry", "semi_sweet", "sweet" ],
@@ -240,6 +529,33 @@
           "semi_sweet" : "세미 스위트",
           "sweet" : "스위트"
         }
+      },
+      "TastingNote" : {
+        "properties" : {
+          "aromaTags" : {
+            "items" : {
+              "$ref" : "#/components/schemas/TaxonRef"
+            },
+            "type" : "array"
+          },
+          "note" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "aromaTags", "note" ],
+        "type" : "object"
+      },
+      "TaxonRef" : {
+        "properties" : {
+          "labelKo" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "labelKo", "slug" ],
+        "type" : "object"
       },
       "Technique" : {
         "description" : "축 3 · 메이킹 방법 (단일값 필수)",
@@ -387,6 +703,58 @@
         },
         "summary" : "칵테일 목록 · 필터",
         "tags" : [ "cocktail-list-controller" ]
+      }
+    },
+    "/api/v1/cocktails/{slug}" : {
+      "get" : {
+        "operationId" : "detail",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "slug",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CocktailDetail"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "cocktail-detail-controller" ]
+      }
+    },
+    "/api/v1/cocktails/{slug}/recipes" : {
+      "get" : {
+        "operationId" : "recipes",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "slug",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/RecipeVersions"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "cocktail-detail-controller" ]
       }
     }
   },

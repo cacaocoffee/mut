@@ -147,4 +147,12 @@ internal fun Ingredient.toView() = IngredientView(
     requiresSubstitute = requiresSubstitute,
     substituteNote = substituteNote,
     hasSponsoredBrand = brands.any { it.requiresAdLabel },
+    priceBand = priceBand,
+    brands = brands.map {
+        kr.kcocktail.ingredient.api.IngredientBrandView(
+            name = it.name,
+            purchaseUrl = it.purchaseUrl,
+            isSponsored = it.isSponsored,
+        )
+    },
 )

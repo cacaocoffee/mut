@@ -54,4 +54,23 @@ data class IngredientView(
     val substituteNote: String?,
     /** `INV-INGREDIENT-02` — 라벨을 붙여야 하는 브랜드가 하나라도 있는가. */
     val hasSponsoredBrand: Boolean,
+
+    /**
+     * 상세의 **국내 구매 가이드** 블록이 쓴다 (이슈 020 · `PRIN-P05`).
+     *
+     * > 이 서비스가 해외 DB 의 번역판이 아닌 이유는 이 축 하나다.
+     */
+    val priceBand: String? = null,
+
+    /**
+     * `INV-INGREDIENT-02` — **광고성 판정을 서버가 내려서** 내보낸다.
+     * 클라이언트에 맡기면 라벨을 붙이지 않는 클라이언트가 생긴다.
+     */
+    val brands: List<IngredientBrandView> = emptyList(),
+)
+
+data class IngredientBrandView(
+    val name: String,
+    val purchaseUrl: String?,
+    val isSponsored: Boolean,
 )

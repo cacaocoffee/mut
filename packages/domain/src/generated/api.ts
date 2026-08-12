@@ -67,15 +67,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/cocktails/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["detail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/cocktails/{slug}/recipes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["recipes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        Actions: {
+            bookmarkTargetSlug: string;
+            bookmarkTargetType: string;
+            sharePath: string;
+        };
         /**
          * @description 축 1 · 기주 (단일값 필수, R-C-1)
          * @enum {string}
          */
         BaseSpirit: "gin" | "vodka" | "whisky" | "rum" | "agave" | "brandy" | "liqueur" | "wine" | "korean" | "non-alcoholic";
+        Brand: {
+            isSponsored: boolean;
+            name: string;
+            purchaseUrl?: string;
+        };
         CategoriesResponse: {
             base: components["schemas"]["CategoryItem"][];
             method: components["schemas"]["CategoryItem"][];
@@ -87,6 +129,26 @@ export interface components {
             intro?: string;
             labelKo: string;
             slug: string;
+        };
+        Classification: {
+            base: components["schemas"]["TaxonRef"];
+            method: components["schemas"]["TaxonRef"];
+            stylePrimary: components["schemas"]["TaxonRef"];
+            styles: components["schemas"]["TaxonRef"][];
+        };
+        CocktailDetail: {
+            actions: components["schemas"]["Actions"];
+            classification: components["schemas"]["Classification"];
+            hero: components["schemas"]["Hero"];
+            ingredients: components["schemas"]["IngredientLine"][];
+            isClassic: boolean;
+            origin?: components["schemas"]["Origin"];
+            purchaseGuide: components["schemas"]["PurchaseGuideItem"][];
+            slug: string;
+            spec: components["schemas"]["Spec"];
+            steps: components["schemas"]["Step"][];
+            story?: string;
+            tastingNote: components["schemas"]["TastingNote"];
         };
         CocktailListItem: {
             abv?: number;
@@ -112,6 +174,29 @@ export interface components {
          * @enum {string}
          */
         FlavorKey: "citrus" | "sour" | "fruity" | "floral" | "herbal" | "spicy" | "smoky" | "bitter" | "nutty" | "creamy";
+        Hero: {
+            imageUrl?: string;
+            nameEn: string;
+            nameKo: string;
+            summary: string;
+        };
+        IngredientLine: {
+            amount?: number;
+            amountLabel?: string;
+            isOptional: boolean;
+            isScalable: boolean;
+            nameEn: string;
+            nameKo: string;
+            role?: string;
+            slug: string;
+            substitute?: components["schemas"]["Substitute"];
+            unit?: string;
+        };
+        Origin: {
+            creator?: string;
+            place?: string;
+            year?: string;
+        };
         PageMeta: {
             /** Format: int32 */
             number: number;
@@ -135,20 +220,66 @@ export interface components {
             items: components["schemas"]["CocktailListItem"][];
             page: components["schemas"]["PageMeta"];
         };
+        PurchaseGuideItem: {
+            availability: components["schemas"]["TaxonRef"];
+            brands: components["schemas"]["Brand"][];
+            nameKo: string;
+            priceBand?: string;
+            slug: string;
+            substituteNote?: string;
+        };
+        RecipeVersion: {
+            ingredients: components["schemas"]["IngredientLine"][];
+            isDefault: boolean;
+            note?: string;
+            /** Format: int32 */
+            servingCount: number;
+            steps: components["schemas"]["Step"][];
+            versionType: string;
+        };
+        RecipeVersions: {
+            items: components["schemas"]["RecipeVersion"][];
+        };
         SortOrder: {
             ascending: boolean;
             property: string;
+        };
+        Spec: {
+            abv?: number;
+            glassType: string;
+            /** Format: int32 */
+            prepTimeMin?: number;
+            sweetness: components["schemas"]["TaxonRef"];
+        };
+        Step: {
+            /** Format: int32 */
+            stepNo: number;
+            techniqueRef?: string;
+            text: string;
         };
         /**
          * @description 축 2 · 스타일 (복수, style_primary 필수)
          * @enum {string}
          */
         StyleKey: "highball" | "sour" | "spirit-forward" | "spritz" | "tiki" | "creamy" | "hot" | "frozen" | "shot";
+        Substitute: {
+            nameKo?: string;
+            note?: string;
+            slug?: string;
+        };
         /**
          * @description 당도 4단계
          * @enum {string}
          */
         SweetLevel: "dry" | "semi_dry" | "semi_sweet" | "sweet";
+        TastingNote: {
+            aromaTags: components["schemas"]["TaxonRef"][];
+            note: string;
+        };
+        TaxonRef: {
+            labelKo: string;
+            slug: string;
+        };
         /**
          * @description 축 3 · 메이킹 방법 (단일값 필수)
          * @enum {string}
@@ -237,6 +368,50 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PageResponseCocktailListItem"];
+                };
+            };
+        };
+    };
+    detail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CocktailDetail"];
+                };
+            };
+        };
+    };
+    recipes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RecipeVersions"];
                 };
             };
         };
