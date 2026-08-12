@@ -13,6 +13,11 @@
 :root {
   --dur: 160ms;
   --ease: cubic-bezier(0.2, 0, 0, 1);
+
+  /* 세리프 폴백을 여기 둔다. 이 파일이 `.editorial` 등에서 --font-serif 를 쓰는데
+     정의는 apps/web/app/globals.css 에만 있었다 — @kca/ui 를 다른 소비자가 가져가면
+     세리프가 조용히 사라진다. 앱의 :root 가 뒤에 와서 next/font 값으로 덮는다. */
+  --font-serif: Georgia, "Noto Serif KR", serif;
 }
 
 /* — 페이지 골격 — */
@@ -91,6 +96,23 @@
   line-height: 1.5;
   color: var(--color-neutral-700);
   max-width: 280px;
+}
+
+/* 섹션 머리 — 상세 화면에서 이 세 줄이 세 번 복붙돼 있었다 (ISSUE-052).
+   색은 토큰을 지키면서 형태만 인라인으로 흩어져 있던 자리다. */
+.section-head {
+  margin: 34px 0 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--color-divider);
+}
+/* 단 맨 위 칸은 위 여백이 없다 — 섹션이 이미 그리드 간격 뒤에 온다 */
+.section-head--flush {
+  margin-top: 0;
+}
+
+/* 테두리 있는 중립 태그 — 인라인 border 가 세 곳에 반복됐다 */
+.tag-bordered {
+  border: 1px solid var(--color-divider);
 }
 
 /* — 섹션 머리 (강한 2px 규칙 아래 제목) — */
@@ -230,6 +252,8 @@
   display: flex;
   align-items: baseline;
   gap: 10px;
+  /* 필터를 누를 때마다 바뀌는 자리다 — 자릿수가 흔들리면 바로 눈에 띈다 */
+  font-variant-numeric: tabular-nums;
 }
 .results-count b {
   font-size: 22px;
@@ -259,8 +283,18 @@
   text-decoration: none;
   text-align: left;
 }
+/* 이 페이지에서 유일한 트랜지션이다. ADR-0001 이 부록 A 에서 살린 값이
+   --dur·--ease 인데 정작 아무도 안 쓰고 있었다 — 쓰거나 지워야 했고, 쓰는 쪽을 골랐다.
+   시안 README 가 "떠 있는 것도 장식된 것도 없다"고 했으므로 **하나를 넘기지 않는다.**
+   레이아웃 속성이 아니라 색만 움직여서 리플로가 없다. */
 .cocktail-card:hover {
   border-color: var(--color-accent);
+}
+.cocktail-card {
+  transition: border-color var(--dur) var(--ease);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cocktail-card { transition: none; }
 }
 .cocktail-card__body {
   padding: 12px 12px 14px;
@@ -429,6 +463,8 @@
   border-top: 2px solid var(--color-divider);
   border-bottom: 2px solid var(--color-divider);
   margin-top: 20px;
+  /* ABV·당도 단계가 숫자다 — 항목 간 세로 정렬이 맞아야 표로 읽힌다 */
+  font-variant-numeric: tabular-nums;
 }
 .spec-strip > div {
   padding: 14px 14px 14px 0;
