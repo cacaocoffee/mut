@@ -15,6 +15,9 @@ import kr.kcocktail.cocktail.recipe.RecipeRepository
 import kr.kcocktail.cocktail.recipe.RecipeVersionType
 import kr.kcocktail.cocktail.repository.CocktailRepository
 import kr.kcocktail.common.audit.AuditRecorder
+import kr.kcocktail.common.revalidate.RevalidateHook
+import kr.kcocktail.common.revalidate.RevalidatePaths
+import kr.kcocktail.common.revalidate.RevalidateTarget
 import kr.kcocktail.common.web.error.ConflictException
 import kr.kcocktail.common.web.error.DomainViolationException
 import kr.kcocktail.common.web.error.ResourceNotFoundException
@@ -46,7 +49,7 @@ class PublishService(
     private val recipes: RecipeRepository,
     private val ingredients: IngredientFacade,
     private val events: ApplicationEventPublisher,
-    private val regeneration: RegenerationHook,
+    private val revalidate: RevalidateHook,
     private val auditor: AuditRecorder,
     private val clock: Clock,
 ) {
@@ -89,22 +92,41 @@ class PublishService(
             ),
         )
 
-        regenerateAfterCommit(cocktail.slug)
+        revalidateAfterCommit(cocktail)
     }
 
     /**
-     * 재생성 훅은 **커밋 뒤에, 실패를 삼키고** 부른다 (`NFR-R-03` · DECISIONS §1.7).
+     * 재생성 훅은 **커밋 뒤에** 부른다 (RED 17 · `NFR-R-03` · DECISIONS §1.7).
      *
+     * 트랜잭션 안에서 부르면 커밋이 실패했을 때 **유령 재생성**이 나간다 —
+     * 없던 일이 된 발행을 프론트가 그려 버린다.
+     *
+     * 실패를 삼키는 것은 훅 자신의 책임이다 ([RevalidateHook] 이 던지지 않는다).
      * 프론트가 늦게 갱신되는 것과 발행이 없던 일이 되는 것은 심각도가 다르다 —
-     * 전자는 다음 재생성이 따라잡고, 후자는 에디터가 처음부터 다시 한다.
+     * 전자는 ISR 주기가 따라잡고, 후자는 에디터가 처음부터 다시 한다.
      * 색인 동기화(위의 이벤트)와 갈리는 지점이다.
      */
-    private fun regenerateAfterCommit(slug: String) {
+    private fun revalidateAfterCommit(cocktail: Cocktail) {
+        val paths = RevalidatePaths.forCocktail(
+            RevalidateTarget(
+                slug = cocktail.slug,
+                baseSpiritSlug = cocktail.baseSpirit.slug,
+                stylePrimarySlug = cocktail.stylePrimary.slug,
+                methodSlug = cocktail.method.slug,
+            ),
+        )
+
         TransactionSynchronizationManager.registerSynchronization(
             object : TransactionSynchronization {
                 override fun afterCommit() {
-                    runCatching { regeneration.onPublished(slug) }
-                        .onFailure { log.error("재생성 훅 실패 — 발행은 유지한다 (NFR-R-03): {}", slug, it) }
+                    // 훅 구현도 실패를 삼키지만(RevalidateHook 계약) 여기서 한 번 더 막는다.
+                    // `NFR-R-03` 은 "발행은 훅 실패로 롤백되지 않는다" 를 **발행 쪽 보증**으로
+                    // 요구한다 — 남의 클래스가 계약을 지킬 것이라는 믿음에 걸어 둘 수 없다.
+                    // afterCommit 에서 던지면 커밋은 됐는데 호출자는 예외를 받는다.
+                    runCatching { revalidate.revalidate(paths) }
+                        .onFailure {
+                            log.error("재생성 훅이 예외를 던졌다 — 발행은 유지한다 (NFR-R-03)", it)
+                        }
                 }
             },
         )
@@ -123,6 +145,8 @@ class PublishService(
         // `archived → draft` 는 이미 색인에 없다. 내려야 하는 것은 `published → draft` 뿐이다.
         if (from == CocktailStatus.PUBLISHED) {
             events.publishEvent(CocktailUnpublished(cocktail.id, cocktail.slug))
+            // RED 10 — 내릴 때도 재생성한다. 안 하면 없어진 페이지가 정적 파일로 남는다
+            revalidateAfterCommit(cocktail)
         }
     }
 
@@ -136,6 +160,11 @@ class PublishService(
         audit(cocktail, from, CocktailStatus.ARCHIVED)
 
         events.publishEvent(CocktailArchived(cocktail.id, cocktail.slug))
+
+        // 회수와 같은 이유다 — `archived` 도 공개 API 에서 404 라 (SPEC-07 §5)
+        // 정적 파일이 남아 있으면 내린 것이 계속 보인다. RED 10 이 회수만 적었지만
+        // 근거가 같아 함께 건다.
+        revalidateAfterCommit(cocktail)
     }
 
     /** 배치 검증(이슈 016)이 쓴다. 저장하지 않고 판정만 한다. */

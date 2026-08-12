@@ -4,6 +4,7 @@ import kr.kcocktail.cocktail.api.CocktailPublished
 import kr.kcocktail.cocktail.api.PublishGate
 import kr.kcocktail.cocktail.domain.CocktailStatus
 import kr.kcocktail.cocktail.lifecycle.CocktailTransition
+import kr.kcocktail.common.revalidate.RevalidateHook
 import kr.kcocktail.common.web.error.ConflictException
 import kr.kcocktail.common.web.error.DomainViolationException
 import kr.kcocktail.support.PostgresSupport
@@ -197,6 +198,35 @@ class PublishServiceTest {
         assertThat(ProbeRegenerationHook.called)
             .`as`("커밋되지 않았으니 재생성도 없다")
             .isEmpty()
+    }
+
+    /**
+     * ISSUE-015 RED 4~7 · 10 — 발행과 **회수 둘 다** 상세·3축·사이트맵을 재생성한다.
+     *
+     * 회수에도 부르는 이유: 안 부르면 내린 칵테일의 정적 페이지가 그대로 남아
+     * 공개 API 는 404 인데 프론트만 계속 보여 준다.
+     */
+    @Test
+    fun `ISSUE015 RED4-7-10 - 발행과 회수가 상세·3축·사이트맵을 재생성한다`() {
+        val id = publishable()
+
+        service.publish(id)
+
+        assertThat(ProbeRegenerationHook.called).hasSize(1)
+        assertThat(ProbeRegenerationHook.called.single())
+            .contains(
+                "/cocktails/base/gin",
+                "/cocktails/style/highball",
+                "/cocktails/method/build",
+                "/sitemap.xml",
+            )
+            .anySatisfy { assertThat(it).startsWith("/cocktails/gin-tonic") }
+
+        service.unpublish(id)
+
+        assertThat(ProbeRegenerationHook.called)
+            .`as`("RED10 — 내릴 때도 부른다")
+            .hasSize(2)
     }
 
     @Test
@@ -402,19 +432,24 @@ class PublishedRecorder {
     }
 }
 
-/** 이슈 015 의 재생성 훅 자리. 커밋 뒤에 불리고, 터져도 발행을 되돌리지 않는다 (`NFR-R-03`). */
+/**
+ * 재생성 훅(이슈 015)을 가로챈다. 커밋 뒤에 불리고, 터져도 발행을 되돌리지 않는다 (`NFR-R-03`).
+ *
+ * 여기서 던지는 것이 요점이다. 운영 구현([kr.kcocktail.common.revalidate.HttpRevalidateHook])은
+ * 실패를 스스로 삼키지만, **삼키는 쪽이 사라져도 발행이 안전한지**를 이 프로브가 확인한다.
+ */
 @Profile(PublishServiceTest.PROFILE)
 @Primary
 @Component
-class ProbeRegenerationHook : RegenerationHook {
+class ProbeRegenerationHook : RevalidateHook {
 
-    override fun onPublished(slug: String) {
-        called += slug
+    override fun revalidate(paths: List<String>) {
+        called += paths
         if (explode) throw IllegalStateException("재생성 훅 실패")
     }
 
     companion object {
-        val called = mutableListOf<String>()
+        val called = mutableListOf<List<String>>()
 
         @JvmStatic
         var explode = false

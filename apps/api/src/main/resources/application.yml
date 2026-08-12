@@ -57,3 +57,11 @@ kcocktail:
     cookie-name: ${KC_SESSION_COOKIE_NAME:KCSESSION}
     secure: ${KC_SESSION_SECURE:true}
     cookie-domain: ${KC_SESSION_COOKIE_DOMAIN:}
+  # SPEC-07 §4 — 방향이 반대인 유일한 호출. 백엔드가 프론트를 부른다.
+  # 기본이 꺼짐인 이유: 로컬에서 프론트를 안 띄웠다고 발행이 막히면 안 된다.
+  # 운영은 프로파일 검사가 켜기를 강제한다 (RevalidateStartupCheck).
+  revalidate:
+    enabled: ${KC_REVALIDATE_ENABLED:false}
+    url: ${KC_FRONTEND_URL:}
+    secret: ${KC_REVALIDATE_SECRET:}
+    timeout-ms: ${KC_REVALIDATE_TIMEOUT_MS:2000}
