@@ -185,10 +185,15 @@ for (const rel of FILES) {
       if (prop(r.decls, "white-space")) seen.add(`clickable:${name}:ws`);
     }
 
-    // 5. nav_wraps — 내비가 안 접히면 320px 에서 넘친다.
-    if (selectorHits(sel, [".site-nav"]) && !r.media) {
+    // 5. nav_fits — 320px 에서 브랜드 + 탭 3개가 한 줄에 안 들어간다.
+    //    접거나(flex-wrap) 쌓거나(flex-direction: column) 둘 중 하나여야 한다.
+    //    셀렉터를 정확히 `.site-nav` 로 본다 — `.site-nav .tabs` 의 flex-wrap 이
+    //    우연히 게이트를 만족시키면 정작 컨테이너는 안 접히는데 통과한다.
+    if (sel.trim() === ".site-nav" && !r.media) {
       seen.add("site-nav");
-      if (prop(r.decls, "flex-wrap")) seen.add("site-nav:wrap");
+      const wraps = prop(r.decls, "flex-wrap");
+      const dir = prop(r.decls, "flex-direction");
+      if ((wraps && /wrap/.test(wraps)) || (dir && /column/.test(dir))) seen.add("site-nav:fits");
     }
 
     // 6. dvh_page_shell — 모바일 주소창이 접히면 100vh 가 화면보다 크다.
@@ -238,10 +243,29 @@ for (const rel of USAGE_ALSO) {
 
 // 존재 자체를 요구하는 게이트는 순회가 끝난 뒤 판정한다.
 if (!seen.has("site-nav")) {
-  fail("nav_wraps", "-", 0, ".site-nav", ".site-nav 규칙을 찾지 못했다 — 가드가 코드와 어긋났다");
-} else if (!seen.has("site-nav:wrap")) {
-  fail("nav_wraps", "packages/ui/app.css", 0, ".site-nav",
-    ".site-nav 에 flex-wrap 미지정 — 320px 에서 브랜드 + 탭 3개가 한 줄에 안 들어간다");
+  fail("nav_fits", "-", 0, ".site-nav", ".site-nav 규칙을 찾지 못했다 — 가드가 코드와 어긋났다");
+} else if (!seen.has("site-nav:fits")) {
+  fail("nav_fits", "packages/ui/app.css", 0, ".site-nav",
+    ".site-nav 가 접히지도 쌓이지도 않는다 — 320px 에서 브랜드 + 탭 3개가 한 줄에 안 들어간다");
+}
+
+// 11. no_decorative_eyebrow — 서수가 아닌 <h6> 커커는 장식이다.
+//     전부 챕터면 아무것도 챕터가 아니다. 폼·목록 레이블은 기능이 있으므로 남긴다.
+const EYEBROW_ALLOWED = [
+  { file: "apps/web/components/search-screen.tsx", text: "필터 FILTERS", why: "필터 패널의 폼 레이블" },
+  { file: "apps/web/app/cocktails/[id]/page.tsx", text: "같은 기주 RELATED", why: "목록 레이블" },
+];
+for (const rel of USAGE_ALSO) {
+  let text;
+  try { text = readFileSync(join(ROOT, rel), "utf8"); } catch { continue; }
+  for (const m of text.matchAll(/<h6[^>]*>([\s\S]*?)<\/h6>/g)) {
+    const label = m[1].replace(/\{[^}]*\}/g, "").replace(/\s+/g, " ").trim();
+    const ok = EYEBROW_ALLOWED.some((e) => e.file === rel && label.includes(e.text));
+    if (!ok) {
+      fail("no_decorative_eyebrow", rel, text.slice(0, m.index).split("\n").length, `<h6>${label}</h6>`,
+        "서수도 폼 레이블도 아닌 <h6> — 장식성 커커는 지운다 (허용은 EYEBROW_ALLOWED 에 근거와 함께)");
+    }
+  }
 }
 
 // 목록이 코드와 어긋나면 가드가 조용히 아무것도 안 보게 된다. 그쪽이 더 위험하다.
@@ -292,7 +316,7 @@ for (const name of NUMERIC) {
 
 if (findings.length === 0) {
   const n = FILES.length;
-  console.log(`css-guard: 9개 게이트 통과 (${n}개 파일)`);
+  console.log(`css-guard: 10개 게이트 통과 (${n}개 파일)`);
   if (EXCEPTIONS.length) console.log(`  등록된 예외 ${EXCEPTIONS.length}건`);
   process.exit(0);
 }
