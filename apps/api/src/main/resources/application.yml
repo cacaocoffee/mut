@@ -60,6 +60,11 @@ kcocktail:
   # SPEC-07 §4 — 방향이 반대인 유일한 호출. 백엔드가 프론트를 부른다.
   # 기본이 꺼짐인 이유: 로컬에서 프론트를 안 띄웠다고 발행이 막히면 안 된다.
   # 운영은 프로파일 검사가 켜기를 강제한다 (RevalidateStartupCheck).
+  # SPEC-06 §4.3 — 앱 강제 불변식의 일 1회 이중 확인 (NFR-D-01·D-02·D-04).
+  # `cli: true` 면 한 번 돌고 종료 코드를 남긴다 (배포 게이트).
+  verification:
+    scheduled: ${KC_VERIFICATION_SCHEDULED:true}
+    cli: ${KC_VERIFICATION_CLI:false}
   revalidate:
     enabled: ${KC_REVALIDATE_ENABLED:false}
     url: ${KC_FRONTEND_URL:}

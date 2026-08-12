@@ -133,7 +133,8 @@ private fun Ingredient.toSavedEvent() = IngredientSaved(
     isApproved = isApproved,
 )
 
-private fun Ingredient.toView() = IngredientView(
+/** `internal` 인 이유: 배치 검증(이슈 016)의 창구가 **같은 매핑**을 써야 한다. 두 벌이면 어긋난다. */
+internal fun Ingredient.toView() = IngredientView(
     id = id,
     slug = slug,
     nameKo = nameKo,

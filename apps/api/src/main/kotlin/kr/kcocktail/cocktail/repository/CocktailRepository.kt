@@ -14,4 +14,12 @@ interface CocktailRepository : JpaRepository<Cocktail, Long> {
 
     /** 공개 조회는 `published` 만 본다. `draft`·`archived` 는 404 다 (SPEC-07 §5). */
     fun findBySlugAndStatusSlug(slug: String, statusSlug: String): Cocktail?
+
+    /**
+     * 배치 검증(이슈 016)의 전수 스캔. `NFR-D-01` 이 대상을 **발행분**으로 못박았다.
+     *
+     * 500종 규모라 한 번에 읽는다. 더 커지면 페이징으로 바꾼다 — 그때는
+     * 배치가 메모리에 다 올리지 않아야 한다.
+     */
+    fun findByStatusSlug(statusSlug: String): List<Cocktail>
 }
