@@ -98,9 +98,8 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
           >
             ← 탐색으로 BACK TO SEARCH
           </Link>
-          <h6 style={{ color: "var(--color-accent-700)", margin: "0 0 8px" }}>
-            {cocktail.base} BASE · {sweetEn}
-          </h6>
+          {/* `{base} BASE · {sweetEn}` 커커를 지웠다. 아이브로우라서가 아니라
+              바로 아래 .spec-strip 이 같은 정보를 표로 이미 준다 — 중복이다 (ISSUE-053). */}
           <h1>{cocktail.ko}</h1>
           <div className="en">{cocktail.en}</div>
           <p className="summary">{cocktail.summary}</p>
@@ -185,7 +184,6 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
 
       <div className="editorial">
         <div>
-          <h6 style={{ color: "var(--color-accent-700)", margin: "0 0 14px" }}>Story &amp; Origin</h6>
           <h2>{cocktail.story.title}</h2>
           {cocktail.story.paragraphs.map((p) => (
             <p key={p}>{p}</p>

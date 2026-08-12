@@ -48,7 +48,6 @@ export function FinderScreen() {
     <main className="shell finder">
       <header className="page-head" style={{ gridTemplateColumns: "1fr" }}>
         <div>
-          <h6 style={{ margin: "0 0 10px", color: "var(--color-accent-700)" }}>Interactive finder</h6>
           <h1>
             취향 파인더<span className="sub">{QUESTIONS.length} questions</span>
           </h1>
