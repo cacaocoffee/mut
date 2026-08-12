@@ -18,6 +18,49 @@
           "wine" : "와인 · 스파클링"
         }
       },
+      "CategoriesResponse" : {
+        "properties" : {
+          "base" : {
+            "items" : {
+              "$ref" : "#/components/schemas/CategoryItem"
+            },
+            "type" : "array"
+          },
+          "method" : {
+            "items" : {
+              "$ref" : "#/components/schemas/CategoryItem"
+            },
+            "type" : "array"
+          },
+          "style" : {
+            "items" : {
+              "$ref" : "#/components/schemas/CategoryItem"
+            },
+            "type" : "array"
+          }
+        },
+        "required" : [ "base", "method", "style" ],
+        "type" : "object"
+      },
+      "CategoryItem" : {
+        "properties" : {
+          "count" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "intro" : {
+            "type" : "string"
+          },
+          "labelKo" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "count", "labelKo", "slug" ],
+        "type" : "object"
+      },
       "CsrfTokenResponse" : {
         "properties" : {
           "headerName" : {
@@ -110,6 +153,32 @@
           }
         },
         "tags" : [ "csrf-token-controller" ]
+      }
+    },
+    "/api/v1/categories" : {
+      "get" : {
+        "operationId" : "categories",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "include",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CategoriesResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "category-controller" ]
       }
     }
   },
