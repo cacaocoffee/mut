@@ -36,6 +36,7 @@ const PAIRS = [
   { where: ".chip-tag[aria-pressed]", fg: "--color-accent-800", bg: "--color-accent-100" },
   { where: ".cocktail-card__foot em", fg: "--color-accent-700", bg: "--color-surface" },
   { where: ".substitute-note", fg: "--color-accent-900", bg: "--color-accent-100" },
+  { where: ".loading-block p", fg: "--color-neutral-700", bg: "--color-bg" },
 ];
 
 /**

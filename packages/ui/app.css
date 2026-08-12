@@ -873,6 +873,79 @@
   margin-bottom: var(--space-3);
 }
 
+/* ─────────────────────────  로딩  ─────────────────────────
+   잔이 채워지는 동작을 **쌓임**으로 표현한다. 회전이 아니다 —
+   시안이 라운드 0 을 규정했고 "떠 있는 것도 장식된 것도 없다"고 했으므로
+   스피너는 이 시스템의 말이 아니다 (ISSUE-057).
+
+   순수 CSS 다. 움직이는 것은 transform 과 opacity 뿐이라 리플로가 없다.
+   층 색은 accent 램프에서 가져온다 — OKLCH 공유 명도 스케일이라 단이 맞는다. */
+
+.pour {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 3px;
+  width: 84px;
+  height: 108px;
+  padding: 6px;
+  /* 텀블러 윤곽 — 위가 열린 2px 상자. 라운드 없음 */
+  border: 2px solid var(--color-divider);
+  border-top: 0;
+}
+.pour span {
+  display: block;
+  height: 9px;
+  transform: scaleX(0);
+  transform-origin: left center;
+  animation: pour-fill 1.6s var(--ease) infinite;
+}
+.pour span:nth-child(1) { background: var(--color-accent-300); animation-delay: 0ms; }
+.pour span:nth-child(2) { background: var(--color-accent-500); animation-delay: 140ms; }
+.pour span:nth-child(3) { background: var(--color-accent-600); animation-delay: 280ms; }
+.pour span:nth-child(4) { background: var(--color-accent-700); animation-delay: 420ms; }
+
+@keyframes pour-fill {
+  0%        { transform: scaleX(0); }
+  28%, 72%  { transform: scaleX(1); }
+  100%      { transform: scaleX(0); }
+}
+
+.loading-block {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-6);
+  padding: 72px 0;
+}
+.loading-block h2 {
+  font-size: 30px;
+  margin: 0 0 4px;
+}
+.loading-block p {
+  font-size: 12px;
+  color: var(--color-neutral-700);
+  margin: 0;
+}
+
+/* 깜빡임 방지 — 빠르게 끝나는 전환에서 로더가 스치듯 지나가면 그게 더 거슬린다.
+   250ms 동안은 투명하게 두고, 그 뒤에도 남아 있을 때만 나타난다. */
+.loading-block {
+  animation: loading-appear 1ms var(--ease) 250ms both;
+}
+@keyframes loading-appear {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* 공간 이동을 걷어내고 층은 채워진 채로 둔다 — 정보는 남기고 움직임만 없앤다 */
+  .pour span {
+    animation: none;
+    transform: scaleX(1);
+  }
+  .loading-block { animation: none; }
+}
+
 /* — 법적 고지 (PRD R-F1.1-8 · 12장) — */
 .legal {
   border-top: 2px solid var(--color-divider);
