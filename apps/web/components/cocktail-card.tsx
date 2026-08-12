@@ -19,9 +19,7 @@ export function CocktailCard({ cocktail }: { cocktail: Cocktail }) {
           </div>
         </div>
         <div className="tag-row">
-          <span className="tag tag-neutral" style={{ border: "1px solid var(--color-divider)" }}>
-            {cocktail.base}
-          </span>
+          <span className="tag tag-neutral tag-bordered">{cocktail.base}</span>
           <SweetTag level={cocktail.sweet} />
         </div>
         <div className="cocktail-card__flavors">

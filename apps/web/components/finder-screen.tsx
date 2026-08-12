@@ -58,17 +58,8 @@ export function FinderScreen() {
       {!done ? (
         <div className="quiz-layout">
           <aside>
-            <div
-              style={{
-                fontSize: 11,
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                color: "var(--color-neutral-700)",
-                marginBottom: 10,
-              }}
-            >
-              진행 PROGRESS
-            </div>
+            {/* .filter-label 을 인라인으로 다시 만들고 있었다 — 같은 것이면 같은 클래스를 쓴다 */}
+            <div className="filter-label">진행 PROGRESS</div>
             <div className="quiz-nav">
               {QUESTIONS.map((q, i) => {
                 const v = answers[q.key];
@@ -171,19 +162,9 @@ export function FinderScreen() {
                       {cocktail.en}
                     </div>
                     <div className="tag-row" style={{ marginBottom: 10 }}>
-                      <span
-                        className="tag tag-neutral"
-                        style={{ border: "1px solid var(--color-divider)" }}
-                      >
-                        {cocktail.base}
-                      </span>
+                      <span className="tag tag-neutral tag-bordered">{cocktail.base}</span>
                       <SweetTag level={cocktail.sweet} en />
-                      <span
-                        className="tag tag-neutral"
-                        style={{ border: "1px solid var(--color-divider)" }}
-                      >
-                        {cocktail.abv}% ABV
-                      </span>
+                      <span className="tag tag-neutral tag-bordered">{cocktail.abv}% ABV</span>
                     </div>
                     <p className="result-card__why">
                       선택한{" "}

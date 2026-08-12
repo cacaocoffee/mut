@@ -122,9 +122,7 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
         <section>
           <RecipePanel cocktail={cocktail} />
 
-          <h4 style={{ margin: "34px 0 0", paddingBottom: 12, borderBottom: "2px solid var(--color-divider)" }}>
-            제조 순서 METHOD
-          </h4>
+          <h4 className="section-head">제조 순서 METHOD</h4>
           <ol style={{ listStyle: "none", margin: 0, padding: 0 }}>
             {cocktail.steps.map((text, i) => (
               <li className="step" key={text}>
@@ -136,9 +134,7 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
         </section>
 
         <section>
-          <h4 style={{ margin: 0, paddingBottom: 12, borderBottom: "2px solid var(--color-divider)" }}>
-            맛 프로필 FLAVOR PROFILE
-          </h4>
+          <h4 className="section-head section-head--flush">맛 프로필 FLAVOR PROFILE</h4>
           <FlavorRadar profile={cocktail.profile} title={cocktail.ko} />
           <div style={{ borderTop: "2px solid var(--color-divider)" }}>
             {cocktail.profile.map((v, i) => (
@@ -154,9 +150,7 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
             ))}
           </div>
 
-          <h4 style={{ margin: "34px 0 0", paddingBottom: 12, borderBottom: "2px solid var(--color-divider)" }}>
-            기록 ORIGIN
-          </h4>
+          <h4 className="section-head">기록 ORIGIN</h4>
           <table className="table">
             <tbody>
               {[
