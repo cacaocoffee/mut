@@ -120,9 +120,6 @@ export function SearchScreen() {
     <main className="shell">
       <header className="page-head">
         <div>
-          <h6 style={{ margin: "0 0 10px", color: "var(--color-accent-700)" }}>
-            Multi-dimensional search
-          </h6>
           <h1>
             칵테일 탐색<span className="sub">Browse {results.length} of 24 entries</span>
           </h1>
