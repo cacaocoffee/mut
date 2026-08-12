@@ -96,7 +96,7 @@ class RestConventionTest {
 
     @Test
     fun `RED7 - 성공 응답에는 violations 가 없다`() {
-        val body = bodyOf(mvc.get("$BASE/cocktails/gin-tonic").andReturn())
+        val body = bodyOf(mvc.get("$BASE/probe/resource/gin-tonic").andReturn())
         assertThat(body).doesNotContainKey("violations")
     }
 
@@ -174,7 +174,7 @@ class RestConventionTest {
 
     @Test
     fun `RED17 - 기본값은 page0 size24`() {
-        val page = pageOf(mvc.get("$BASE/cocktails").andReturn())
+        val page = pageOf(mvc.get("$BASE/probe/paged").andReturn())
 
         assertThat(page["number"]).isEqualTo(0)
         assertThat(page["size"]).isEqualTo(24)
@@ -182,13 +182,13 @@ class RestConventionTest {
 
     @Test
     fun `RED18 - 응답에 items 와 page 객체가 있다`() {
-        val body = bodyOf(mvc.get("$BASE/cocktails").andReturn())
+        val body = bodyOf(mvc.get("$BASE/probe/paged").andReturn())
         assertThat(body.keys).containsExactlyInAnyOrder("items", "page")
     }
 
     @Test
     fun `RED19 - page 에 number size totalElements totalPages 가 있다`() {
-        val page = pageOf(mvc.get("$BASE/cocktails").andReturn())
+        val page = pageOf(mvc.get("$BASE/probe/paged").andReturn())
 
         assertThat(page.keys).containsExactlyInAnyOrder(
             "number", "size", "totalElements", "totalPages",
@@ -200,17 +200,17 @@ class RestConventionTest {
     /** 무제한 조회를 막는다. 400 이 아니라 절삭 — 흔한 실수를 실패로 만들지 않는다. */
     @Test
     fun `RED20 - size 상한을 넘으면 상한으로 절삭된다`() {
-        val page = pageOf(mvc.get("$BASE/cocktails") { param("size", "10000") }.andReturn())
+        val page = pageOf(mvc.get("$BASE/probe/paged") { param("size", "10000") }.andReturn())
         assertThat(page["size"]).isEqualTo(100)
     }
 
     /** 인덱스 없는 컬럼 정렬을 받으면 그것이 곧 풀스캔 경로다. */
     @Test
     fun `RED21 - sort 파라미터가 허용목록 밖이면 400`() {
-        mvc.get("$BASE/cocktails") { param("sort", "abv,asc") }
+        mvc.get("$BASE/probe/paged") { param("sort", "abv,asc") }
             .andExpect { status { isOk() } }
 
-        val result = mvc.get("$BASE/cocktails") { param("sort", "secret_column,asc") }.andReturn()
+        val result = mvc.get("$BASE/probe/paged") { param("sort", "secret_column,asc") }.andReturn()
         assertThat(result.response.status).isEqualTo(400)
         assertThat(result.response.contentAsString)
             .`as`("무엇이 가능한지 알려 준다")
@@ -221,16 +221,16 @@ class RestConventionTest {
 
     @Test
     fun `RED22 - 공개 조회에 ETag 가 붙는다`() {
-        val etag = mvc.get("$BASE/cocktails/gin-tonic").andReturn().response.getHeader(HttpHeaders.ETAG)
+        val etag = mvc.get("$BASE/probe/resource/gin-tonic").andReturn().response.getHeader(HttpHeaders.ETAG)
         assertThat(etag).isNotBlank()
     }
 
     /** SSG 빌드가 같은 엔드포인트를 500번 호출한다. 내용이 그대로면 304 로 끝나야 한다. */
     @Test
     fun `RED23 - If-None-Match 일치시 304 를 반환한다`() {
-        val etag = mvc.get("$BASE/cocktails/gin-tonic").andReturn().response.getHeader(HttpHeaders.ETAG)!!
+        val etag = mvc.get("$BASE/probe/resource/gin-tonic").andReturn().response.getHeader(HttpHeaders.ETAG)!!
 
-        val second = mvc.get("$BASE/cocktails/gin-tonic") {
+        val second = mvc.get("$BASE/probe/resource/gin-tonic") {
             header(HttpHeaders.IF_NONE_MATCH, etag)
         }.andReturn()
 
@@ -240,7 +240,7 @@ class RestConventionTest {
 
     @Test
     fun `RED24 - 공개 조회에 Cache-Control max-age 60 이 붙는다`() {
-        val header = mvc.get("$BASE/cocktails/gin-tonic")
+        val header = mvc.get("$BASE/probe/resource/gin-tonic")
             .andReturn().response.getHeader(HttpHeaders.CACHE_CONTROL)
 
         assertThat(header).isEqualTo(CacheControlFilter.PUBLIC_CACHE)
@@ -342,7 +342,7 @@ class RestConventionTest {
     /** 공개 식별자는 `slug` 다. `id` 는 어드민·파트너 API 에서만 쓴다 (`PRIN-D02`). */
     @Test
     fun `RED30 - 공개 응답에 내부 id 가 없다`() {
-        val body = bodyOf(mvc.get("$BASE/cocktails/gin-tonic").andReturn())
+        val body = bodyOf(mvc.get("$BASE/probe/resource/gin-tonic").andReturn())
 
         assertThat(body).containsKey("slug")
         assertThat(body).doesNotContainKey("id")
@@ -350,7 +350,7 @@ class RestConventionTest {
 
     @Test
     fun `RED31 - 응답 필드는 camelCase 다`() {
-        val body = bodyOf(mvc.get("$BASE/cocktails/gin-tonic").andReturn())
+        val body = bodyOf(mvc.get("$BASE/probe/resource/gin-tonic").andReturn())
 
         assertThat(body.keys).allSatisfy { key ->
             assertThat(key).matches("^[a-z][a-zA-Z0-9]*$")
@@ -360,6 +360,11 @@ class RestConventionTest {
     /**
      * 경로는 **복수형**(`/cocktails`)이고 테이블은 **단수형**(`cocktail`)이다 (SPEC-06 §1.1).
      * 헷갈리기 쉬운 지점이라 양쪽을 각각 고정한다 — 테이블 쪽은 `SchemaLintTest` 가 본다.
+     */
+    /**
+     * **프로브가 아니라 진짜 엔드포인트를 본다.** 규약은 실제로 나가는 경로에 걸려야 뜻이 있고,
+     * 프로브 경로(`/probe/…`)를 검사하면 내가 지은 이름을 내가 확인하는 것뿐이다.
+     * 이슈 018 이 `GET /api/v1/cocktails` 를 만들면서 볼 대상이 생겼다.
      */
     @Test
     fun `RED32 - 경로는 kebab-case 복수형이다`() {
