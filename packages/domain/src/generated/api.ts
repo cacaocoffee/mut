@@ -47,6 +47,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/cocktails": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 칵테일 목록 · 필터
+         * @description 발행분만 반환한다. 필터 결과는 색인하지 않는다 (X-Robots-Tag: noindex).
+         */
+        get: operations["list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -68,6 +88,21 @@ export interface components {
             labelKo: string;
             slug: string;
         };
+        CocktailListItem: {
+            abv?: number;
+            aromaTags: components["schemas"]["FlavorKey"][];
+            baseSpirit: components["schemas"]["BaseSpirit"];
+            glassType: string;
+            isClassic: boolean;
+            method: components["schemas"]["Technique"];
+            nameEn: string;
+            nameKo: string;
+            slug: string;
+            stylePrimary: components["schemas"]["StyleKey"];
+            styles: components["schemas"]["StyleKey"][];
+            summary: string;
+            sweetness: components["schemas"]["SweetLevel"];
+        };
         CsrfTokenResponse: {
             headerName: string;
             token: string;
@@ -77,6 +112,33 @@ export interface components {
          * @enum {string}
          */
         FlavorKey: "citrus" | "sour" | "fruity" | "floral" | "herbal" | "spicy" | "smoky" | "bitter" | "nutty" | "creamy";
+        PageMeta: {
+            /** Format: int32 */
+            number: number;
+            /** Format: int32 */
+            size: number;
+            /** Format: int64 */
+            totalElements: number;
+            /** Format: int32 */
+            totalPages: number;
+        };
+        PageQuery: {
+            /** Format: int64 */
+            offset: number;
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            size: number;
+            sort: components["schemas"]["SortOrder"][];
+        };
+        PageResponseCocktailListItem: {
+            items: components["schemas"]["CocktailListItem"][];
+            page: components["schemas"]["PageMeta"];
+        };
+        SortOrder: {
+            ascending: boolean;
+            property: string;
+        };
         /**
          * @description 축 2 · 스타일 (복수, style_primary 필수)
          * @enum {string}
@@ -139,6 +201,42 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["CategoriesResponse"];
+                };
+            };
+        };
+    };
+    list: {
+        parameters: {
+            query: {
+                /** @description 기주 슬러그. 콤마로 여러 개 — **OR** */
+                base?: string;
+                /** @description 스타일 슬러그. 콤마로 여러 개 — **OR**. style_primary 가 아니라 보유 스타일 전체와 맞춘다 */
+                style?: string;
+                /** @description 메이킹 방법 슬러그. 콤마로 여러 개 — **OR** */
+                method?: string;
+                /** @description 당도 슬러그. **단일값** — 여러 개를 주면 400 */
+                sweet?: string;
+                /** @description 도수 구간 na·low·mid·high. 콤마로 여러 개 — **OR** (ADR-0003) */
+                abv?: string;
+                /** @description 향·맛 슬러그. 콤마로 여러 개 — **AND**. 전부 가진 것만 (SPEC-07 §3.1) */
+                flavor?: string;
+                /** @description 이름 검색. 초성·별칭까지 보는 정밀 검색은 /search 다 */
+                q?: string;
+                page: components["schemas"]["PageQuery"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageResponseCocktailListItem"];
                 };
             };
         };

@@ -29,9 +29,18 @@ import java.util.concurrent.atomic.AtomicInteger
  * ## 프로파일로 가둔다
  *
  * 테스트 소스도 `kr.kcocktail` 아래라 컴포넌트 스캔에 걸린다. 그냥 두면
- * **모든 웹 통합 테스트에 이 매핑이 딸려 들어가고**, 이슈 018 이 진짜
- * `GET /api/v1/cocktails` 를 만드는 순간 매핑이 충돌한다.
- * `@Profile` 로 이 테스트에서만 켜지게 한다.
+ * **모든 웹 통합 테스트에 이 매핑이 딸려 들어간다.** `@Profile` 로 이 테스트에서만 켜지게 한다.
+ *
+ * ## 경로가 `/probe/…` 인 이유 (이슈 018 에서 옮겼다)
+ *
+ * 원래는 `/cocktails` · `/cocktails/{slug}` 를 썼다. 진짜 엔드포인트가 없던 시절
+ * 실감 나는 경로를 빌린 것인데, 이슈 018 이 `GET /api/v1/cocktails` 를 만드는 순간
+ * **같은 프로파일 안에서 매핑이 충돌해 컨텍스트가 아예 안 떴다.** `@Profile` 은 다른 테스트를
+ * 지켜 줄 뿐, 이 테스트 자신은 못 지킨다.
+ *
+ * 그래서 도메인 경로를 빌리지 않는다. 여기서 검증하는 것은 **페이징 · 캐시 · 에러 규약**이지
+ * 칵테일이 아니다 — 경로가 무엇이든 성립해야 맞다. 이슈 020 의 `/cocktails/{slug}` 도
+ * 같은 벽을 만났을 것이라 함께 비웠다.
  */
 object RestProbes {
     const val PROFILE = "rest-probe"
@@ -43,14 +52,14 @@ object RestProbes {
 class PublicProbe {
 
     /** RED 30·31 — 공개 응답에 내부 `id` 가 없고 필드는 `camelCase` 다. */
-    @GetMapping("/cocktails/{slug}")
+    @GetMapping("/probe/resource/{slug}")
     fun detail(): Map<String, Any> = mapOf(
         "slug" to "gin-tonic",
         "displayName" to "진토닉",
         "abv" to 12,
     )
 
-    @GetMapping("/cocktails")
+    @GetMapping("/probe/paged")
     fun list(@SortableBy("name", "abv") page: PageQuery): PageResponse<Map<String, Any>> =
         PageResponse.of(
             items = listOf(mapOf("slug" to "gin-tonic")),

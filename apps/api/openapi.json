@@ -61,6 +61,57 @@
         "required" : [ "count", "labelKo", "slug" ],
         "type" : "object"
       },
+      "CocktailListItem" : {
+        "properties" : {
+          "abv" : {
+            "type" : "number"
+          },
+          "aromaTags" : {
+            "items" : {
+              "$ref" : "#/components/schemas/FlavorKey"
+            },
+            "type" : "array"
+          },
+          "baseSpirit" : {
+            "$ref" : "#/components/schemas/BaseSpirit"
+          },
+          "glassType" : {
+            "type" : "string"
+          },
+          "isClassic" : {
+            "type" : "boolean"
+          },
+          "method" : {
+            "$ref" : "#/components/schemas/Technique"
+          },
+          "nameEn" : {
+            "type" : "string"
+          },
+          "nameKo" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "stylePrimary" : {
+            "$ref" : "#/components/schemas/StyleKey"
+          },
+          "styles" : {
+            "items" : {
+              "$ref" : "#/components/schemas/StyleKey"
+            },
+            "type" : "array"
+          },
+          "summary" : {
+            "type" : "string"
+          },
+          "sweetness" : {
+            "$ref" : "#/components/schemas/SweetLevel"
+          }
+        },
+        "required" : [ "aromaTags", "baseSpirit", "glassType", "isClassic", "method", "nameEn", "nameKo", "slug", "stylePrimary", "styles", "summary", "sweetness" ],
+        "type" : "object"
+      },
       "CsrfTokenResponse" : {
         "properties" : {
           "headerName" : {
@@ -89,6 +140,79 @@
           "sour" : "산미",
           "spicy" : "스파이시"
         }
+      },
+      "PageMeta" : {
+        "properties" : {
+          "number" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "size" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "totalElements" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "totalPages" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        },
+        "required" : [ "number", "size", "totalElements", "totalPages" ],
+        "type" : "object"
+      },
+      "PageQuery" : {
+        "properties" : {
+          "offset" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "page" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "size" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "sort" : {
+            "items" : {
+              "$ref" : "#/components/schemas/SortOrder"
+            },
+            "type" : "array"
+          }
+        },
+        "required" : [ "offset", "page", "size", "sort" ],
+        "type" : "object"
+      },
+      "PageResponseCocktailListItem" : {
+        "properties" : {
+          "items" : {
+            "items" : {
+              "$ref" : "#/components/schemas/CocktailListItem"
+            },
+            "type" : "array"
+          },
+          "page" : {
+            "$ref" : "#/components/schemas/PageMeta"
+          }
+        },
+        "required" : [ "items", "page" ],
+        "type" : "object"
+      },
+      "SortOrder" : {
+        "properties" : {
+          "ascending" : {
+            "type" : "boolean"
+          },
+          "property" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "ascending", "property" ],
+        "type" : "object"
       },
       "StyleKey" : {
         "description" : "축 2 · 스타일 (복수, style_primary 필수)",
@@ -179,6 +303,90 @@
           }
         },
         "tags" : [ "category-controller" ]
+      }
+    },
+    "/api/v1/cocktails" : {
+      "get" : {
+        "description" : "발행분만 반환한다. 필터 결과는 색인하지 않는다 (X-Robots-Tag: noindex).",
+        "operationId" : "list",
+        "parameters" : [ {
+          "description" : "기주 슬러그. 콤마로 여러 개 — **OR**",
+          "in" : "query",
+          "name" : "base",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "스타일 슬러그. 콤마로 여러 개 — **OR**. style_primary 가 아니라 보유 스타일 전체와 맞춘다",
+          "in" : "query",
+          "name" : "style",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "메이킹 방법 슬러그. 콤마로 여러 개 — **OR**",
+          "in" : "query",
+          "name" : "method",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "당도 슬러그. **단일값** — 여러 개를 주면 400",
+          "in" : "query",
+          "name" : "sweet",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "도수 구간 na·low·mid·high. 콤마로 여러 개 — **OR** (ADR-0003)",
+          "in" : "query",
+          "name" : "abv",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "향·맛 슬러그. 콤마로 여러 개 — **AND**. 전부 가진 것만 (SPEC-07 §3.1)",
+          "in" : "query",
+          "name" : "flavor",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "이름 검색. 초성·별칭까지 보는 정밀 검색은 /search 다",
+          "in" : "query",
+          "name" : "q",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "page",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/PageQuery"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageResponseCocktailListItem"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "칵테일 목록 · 필터",
+        "tags" : [ "cocktail-list-controller" ]
       }
     }
   },
