@@ -31,6 +31,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["categories"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -40,6 +56,18 @@ export interface components {
          * @enum {string}
          */
         BaseSpirit: "gin" | "vodka" | "whisky" | "rum" | "agave" | "brandy" | "liqueur" | "wine" | "korean" | "non-alcoholic";
+        CategoriesResponse: {
+            base: components["schemas"]["CategoryItem"][];
+            method: components["schemas"]["CategoryItem"][];
+            style: components["schemas"]["CategoryItem"][];
+        };
+        CategoryItem: {
+            /** Format: int32 */
+            count: number;
+            intro?: string;
+            labelKo: string;
+            slug: string;
+        };
         CsrfTokenResponse: {
             headerName: string;
             token: string;
@@ -89,6 +117,28 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["CsrfTokenResponse"];
+                };
+            };
+        };
+    };
+    categories: {
+        parameters: {
+            query?: {
+                include?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CategoriesResponse"];
                 };
             };
         };
