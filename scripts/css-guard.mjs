@@ -24,11 +24,58 @@ const FILES = [
   "apps/web/app/globals.css",
 ];
 
+/**
+ * 우리가 쓴 층. 시안 정본(`styles.css`)은 여기 없다 — ADR-0005 결정 1.
+ * 간격·죽은 토큰 게이트는 이쪽에만 건다. 시안의 램프는 **팔레트**라서
+ * 지금 안 쓰는 단이 있다고 죽은 코드가 아니다.
+ */
+const OURS = ["packages/ui/app.css", "apps/web/app/globals.css"];
+
+/** 토큰 참조는 CSS 밖에서도 일어난다 — 인라인 style 이 램프를 직접 쓴다. */
+const USAGE_ALSO = [
+  "apps/web/components/sweet-tag.tsx",
+  "apps/web/components/cocktail-card.tsx",
+  "apps/web/components/finder-screen.tsx",
+  "apps/web/components/search-screen.tsx",
+  "apps/web/components/flavor-radar.tsx",
+  "apps/web/app/cocktails/[id]/page.tsx",
+];
+
 /** 사진 슬롯을 담는 그리드 — 트랙이 min-content 바닥을 가지면 안 된다 (게이트 3). */
 const IMAGE_GRIDS = [".card-grid", ".result-grid"];
 
 /** 클릭 대상 — 레이블이 두 줄로 접히면 안 된다 (게이트 4). */
 const CLICKABLE = [".tab", ".chip", ".chip-tag"];
+
+/*
+ * 게이트 7(spacing_token)은 **의도적으로 없다.**
+ *
+ * 감사가 "간격 스케일을 만들어놓고 안 쓴다"고 지적했고 처음엔 4pt 강제로 잡으려 했다.
+ * 실측해 보니 둘 다 성립하지 않았다 (ISSUE-052 / #70):
+ *
+ *   - 68개 리터럴 / 고유값 20종. 4pt 로 강제하면 눈에 보이는 변경이 30곳 생긴다
+ *   - 전부 토큰화하려면 --space-0-5 · 1-5 · 2-5 · 3-5 · 4-5 · 5 · 7 · 7-5 ·
+ *     9 · 10 · 11 · 13 · 16 을 새로 만들어야 한다
+ *
+ * 토큰 13개를 더한 것은 스케일이 아니라 **px 에 이름만 붙인 것**이다. 모든 값이 이름을
+ * 얻으면 아무것도 제약되지 않고, "리듬을 한 번에 조일 손잡이"라는 원래 논거가 무너진다 —
+ * 공유되는 단이 없기 때문이다.
+ *
+ * ADR-0005 결과 항목대로 **취향이면 취향이라고 적고 남긴다.** 되살리는 조건:
+ * 섹션 리듬을 실제로 재설계할 때. 그때는 큰 간격(≥20px)만 좁게 거는 편이 맞다.
+ */
+
+/**
+ * 숫자 열을 담는 클래스 — 자릿수가 흔들리면 안 된다 (게이트 10).
+ * 필터를 누를 때마다 바뀌는 자리가 특히 눈에 띈다.
+ */
+const NUMERIC = [".results-count", ".spec-strip", ".cocktail-card__abv", ".profile-row", ".amount-cell"];
+
+/**
+ * 앱이 주입하는 것으로 알려진 토큰 — `packages/ui` 가 정의하지 않아도 된다 (게이트 9).
+ * next/font 가 런타임에 넣는다. 이 목록 밖의 미정의 토큰은 실패로 본다.
+ */
+const APP_PROVIDED = ["--font-archivo", "--font-noto-sans", "--font-noto-serif"];
 
 const EXCEPTIONS = [
   // 형식: { gate, selector, why }
@@ -49,7 +96,12 @@ function parseRules(css) {
   for (let i = 0; i < src.length; i++) {
     const ch = src[i];
     if (ch === "{") {
-      stack.push({ prelude: src.slice(start, i).trim(), at: i, bodyStart: i + 1 });
+      // `@import url(...);` 처럼 중괄호 없이 끝나는 문이 앞에 있으면 그것까지 프렐류드에
+      // 딸려 들어와 다음 규칙이 at-rule 로 오인된다. 마지막 `;` 뒤만 취한다.
+      // (셀렉터에는 `;` 가 오지 않으므로 안전하다.)
+      const raw = src.slice(start, i);
+      const prelude = raw.slice(raw.lastIndexOf(";") + 1).trim();
+      stack.push({ prelude, at: i, bodyStart: i + 1 });
       start = i + 1;
     } else if (ch === "}") {
       const top = stack.pop();
@@ -87,6 +139,8 @@ const selectorHits = (selector, names) => matchedNames(selector, names).length >
 
 const findings = [];
 const seen = new Set();
+const defined = new Map();   // --name → "file:line"  (packages/ui 가 정의한 것)
+const used = new Map();      // --name → "file:line"  (packages/ui 가 참조한 것)
 
 function fail(gate, file, line, selector, msg) {
   if (EXCEPTIONS.some((e) => e.gate === gate && e.selector === selector)) return;
@@ -146,6 +200,39 @@ for (const rel of FILES) {
         fail("dvh_page_shell", rel, r.line, sel, `페이지 셸에 ${mh} — dvh 를 쓴다`);
       }
     }
+
+    // 7. tabular_nums — 자릿수가 흔들리면 눈에 띈다.
+    for (const name of matchedNames(sel, NUMERIC)) {
+      seen.add(`num:${name}`);
+      if (/tabular-nums/.test(r.decls)) seen.add(`num:${name}:ok`);
+    }
+
+    // 게이트 8·9 를 위한 수집 — packages/ui 안에서만 본다.
+    if (rel.startsWith("packages/ui/")) {
+      for (const m of r.decls.matchAll(/(--[\w-]+)\s*:/g)) {
+        if (!defined.has(m[1])) defined.set(m[1], `${rel}:${r.line}`);
+      }
+      for (const m of r.decls.matchAll(/var\(\s*(--[\w-]+)/g)) {
+        if (!used.has(m[1])) used.set(m[1], `${rel}:${r.line}`);
+      }
+    }
+  }
+}
+
+// 토큰 참조는 CSS 밖에서도 일어난다. 여기를 안 보면 램프가 통째로 "죽은 토큰"이 된다.
+for (const rel of USAGE_ALSO) {
+  let text;
+  try {
+    text = readFileSync(join(ROOT, rel), "utf8");
+  } catch {
+    findings.push({
+      gate: "usage_scan", file: rel, line: 0, selector: "-",
+      msg: "USAGE_ALSO 에 있는 파일을 찾지 못했다 — 목록이 코드와 어긋났다",
+    });
+    continue;
+  }
+  for (const m of text.matchAll(/var\(\s*(--[\w-]+)/g)) {
+    if (!used.has(m[1])) used.set(m[1], rel);
   }
 }
 
@@ -168,11 +255,44 @@ for (const name of CLICKABLE) {
   }
 }
 
+// 8. no_dead_tokens — 선언만 하고 아무도 안 쓰는 토큰은 죽은 정보다.
+//    ADR-0001 이 부록 A 에서 "이 한 줄만 살렸다"고 적어둔 것이 실제로 안 쓰이면
+//    문서와 코드가 어긋난 채로 굳는다.
+//    시안 정본의 램프는 제외한다 — 팔레트는 지금 안 쓰는 단이 있어도 완결돼 있는 게 맞다.
+//    우리가 쓴 층(app.css)이 선언한 것만 본다.
+for (const [name, where] of defined) {
+  const file = where.split(":")[0];
+  if (!OURS.includes(file)) continue;
+  if (!used.has(name)) {
+    fail("no_dead_tokens", file, Number(where.split(":")[1]), name,
+      `${name} 을 선언만 하고 아무도 참조하지 않는다 — 쓰거나 지운다`);
+  }
+}
+
+// 9. token_defined_where_used — 패키지가 쓰는 토큰은 패키지가 정의한다.
+//    소비자가 하나뿐이라 지금은 안 드러나지만, @kca/ui 를 다른 곳에서 가져가면
+//    값이 조용히 사라진다.
+for (const [name, where] of used) {
+  if (!defined.has(name) && !APP_PROVIDED.includes(name)) {
+    fail("token_defined_where_used", where.split(":")[0], Number(where.split(":")[1]), name,
+      `${name} 을 packages/ui 가 쓰는데 정의는 밖에 있다 — 폴백을 패키지 안에 둔다`);
+  }
+}
+
+for (const name of NUMERIC) {
+  if (!seen.has(`num:${name}`)) {
+    fail("tabular_nums", "-", 0, name, `${name} 규칙을 찾지 못했다 — NUMERIC 목록이 코드와 어긋났다`);
+  } else if (!seen.has(`num:${name}:ok`)) {
+    fail("tabular_nums", "packages/ui/app.css", 0, name,
+      `${name} 에 font-variant-numeric 미지정 — 값이 바뀔 때 자릿수가 흔들린다`);
+  }
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 if (findings.length === 0) {
   const n = FILES.length;
-  console.log(`css-guard: 6개 게이트 통과 (${n}개 파일)`);
+  console.log(`css-guard: 9개 게이트 통과 (${n}개 파일)`);
   if (EXCEPTIONS.length) console.log(`  등록된 예외 ${EXCEPTIONS.length}건`);
   process.exit(0);
 }
