@@ -8,14 +8,17 @@ export function SiteNav() {
   const pathname = usePathname();
   const lastViewed = useLastViewed();
 
+  // 국문과 영문을 나눠 둔다 — 560px 아래에서 영문만 감춘다 (ISSUE-051 #69).
+  // 레이블을 두 줄로 접는 대신 짧게 쓴다. `01`·`02`·`03` 이 화면 순서를 계속 드러낸다.
   const tabs = [
-    { href: "/", label: "01 탐색 SEARCH", match: (p: string) => p === "/" },
+    { href: "/", ko: "01 탐색", en: "SEARCH", match: (p: string) => p === "/" },
     {
       href: `/cocktails/${lastViewed}`,
-      label: "02 상세 DETAIL",
+      ko: "02 상세",
+      en: "DETAIL",
       match: (p: string) => p.startsWith("/cocktails/"),
     },
-    { href: "/finder", label: "03 파인더 FINDER", match: (p: string) => p === "/finder" },
+    { href: "/finder", ko: "03 파인더", en: "FINDER", match: (p: string) => p === "/finder" },
   ];
 
   return (
@@ -31,7 +34,7 @@ export function SiteNav() {
             className="btn btn-secondary tab"
             aria-current={t.match(pathname) ? "page" : undefined}
           >
-            {t.label}
+            {t.ko} <span className="en">{t.en}</span>
           </Link>
         ))}
       </div>
