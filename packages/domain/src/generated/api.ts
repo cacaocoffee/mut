@@ -67,6 +67,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/cocktails/facets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 필터 값별 결과 개수
+         * @description 기주·스타일·메이킹·당도·도수는 같은 축 선택을 무시하고, 향·맛만 현재 선택에 더했을 때의 수다 (SPEC-07 §3.2).
+         */
+        get: operations["facets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/cocktails/{slug}": {
         parameters: {
             query?: never;
@@ -234,6 +254,26 @@ export interface components {
         CsrfTokenResponse: {
             headerName: string;
             token: string;
+        };
+        FacetCounts: {
+            abv: {
+                [key: string]: number;
+            };
+            base: {
+                [key: string]: number;
+            };
+            flavor: {
+                [key: string]: number;
+            };
+            method: {
+                [key: string]: number;
+            };
+            style: {
+                [key: string]: number;
+            };
+            sweet: {
+                [key: string]: number;
+            };
         };
         /**
          * @description 향 태그 1~3개 (R-F1.2-1). 카테고리가 아니다
@@ -470,6 +510,35 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PageResponseCocktailListItem"];
+                };
+            };
+        };
+    };
+    facets: {
+        parameters: {
+            query?: {
+                /** @description 기주 슬러그. 콤마로 여러 개 */
+                base?: string;
+                style?: string;
+                method?: string;
+                sweet?: string;
+                abv?: string;
+                flavor?: string;
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["FacetCounts"];
                 };
             };
         };

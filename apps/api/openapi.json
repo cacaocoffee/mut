@@ -244,6 +244,54 @@
         "required" : [ "headerName", "token" ],
         "type" : "object"
       },
+      "FacetCounts" : {
+        "properties" : {
+          "abv" : {
+            "additionalProperties" : {
+              "format" : "int64",
+              "type" : "integer"
+            },
+            "type" : "object"
+          },
+          "base" : {
+            "additionalProperties" : {
+              "format" : "int64",
+              "type" : "integer"
+            },
+            "type" : "object"
+          },
+          "flavor" : {
+            "additionalProperties" : {
+              "format" : "int64",
+              "type" : "integer"
+            },
+            "type" : "object"
+          },
+          "method" : {
+            "additionalProperties" : {
+              "format" : "int64",
+              "type" : "integer"
+            },
+            "type" : "object"
+          },
+          "style" : {
+            "additionalProperties" : {
+              "format" : "int64",
+              "type" : "integer"
+            },
+            "type" : "object"
+          },
+          "sweet" : {
+            "additionalProperties" : {
+              "format" : "int64",
+              "type" : "integer"
+            },
+            "type" : "object"
+          }
+        },
+        "required" : [ "abv", "base", "flavor", "method", "style", "sweet" ],
+        "type" : "object"
+      },
       "FlavorKey" : {
         "description" : "향 태그 1~3개 (R-F1.2-1). 카테고리가 아니다",
         "enum" : [ "citrus", "sour", "fruity", "floral", "herbal", "spicy", "smoky", "bitter", "nutty", "creamy" ],
@@ -841,6 +889,77 @@
         },
         "summary" : "칵테일 목록 · 필터",
         "tags" : [ "cocktail-list-controller" ]
+      }
+    },
+    "/api/v1/cocktails/facets" : {
+      "get" : {
+        "description" : "기주·스타일·메이킹·당도·도수는 같은 축 선택을 무시하고, 향·맛만 현재 선택에 더했을 때의 수다 (SPEC-07 §3.2).",
+        "operationId" : "facets",
+        "parameters" : [ {
+          "description" : "기주 슬러그. 콤마로 여러 개",
+          "in" : "query",
+          "name" : "base",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "style",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "method",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "sweet",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "abv",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "flavor",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "q",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/FacetCounts"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "필터 값별 결과 개수",
+        "tags" : [ "facet-controller" ]
       }
     },
     "/api/v1/cocktails/{slug}" : {
