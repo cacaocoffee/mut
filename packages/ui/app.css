@@ -80,18 +80,46 @@
   display: flex;
   gap: var(--space-1);
 }
+/* ┌─ 탭 — 선택 상태를 채움이 아니라 하단 인디케이터로 표시한다 (ISSUE-055) ─┐
+   채움을 버린 이유가 둘이다.
+
+   ① 결함. `styles.css:220` 의 `.nav a[aria-current='page']`(0,2,1)가
+      `.tab[aria-current]`(0,2,0)를 **명시도로** 이겨서, 배경은 .tab 이 accent 로
+      칠하고 글자색은 저쪽이 accent 로 덮었다. 대비 1:1 — 완전 비가시였다.
+      `app.css` 가 뒤에 로드돼도 명시도가 순서를 이긴다.
+
+   ② 그 규칙을 이겨도 의도했던 조합(--color-bg on accent)이 **3.76:1** 이다.
+      탭은 12px 소형 텍스트라 AA 기준 4.5:1 에 미달한다. 이건 G-16 이 이미 등재했고
+      이슈 050(#52)이 BLOCKED 로 들고 있는 바로 그 숫자다.
+
+   밑줄 안은 글자를 accent **위**가 아니라 종이 **위**에 두므로 6.41:1 을 얻고,
+   #52 의 제품 결정을 기다리지 않아도 된다. 시안 README 의
+   "구분선의 세기가 조직화를 전담한다" 와도 맞는다.
+   └──────────────────────────────────────────────────────────────────────┘ */
 .tab {
-  padding: 7px 12px;
-  font-size: 12px;
-  border-color: var(--color-divider);
-  /* 클릭 대상은 한 줄짜리 물건이다. 두 줄로 접히면 줄바꿈이 의도인지 알 수 없고
-     버튼 높이만 자라 형제와 리듬이 깨진다. */
+  padding: var(--space-3) var(--space-3);
+  /* 터치 타깃 — WCAG 2.5.8. 모바일 트래픽 80% 가정(PRD 12장)이면 특히 */
+  min-height: 44px;
+  font-size: 13px;
+  /* 클릭 대상은 한 줄짜리 물건이다 (ISSUE-051). 두 줄로 접히면 줄바꿈이 의도인지
+     알 수 없고 버튼 높이만 자라 형제와 리듬이 깨진다. */
   white-space: nowrap;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--color-neutral-700); /* 5.83:1 */
 }
-.tab[aria-current="page"] {
-  background: var(--color-accent);
-  color: var(--color-bg);
-  border-color: var(--color-accent);
+.site-nav .tab:hover {
+  background: transparent;
+  color: var(--color-text);
+}
+/* (0,3,0) — styles.css 의 `.nav a[aria-current='page']`(0,2,1)를 이긴다.
+   명시도로 이기는 것이 핵심이라 이 셀렉터를 줄이지 말 것. */
+.site-nav .tab[aria-current="page"] {
+  background: transparent;
+  color: var(--color-accent-700); /* 6.41:1 */
+  border-bottom-color: var(--color-accent);
+  font-weight: var(--font-heading-weight);
 }
 
 /* — 페이지 머리 — */
@@ -170,16 +198,14 @@
   border-bottom: 1px solid var(--color-divider);
 }
 .filter-label {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-neutral-700);
   margin-bottom: var(--space-2);
-}
-.filter-label {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-2);
 }
 .filter-label .hint {
   /* float 이었다 — 부모를 flex 로 바꿔 정렬을 배치에 맡긴다 */
