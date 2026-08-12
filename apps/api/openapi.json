@@ -48,6 +48,24 @@
         "required" : [ "isSponsored", "name" ],
         "type" : "object"
       },
+      "BrandItem" : {
+        "properties" : {
+          "isSponsored" : {
+            "type" : "boolean"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "purchaseUrl" : {
+            "type" : "string"
+          },
+          "requiresAdLabel" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "isSponsored", "name", "requiresAdLabel" ],
+        "type" : "object"
+      },
       "CategoriesResponse" : {
         "properties" : {
           "base" : {
@@ -261,6 +279,96 @@
         "required" : [ "nameEn", "nameKo", "summary" ],
         "type" : "object"
       },
+      "IngredientCocktailItem" : {
+        "properties" : {
+          "isOptional" : {
+            "type" : "boolean"
+          },
+          "nameEn" : {
+            "type" : "string"
+          },
+          "nameKo" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "summary" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "isOptional", "nameEn", "nameKo", "slug", "summary" ],
+        "type" : "object"
+      },
+      "IngredientDetail" : {
+        "properties" : {
+          "abv" : {
+            "type" : "number"
+          },
+          "aliases" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "brands" : {
+            "items" : {
+              "$ref" : "#/components/schemas/BrandItem"
+            },
+            "type" : "array"
+          },
+          "category" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "domesticAvailability" : {
+            "type" : "string"
+          },
+          "nameEn" : {
+            "type" : "string"
+          },
+          "nameKo" : {
+            "type" : "string"
+          },
+          "priceBand" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "substituteNote" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "aliases", "brands", "category", "domesticAvailability", "nameEn", "nameKo", "slug" ],
+        "type" : "object"
+      },
+      "IngredientItem" : {
+        "properties" : {
+          "abv" : {
+            "type" : "number"
+          },
+          "category" : {
+            "type" : "string"
+          },
+          "domesticAvailability" : {
+            "type" : "string"
+          },
+          "nameEn" : {
+            "type" : "string"
+          },
+          "nameKo" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "category", "domesticAvailability", "nameEn", "nameKo", "slug" ],
+        "type" : "object"
+      },
       "IngredientLine" : {
         "properties" : {
           "amount" : {
@@ -362,6 +470,36 @@
           "items" : {
             "items" : {
               "$ref" : "#/components/schemas/CocktailListItem"
+            },
+            "type" : "array"
+          },
+          "page" : {
+            "$ref" : "#/components/schemas/PageMeta"
+          }
+        },
+        "required" : [ "items", "page" ],
+        "type" : "object"
+      },
+      "PageResponseIngredientCocktailItem" : {
+        "properties" : {
+          "items" : {
+            "items" : {
+              "$ref" : "#/components/schemas/IngredientCocktailItem"
+            },
+            "type" : "array"
+          },
+          "page" : {
+            "$ref" : "#/components/schemas/PageMeta"
+          }
+        },
+        "required" : [ "items", "page" ],
+        "type" : "object"
+      },
+      "PageResponseIngredientItem" : {
+        "properties" : {
+          "items" : {
+            "items" : {
+              "$ref" : "#/components/schemas/IngredientItem"
             },
             "type" : "array"
           },
@@ -624,7 +762,7 @@
     "/api/v1/cocktails" : {
       "get" : {
         "description" : "발행분만 반환한다. 필터 결과는 색인하지 않는다 (X-Robots-Tag: noindex).",
-        "operationId" : "list",
+        "operationId" : "list_1",
         "parameters" : [ {
           "description" : "기주 슬러그. 콤마로 여러 개 — **OR**",
           "in" : "query",
@@ -707,7 +845,7 @@
     },
     "/api/v1/cocktails/{slug}" : {
       "get" : {
-        "operationId" : "detail",
+        "operationId" : "detail_1",
         "parameters" : [ {
           "in" : "path",
           "name" : "slug",
@@ -755,6 +893,113 @@
           }
         },
         "tags" : [ "cocktail-detail-controller" ]
+      }
+    },
+    "/api/v1/ingredients" : {
+      "get" : {
+        "description" : "**승인된 재료만** 반환한다 (FR-INGREDIENT-001).",
+        "operationId" : "list",
+        "parameters" : [ {
+          "description" : "재료 카테고리 슬러그 (7종)",
+          "in" : "query",
+          "name" : "category",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "국내 유통 슬러그 (4종) — PRIN-P05",
+          "in" : "query",
+          "name" : "availability",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "page",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/PageQuery"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageResponseIngredientItem"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "재료 사전 목록",
+        "tags" : [ "ingredient-controller" ]
+      }
+    },
+    "/api/v1/ingredients/{slug}" : {
+      "get" : {
+        "description" : "FR-INGREDIENT-002 의 6개 항목. 브랜드의 isSponsored 는 항상 실려 나간다 (NFR-L-02).",
+        "operationId" : "detail",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "slug",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/IngredientDetail"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "재료 상세",
+        "tags" : [ "ingredient-controller" ]
+      }
+    },
+    "/api/v1/ingredients/{slug}/cocktails" : {
+      "get" : {
+        "description" : "표준 레시피 · 발행분만. 대체재로만 등장하는 것은 제외한다 (R-F1.3-1).",
+        "operationId" : "cocktails",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "slug",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "page",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/PageQuery"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageResponseIngredientCocktailItem"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "이 재료를 쓰는 칵테일",
+        "tags" : [ "ingredient-cocktails-controller" ]
       }
     }
   },

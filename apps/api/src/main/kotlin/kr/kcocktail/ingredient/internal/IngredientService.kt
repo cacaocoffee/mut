@@ -114,6 +114,10 @@ class IngredientService(
     override fun requiresSubstitute(ingredientId: Long): Boolean =
         load(ingredientId).requiresSubstitute
 
+    @Transactional(readOnly = true)
+    override fun findApprovedBySlug(slug: String): IngredientView? =
+        ingredients.findBySlugAndIsApprovedTrue(slug)?.toView()
+
     private fun load(id: Long): Ingredient =
         ingredients.findById(id).orElseThrow { ResourceNotFoundException() }
 

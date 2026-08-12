@@ -58,7 +58,7 @@ export interface paths {
          * 칵테일 목록 · 필터
          * @description 발행분만 반환한다. 필터 결과는 색인하지 않는다 (X-Robots-Tag: noindex).
          */
-        get: operations["list"];
+        get: operations["list_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -74,7 +74,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["detail"];
+        get: operations["detail_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -91,6 +91,66 @@ export interface paths {
             cookie?: never;
         };
         get: operations["recipes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ingredients": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 재료 사전 목록
+         * @description **승인된 재료만** 반환한다 (FR-INGREDIENT-001).
+         */
+        get: operations["list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ingredients/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 재료 상세
+         * @description FR-INGREDIENT-002 의 6개 항목. 브랜드의 isSponsored 는 항상 실려 나간다 (NFR-L-02).
+         */
+        get: operations["detail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ingredients/{slug}/cocktails": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 이 재료를 쓰는 칵테일
+         * @description 표준 레시피 · 발행분만. 대체재로만 등장하는 것은 제외한다 (R-F1.3-1).
+         */
+        get: operations["cocktails"];
         put?: never;
         post?: never;
         delete?: never;
@@ -117,6 +177,12 @@ export interface components {
             isSponsored: boolean;
             name: string;
             purchaseUrl?: string;
+        };
+        BrandItem: {
+            isSponsored: boolean;
+            name: string;
+            purchaseUrl?: string;
+            requiresAdLabel: boolean;
         };
         CategoriesResponse: {
             base: components["schemas"]["CategoryItem"][];
@@ -180,6 +246,34 @@ export interface components {
             nameKo: string;
             summary: string;
         };
+        IngredientCocktailItem: {
+            isOptional: boolean;
+            nameEn: string;
+            nameKo: string;
+            slug: string;
+            summary: string;
+        };
+        IngredientDetail: {
+            abv?: number;
+            aliases: string[];
+            brands: components["schemas"]["BrandItem"][];
+            category: string;
+            description?: string;
+            domesticAvailability: string;
+            nameEn: string;
+            nameKo: string;
+            priceBand?: string;
+            slug: string;
+            substituteNote?: string;
+        };
+        IngredientItem: {
+            abv?: number;
+            category: string;
+            domesticAvailability: string;
+            nameEn: string;
+            nameKo: string;
+            slug: string;
+        };
         IngredientLine: {
             amount?: number;
             amountLabel?: string;
@@ -218,6 +312,14 @@ export interface components {
         };
         PageResponseCocktailListItem: {
             items: components["schemas"]["CocktailListItem"][];
+            page: components["schemas"]["PageMeta"];
+        };
+        PageResponseIngredientCocktailItem: {
+            items: components["schemas"]["IngredientCocktailItem"][];
+            page: components["schemas"]["PageMeta"];
+        };
+        PageResponseIngredientItem: {
+            items: components["schemas"]["IngredientItem"][];
             page: components["schemas"]["PageMeta"];
         };
         PurchaseGuideItem: {
@@ -336,7 +438,7 @@ export interface operations {
             };
         };
     };
-    list: {
+    list_1: {
         parameters: {
             query: {
                 /** @description 기주 슬러그. 콤마로 여러 개 — **OR** */
@@ -372,7 +474,7 @@ export interface operations {
             };
         };
     };
-    detail: {
+    detail_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -412,6 +514,78 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["RecipeVersions"];
+                };
+            };
+        };
+    };
+    list: {
+        parameters: {
+            query: {
+                /** @description 재료 카테고리 슬러그 (7종) */
+                category?: string;
+                /** @description 국내 유통 슬러그 (4종) — PRIN-P05 */
+                availability?: string;
+                page: components["schemas"]["PageQuery"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageResponseIngredientItem"];
+                };
+            };
+        };
+    };
+    detail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["IngredientDetail"];
+                };
+            };
+        };
+    };
+    cocktails: {
+        parameters: {
+            query: {
+                page: components["schemas"]["PageQuery"];
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageResponseIngredientCocktailItem"];
                 };
             };
         };

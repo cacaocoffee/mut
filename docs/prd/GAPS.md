@@ -701,6 +701,27 @@ CONVENTIONS §4의 한 줄을 이 표로 교체했다. **`styles.css`의 3단 �
 
 ---
 
+### G-28
+
+**이슈 023 의 "1안: `CocktailFacade` 경유 — 경계 준수" 는 틀렸다** *(경계 테스트가 잡았다)*
+
+이슈 023(재료 사전)이 "이 재료를 쓰는 칵테일"(`R-F1.3-1`)의 모듈 경계를 두고 두 안을 적고 1안을 택했다.
+
+> **1안**(`CocktailFacade`)을 택한다. SPEC-05 §3이 "조회 전용 서비스가 담당해 순환을 끊는다"고 했으나 **여기엔 순환이 없다.**
+
+**순환이 있다.** [SPEC-05 §3](../spec/SPEC-05_아키텍처.md) 방향표에 `COCKTAIL ──uses──▶ INGREDIENT` 가 이미 있어, `ingredient → cocktail` 은 되돌아오는 화살표다.
+
+놓친 구분이 이것이다 — **Facade 를 거치면 `repository` 직행만 막힌다. 모듈 간 화살표는 그대로 반대다.** `ModuleBoundaryTest` 의 `RED6`(방향표 위반)·`RED7`(순환)이 둘 다 걸렸다.
+
+**해결 (2026-08-12)** — 같은 이슈가 적어 둔 **2안**으로 갔다. `SEARCH ──reads──▶ COCKTAIL · INGREDIENT` 가 방향표에 있고, `search` 는 여러 도메인을 읽으라고 있는 모듈이다. `GET /ingredients/{slug}/cocktails` 를 `kr.kcocktail.search.ingredient` 로 옮겼다.
+
+> **URL 과 모듈은 별개다.** URL 은 사용자가 읽는 자원 구조이고 모듈은 코드의 의존 방향이다.
+> `search/list/CocktailListController` 가 `/cocktails` 를 잡는 것과 같은 패턴이다.
+
+**교훈**: 이슈 본문의 경계 판단은 방향표를 다시 대조해야 한다. 이 건은 사람이 리뷰로 잡으려면 SPEC-05 §3 을 외우고 있어야 했고, 경계 테스트가 자동으로 잡았다.
+
+---
+
 ## 다음 할 일
 
 DB · CMS · 백엔드 스택이 확정되면서 SPEC-05·06·07이 나왔고, 병목이 다시 옮겨갔다.

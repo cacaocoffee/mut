@@ -26,6 +26,14 @@ interface IngredientFacade {
 
     /** `GATE-COCKTAIL-06` — 미유통이라 대체재 명시가 필요한가. */
     fun requiresSubstitute(ingredientId: Long): Boolean
+
+    /**
+     * 슬러그로 승인된 재료 하나. 없거나 미승인이면 `null` 이다.
+     *
+     * 미승인을 `null` 로 돌려주는 것이 의도다 — 호출부가 **404** 로 처리해야 한다.
+     * 403 이면 "있긴 있다" 가 새어 나간다 (`FR-INGREDIENT-001` · DECISIONS §1.1).
+     */
+    fun findApprovedBySlug(slug: String): IngredientView?
 }
 
 /**

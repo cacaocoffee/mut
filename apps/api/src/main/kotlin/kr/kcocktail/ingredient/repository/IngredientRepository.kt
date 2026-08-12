@@ -1,7 +1,10 @@
 package kr.kcocktail.ingredient.repository
 
 import kr.kcocktail.ingredient.domain.Ingredient
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 
 /**
  * `PRIN-T03` — 모듈 밖에서 참조하지 않는다. 타 모듈은 `ingredient.api` 의 Facade 를 쓴다.
@@ -17,6 +20,46 @@ interface IngredientRepository : JpaRepository<Ingredient, Long> {
 
     /** DECISIONS §1.2 — 300개 초과 시 **경고**다. 차단이 아니다. */
     fun countByIsApprovedTrue(): Long
+
+    /**
+     * 재료 사전 목록 (이슈 023).
+     *
+     * **승인된 것만** 나간다 (`FR-INGREDIENT-001` · DECISIONS §1.1) —
+     * 승인 전 재료가 사전에 보이면 승인제가 아무것도 막지 못한다.
+     *
+     * 필터는 `null` 이면 무시한다. 두 축을 각각 옵션으로 두는 것이
+     * 조합마다 메서드를 만드는 것보다 낫다 — 축이 늘면 메서드가 곱으로 는다.
+     */
+    @Query(
+        """
+        SELECT i FROM Ingredient i
+         WHERE i.isApproved = true
+           AND (:category IS NULL OR i.categorySlug = :category)
+           AND (:availability IS NULL OR i.availabilitySlug = :availability)
+         ORDER BY i.nameKo
+        """,
+    )
+    fun findDictionary(
+        @Param("category") category: String?,
+        @Param("availability") availability: String?,
+        pageable: Pageable,
+    ): List<Ingredient>
+
+    @Query(
+        """
+        SELECT count(i) FROM Ingredient i
+         WHERE i.isApproved = true
+           AND (:category IS NULL OR i.categorySlug = :category)
+           AND (:availability IS NULL OR i.availabilitySlug = :availability)
+        """,
+    )
+    fun countDictionary(
+        @Param("category") category: String?,
+        @Param("availability") availability: String?,
+    ): Long
+
+    /** 상세. **미승인은 404 다** — 403 이면 존재가 새어 나간다 (이슈 023 RED 17). */
+    fun findBySlugAndIsApprovedTrue(slug: String): Ingredient?
 
 }
 
