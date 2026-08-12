@@ -14,8 +14,11 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+/* `clip` 이지 `hidden` 이 아니다 — `hidden` 은 루트를 스크롤 컨테이너로 만들고,
+   무엇보다 **넘침을 숨겨서** 레이아웃 결함이 테스트에 안 잡히게 한다.
+   `max-width: 100vw` 도 뺐다. 100vw 는 스크롤바 폭을 포함해 데스크톱에서 항상 넘친다.
+   둘이 겹쳐 있던 동안 320px 내비 파손이 보이지 않았다 (ISSUE-051 #69). */
 html,
 body {
-  max-width: 100vw;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
