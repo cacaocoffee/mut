@@ -67,3 +67,7 @@ build/
 # Gradle (apps/api) — 모노레포 패턴이 이미 .gradle/ build/ 를 잡지만 wrapper 는 커밋한다
 !apps/api/gradle/wrapper/gradle-wrapper.jar
 !apps/api/gradlew
+
+# Playwright (ISSUE-056)
+apps/web/playwright-report/
+apps/web/test-results/

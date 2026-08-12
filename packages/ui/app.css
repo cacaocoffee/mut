@@ -174,6 +174,10 @@
   gap: var(--space-4);
   padding-bottom: 10px;
   border-bottom: 2px solid var(--color-divider);
+  /* 320px 에서 제목 + .recipe-controls(174px)가 한 줄에 안 들어간다.
+     헤드리스 러너가 잡았다 — 정적 가드도 감사도 못 본 자리다 (ISSUE-056 #80). */
+  flex-wrap: wrap;
+  row-gap: var(--space-2);
 }
 
 /* ─────────────────────────  01 탐색  ───────────────────────── */
@@ -930,6 +934,13 @@
 }
 
 @media (max-width: 560px) {
+  /* 재료 표가 min-content 바닥 때문에 뷰포트를 밀어냈다 (320px 에서 333px).
+     fixed 로 두면 th 의 퍼센트 폭이 존중되고 셀 안에서 줄바꿈이 일어난다. */
+  .table { table-layout: fixed; }
+  .table td, .table th { overflow-wrap: anywhere; }
+  /* 대체재 버튼의 nowrap 이 셀을 밀던 자리 */
+  .table .tag-outline { white-space: normal; }
+
   .card-grid { grid-template-columns: minmax(0, 1fr); }
   .result-grid { grid-template-columns: minmax(0, 1fr); }
   .quiz-options { grid-template-columns: 1fr; }
