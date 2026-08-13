@@ -628,6 +628,39 @@
         "required" : [ "items" ],
         "type" : "object"
       },
+      "RelatedItem" : {
+        "properties" : {
+          "matchedOn" : {
+            "type" : "string"
+          },
+          "nameEn" : {
+            "type" : "string"
+          },
+          "nameKo" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "summary" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "matchedOn", "nameEn", "nameKo", "slug", "summary" ],
+        "type" : "object"
+      },
+      "RelatedResponse" : {
+        "properties" : {
+          "items" : {
+            "items" : {
+              "$ref" : "#/components/schemas/RelatedItem"
+            },
+            "type" : "array"
+          }
+        },
+        "required" : [ "items" ],
+        "type" : "object"
+      },
       "SearchGroup" : {
         "properties" : {
           "count" : {
@@ -1072,6 +1105,34 @@
           }
         },
         "tags" : [ "cocktail-detail-controller" ]
+      }
+    },
+    "/api/v1/cocktails/{slug}/related" : {
+      "get" : {
+        "description" : "style_primary 일치가 1순위, base_spirit 일치가 2순위다 (R-C-3). 둘 다 아니면 제외한다 — 채우면 추천이 아니라 잡음이 된다.",
+        "operationId" : "related",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "slug",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/RelatedResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "배리에이션",
+        "tags" : [ "related-controller" ]
       }
     },
     "/api/v1/ingredients" : {
