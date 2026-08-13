@@ -55,7 +55,10 @@ class VerificationTaskStore(
                         ELSE now()
                     END,
                     resolved_at = NULL,
-                    resolved_by = NULL
+                    resolved_by = NULL,
+                    -- 다시 걸렸으면 지난번 "넘긴 사유"는 더 이상 유효하지 않다 (이슈 028).
+                    -- 남겨 두면 열린 태스크에 해소 사유가 붙어 있는 상태가 된다.
+                    resolution = NULL
             RETURNING xmax = 0
             """.trimIndent(),
             Boolean::class.java,

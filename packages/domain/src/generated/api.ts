@@ -43,7 +43,7 @@ export interface paths {
             cookie?: never;
         };
         /** 칵테일 조회 (draft 포함) */
-        get: operations["find_1"];
+        get: operations["find_2"];
         put?: never;
         post?: never;
         delete?: never;
@@ -184,7 +184,7 @@ export interface paths {
             cookie?: never;
         };
         /** 재료 조회 (미승인 포함) */
-        get: operations["find"];
+        get: operations["find_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -207,6 +207,63 @@ export interface paths {
          * @description admin 만 가능하다 (SPEC-08 §2). 재승인은 409. 감사에 남는다.
          */
         post: operations["approve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 검증 태스크 큐
+         * @description 기본은 open 만. 정렬은 최근 탐지순 고정이다 (인덱스가 그 순서다).
+         */
+        get: operations["list_2"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/tasks/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 태스크 상세 */
+        get: operations["find"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/tasks/{id}/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 태스크 해소
+         * @description dismiss=true 는 사유 필수. 이미 처리된 태스크는 409. 감사에는 남기지 않는다 (테이블 자체가 이력).
+         */
+        post: operations["resolve"];
         delete?: never;
         options?: never;
         head?: never;
@@ -667,6 +724,7 @@ export interface components {
             substitute?: components["schemas"]["Substitute"];
             unit?: string;
         };
+        JsonNode: Record<string, never>;
         Origin: {
             creator?: string;
             place?: string;
@@ -701,6 +759,10 @@ export interface components {
         };
         PageResponseIngredientItem: {
             items: components["schemas"]["IngredientItem"][];
+            page: components["schemas"]["PageMeta"];
+        };
+        PageResponseVerificationTaskItem: {
+            items: components["schemas"]["VerificationTaskItem"][];
             page: components["schemas"]["PageMeta"];
         };
         PublishResponse: {
@@ -738,6 +800,11 @@ export interface components {
         };
         RelatedResponse: {
             items: components["schemas"]["RelatedItem"][];
+        };
+        ResolveTaskRequest: {
+            dismiss: boolean;
+            /** @description dismiss=true 면 필수. 왜 고치지 않고 넘기는지. */
+            reason?: string;
         };
         SearchGroup: {
             /** Format: int32 */
@@ -826,6 +893,25 @@ export interface components {
             sweetness?: string;
             tastingNote?: string;
         };
+        VerificationTaskItem: {
+            adminPath?: string;
+            code: string;
+            detail?: components["schemas"]["JsonNode"];
+            /** Format: date-time */
+            detectedAt: string;
+            /** Format: int64 */
+            entityId: number;
+            entityType: string;
+            /** Format: int64 */
+            id: number;
+            resolution?: string;
+            /** Format: date-time */
+            resolvedAt?: string;
+            /** Format: int64 */
+            resolvedBy?: number;
+            status: string;
+            taskType: string;
+        };
     };
     responses: never;
     parameters: never;
@@ -859,7 +945,7 @@ export interface operations {
             };
         };
     };
-    find_1: {
+    find_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -1037,7 +1123,7 @@ export interface operations {
             };
         };
     };
-    find: {
+    find_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -1077,6 +1163,82 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["AdminIngredientResponse"];
+                };
+            };
+        };
+    };
+    list_2: {
+        parameters: {
+            query: {
+                /** @description open · resolved · dismissed. 기본 open */
+                status?: string;
+                /** @description invariant_violation · gate_bypass · slug_changed (1b: hours_expired · instagram_signal) */
+                taskType?: string;
+                /** @description cocktail · ingredient */
+                entityType?: string;
+                page: components["schemas"]["PageQuery"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageResponseVerificationTaskItem"];
+                };
+            };
+        };
+    };
+    find: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["VerificationTaskItem"];
+                };
+            };
+        };
+    };
+    resolve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ResolveTaskRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["VerificationTaskItem"];
                 };
             };
         };
