@@ -27,8 +27,16 @@ class ResourceNotFoundException(message: String = "찾을 수 없습니다") : R
 /** `409` — 상태 충돌. 이미 발행됨, 멱등 키 재사용 등. */
 class ConflictException(message: String) : RuntimeException(message)
 
-/** `400` — 문법적으로 잘못된 요청. 값이 도메인 규칙을 어긴 것은 `422` 다. */
-class BadRequestException(message: String) : RuntimeException(message)
+/**
+ * `400` — 문법적으로 잘못된 요청. 값이 도메인 규칙을 어긴 것은 `422` 다.
+ *
+ * `open` 인 이유: 도메인이 자기 이름의 예외를 갖되 상태 코드는 여기서 물려받게 한다
+ * (`OAuthStateException` 이 그렇다). 하위 타입을 만들지 않고 상태 코드 표에 도메인 예외를
+ * 등록하면 **`common` 이 도메인을 알게 되어** 의존이 거꾸로 선다 (경계 테스트, 이슈 001).
+ *
+ * `@ExceptionHandler` 는 하위 타입도 잡으므로 상속만으로 매핑이 끝난다.
+ */
+open class BadRequestException(message: String) : RuntimeException(message)
 
 /** `401` — 미인증. 실제 인증은 이슈 005 가 채운다. */
 class UnauthenticatedException(message: String = "인증이 필요합니다") : RuntimeException(message)
