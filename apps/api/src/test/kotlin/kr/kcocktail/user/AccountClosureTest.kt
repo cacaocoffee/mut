@@ -65,9 +65,38 @@ class AccountClosureTest {
             .isTrue()
     }
 
+    /**
+     * RED 24 — **북마크와 컬렉션은 즉시 지운다** (SPEC-08 §5.3, 이슈 031 이 풀었다).
+     *
+     * `audit_log` 와 정반대인데 근거가 다르다. 발행 이력은 법적 근거이자 신뢰 기록이라
+     * 남기고, 북마크는 **순수한 개인 취향 기록**이라 남길 이유가 없다 —
+     * 남겨 봐야 "이 사람이 무엇을 좋아했나" 만 남는다.
+     *
+     * `ON DELETE CASCADE` 가 DB 에서 처리한다. 앱이 지우면 새 테이블이 생길 때마다
+     * 탈퇴 코드를 고쳐야 하고, 그걸 잊으면 조용히 남는다.
+     */
     @Test
-    @Disabled("북마크 테이블은 이슈 031 (#33) 이 만든다")
-    fun `RED24 - 탈퇴시 북마크가 CASCADE 삭제된다`() = Unit
+    fun `RED24 - 탈퇴시 북마크가 CASCADE 삭제된다`() {
+        val id = insertUser("close-with-bookmarks")
+        val collectionId = jdbc.queryForObject(
+            "INSERT INTO bookmark_collection (user_id, name, share_token) " +
+                "VALUES ($id, '내 취향', 'token-$id') RETURNING id",
+            Long::class.java,
+        )!!
+        jdbc.execute(
+            "INSERT INTO bookmark (user_id, collection_id, target_type, target_id) " +
+                "VALUES ($id, $collectionId, 'cocktail', 1)",
+        )
+
+        closure.close(id)
+
+        assertThat(count("SELECT count(*) FROM bookmark WHERE user_id = $id"))
+            .`as`("RED24 북마크")
+            .isZero()
+        assertThat(count("SELECT count(*) FROM bookmark_collection WHERE user_id = $id"))
+            .`as`("RED30 컬렉션도 함께")
+            .isZero()
+    }
 
     /**
      * RED 25 — **탈퇴해도 감사의 주체는 남는다** (SPEC-08 §5.3, 이슈 014 가 풀었다).

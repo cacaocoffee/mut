@@ -26,7 +26,7 @@ export interface paths {
          * 감사 로그 조회
          * @description admin 만 가능하다 (SPEC-08 §2.2 — 감시받는 사람이 감시 기록을 보면 안 된다). 필터는 AND 로 묶이고 정렬은 최신순 고정이다.
          */
-        get: operations["list_3"];
+        get: operations["list_4"];
         put?: never;
         post?: never;
         delete?: never;
@@ -244,7 +244,7 @@ export interface paths {
          * 검증 태스크 큐
          * @description 기본은 open 만. 정렬은 최근 탐지순 고정이다 (인덱스가 그 순서다).
          */
-        get: operations["list_2"];
+        get: operations["list_3"];
         put?: never;
         post?: never;
         delete?: never;
@@ -393,7 +393,7 @@ export interface paths {
          * 칵테일 목록 · 필터
          * @description 발행분만 반환한다. 필터 결과는 색인하지 않는다 (X-Robots-Tag: noindex).
          */
-        get: operations["list_1"];
+        get: operations["list_2"];
         put?: never;
         post?: never;
         delete?: never;
@@ -474,6 +474,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/collections/{shareToken}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 공유된 컬렉션
+         * @description 비로그인 조회. 소유자 정보와 내부 id 를 담지 않고, 미발행 항목은 빠진다.
+         */
+        get: operations["shared"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/ingredients": {
         parameters: {
             query?: never;
@@ -485,7 +505,7 @@ export interface paths {
          * 재료 사전 목록
          * @description **승인된 재료만** 반환한다 (FR-INGREDIENT-001).
          */
-        get: operations["list"];
+        get: operations["list_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -528,6 +548,68 @@ export interface paths {
         get: operations["cocktails"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/bookmarks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 내 북마크 목록
+         * @description 사라지거나 내려간 대상은 빠진다 (다형 참조라 앱이 무결성을 진다).
+         */
+        get: operations["list"];
+        put?: never;
+        /**
+         * 북마크 추가
+         * @description targetSlug 로 받는다. 중복은 멱등이다.
+         */
+        post: operations["add"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/bookmarks/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** 북마크 삭제 */
+        delete: operations["remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/collections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 내 컬렉션 목록 */
+        get: operations["collections"];
+        put?: never;
+        /**
+         * 컬렉션 생성
+         * @description 생성 시점에 공유 토큰이 함께 발급된다.
+         */
+        post: operations["createCollection"];
         delete?: never;
         options?: never;
         head?: never;
@@ -589,6 +671,16 @@ export interface components {
             userId: number;
             withdrawn: boolean;
         };
+        AddBookmarkRequest: {
+            /**
+             * Format: int64
+             * @description 생략하면 기본 컬렉션이다 (SPEC-06 §3.5)
+             */
+            collectionId?: number;
+            targetSlug: string;
+            /** @description cocktail · bar · article. Phase 1a 에 실재하는 것은 cocktail 뿐이다 */
+            targetType: string;
+        };
         AdminCocktailResponse: {
             abvCalculated?: number;
             abvOverride?: number;
@@ -648,6 +740,16 @@ export interface components {
          * @enum {string}
          */
         BaseSpirit: "gin" | "vodka" | "whisky" | "rum" | "agave" | "brandy" | "liqueur" | "wine" | "korean" | "non-alcoholic";
+        BookmarkItem: {
+            /** Format: int64 */
+            collectionId?: number;
+            /** Format: int64 */
+            id: number;
+            nameEn: string;
+            nameKo: string;
+            targetSlug: string;
+            targetType: string;
+        };
         Brand: {
             isSponsored: boolean;
             name: string;
@@ -706,6 +808,14 @@ export interface components {
             summary: string;
             sweetness: components["schemas"]["SweetLevel"];
         };
+        CollectionItem: {
+            /** Format: int32 */
+            bookmarkCount: number;
+            /** Format: int64 */
+            id: number;
+            name: string;
+            shareToken?: string;
+        };
         CreateCocktailRequest: {
             abvOverride?: number;
             aliases: string[];
@@ -728,6 +838,9 @@ export interface components {
             summary: string;
             sweetness: string;
             tastingNote?: string;
+        };
+        CreateCollectionRequest: {
+            name?: string;
         };
         CreateIngredientRequest: {
             abv?: number;
@@ -931,6 +1044,16 @@ export interface components {
             matchedCount: number;
             query: string;
         };
+        SharedCollection: {
+            items: components["schemas"]["SharedItem"][];
+            name: string;
+        };
+        SharedItem: {
+            nameEn: string;
+            nameKo: string;
+            targetSlug: string;
+            targetType: string;
+        };
         SortOrder: {
             ascending: boolean;
             property: string;
@@ -1024,7 +1147,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    list_3: {
+    list_4: {
         parameters: {
             query: {
                 /** @description cocktail · ingredient 같은 테이블 이름 */
@@ -1303,7 +1426,7 @@ export interface operations {
             };
         };
     };
-    list_2: {
+    list_3: {
         parameters: {
             query: {
                 /** @description open · resolved · dismissed. 기본 open */
@@ -1487,7 +1610,7 @@ export interface operations {
             };
         };
     };
-    list_1: {
+    list_2: {
         parameters: {
             query: {
                 /** @description 기주 슬러그. 콤마로 여러 개 — **OR** */
@@ -1618,7 +1741,29 @@ export interface operations {
             };
         };
     };
-    list: {
+    shared: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                shareToken: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SharedCollection"];
+                };
+            };
+        };
+    };
+    list_1: {
         parameters: {
             query: {
                 /** @description 재료 카테고리 슬러그 (7종) */
@@ -1686,6 +1831,117 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PageResponseIngredientCocktailItem"];
+                };
+            };
+        };
+    };
+    list: {
+        parameters: {
+            query?: {
+                /** @description 생략하면 전체. 0 이면 기본 컬렉션(collection_id IS NULL) */
+                collectionId?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BookmarkItem"][];
+                };
+            };
+        };
+    };
+    add: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddBookmarkRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BookmarkItem"];
+                };
+            };
+        };
+    };
+    remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    collections: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CollectionItem"][];
+                };
+            };
+        };
+    };
+    createCollection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCollectionRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CollectionItem"];
                 };
             };
         };
