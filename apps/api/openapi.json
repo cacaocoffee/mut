@@ -16,6 +16,22 @@
         "required" : [ "bookmarkTargetSlug", "bookmarkTargetType", "sharePath" ],
         "type" : "object"
       },
+      "ActorRef" : {
+        "properties" : {
+          "displayName" : {
+            "type" : "string"
+          },
+          "userId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "withdrawn" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "userId", "withdrawn" ],
+        "type" : "object"
+      },
       "AdminCocktailResponse" : {
         "properties" : {
           "abvCalculated" : {
@@ -141,6 +157,39 @@
           }
         },
         "required" : [ "aliases", "category", "domesticAvailability", "id", "isApproved", "nameEn", "nameKo", "slug" ],
+        "type" : "object"
+      },
+      "AuditLogItem" : {
+        "properties" : {
+          "action" : {
+            "type" : "string"
+          },
+          "actor" : {
+            "$ref" : "#/components/schemas/ActorRef"
+          },
+          "after" : {
+            "$ref" : "#/components/schemas/JsonNode"
+          },
+          "at" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "before" : {
+            "$ref" : "#/components/schemas/JsonNode"
+          },
+          "entityId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "entityType" : {
+            "type" : "string"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        },
+        "required" : [ "action", "at", "entityId", "entityType", "id" ],
         "type" : "object"
       },
       "BaseSpirit" : {
@@ -787,6 +836,21 @@
         "required" : [ "offset", "page", "size", "sort" ],
         "type" : "object"
       },
+      "PageResponseAuditLogItem" : {
+        "properties" : {
+          "items" : {
+            "items" : {
+              "$ref" : "#/components/schemas/AuditLogItem"
+            },
+            "type" : "array"
+          },
+          "page" : {
+            "$ref" : "#/components/schemas/PageMeta"
+          }
+        },
+        "required" : [ "items", "page" ],
+        "type" : "object"
+      },
       "PageResponseCocktailListItem" : {
         "properties" : {
           "items" : {
@@ -1289,6 +1353,85 @@
   },
   "openapi" : "3.0.1",
   "paths" : {
+    "/api/v1/admin/audit-logs" : {
+      "get" : {
+        "description" : "admin 만 가능하다 (SPEC-08 §2.2 — 감시받는 사람이 감시 기록을 보면 안 된다). 필터는 AND 로 묶이고 정렬은 최신순 고정이다.",
+        "operationId" : "list_3",
+        "parameters" : [ {
+          "description" : "cocktail · ingredient 같은 테이블 이름",
+          "in" : "query",
+          "name" : "entityType",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "entityId",
+          "required" : false,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        }, {
+          "description" : "publish · unpublish · archive · restore · approve · slug_change_attempt 등",
+          "in" : "query",
+          "name" : "action",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "행위자 user id. 탈퇴해도 id 는 남는다 (SPEC-08 §5.3)",
+          "in" : "query",
+          "name" : "actorUserId",
+          "required" : false,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        }, {
+          "description" : "ISO-8601. 이 시각 이후",
+          "in" : "query",
+          "name" : "from",
+          "required" : false,
+          "schema" : {
+            "format" : "date-time",
+            "type" : "string"
+          }
+        }, {
+          "description" : "ISO-8601. 이 시각 이전",
+          "in" : "query",
+          "name" : "to",
+          "required" : false,
+          "schema" : {
+            "format" : "date-time",
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "page",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/PageQuery"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageResponseAuditLogItem"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "감사 로그 조회",
+        "tags" : [ "admin-audit-log-controller" ]
+      }
+    },
     "/api/v1/admin/cocktails" : {
       "post" : {
         "description" : "editor 이상. 생성 시점은 항상 draft 다.",
