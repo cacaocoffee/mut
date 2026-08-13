@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Archivo, Noto_Sans_KR, Noto_Serif_KR } from "next/font/google";
 import { SiteNav } from "@/components/site-nav";
+import { LegalNotice } from "@/components/legal/legal-notice";
 import "./globals.css";
+import "@/components/legal/legal.css";
 
 const archivo = Archivo({
   variable: "--font-archivo",
@@ -40,11 +42,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <div className="page">
           <SiteNav />
           {children}
-          <footer className="legal">
-            {/* PRD R-F1.1-8 · 12장 — 과음 경고는 모든 페이지 하단 고정 */}
-            지나친 음주는 뇌졸중, 기억력 손상이나 치매를 유발합니다. 임신 중 음주는 기형아 출생
-            위험을 높입니다. 만 19세 미만 청소년에게 판매하지 않습니다.
-          </footer>
+          {/* NFR-L-01 — 모든 페이지 하단 고정. 배포 차단 조건이다.
+              루트 레이아웃에 무조건 렌더한다: 페이지마다 붙이면 언젠가 빠뜨리고,
+              빠뜨린 것을 알아채는 방법이 없다. 컴포넌트에 끌 수 있는 prop 도 없다. */}
+          <LegalNotice />
         </div>
       </body>
     </html>
