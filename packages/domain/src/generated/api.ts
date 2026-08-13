@@ -179,6 +179,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 통합 검색
+         * @description 타입별로 그룹핑한다 (R-F5-1). 초성·별칭·띄어쓰기 변형을 매칭한다.
+         */
+        get: operations["search"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/search/suggest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 자동완성
+         * @description 프리픽스 매칭. 초성 입력도 앞에서부터 맞춘다.
+         */
+        get: operations["suggest"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -381,6 +421,28 @@ export interface components {
         };
         RecipeVersions: {
             items: components["schemas"]["RecipeVersion"][];
+        };
+        SearchGroup: {
+            /** Format: int32 */
+            count: number;
+            items: components["schemas"]["SearchHit"][];
+        };
+        SearchHit: {
+            entityType: string;
+            nameEn?: string;
+            nameKo: string;
+            slug: string;
+            /** Format: int32 */
+            weight: number;
+        };
+        SearchResponse: {
+            groups: {
+                [key: string]: components["schemas"]["SearchGroup"];
+            };
+            hadChosung: boolean;
+            /** Format: int32 */
+            matchedCount: number;
+            query: string;
         };
         SortOrder: {
             ascending: boolean;
@@ -655,6 +717,51 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PageResponseIngredientCocktailItem"];
+                };
+            };
+        };
+    };
+    search: {
+        parameters: {
+            query?: {
+                /** @description 검색어. 초성만으로 이뤄지면 초성 검색이다 */
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SearchResponse"];
+                };
+            };
+        };
+    };
+    suggest: {
+        parameters: {
+            query?: {
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SearchHit"][];
                 };
             };
         };
