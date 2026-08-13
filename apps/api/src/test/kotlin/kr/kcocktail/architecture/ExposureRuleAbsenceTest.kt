@@ -286,7 +286,16 @@ class ExposureRuleAbsenceTest {
         val rest = lines.drop(start + 1)
         // 다음 최상위 키(들여쓰기 0, 주석·빈 줄 아님)까지가 우리 블록이다.
         val end = rest.indexOfFirst { it.isNotBlank() && !it.startsWith(" ") && !it.startsWith("#") }
-        return (if (end < 0) rest else rest.take(end)).joinToString("\n")
+
+        return (if (end < 0) rest else rest.take(end))
+            // **주석을 걷어낸다.** 규칙이 보는 것은 설정 키이지 산문이 아니다.
+            // 이 파일 이름(`ExposureRuleAbsenceTest`)을 주석에 적었다가 `exposure` 에 걸렸다 —
+            // 주석에 걸리는 규칙은 다음 사람이 **주석을 지워서** 통과시킨다. 근거가 사라지는 쪽이 더 나쁘다.
+            // YAML 규칙대로 **줄 처음이거나 공백 뒤의** `#` 부터가 주석이다.
+            // 그냥 `substringBefore('#')` 로 자르면 값 안의 `#`(URL 프래그먼트 등)까지 날아간다.
+            .map { it.replace(Regex("(^|\\s)#.*$"), "") }
+            .filter { it.isNotBlank() }
+            .joinToString("\n")
     }
 
     // ── RED 14~16 : 라벨 강제 (NFR-L-02 · INV-PARTNER-04) ─────────────────

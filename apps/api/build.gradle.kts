@@ -37,6 +37,13 @@ dependencies {
     // SPEC-08 §9 — "Phase 1 은 DB 세션으로 충분." Redis 를 지금 들이지 않는다 (ISSUE-005)
     implementation("org.springframework.session:spring-session-jdbc")
 
+    // ISSUE-030 — 애플 로그인만 JWT 를 요구한다 (SPEC-08 §4.2).
+    //   · client_secret 이 고정 문자열이 아니라 ES256 서명 JWT 다
+    //   · 프로필이 userinfo 가 아니라 id_token 클레임에 온다 — **서명을 검증해야** 한다
+    // 직접 파싱하고 검증을 건너뛰면 누구나 아무 sub 로 로그인할 수 있다.
+    // 스프링이 버전을 관리하는 것으로 고른다 (nimbus-jose-jwt 를 직접 핀하지 않는다).
+    implementation("org.springframework.security:spring-security-oauth2-jose")
+
     // SPEC-06 §6 — Flyway. 앞으로만 간다
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-database-postgresql")

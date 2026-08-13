@@ -76,3 +76,33 @@ kcocktail:
     url: ${KC_FRONTEND_URL:}
     secret: ${KC_REVALIDATE_SECRET:}
     timeout-ms: ${KC_REVALIDATE_TIMEOUT_MS:2000}
+  # ISSUE-030 — 소셜 로그인 (SPEC-08 §4.2 · §5.1)
+  #
+  # 시크릿에 기본값을 두지 않는다. 빠뜨린 채로 기동하면 로그인 시도 때 제공자가 401 을 주고,
+  # 사용자에게는 "로그인 실패" 로만 보인다 — 원인이 멀다.
+  #
+  # scope 가 SPEC-08 §5.1 목록이다. birthday · phone_number 를 넣지 않는 것이 결정이다
+  # (ADR-0004) — 요청하면 받게 되고, 받으면 저장하고 싶어진다.
+  # ExposureRuleAbsenceTest 와 같은 방식으로 SocialLoginApiTest 가 부재를 지킨다.
+  #
+  # 엔드포인트 URL 을 열어 둔 이유: 상수로 박으면 테스트가 제공자를 실제로 부르게 되고,
+  # CI 가 카카오 장애를 따라 빨개진다. 비우면 제공자 기본값이다.
+  oauth:
+    # 제공자 콘솔에 등록한 값과 글자 단위로 같아야 한다. 오픈 리다이렉트의 1차 방어선이다.
+    redirect-base: ${KC_OAUTH_REDIRECT_BASE:http://localhost:8080}
+    # 로그인 후 되돌아갈 수 있는 프론트 주소. 목록 밖이면 첫 항목으로 간다 (거부가 아니다).
+    allowed-returns: ${KC_OAUTH_ALLOWED_RETURNS:http://localhost:3000}
+    kakao:
+      client-id: ${KAKAO_CLIENT_ID:}
+      client-secret: ${KAKAO_CLIENT_SECRET:}
+      scopes: profile_nickname,account_email
+    naver:
+      client-id: ${NAVER_CLIENT_ID:}
+      client-secret: ${NAVER_CLIENT_SECRET:}
+    # 애플만 client_secret 이 ES256 서명 JWT 다. 개인키는 환경변수로만 들어온다 —
+    # 저장소에 들어가는 순간 그 키는 폐기 대상이다.
+    apple:
+      client-id: ${APPLE_CLIENT_ID:}
+      team-id: ${APPLE_TEAM_ID:}
+      key-id: ${APPLE_KEY_ID:}
+      private-key-pem: ${APPLE_PRIVATE_KEY:}
