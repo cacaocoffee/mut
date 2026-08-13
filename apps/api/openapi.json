@@ -628,6 +628,66 @@
         "required" : [ "items" ],
         "type" : "object"
       },
+      "SearchGroup" : {
+        "properties" : {
+          "count" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "items" : {
+            "items" : {
+              "$ref" : "#/components/schemas/SearchHit"
+            },
+            "type" : "array"
+          }
+        },
+        "required" : [ "count", "items" ],
+        "type" : "object"
+      },
+      "SearchHit" : {
+        "properties" : {
+          "entityType" : {
+            "type" : "string"
+          },
+          "nameEn" : {
+            "type" : "string"
+          },
+          "nameKo" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "weight" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        },
+        "required" : [ "entityType", "nameKo", "slug", "weight" ],
+        "type" : "object"
+      },
+      "SearchResponse" : {
+        "properties" : {
+          "groups" : {
+            "additionalProperties" : {
+              "$ref" : "#/components/schemas/SearchGroup"
+            },
+            "type" : "object"
+          },
+          "hadChosung" : {
+            "type" : "boolean"
+          },
+          "matchedCount" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "query" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "groups", "hadChosung", "matchedCount", "query" ],
+        "type" : "object"
+      },
       "SortOrder" : {
         "properties" : {
           "ascending" : {
@@ -1119,6 +1179,66 @@
         },
         "summary" : "이 재료를 쓰는 칵테일",
         "tags" : [ "ingredient-cocktails-controller" ]
+      }
+    },
+    "/api/v1/search" : {
+      "get" : {
+        "description" : "타입별로 그룹핑한다 (R-F5-1). 초성·별칭·띄어쓰기 변형을 매칭한다.",
+        "operationId" : "search",
+        "parameters" : [ {
+          "description" : "검색어. 초성만으로 이뤄지면 초성 검색이다",
+          "in" : "query",
+          "name" : "q",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SearchResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "통합 검색",
+        "tags" : [ "search-controller" ]
+      }
+    },
+    "/api/v1/search/suggest" : {
+      "get" : {
+        "description" : "프리픽스 매칭. 초성 입력도 앞에서부터 맞춘다.",
+        "operationId" : "suggest",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "q",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/SearchHit"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "자동완성",
+        "tags" : [ "search-controller" ]
       }
     }
   },
