@@ -65,6 +65,12 @@ kcocktail:
   verification:
     scheduled: ${KC_VERIFICATION_SCHEDULED:true}
     cli: ${KC_VERIFICATION_CLI:false}
+  # FR-INGREDIENT-001 — "국내 유통 기준 200~300개". 넘으면 경고지 차단이 아니다
+  # (DECISIONS §1.2 — 상한 근거가 역검색 UX 이지 무결성이 아니다).
+  # 상수가 아니라 설정인 이유: 250 이 맞는지 350 이 맞는지는 목록을 띄워 봐야 알고,
+  # 경고 하나 조정하자고 배포하지 않는다 (이슈 026 RED 20).
+  ingredient:
+    approved-cap: ${KC_INGREDIENT_APPROVED_CAP:300}
   revalidate:
     enabled: ${KC_REVALIDATE_ENABLED:false}
     url: ${KC_FRONTEND_URL:}

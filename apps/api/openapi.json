@@ -97,6 +97,52 @@
         "required" : [ "aliases", "aromaTags", "baseSpirit", "glassType", "id", "isClassic", "method", "nameEn", "nameKo", "slug", "status", "stylePrimary", "styles", "summary", "sweetness" ],
         "type" : "object"
       },
+      "AdminIngredientResponse" : {
+        "properties" : {
+          "abv" : {
+            "type" : "number"
+          },
+          "aliases" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "category" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "domesticAvailability" : {
+            "type" : "string"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "isApproved" : {
+            "type" : "boolean"
+          },
+          "nameEn" : {
+            "type" : "string"
+          },
+          "nameKo" : {
+            "type" : "string"
+          },
+          "priceBand" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "substituteNote" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "aliases", "category", "domesticAvailability", "id", "isApproved", "nameEn", "nameKo", "slug" ],
+        "type" : "object"
+      },
       "BaseSpirit" : {
         "description" : "축 1 · 기주 (단일값 필수, R-C-1)",
         "enum" : [ "gin", "vodka", "whisky", "rum", "agave", "brandy", "liqueur", "wine", "korean", "non-alcoholic" ],
@@ -395,6 +441,51 @@
         "required" : [ "aliases", "aromaTags", "baseSpirit", "glassType", "isClassic", "method", "nameEn", "nameKo", "slug", "stylePrimary", "styles", "summary", "sweetness" ],
         "type" : "object"
       },
+      "CreateIngredientRequest" : {
+        "properties" : {
+          "abv" : {
+            "type" : "number"
+          },
+          "aliases" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "category" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "domesticAvailability" : {
+            "type" : "string"
+          },
+          "nameEn" : {
+            "maxLength" : 120,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "nameKo" : {
+            "maxLength" : 120,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "priceBand" : {
+            "type" : "string"
+          },
+          "slug" : {
+            "maxLength" : 120,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "substituteNote" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "aliases", "category", "domesticAvailability", "nameEn", "nameKo", "slug" ],
+        "type" : "object"
+      },
       "CsrfTokenResponse" : {
         "properties" : {
           "headerName" : {
@@ -488,6 +579,23 @@
           }
         },
         "required" : [ "nameEn", "nameKo", "summary" ],
+        "type" : "object"
+      },
+      "IngredientCapacity" : {
+        "properties" : {
+          "approved" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "cap" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "warning" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "approved", "cap", "warning" ],
         "type" : "object"
       },
       "IngredientCocktailItem" : {
@@ -1104,7 +1212,7 @@
     "/api/v1/admin/cocktails" : {
       "post" : {
         "description" : "editor 이상. 생성 시점은 항상 draft 다.",
-        "operationId" : "create",
+        "operationId" : "create_1",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -1133,7 +1241,7 @@
     },
     "/api/v1/admin/cocktails/{id}" : {
       "get" : {
-        "operationId" : "find",
+        "operationId" : "find_1",
         "parameters" : [ {
           "in" : "path",
           "name" : "id",
@@ -1281,6 +1389,136 @@
         },
         "summary" : "회수",
         "tags" : [ "admin-cocktail-controller" ]
+      }
+    },
+    "/api/v1/admin/ingredients" : {
+      "post" : {
+        "description" : "editor 이상. 생성 시점은 항상 승인 대기(is_approved=false)다.",
+        "operationId" : "create",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateIngredientRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminIngredientResponse"
+                }
+              }
+            },
+            "description" : "Created"
+          }
+        },
+        "summary" : "재료 생성",
+        "tags" : [ "admin-ingredient-controller" ]
+      }
+    },
+    "/api/v1/admin/ingredients/capacity" : {
+      "get" : {
+        "description" : "상한 초과는 경고다. 승인을 막지 않는다.",
+        "operationId" : "capacity",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/IngredientCapacity"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "승인 재료 수와 상한",
+        "tags" : [ "admin-ingredient-controller" ]
+      }
+    },
+    "/api/v1/admin/ingredients/pending" : {
+      "get" : {
+        "description" : "editor·admin. 이름순 고정.",
+        "operationId" : "pending",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/AdminIngredientResponse"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "승인 대기 큐",
+        "tags" : [ "admin-ingredient-controller" ]
+      }
+    },
+    "/api/v1/admin/ingredients/{id}" : {
+      "get" : {
+        "operationId" : "find",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminIngredientResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "재료 조회 (미승인 포함)",
+        "tags" : [ "admin-ingredient-controller" ]
+      }
+    },
+    "/api/v1/admin/ingredients/{id}/approve" : {
+      "post" : {
+        "description" : "admin 만 가능하다 (SPEC-08 §2). 재승인은 409. 감사에 남는다.",
+        "operationId" : "approve",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminIngredientResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "재료 승인",
+        "tags" : [ "admin-ingredient-controller" ]
       }
     },
     "/api/v1/auth/csrf" : {

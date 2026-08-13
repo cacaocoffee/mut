@@ -61,6 +61,15 @@ interface IngredientRepository : JpaRepository<Ingredient, Long> {
     /** 상세. **미승인은 404 다** — 403 이면 존재가 새어 나간다 (이슈 023 RED 17). */
     fun findBySlugAndIsApprovedTrue(slug: String): Ingredient?
 
+    /**
+     * 승인 대기 큐 (이슈 026 RED 11).
+     *
+     * 정렬을 이름순으로 고정한다 — 대기 큐는 `admin` 이 훑어 내려가는 목록이라
+     * 새로고침마다 순서가 달라지면 어디까지 봤는지 잃는다. `created_at` 이 아닌 이유는
+     * 오래된 것부터 처리해야 할 이유가 없어서다. 승인은 선착순이 아니라 판단이다.
+     */
+    fun findByIsApprovedFalseOrderByNameKo(): List<Ingredient>
+
 }
 
 // 참조 중인 재료의 삭제는 **FK 가 막는다** (RED 24).

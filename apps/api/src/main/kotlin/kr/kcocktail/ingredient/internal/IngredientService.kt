@@ -1,10 +1,13 @@
 package kr.kcocktail.ingredient.internal
 
 import kr.kcocktail.ingredient.api.IngredientFacade
+import kr.kcocktail.ingredient.api.IngredientProperties
 import kr.kcocktail.ingredient.api.IngredientSaved
 import kr.kcocktail.ingredient.api.IngredientView
 import kr.kcocktail.ingredient.domain.Ingredient
 import kr.kcocktail.ingredient.repository.IngredientRepository
+import kr.kcocktail.common.audit.AuditAction
+import kr.kcocktail.common.audit.AuditRecorder
 import kr.kcocktail.common.web.error.ConflictException
 import kr.kcocktail.common.web.error.ResourceNotFoundException
 import org.slf4j.LoggerFactory
@@ -22,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional
 class IngredientService(
     private val ingredients: IngredientRepository,
     private val events: ApplicationEventPublisher,
+    private val audit: AuditRecorder,
+    private val properties: IngredientProperties,
 ) : IngredientFacade {
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -46,6 +51,10 @@ class IngredientService(
     /**
      * DECISIONS §1.1 — 승인은 `admin` 만. 권한 판정은 호출부(이슈 026)가
      * `PermissionMatrix.APPROVE_INGREDIENT` 로 한다.
+     *
+     * **감사에 남긴다** (DECISIONS §1.3 · 이슈 026 RED 9). `PRIN-T08` 의 4종에는 없지만
+     * 마스터 오염이 `PRIN-D01` 의 전제를 무너뜨린다 — 누가 통과시켰는지 남아야 되짚는다.
+     * 같은 트랜잭션이라 승인이 롤백되면 기록도 사라진다 ([AuditRecorder] 는 `MANDATORY`).
      */
     @Transactional
     fun approve(id: Long): Ingredient {
@@ -55,6 +64,13 @@ class IngredientService(
         if (ingredient.isApproved) throw ConflictException("이미 승인된 재료입니다")
 
         ingredient.approve()
+        audit.record(
+            entityType = "ingredient",
+            entityId = ingredient.id,
+            action = AuditAction.APPROVE,
+            before = mapOf("isApproved" to false),
+            after = mapOf("isApproved" to true, "slug" to ingredient.slug),
+        )
         events.publishEvent(ingredient.toSavedEvent())
         warnIfOverCap()
         return ingredient
@@ -85,11 +101,11 @@ class IngredientService(
      */
     private fun warnIfOverCap() {
         val approved = ingredients.countByIsApprovedTrue()
-        if (approved > APPROVED_CAP) {
+        if (approved > properties.approvedCap) {
             log.warn(
                 "승인된 재료가 상한을 넘었다: {}개 (권장 {}개, FR-INGREDIENT-001). " +
                     "차단하지 않으나 역검색 UX 를 검토한다",
-                approved, APPROVED_CAP,
+                approved, properties.approvedCap,
             )
         }
     }
@@ -120,11 +136,6 @@ class IngredientService(
 
     private fun load(id: Long): Ingredient =
         ingredients.findById(id).orElseThrow { ResourceNotFoundException() }
-
-    companion object {
-        /** `FR-INGREDIENT-001` "국내 유통 기준 200~300개". 넘으면 경고한다. */
-        const val APPROVED_CAP = 300L
-    }
 }
 
 /** 색인에 필요한 것만. 엔티티를 담으면 리스너가 다른 트랜잭션에서 지연 로딩을 만난다. */
