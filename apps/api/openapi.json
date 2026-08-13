@@ -16,6 +16,87 @@
         "required" : [ "bookmarkTargetSlug", "bookmarkTargetType", "sharePath" ],
         "type" : "object"
       },
+      "AdminCocktailResponse" : {
+        "properties" : {
+          "abvCalculated" : {
+            "type" : "number"
+          },
+          "abvOverride" : {
+            "type" : "number"
+          },
+          "aliases" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "aromaTags" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "baseSpirit" : {
+            "type" : "string"
+          },
+          "glassType" : {
+            "type" : "string"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "isClassic" : {
+            "type" : "boolean"
+          },
+          "method" : {
+            "type" : "string"
+          },
+          "nameEn" : {
+            "type" : "string"
+          },
+          "nameKo" : {
+            "type" : "string"
+          },
+          "prepTimeMin" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "publishedAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "string"
+          },
+          "story" : {
+            "type" : "string"
+          },
+          "stylePrimary" : {
+            "type" : "string"
+          },
+          "styles" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "summary" : {
+            "type" : "string"
+          },
+          "sweetness" : {
+            "type" : "string"
+          },
+          "tastingNote" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "aliases", "aromaTags", "baseSpirit", "glassType", "id", "isClassic", "method", "nameEn", "nameKo", "slug", "status", "stylePrimary", "styles", "summary", "sweetness" ],
+        "type" : "object"
+      },
       "BaseSpirit" : {
         "description" : "축 1 · 기주 (단일값 필수, R-C-1)",
         "enum" : [ "gin", "vodka", "whisky", "rum", "agave", "brandy", "liqueur", "wine", "korean", "non-alcoholic" ],
@@ -230,6 +311,88 @@
           }
         },
         "required" : [ "aromaTags", "baseSpirit", "glassType", "isClassic", "method", "nameEn", "nameKo", "slug", "stylePrimary", "styles", "summary", "sweetness" ],
+        "type" : "object"
+      },
+      "CreateCocktailRequest" : {
+        "properties" : {
+          "abvOverride" : {
+            "type" : "number"
+          },
+          "aliases" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "aromaTags" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "baseSpirit" : {
+            "type" : "string"
+          },
+          "glassType" : {
+            "type" : "string"
+          },
+          "isClassic" : {
+            "type" : "boolean"
+          },
+          "method" : {
+            "type" : "string"
+          },
+          "nameEn" : {
+            "maxLength" : 120,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "nameKo" : {
+            "maxLength" : 120,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "originCreator" : {
+            "type" : "string"
+          },
+          "originPlace" : {
+            "type" : "string"
+          },
+          "originYear" : {
+            "type" : "string"
+          },
+          "prepTimeMin" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "slug" : {
+            "maxLength" : 120,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "story" : {
+            "type" : "string"
+          },
+          "stylePrimary" : {
+            "type" : "string"
+          },
+          "styles" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "summary" : {
+            "type" : "string"
+          },
+          "sweetness" : {
+            "type" : "string"
+          },
+          "tastingNote" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "aliases", "aromaTags", "baseSpirit", "glassType", "isClassic", "method", "nameEn", "nameKo", "slug", "stylePrimary", "styles", "summary", "sweetness" ],
         "type" : "object"
       },
       "CsrfTokenResponse" : {
@@ -558,6 +721,22 @@
         "required" : [ "items", "page" ],
         "type" : "object"
       },
+      "PublishResponse" : {
+        "properties" : {
+          "publishedAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "slug", "status" ],
+        "type" : "object"
+      },
       "PurchaseGuideItem" : {
         "properties" : {
           "availability" : {
@@ -847,6 +1026,72 @@
           "shake" : "셰이크",
           "stir" : "스터"
         }
+      },
+      "UpdateCocktailRequest" : {
+        "properties" : {
+          "abvOverride" : {
+            "type" : "number"
+          },
+          "aliases" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "aromaTags" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "baseSpirit" : {
+            "type" : "string"
+          },
+          "glassType" : {
+            "type" : "string"
+          },
+          "isClassic" : {
+            "type" : "boolean"
+          },
+          "method" : {
+            "type" : "string"
+          },
+          "nameEn" : {
+            "type" : "string"
+          },
+          "nameKo" : {
+            "type" : "string"
+          },
+          "prepTimeMin" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "slug" : {
+            "type" : "string"
+          },
+          "story" : {
+            "type" : "string"
+          },
+          "stylePrimary" : {
+            "type" : "string"
+          },
+          "styles" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "summary" : {
+            "type" : "string"
+          },
+          "sweetness" : {
+            "type" : "string"
+          },
+          "tastingNote" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
       }
     }
   },
@@ -856,6 +1101,188 @@
   },
   "openapi" : "3.0.1",
   "paths" : {
+    "/api/v1/admin/cocktails" : {
+      "post" : {
+        "description" : "editor 이상. 생성 시점은 항상 draft 다.",
+        "operationId" : "create",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateCocktailRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminCocktailResponse"
+                }
+              }
+            },
+            "description" : "Created"
+          }
+        },
+        "summary" : "칵테일 생성",
+        "tags" : [ "admin-cocktail-controller" ]
+      }
+    },
+    "/api/v1/admin/cocktails/{id}" : {
+      "get" : {
+        "operationId" : "find",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminCocktailResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "칵테일 조회 (draft 포함)",
+        "tags" : [ "admin-cocktail-controller" ]
+      },
+      "patch" : {
+        "description" : "status·publishedAt 은 요청 타입에 없다. 발행은 전용 엔드포인트만이 한다 (PRIN-T05).",
+        "operationId" : "update",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UpdateCocktailRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminCocktailResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "칵테일 수정",
+        "tags" : [ "admin-cocktail-controller" ]
+      }
+    },
+    "/api/v1/admin/cocktails/{id}/archive" : {
+      "post" : {
+        "description" : "published → archived.",
+        "operationId" : "archive",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PublishResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "보관",
+        "tags" : [ "admin-cocktail-controller" ]
+      }
+    },
+    "/api/v1/admin/cocktails/{id}/publish" : {
+      "post" : {
+        "description" : "게이트 실패는 422 + violations 전부. 이미 발행됐으면 409.",
+        "operationId" : "publish",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PublishResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "발행",
+        "tags" : [ "admin-cocktail-controller" ]
+      }
+    },
+    "/api/v1/admin/cocktails/{id}/unpublish" : {
+      "post" : {
+        "description" : "published → draft. 게이트를 검사하지 않는다.",
+        "operationId" : "unpublish",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PublishResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "회수",
+        "tags" : [ "admin-cocktail-controller" ]
+      }
+    },
     "/api/v1/auth/csrf" : {
       "get" : {
         "operationId" : "issue",
