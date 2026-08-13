@@ -15,6 +15,107 @@
  */
 
 export interface paths {
+    "/api/v1/admin/cocktails": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 칵테일 생성
+         * @description editor 이상. 생성 시점은 항상 draft 다.
+         */
+        post: operations["create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/cocktails/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 칵테일 조회 (draft 포함) */
+        get: operations["find"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * 칵테일 수정
+         * @description status·publishedAt 은 요청 타입에 없다. 발행은 전용 엔드포인트만이 한다 (PRIN-T05).
+         */
+        patch: operations["update"];
+        trace?: never;
+    };
+    "/api/v1/admin/cocktails/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 보관
+         * @description published → archived.
+         */
+        post: operations["archive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/cocktails/{id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 발행
+         * @description 게이트 실패는 422 + violations 전부. 이미 발행됐으면 409.
+         */
+        post: operations["publish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/cocktails/{id}/unpublish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 회수
+         * @description published → draft. 게이트를 검사하지 않는다.
+         */
+        post: operations["unpublish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/csrf": {
         parameters: {
             query?: never;
@@ -248,6 +349,32 @@ export interface components {
             bookmarkTargetType: string;
             sharePath: string;
         };
+        AdminCocktailResponse: {
+            abvCalculated?: number;
+            abvOverride?: number;
+            aliases: string[];
+            aromaTags: string[];
+            baseSpirit: string;
+            glassType: string;
+            /** Format: int64 */
+            id: number;
+            isClassic: boolean;
+            method: string;
+            nameEn: string;
+            nameKo: string;
+            /** Format: int32 */
+            prepTimeMin?: number;
+            /** Format: date-time */
+            publishedAt?: string;
+            slug: string;
+            status: string;
+            story?: string;
+            stylePrimary: string;
+            styles: string[];
+            summary: string;
+            sweetness: string;
+            tastingNote?: string;
+        };
         /**
          * @description 축 1 · 기주 (단일값 필수, R-C-1)
          * @enum {string}
@@ -310,6 +437,29 @@ export interface components {
             styles: components["schemas"]["StyleKey"][];
             summary: string;
             sweetness: components["schemas"]["SweetLevel"];
+        };
+        CreateCocktailRequest: {
+            abvOverride?: number;
+            aliases: string[];
+            aromaTags: string[];
+            baseSpirit: string;
+            glassType: string;
+            isClassic: boolean;
+            method: string;
+            nameEn: string;
+            nameKo: string;
+            originCreator?: string;
+            originPlace?: string;
+            originYear?: string;
+            /** Format: int32 */
+            prepTimeMin?: number;
+            slug: string;
+            story?: string;
+            stylePrimary: string;
+            styles: string[];
+            summary: string;
+            sweetness: string;
+            tastingNote?: string;
         };
         CsrfTokenResponse: {
             headerName: string;
@@ -422,6 +572,12 @@ export interface components {
             items: components["schemas"]["IngredientItem"][];
             page: components["schemas"]["PageMeta"];
         };
+        PublishResponse: {
+            /** Format: date-time */
+            publishedAt?: string;
+            slug: string;
+            status: string;
+        };
         PurchaseGuideItem: {
             availability: components["schemas"]["TaxonRef"];
             brands: components["schemas"]["Brand"][];
@@ -519,6 +675,26 @@ export interface components {
          * @enum {string}
          */
         Technique: "build" | "shake" | "stir" | "blend" | "etc";
+        UpdateCocktailRequest: {
+            abvOverride?: number;
+            aliases?: string[];
+            aromaTags?: string[];
+            baseSpirit?: string;
+            glassType?: string;
+            isClassic?: boolean;
+            method?: string;
+            nameEn?: string;
+            nameKo?: string;
+            /** Format: int32 */
+            prepTimeMin?: number;
+            slug?: string;
+            story?: string;
+            stylePrimary?: string;
+            styles?: string[];
+            summary?: string;
+            sweetness?: string;
+            tastingNote?: string;
+        };
     };
     responses: never;
     parameters: never;
@@ -528,6 +704,144 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCocktailRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdminCocktailResponse"];
+                };
+            };
+        };
+    };
+    find: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdminCocktailResponse"];
+                };
+            };
+        };
+    };
+    update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCocktailRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdminCocktailResponse"];
+                };
+            };
+        };
+    };
+    archive: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PublishResponse"];
+                };
+            };
+        };
+    };
+    publish: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PublishResponse"];
+                };
+            };
+        };
+    };
+    unpublish: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PublishResponse"];
+                };
+            };
+        };
+    };
     issue: {
         parameters: {
             query?: never;
