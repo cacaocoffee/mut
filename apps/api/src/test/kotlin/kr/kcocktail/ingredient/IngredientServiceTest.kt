@@ -2,6 +2,7 @@ package kr.kcocktail.ingredient
 
 import kr.kcocktail.common.web.error.ConflictException
 import kr.kcocktail.ingredient.api.IngredientFacade
+import kr.kcocktail.ingredient.api.IngredientProperties
 import kr.kcocktail.ingredient.api.IngredientSaved
 import kr.kcocktail.ingredient.domain.DomesticAvailability
 import kr.kcocktail.ingredient.domain.Ingredient
@@ -37,6 +38,7 @@ class IngredientServiceTest {
     @Autowired private lateinit var service: IngredientService
     @Autowired private lateinit var facade: IngredientFacade
     @Autowired private lateinit var jdbc: JdbcTemplate
+    @Autowired private lateinit var properties: IngredientProperties
 
     /**
      * 컨테이너를 테스트 전체가 공유하므로(`PostgresSupport`) 앞선 테스트가 남긴 행이
@@ -139,7 +141,8 @@ class IngredientServiceTest {
      */
     @Test
     fun `RED19 - 상한을 넘어도 저장은 된다`() {
-        assertThat(IngredientService.APPROVED_CAP).isEqualTo(300L)
+        // 이슈 026 RED 20 에서 설정으로 뺐다 — 상수였을 때는 조정에 배포가 필요했다.
+        assertThat(properties.approvedCap).isEqualTo(300L)
 
         // 상한 자체를 채우지 않는다 — 300건 저장은 느리고, 확인할 것은 "차단하지 않는다"뿐이다.
         val target = service.save(newIngredient("gin"))

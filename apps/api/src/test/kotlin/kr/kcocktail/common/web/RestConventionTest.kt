@@ -119,6 +119,23 @@ class RestConventionTest {
         mvc.get("$BASE/errors/not-found").andExpect { status { isNotFound() } }.let {}
 
     /**
+     * RED 11 보강 — **매핑 자체가 없는 경로도 404 다** (이슈 026 에서 발견).
+     *
+     * 부트 3.2 부터 이 경우는 `NoHandlerFoundException` 이 아니라 `NoResourceFoundException`
+     * 으로 온다. 핸들러가 옛 예외만 알고 있으면 catch-all 이 받아 **오탈자 경로가 전부 500** 이 되고,
+     * 상태가 틀린 것보다 나쁜 일이 따라온다 — 없는 경로를 긁는 봇 하나가 `ERROR` 로그를 채워
+     * 진짜 500 을 묻는다.
+     */
+    @Test
+    fun `RED11 - 매핑이 없는 경로도 404 다`() {
+        val problem = problemOf(mvc.get("$BASE/there-is-no-such-thing").andReturn())
+
+        assertThat(problem["status"]).`as`("500 이 아니다").isEqualTo(404)
+        assertThat(problem["title"])
+            .isEqualTo(problemOf(mvc.get("$BASE/errors/not-found").andReturn())["title"])
+    }
+
+    /**
      * SPEC-07 §1.4 — `403` 이면 "그 슬러그는 존재한다"가 새어 나간다.
      *
      * `instance` 는 요청 URI 를 그대로 되비치므로 검사 대상이 아니다 — 클라이언트가 이미 아는 값이다.

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import org.springframework.web.servlet.NoHandlerFoundException
+import org.springframework.web.servlet.resource.NoResourceFoundException
 import java.net.URI
 
 /**
@@ -114,8 +115,20 @@ class ApiExceptionHandler(
     /**
      * **비공개 리소스도 여기로 온다.** `draft` 를 403 으로 돌려주면
      * "그 슬러그는 존재한다"는 사실이 새어 나간다 (SPEC-07 §1.4 · §5).
+     *
+     * ## `NoResourceFoundException` 이 따로 필요하다 (이슈 026 에서 발견)
+     *
+     * 부트 3.2 부터 매핑이 없는 경로는 [NoHandlerFoundException] 이 아니라
+     * `NoResourceFoundException` 으로 온다 — 정적 리소스 핸들러까지 내려간 뒤에 나는 예외다.
+     * 둘 중 하나만 걸어 두면 **오탈자 경로가 전부 500** 이 된다. 아래 catch-all 이
+     * 받아 버리기 때문인데, 상태가 틀린 것보다 나쁜 게 있다 —
+     * 없는 경로를 긁는 봇 하나가 `ERROR` 로그를 채워서 진짜 500 을 묻는다.
      */
-    @ExceptionHandler(ResourceNotFoundException::class, NoHandlerFoundException::class)
+    @ExceptionHandler(
+        ResourceNotFoundException::class,
+        NoHandlerFoundException::class,
+        NoResourceFoundException::class,
+    )
     fun onNotFound(req: HttpServletRequest) = problem(
         status = HttpStatus.NOT_FOUND,
         typeSlug = "not-found",

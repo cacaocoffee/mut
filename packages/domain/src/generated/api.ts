@@ -28,7 +28,7 @@ export interface paths {
          * 칵테일 생성
          * @description editor 이상. 생성 시점은 항상 draft 다.
          */
-        post: operations["create"];
+        post: operations["create_1"];
         delete?: never;
         options?: never;
         head?: never;
@@ -43,7 +43,7 @@ export interface paths {
             cookie?: never;
         };
         /** 칵테일 조회 (draft 포함) */
-        get: operations["find"];
+        get: operations["find_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -110,6 +110,103 @@ export interface paths {
          * @description published → draft. 게이트를 검사하지 않는다.
          */
         post: operations["unpublish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ingredients": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 재료 생성
+         * @description editor 이상. 생성 시점은 항상 승인 대기(is_approved=false)다.
+         */
+        post: operations["create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ingredients/capacity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 승인 재료 수와 상한
+         * @description 상한 초과는 경고다. 승인을 막지 않는다.
+         */
+        get: operations["capacity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ingredients/pending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 승인 대기 큐
+         * @description editor·admin. 이름순 고정.
+         */
+        get: operations["pending"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ingredients/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 재료 조회 (미승인 포함) */
+        get: operations["find"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ingredients/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 재료 승인
+         * @description admin 만 가능하다 (SPEC-08 §2). 재승인은 409. 감사에 남는다.
+         */
+        post: operations["approve"];
         delete?: never;
         options?: never;
         head?: never;
@@ -375,6 +472,21 @@ export interface components {
             sweetness: string;
             tastingNote?: string;
         };
+        AdminIngredientResponse: {
+            abv?: number;
+            aliases: string[];
+            category: string;
+            description?: string;
+            domesticAvailability: string;
+            /** Format: int64 */
+            id: number;
+            isApproved: boolean;
+            nameEn: string;
+            nameKo: string;
+            priceBand?: string;
+            slug: string;
+            substituteNote?: string;
+        };
         /**
          * @description 축 1 · 기주 (단일값 필수, R-C-1)
          * @enum {string}
@@ -461,6 +573,18 @@ export interface components {
             sweetness: string;
             tastingNote?: string;
         };
+        CreateIngredientRequest: {
+            abv?: number;
+            aliases: string[];
+            category: string;
+            description?: string;
+            domesticAvailability: string;
+            nameEn: string;
+            nameKo: string;
+            priceBand?: string;
+            slug: string;
+            substituteNote?: string;
+        };
         CsrfTokenResponse: {
             headerName: string;
             token: string;
@@ -495,6 +619,13 @@ export interface components {
             nameEn: string;
             nameKo: string;
             summary: string;
+        };
+        IngredientCapacity: {
+            /** Format: int64 */
+            approved: number;
+            /** Format: int64 */
+            cap: number;
+            warning: boolean;
         };
         IngredientCocktailItem: {
             isOptional: boolean;
@@ -704,7 +835,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    create: {
+    create_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -728,7 +859,7 @@ export interface operations {
             };
         };
     };
-    find: {
+    find_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -838,6 +969,114 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PublishResponse"];
+                };
+            };
+        };
+    };
+    create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateIngredientRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdminIngredientResponse"];
+                };
+            };
+        };
+    };
+    capacity: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["IngredientCapacity"];
+                };
+            };
+        };
+    };
+    pending: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdminIngredientResponse"][];
+                };
+            };
+        };
+    };
+    find: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdminIngredientResponse"];
+                };
+            };
+        };
+    };
+    approve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdminIngredientResponse"];
                 };
             };
         };

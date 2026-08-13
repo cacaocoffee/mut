@@ -240,6 +240,8 @@ class AuditLogTest {
             "publish", "unpublish", "archive", "restore",
             "tier_change", "rank_change", "verify",
             "slug_change_attempt",
+            // 이슈 026 — 재료 승인 (DECISIONS §1.3). 마스터 오염을 되짚으려면 필요하다
+            "approve",
         )
 
         val check = jdbc.queryForObject(
