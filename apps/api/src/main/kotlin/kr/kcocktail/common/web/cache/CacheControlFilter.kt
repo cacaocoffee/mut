@@ -21,11 +21,18 @@ import org.springframework.web.filter.OncePerRequestFilter
  * 아무 일도 일어나지 않는다 — 그것도 **조용히** 일어난다.
  *
  * 어드민에는 붙이지 않는다. 발행 전 데이터가 중간 캐시에 남으면 안 된다.
+ *
+ * ## `/me` · `/auth` 도 아니다 (이슈 031 에서 드러났다)
+ *
+ * `isPublicApi` 로 판정하다가 `/me/bookmarks` 에 `public, max-age=60` 이 붙어 나갔다 —
+ * **중간 캐시가 한 사람의 북마크를 다른 사람에게 줄 수 있다는 뜻이다.**
+ * "공개 API 인가" 와 "공유 캐시에 올려도 되는가" 는 다른 질문이라
+ * [ApiPaths.isPubliclyCacheable] 로 나눴다.
  */
 class CacheControlFilter : OncePerRequestFilter() {
 
     override fun shouldNotFilter(request: HttpServletRequest) =
-        request.method != HttpMethod.GET.name() || !ApiPaths.isPublicApi(request.requestURI)
+        request.method != HttpMethod.GET.name() || !ApiPaths.isPubliclyCacheable(request.requestURI)
 
     override fun doFilterInternal(
         request: HttpServletRequest,

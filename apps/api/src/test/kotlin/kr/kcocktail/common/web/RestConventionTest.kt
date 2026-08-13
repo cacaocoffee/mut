@@ -7,6 +7,8 @@ import kr.kcocktail.common.web.idempotency.IdempotencyFilter
 import kr.kcocktail.support.PostgresSupport
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -282,6 +284,44 @@ class RestConventionTest {
         assertThat(response.getHeader(HttpHeaders.ETAG))
             .`as`("발행 전 데이터에 검증자를 붙이지 않는다")
             .isNull()
+    }
+
+    /**
+     * RED 25 보강 — **개인 응답도 공개 캐시 대상이 아니다** (이슈 031 에서 드러났다).
+     *
+     * `/me/bookmarks` 가 `isPublicApi` 를 통과해 `public, max-age=60` 과 ETag 를 달고 나갔다.
+     * 중간 캐시가 **한 사람의 북마크를 다른 사람에게 줄 수 있다**는 뜻이다.
+     *
+     * `/auth` 도 같다 — CSRF 토큰이 60초 캐시되면 토큰을 세션에 바인딩한 의미가 없다.
+     *
+     * 인증이 필요한 경로를 열거하지 않고 접두사로 판정한다: 열거하면 새 개인 경로가
+     * 목록에서 빠진 채 들어오고, **그때 새는 것은 조용하다.**
+     */
+    @ParameterizedTest
+    @ValueSource(strings = ["/me/bookmarks", "/me/collections", "/auth/csrf"])
+    fun `개인 API 에는 공개 캐시 헤더가 붙지 않는다`(path: String) {
+        val response = mvc.get("$BASE$path").andReturn().response
+
+        assertThat(response.getHeader(HttpHeaders.CACHE_CONTROL).orEmpty())
+            .`as`("%s 가 공유 캐시에 올라간다", path)
+            .doesNotContain("public")
+            .doesNotContain("max-age=60")
+        assertThat(response.getHeader(HttpHeaders.ETAG))
+            .`as`("%s 에 검증자가 붙으면 그것을 근거로 재사용된다", path)
+            .isNull()
+    }
+
+    /** 판정 함수 자체도 고정한다 — 필터가 바뀌어도 규칙은 한 곳이다. */
+    @Test
+    fun `공유 캐시 판정이 개인 경로를 공개로 보지 않는다`() {
+        assertThat(ApiPaths.isPubliclyCacheable("$BASE/cocktails")).isTrue()
+        assertThat(ApiPaths.isPubliclyCacheable("$BASE/collections/some-token"))
+            .`as`("공유 링크는 토큰이 URL 에 있어 캐시 키가 갈린다")
+            .isTrue()
+
+        assertThat(ApiPaths.isPubliclyCacheable("$BASE/me/bookmarks")).isFalse()
+        assertThat(ApiPaths.isPubliclyCacheable("$BASE/auth/csrf")).isFalse()
+        assertThat(ApiPaths.isPubliclyCacheable("${ApiPaths.ADMIN}/cocktails")).isFalse()
     }
 
     /** 에러를 캐시시키면 발행 직후가 60초 동안 비어 보인다. */

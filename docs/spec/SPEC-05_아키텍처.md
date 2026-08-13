@@ -48,6 +48,7 @@ BAR ◀──extends── PARTNER │
                          │
 CONTENT ──references──▶ BAR · COCKTAIL
 USER ──owns──▶ STOCK · Bookmark
+USER ──reads──▶ COCKTAIL
 SEARCH ──reads──▶ COCKTAIL · BAR · INGREDIENT · CONTENT
 ADMIN ──governs──▶ 전부 (발행 상태 · 감사)
 ```
@@ -59,6 +60,19 @@ ADMIN ──governs──▶ 전부 (발행 상태 · 감사)
 - 순환 의존을 만들지 않는다. `BAR`가 `COCKTAIL`을 참조하고 `COCKTAIL`이 "이 칵테일을 파는 바"를
   보여줘야 하므로 **양방향으로 보이지만**, 조회는 `SEARCH`나 조회 전용 서비스가 담당해 순환을 끊는다.
 - 부수효과(알림 · 집계 · 검증 태스크 생성)는 도메인 이벤트로 발행하고 리스너가 처리한다.
+
+> **개정 (2026-08-13, 이슈 031)** — `USER ──reads──▶ COCKTAIL` 를 추가했다.
+>
+> `Bookmark`는 이 표가 `USER`에 배정한 것인데(`owns`), 북마크는 본질적으로 **콘텐츠를 가리킨다.**
+> 저장할 때 대상이 발행됐는지 확인해야 하고(`FR-USER-004`), 목록을 보여줄 때 무엇을 저장했는지
+> 알려줘야 한다 — **가리키는 대상을 못 읽는 북마크는 쓸모가 없다.**
+>
+> `SEARCH` 경유를 검토했으나 그쪽은 `USER`를 읽지 못한다(표에 없다). 북마크 행을 읽으려면
+> 반대 화살표가 필요해져 문제가 옮겨갈 뿐이다.
+>
+> 순환은 생기지 않는다 — `COCKTAIL`은 `USER`를 참조하지 않는다. 근거는
+> [`GAPS.md` G-30](../prd/GAPS.md#g-30). 이슈 023이 같은 함정을 밟았고([G-28](../prd/GAPS.md#g-28)),
+> 그때 배운 것이 **"Facade를 거쳐도 모듈 화살표는 그대로"** 다.
 
 ## 4. 프론트엔드 렌더링 전략
 

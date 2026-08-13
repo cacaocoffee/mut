@@ -32,6 +32,24 @@
         "required" : [ "userId", "withdrawn" ],
         "type" : "object"
       },
+      "AddBookmarkRequest" : {
+        "properties" : {
+          "collectionId" : {
+            "description" : "생략하면 기본 컬렉션이다 (SPEC-06 §3.5)",
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "targetSlug" : {
+            "type" : "string"
+          },
+          "targetType" : {
+            "description" : "cocktail · bar · article. Phase 1a 에 실재하는 것은 cocktail 뿐이다",
+            "type" : "string"
+          }
+        },
+        "required" : [ "targetSlug", "targetType" ],
+        "type" : "object"
+      },
       "AdminCocktailResponse" : {
         "properties" : {
           "abvCalculated" : {
@@ -208,6 +226,32 @@
           "whisky" : "위스키",
           "wine" : "와인 · 스파클링"
         }
+      },
+      "BookmarkItem" : {
+        "properties" : {
+          "collectionId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "nameEn" : {
+            "type" : "string"
+          },
+          "nameKo" : {
+            "type" : "string"
+          },
+          "targetSlug" : {
+            "type" : "string"
+          },
+          "targetType" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "id", "nameEn", "nameKo", "targetSlug", "targetType" ],
+        "type" : "object"
       },
       "Brand" : {
         "properties" : {
@@ -408,6 +452,26 @@
         "required" : [ "aromaTags", "baseSpirit", "glassType", "isClassic", "method", "nameEn", "nameKo", "slug", "stylePrimary", "styles", "summary", "sweetness" ],
         "type" : "object"
       },
+      "CollectionItem" : {
+        "properties" : {
+          "bookmarkCount" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "shareToken" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "bookmarkCount", "id", "name" ],
+        "type" : "object"
+      },
       "CreateCocktailRequest" : {
         "properties" : {
           "abvOverride" : {
@@ -488,6 +552,16 @@
           }
         },
         "required" : [ "aliases", "aromaTags", "baseSpirit", "glassType", "isClassic", "method", "nameEn", "nameKo", "slug", "stylePrimary", "styles", "summary", "sweetness" ],
+        "type" : "object"
+      },
+      "CreateCollectionRequest" : {
+        "properties" : {
+          "name" : {
+            "maxLength" : 60,
+            "minLength" : 0,
+            "type" : "string"
+          }
+        },
         "type" : "object"
       },
       "CreateIngredientRequest" : {
@@ -1105,6 +1179,39 @@
         "required" : [ "groups", "hadChosung", "matchedCount", "query" ],
         "type" : "object"
       },
+      "SharedCollection" : {
+        "properties" : {
+          "items" : {
+            "items" : {
+              "$ref" : "#/components/schemas/SharedItem"
+            },
+            "type" : "array"
+          },
+          "name" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "items", "name" ],
+        "type" : "object"
+      },
+      "SharedItem" : {
+        "properties" : {
+          "nameEn" : {
+            "type" : "string"
+          },
+          "nameKo" : {
+            "type" : "string"
+          },
+          "targetSlug" : {
+            "type" : "string"
+          },
+          "targetType" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "nameEn", "nameKo", "targetSlug", "targetType" ],
+        "type" : "object"
+      },
       "SortOrder" : {
         "properties" : {
           "ascending" : {
@@ -1356,7 +1463,7 @@
     "/api/v1/admin/audit-logs" : {
       "get" : {
         "description" : "admin 만 가능하다 (SPEC-08 §2.2 — 감시받는 사람이 감시 기록을 보면 안 된다). 필터는 AND 로 묶이고 정렬은 최신순 고정이다.",
-        "operationId" : "list_3",
+        "operationId" : "list_4",
         "parameters" : [ {
           "description" : "cocktail · ingredient 같은 테이블 이름",
           "in" : "query",
@@ -1747,7 +1854,7 @@
     "/api/v1/admin/tasks" : {
       "get" : {
         "description" : "기본은 open 만. 정렬은 최근 탐지순 고정이다 (인덱스가 그 순서다).",
-        "operationId" : "list_2",
+        "operationId" : "list_3",
         "parameters" : [ {
           "description" : "open · resolved · dismissed. 기본 open",
           "in" : "query",
@@ -1994,7 +2101,7 @@
     "/api/v1/cocktails" : {
       "get" : {
         "description" : "발행분만 반환한다. 필터 결과는 색인하지 않는다 (X-Robots-Tag: noindex).",
-        "operationId" : "list_1",
+        "operationId" : "list_2",
         "parameters" : [ {
           "description" : "기주 슬러그. 콤마로 여러 개 — **OR**",
           "in" : "query",
@@ -2226,10 +2333,38 @@
         "tags" : [ "related-controller" ]
       }
     },
+    "/api/v1/collections/{shareToken}" : {
+      "get" : {
+        "description" : "비로그인 조회. 소유자 정보와 내부 id 를 담지 않고, 미발행 항목은 빠진다.",
+        "operationId" : "shared",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "shareToken",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SharedCollection"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "공유된 컬렉션",
+        "tags" : [ "shared-collection-controller" ]
+      }
+    },
     "/api/v1/ingredients" : {
       "get" : {
         "description" : "**승인된 재료만** 반환한다 (FR-INGREDIENT-001).",
-        "operationId" : "list",
+        "operationId" : "list_1",
         "parameters" : [ {
           "description" : "재료 카테고리 슬러그 (7종)",
           "in" : "query",
@@ -2331,6 +2466,138 @@
         },
         "summary" : "이 재료를 쓰는 칵테일",
         "tags" : [ "ingredient-cocktails-controller" ]
+      }
+    },
+    "/api/v1/me/bookmarks" : {
+      "get" : {
+        "description" : "사라지거나 내려간 대상은 빠진다 (다형 참조라 앱이 무결성을 진다).",
+        "operationId" : "list",
+        "parameters" : [ {
+          "description" : "생략하면 전체. 0 이면 기본 컬렉션(collection_id IS NULL)",
+          "in" : "query",
+          "name" : "collectionId",
+          "required" : false,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/BookmarkItem"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "내 북마크 목록",
+        "tags" : [ "bookmark-controller" ]
+      },
+      "post" : {
+        "description" : "targetSlug 로 받는다. 중복은 멱등이다.",
+        "operationId" : "add",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/AddBookmarkRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/BookmarkItem"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "북마크 추가",
+        "tags" : [ "bookmark-controller" ]
+      }
+    },
+    "/api/v1/me/bookmarks/{id}" : {
+      "delete" : {
+        "operationId" : "remove",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        },
+        "summary" : "북마크 삭제",
+        "tags" : [ "bookmark-controller" ]
+      }
+    },
+    "/api/v1/me/collections" : {
+      "get" : {
+        "operationId" : "collections",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/CollectionItem"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "내 컬렉션 목록",
+        "tags" : [ "bookmark-controller" ]
+      },
+      "post" : {
+        "description" : "생성 시점에 공유 토큰이 함께 발급된다.",
+        "operationId" : "createCollection",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateCollectionRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CollectionItem"
+                }
+              }
+            },
+            "description" : "Created"
+          }
+        },
+        "summary" : "컬렉션 생성",
+        "tags" : [ "bookmark-controller" ]
       }
     },
     "/api/v1/search" : {
