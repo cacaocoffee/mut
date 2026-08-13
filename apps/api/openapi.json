@@ -724,6 +724,9 @@
         "required" : [ "isOptional", "isScalable", "nameEn", "nameKo", "slug" ],
         "type" : "object"
       },
+      "JsonNode" : {
+        "type" : "object"
+      },
       "Origin" : {
         "properties" : {
           "creator" : {
@@ -819,6 +822,21 @@
           "items" : {
             "items" : {
               "$ref" : "#/components/schemas/IngredientItem"
+            },
+            "type" : "array"
+          },
+          "page" : {
+            "$ref" : "#/components/schemas/PageMeta"
+          }
+        },
+        "required" : [ "items", "page" ],
+        "type" : "object"
+      },
+      "PageResponseVerificationTaskItem" : {
+        "properties" : {
+          "items" : {
+            "items" : {
+              "$ref" : "#/components/schemas/VerificationTaskItem"
             },
             "type" : "array"
           },
@@ -946,6 +964,21 @@
           }
         },
         "required" : [ "items" ],
+        "type" : "object"
+      },
+      "ResolveTaskRequest" : {
+        "properties" : {
+          "dismiss" : {
+            "type" : "boolean"
+          },
+          "reason" : {
+            "description" : "dismiss=true 면 필수. 왜 고치지 않고 넘기는지.",
+            "maxLength" : 500,
+            "minLength" : 0,
+            "type" : "string"
+          }
+        },
+        "required" : [ "dismiss" ],
         "type" : "object"
       },
       "SearchGroup" : {
@@ -1200,6 +1233,53 @@
           }
         },
         "type" : "object"
+      },
+      "VerificationTaskItem" : {
+        "properties" : {
+          "adminPath" : {
+            "type" : "string"
+          },
+          "code" : {
+            "type" : "string"
+          },
+          "detail" : {
+            "$ref" : "#/components/schemas/JsonNode"
+          },
+          "detectedAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "entityId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "entityType" : {
+            "type" : "string"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "resolution" : {
+            "type" : "string"
+          },
+          "resolvedAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "resolvedBy" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "status" : {
+            "type" : "string"
+          },
+          "taskType" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "code", "detectedAt", "entityId", "entityType", "id", "status", "taskType" ],
+        "type" : "object"
       }
     }
   },
@@ -1241,7 +1321,7 @@
     },
     "/api/v1/admin/cocktails/{id}" : {
       "get" : {
-        "operationId" : "find_1",
+        "operationId" : "find_2",
         "parameters" : [ {
           "in" : "path",
           "name" : "id",
@@ -1466,7 +1546,7 @@
     },
     "/api/v1/admin/ingredients/{id}" : {
       "get" : {
-        "operationId" : "find",
+        "operationId" : "find_1",
         "parameters" : [ {
           "in" : "path",
           "name" : "id",
@@ -1519,6 +1599,124 @@
         },
         "summary" : "재료 승인",
         "tags" : [ "admin-ingredient-controller" ]
+      }
+    },
+    "/api/v1/admin/tasks" : {
+      "get" : {
+        "description" : "기본은 open 만. 정렬은 최근 탐지순 고정이다 (인덱스가 그 순서다).",
+        "operationId" : "list_2",
+        "parameters" : [ {
+          "description" : "open · resolved · dismissed. 기본 open",
+          "in" : "query",
+          "name" : "status",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "invariant_violation · gate_bypass · slug_changed (1b: hours_expired · instagram_signal)",
+          "in" : "query",
+          "name" : "taskType",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "description" : "cocktail · ingredient",
+          "in" : "query",
+          "name" : "entityType",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "page",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/PageQuery"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageResponseVerificationTaskItem"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "검증 태스크 큐",
+        "tags" : [ "admin-task-controller" ]
+      }
+    },
+    "/api/v1/admin/tasks/{id}" : {
+      "get" : {
+        "operationId" : "find",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/VerificationTaskItem"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "태스크 상세",
+        "tags" : [ "admin-task-controller" ]
+      }
+    },
+    "/api/v1/admin/tasks/{id}/resolve" : {
+      "post" : {
+        "description" : "dismiss=true 는 사유 필수. 이미 처리된 태스크는 409. 감사에는 남기지 않는다 (테이블 자체가 이력).",
+        "operationId" : "resolve",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ResolveTaskRequest"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/VerificationTaskItem"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "태스크 해소",
+        "tags" : [ "admin-task-controller" ]
       }
     },
     "/api/v1/auth/csrf" : {

@@ -17,7 +17,7 @@ data class VerificationTask(
     val detail: Map<String, Any?> = emptyMap(),
 )
 
-enum class TaskType(val slug: String) {
+enum class TaskType(val slug: String, val phase: Phase = Phase.P1A) {
 
     /** 앱 강제 불변식 위반 (SPEC-06 §4.3). */
     INVARIANT_VIOLATION("invariant_violation"),
@@ -32,11 +32,32 @@ enum class TaskType(val slug: String) {
 
     /** `slug` 변경 흔적 (`NFR-D-04` — 있으면 0건이 아니다). */
     SLUG_CHANGED("slug_changed"),
+
+    // ── Phase 1b (SPEC-05 §8) ─────────────────────────────────────────────
+    //
+    // 생성자는 BAR 도메인이라 1b 다. 그래도 **지금 정의한다** —
+    // `FR-ADMIN-004` 가 이 둘을 명시적으로 예로 들었으므로 계약에 있어야 하고,
+    // 나중에 열거를 늘리면 이 목록을 읽는 쪽(큐 필터 · 어드민 UI)이 그때 깨진다.
+    // 조회는 지금도 되고 결과가 빈 것뿐이다 (이슈 028 RED 24·25).
+
+    /** `hours_verified_at` 90일 경과 (`R-F3.1-2`). */
+    HOURS_EXPIRED("hours_expired", Phase.P1B),
+
+    /** 인스타 피드에서 온 폐업 신호 (SPEC-05 §8). */
+    INSTAGRAM_SIGNAL("instagram_signal", Phase.P1B),
     ;
+
+    /** Phase 1a 배치가 실제로 만드는 종류인가. `resolveMissing` 의 스캔 범위가 이것을 본다. */
+    val isPhase1a: Boolean get() = phase == Phase.P1A
+
+    enum class Phase { P1A, P1B }
 
     companion object {
         fun ofSlug(slug: String): TaskType =
             entries.firstOrNull { it.slug == slug } ?: error("알 수 없는 태스크 종류: $slug")
+
+        /** 조회 필터용. 모르는 슬러그면 `null` — 400 으로 옮기는 것은 호출부의 일이다. */
+        fun findBySlug(slug: String): TaskType? = entries.firstOrNull { it.slug == slug }
     }
 }
 
