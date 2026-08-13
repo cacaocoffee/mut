@@ -15,6 +15,26 @@
  */
 
 export interface paths {
+    "/api/v1/admin/audit-logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 감사 로그 조회
+         * @description admin 만 가능하다 (SPEC-08 §2.2 — 감시받는 사람이 감시 기록을 보면 안 된다). 필터는 AND 로 묶이고 정렬은 최신순 고정이다.
+         */
+        get: operations["list_3"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/cocktails": {
         parameters: {
             query?: never;
@@ -503,6 +523,12 @@ export interface components {
             bookmarkTargetType: string;
             sharePath: string;
         };
+        ActorRef: {
+            displayName?: string;
+            /** Format: int64 */
+            userId: number;
+            withdrawn: boolean;
+        };
         AdminCocktailResponse: {
             abvCalculated?: number;
             abvOverride?: number;
@@ -543,6 +569,19 @@ export interface components {
             priceBand?: string;
             slug: string;
             substituteNote?: string;
+        };
+        AuditLogItem: {
+            action: string;
+            actor?: components["schemas"]["ActorRef"];
+            after?: components["schemas"]["JsonNode"];
+            /** Format: date-time */
+            at: string;
+            before?: components["schemas"]["JsonNode"];
+            /** Format: int64 */
+            entityId: number;
+            entityType: string;
+            /** Format: int64 */
+            id: number;
         };
         /**
          * @description 축 1 · 기주 (단일값 필수, R-C-1)
@@ -749,6 +788,10 @@ export interface components {
             size: number;
             sort: components["schemas"]["SortOrder"][];
         };
+        PageResponseAuditLogItem: {
+            items: components["schemas"]["AuditLogItem"][];
+            page: components["schemas"]["PageMeta"];
+        };
         PageResponseCocktailListItem: {
             items: components["schemas"]["CocktailListItem"][];
             page: components["schemas"]["PageMeta"];
@@ -921,6 +964,39 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    list_3: {
+        parameters: {
+            query: {
+                /** @description cocktail · ingredient 같은 테이블 이름 */
+                entityType?: string;
+                entityId?: number;
+                /** @description publish · unpublish · archive · restore · approve · slug_change_attempt 등 */
+                action?: string;
+                /** @description 행위자 user id. 탈퇴해도 id 는 남는다 (SPEC-08 §5.3) */
+                actorUserId?: number;
+                /** @description ISO-8601. 이 시각 이후 */
+                from?: string;
+                /** @description ISO-8601. 이 시각 이전 */
+                to?: string;
+                page: components["schemas"]["PageQuery"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageResponseAuditLogItem"];
+                };
+            };
+        };
+    };
     create_1: {
         parameters: {
             query?: never;
