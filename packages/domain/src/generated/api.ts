@@ -119,6 +119,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/cocktails/{slug}/related": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 배리에이션
+         * @description style_primary 일치가 1순위, base_spirit 일치가 2순위다 (R-C-3). 둘 다 아니면 제외한다 — 채우면 추천이 아니라 잡음이 된다.
+         */
+        get: operations["related"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/ingredients": {
         parameters: {
             query?: never;
@@ -422,6 +442,16 @@ export interface components {
         RecipeVersions: {
             items: components["schemas"]["RecipeVersion"][];
         };
+        RelatedItem: {
+            matchedOn: string;
+            nameEn: string;
+            nameKo: string;
+            slug: string;
+            summary: string;
+        };
+        RelatedResponse: {
+            items: components["schemas"]["RelatedItem"][];
+        };
         SearchGroup: {
             /** Format: int32 */
             count: number;
@@ -645,6 +675,28 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["RecipeVersions"];
+                };
+            };
+        };
+    };
+    related: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RelatedResponse"];
                 };
             };
         };
