@@ -1,83 +1,63 @@
 /**
- * 분류 축의 정본. PRD 5장 + 시안을 합쳐 ADR-0002에서 확정한 값이다.
- * enum은 PRD 기준으로 완전하게 두고(카테고리 URL이 되므로), 화면에는
- * 아카이브에 실제로 존재하는 값만 노출한다 — `basesInCorpus` 등을 쓸 것.
+ * 분류 축의 **정본은 Kotlin 이다** (`PRIN-T02`).
+ *
+ * 이 파일은 프로토타입 시절 손으로 쓴 것이었다 — 기주가 한국어(`"진"`)이고 당도가
+ * 숫자(`0`)였다. 이슈 037 이 그것을 계약 생성물로 바꿨다.
+ *
+ * ## 무엇이 어디에 있나
+ *
+ * | | 어디 | 왜 |
+ * |---|---|---|
+ * | 분류 축 5종 | `generated/api.ts` (계약) | 정본이 Kotlin 이다 |
+ * | 한국어 이름 | `generated/labels.ts` (계약의 `x-labels`) | 같은 이유 |
+ * | 화면 표시 문구 | `data.ts` | `"CITRUS 시트러스"` 처럼 꾸민 것. 계약의 관심사가 아니다 |
+ * | 프론트 전용 타입 | 이 파일 | 필터 상태·파인더 단계처럼 서버가 모르는 것 |
+ *
+ * 표시 문구를 `Record<StyleKey, string>` 으로 두면 **축이 늘 때 빌드가 깨진다** —
+ * 손으로 쓴 목록이 조용히 낡는 것을 그것이 막는다.
  */
+import type { components } from "./generated/api";
 
-/* ─────────────────  축 1 · 기주 (단일값, 필수)  ───────────────── */
-
-export type BaseSpirit =
-  | "진"
-  | "보드카"
-  | "위스키"
-  | "럼"
-  | "데킬라 · 메즈칼"
-  | "브랜디"
-  | "리큐르"
-  | "와인 · 스파클링"
-  | "전통주"
-  | "무알콜";
-
-/** 카테고리 URL `/cocktails/base/<slug>/`. 한번 노출되면 리다이렉트 없이 못 바꾼다. */
-export const BASE_SLUGS: Record<BaseSpirit, string> = {
-  진: "gin",
-  보드카: "vodka",
-  위스키: "whisky",
-  럼: "rum",
-  "데킬라 · 메즈칼": "agave",
-  브랜디: "brandy",
-  리큐르: "liqueur",
-  "와인 · 스파클링": "wine",
-  // PRD 5.1은 `soju`였으나 막걸리·문배주를 소주로 부르는 건 부정확하다 (ADR-0002).
-  전통주: "korean",
-  무알콜: "non-alcoholic",
-};
-
-/* ─────────────────  축 2 · 스타일 (복수, primary 필수)  ───────────────── */
-
-/** 레시피 **구조** 기준. 시대 구분(클래식/모던)으로 잡으면 필터로 쓸모가 없다. */
-export type StyleKey =
-  | "highball"
-  | "sour"
-  | "spirit-forward"
-  | "spritz"
-  | "tiki"
-  | "creamy"
-  | "hot"
-  | "frozen"
-  | "shot";
-
-/* ─────────────────  축 3 · 메이킹 방법 (단일값, 필수)  ───────────────── */
-
-/** 실질 가치는 난이도 프록시다. Build만 켜면 도구 없이 오늘 만들 수 있는 것만 남는다. */
-export type Technique = "Build" | "Shake" | "Stir" | "Blend" | "Etc";
-
-/* ─────────────────  필터 축 (카테고리 아님 — 색인하지 않음)  ───────────────── */
+/* ─────────────────  분류 축 — 계약이 정본 (PRIN-T02)  ───────────────── */
 
 /**
- * PRD 6.3의 9개와 시안의 7개를 합집합한 결과 (ADR-0002).
- * `sour`는 시안에서 왔다 — 위스키 사워처럼 시트러스 향이 주인공이 아닌 산미가 있어
- * `citrus`와 한 칸에 넣을 수 없다.
+ * 축 1 · 기주 (단일값 필수, `R-C-1`).
+ *
+ * 값이 **슬러그**다. 카테고리 URL `/cocktails/base/gin` 이 그대로 이 값이고,
+ * 한번 노출되면 리다이렉트 없이 못 바꾼다 (`PRIN-D02`).
+ *
+ * 전통주가 `korean` 이다 — PRD 5.1 은 `soju` 였으나 막걸리·문배주를 소주로 부르는 것은
+ * 부정확하다 (ADR-0002).
  */
-export type FlavorKey =
-  | "citrus"
-  | "sour"
-  | "fruity"
-  | "floral"
-  | "herbal"
-  | "spicy"
-  | "smoky"
-  | "bitter"
-  | "nutty"
-  | "creamy";
+export type BaseSpirit = components["schemas"]["BaseSpirit"];
 
-/** 0 드라이 · 1 세미 드라이 · 2 세미 스위트 · 3 스위트 */
-export type SweetLevel = 0 | 1 | 2 | 3;
+/** 축 2 · 스타일 (복수, `stylePrimary` 필수). 레시피 **구조** 기준이다. */
+export type StyleKey = components["schemas"]["StyleKey"];
+
+/** 축 3 · 메이킹 방법. 실질 가치는 난이도 대신 쓰는 값이다 — `build` 만 켜면 도구 없이 만든다. */
+export type Technique = components["schemas"]["Technique"];
+
+/** 향 태그 1~3개 (`R-F1.2-1`). 카테고리가 아니라 필터 축이라 색인하지 않는다. */
+export type FlavorKey = components["schemas"]["FlavorKey"];
 
 /**
- * 도수 4구간. 연속 슬라이더를 쓰지 않는 이유는 `R-F2.1-2`가 모든 필터 값에
- * 결과 개수를 요구하는데 슬라이더 눈금에는 카운트를 붙일 수 없기 때문이다 (ADR-0003).
- * 탐색 필터와 취향 파인더가 이 정의를 공유한다.
+ * 당도 4단계.
+ *
+ * 프로토타입은 `0 | 1 | 2 | 3` 이었다. 숫자는 **의미가 순서에 숨어** 있어서,
+ * 값을 하나 끼워 넣는 순간 저장된 데이터가 전부 뒤집힌다.
+ */
+export type SweetLevel = components["schemas"]["SweetLevel"];
+
+/* ─────────────────  프론트 전용  ───────────────── */
+
+/**
+ * 도수 4구간.
+ *
+ * 연속 슬라이더를 쓰지 않는 이유는 `R-F2.1-2` 가 모든 필터 값에 결과 개수를 요구하는데
+ * 슬라이더 눈금에는 개수를 붙일 수 없기 때문이다 (ADR-0003).
+ *
+ * **계약에 없다.** 도수는 서버가 숫자로 주고 구간 나누기는 화면의 판단이라
+ * `abvBandOf()` 한 곳에서만 정의한다.
  */
 export type AbvBand = "na" | "low" | "mid" | "high";
 

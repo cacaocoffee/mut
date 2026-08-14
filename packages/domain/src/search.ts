@@ -7,11 +7,12 @@ import {
   STYLES_IN_CORPUS,
   abvBandOf,
 } from "./data";
-import type { AbvBand, BaseSpirit, Cocktail, FlavorKey, StyleKey } from "./types";
+import { SWEET_LEVELS, sweetRank } from "./data";
+import type { AbvBand, BaseSpirit, Cocktail, FlavorKey, StyleKey, SweetLevel } from "./types";
 
 export interface Filters {
-  /** -1 = 전체 */
-  sweet: number;
+  /** `null` 이면 전체. 예전에는 `-1` 이었는데, 값이 문자열이 되면서 그 자리가 없어졌다 */
+  sweet: SweetLevel | null;
   bases: BaseSpirit[];
   /** 복수 선택, OR 결합 (PRD 7.1 — 스타일은 복수 축) */
   styles: StyleKey[];
@@ -22,7 +23,7 @@ export interface Filters {
 }
 
 export const DEFAULT_FILTERS: Filters = {
-  sweet: -1,
+  sweet: null,
   bases: [],
   styles: [],
   flavors: [],
@@ -35,7 +36,7 @@ export function filterCocktails(f: Filters): Cocktail[] {
   const q = f.query.trim().toLowerCase();
   return COCKTAILS.filter(
     (x) =>
-      (f.sweet < 0 || x.sweet === f.sweet) &&
+      (f.sweet === null || x.sweet === f.sweet) &&
       (f.bases.length === 0 || f.bases.includes(x.base)) &&
       (f.styles.length === 0 || f.styles.some((s) => x.styles.includes(s))) &&
       (f.flavors.length === 0 || f.flavors.every((k) => x.flavors.includes(k))) &&
@@ -56,8 +57,10 @@ export function facetCounts(f: Filters) {
   const count = (patch: Partial<Filters>) => filterCocktails({ ...f, ...patch }).length;
 
   return {
-    sweet: [0, 1, 2, 3].map((level) => count({ sweet: level })),
-    sweetAll: count({ sweet: -1 }),
+    sweet: Object.fromEntries(
+      SWEET_LEVELS.map((level) => [level, count({ sweet: level })])
+    ) as Record<SweetLevel, number>,
+    sweetAll: count({ sweet: null }),
     bases: Object.fromEntries(
       BASES_IN_CORPUS.map((b) => [b, count({ bases: [b] })])
     ) as Record<BaseSpirit, number>,
@@ -114,10 +117,10 @@ export const QUESTIONS: Question[] = [
     title: "단맛은 얼마나 들어가길 원하시나요?",
     hint: "당도는 4단계로 색인되어 있습니다.",
     options: [
-      { ko: "단맛 절대 사절", en: "Dry", value: 0 },
-      { ko: "살짝 달콤", en: "Semi-Dry / Semi-Sweet", value: 1 },
-      { ko: "달콤함 선호", en: "Sweet", value: 3 },
-      { ko: "상관없음", en: "Any", value: -1 },
+      { ko: "단맛 절대 사절", en: "Dry", value: "dry" },
+      { ko: "살짝 달콤", en: "Semi-Dry / Semi-Sweet", value: "semi_dry" },
+      { ko: "달콤함 선호", en: "Sweet", value: "sweet" },
+      { ko: "상관없음", en: "Any", value: "any" },
     ],
   },
   {
@@ -138,7 +141,8 @@ export const QUESTIONS: Question[] = [
     options: [
       { ko: "상관없음", en: "Any base", value: "any" },
       { ko: "진 · 보드카", en: "Gin / Vodka", value: "clear" },
-      { ko: "위스키", en: "Whiskey", value: "위스키" },
+      // 다른 선택지는 여러 기주를 묶은 이름(`clear`·`warm`)이고 이것만 기주 슬러그 그대로다.
+      { ko: "위스키", en: "Whiskey", value: "whisky" },
       { ko: "럼 · 데킬라 · 전통주", en: "Rum / Tequila / Korean", value: "warm" },
     ],
   },
@@ -149,20 +153,27 @@ export type Answers = Partial<Record<QuestionKey, number | string>>;
 /** 답변으로 후보군을 좁힌다. 도수·당도·기주는 하드 필터, 향은 점수에만 반영. */
 export function quizCandidates(answers: Answers): Cocktail[] {
   const abv = answers.abv as AbvBand | undefined;
-  const sweet = answers.sweet as number | undefined;
+  const sweet = answers.sweet as string | undefined;
   const base = answers.base as string | undefined;
 
   return COCKTAILS.filter((x) => {
     if (abv !== undefined && abvBandOf(x.abv) !== abv) return false;
-    if (sweet !== undefined && sweet >= 0) {
-      if (sweet === 0 && x.sweet !== 0) return false;
-      if (sweet === 1 && (x.sweet < 1 || x.sweet > 2)) return false;
-      if (sweet === 3 && x.sweet < 2) return false;
+
+    // 파인더의 세 선택지는 당도 4단계를 **구간으로 묶은 것**이다 —
+    // "살짝 달콤" 은 가운데 둘을 덮고, "달콤함 선호" 는 위 둘을 덮는다.
+    if (sweet && sweet !== "any") {
+      const rank = sweetRank(x.sweet);
+      if (sweet === "dry" && rank !== 0) return false;
+      if (sweet === "semi_dry" && (rank < 1 || rank > 2)) return false;
+      if (sweet === "sweet" && rank < 2) return false;
     }
+
     if (base) {
-      if (base === "clear" && !["진", "보드카"].includes(x.base)) return false;
-      if (base === "위스키" && x.base !== "위스키") return false;
-      if (base === "warm" && !["럼", "데킬라", "전통주"].includes(x.base)) return false;
+      // 기주가 슬러그가 됐다 (이슈 037). `데킬라` 는 계약에서 `agave` 다 —
+      // 예전 목록은 한국어 표기를 적어 두어 데킬라가 실제로는 안 걸리고 있었다.
+      if (base === "clear" && !["gin", "vodka"].includes(x.base)) return false;
+      if (base === "whisky" && x.base !== "whisky") return false;
+      if (base === "warm" && !["rum", "agave", "korean"].includes(x.base)) return false;
     }
     return true;
   });
@@ -171,7 +182,7 @@ export function quizCandidates(answers: Answers): Cocktail[] {
 /** 62점에서 출발해 향·당도·도수 일치도를 더한 매칭 점수(최대 98). */
 export function matchScore(x: Cocktail, answers: Answers): number {
   const flavor = answers.flavor as FlavorKey | undefined;
-  const sweet = answers.sweet as number | undefined;
+  const sweet = answers.sweet as string | undefined;
   const abv = answers.abv as AbvBand | undefined;
   const base = answers.base as string | undefined;
 
@@ -180,9 +191,10 @@ export function matchScore(x: Cocktail, answers: Answers): number {
   else if (flavor === "citrus" && x.flavors.includes("sour")) s += 14;
   else if (flavor === "bitter" && x.flavors.includes("smoky")) s += 10;
 
-  if (sweet !== undefined && sweet >= 0) {
-    const target = sweet === 1 ? 1.5 : sweet;
-    s += Math.max(0, 10 - Math.abs(x.sweet - target) * 5);
+  if (sweet && sweet !== "any") {
+    // `semi_dry` 는 가운데 둘을 덮으므로 그 사이(1.5)를 기준으로 잰다.
+    const target = sweet === "semi_dry" ? 1.5 : sweetRank(sweet as SweetLevel);
+    s += Math.max(0, 10 - Math.abs(sweetRank(x.sweet) - target) * 5);
   }
   // 구간은 이미 하드 필터라 가산점은 구간 **안에서의** 순위 조정용이다.
   // `high`는 위가 열려 있어 폭이 넓으므로 더 독한 쪽을 올린다.

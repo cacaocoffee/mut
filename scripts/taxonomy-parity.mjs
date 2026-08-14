@@ -1,15 +1,25 @@
 #!/usr/bin/env node
 /**
- * 프로토타입 `types.ts` 와 계약(`openapi.json`)의 분류 축이 어긋나는지 본다 (ISSUE-004).
+ * 분류 축이 **계약에서 오는지** 확인한다 (ISSUE-004 → ISSUE-037).
  *
- * 이슈 037 이 `types.ts` 를 생성물로 **대체**한다. 그때 어긋남을 발견하면 화면 네 개를 동시에
- * 고쳐야 한다 — 전환 전에 여기서 먼저 잡는다.
+ * ## 역할이 한 번 바뀌었다
  *
- * ## 알려진 차이는 등록한다
+ * 처음에는 프로토타입 `types.ts` 와 계약(`openapi.json`)의 축을 대조했다 —
+ * 손으로 쓴 목록과 계약이 어긋나는지 보는 일이었다.
  *
- * 표현이 달라지는 것은 의도된 전환이다. 그런 항목은 [KNOWN] 에 **근거와 함께** 적는다.
- * 목록에 없는 차이는 실패다. 별도 억제 파일을 두지 않는 이유는 억제가 쌓이는 것이
- * 리뷰에서 보여야 하기 때문이다.
+ * 이슈 037 이 `types.ts` 를 **계약 생성물로 대체**하면서 대조할 두 목록이 없어졌다.
+ * 축은 이제 한 곳에서만 온다.
+ *
+ * 그래서 지금 지키는 것은 **전환이 되돌아가지 않는 것**이다:
+ *
+ * | 확인 | 왜 |
+ * |---|---|
+ * | `types.ts` 가 축을 직접 선언하지 않는다 | 손으로 쓴 목록이 다시 생기면 또 어긋난다 (`PRIN-T02`) |
+ * | 생성물에 축 5종이 있다 | 계약에서 축이 사라지면 화면이 조용히 `any` 가 된다 |
+ * | 레이블이 값마다 있다 | 없으면 화면에 슬러그가 그대로 나온다 |
+ *
+ * 이 스크립트를 지우지 않는 이유: 지우면 `types.ts` 에 `export type BaseSpirit = "진" | …`
+ * 를 다시 적는 것을 아무도 못 막는다.
  */
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -17,102 +27,64 @@ import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const typesSrc = readFileSync(resolve(root, "packages/domain/src/types.ts"), "utf8");
+const labelsSrc = readFileSync(resolve(root, "packages/domain/src/generated/labels.ts"), "utf8");
 const spec = JSON.parse(readFileSync(resolve(root, "apps/api/openapi.json"), "utf8"));
 const schemas = spec.components.schemas;
 
-/**
- * 프로토타입과 계약의 표현이 다른 축. **전환(037)이 처리할 목록이다.**
- * 여기 없는 차이가 나오면 스펙과 프로토타입 중 하나가 틀린 것이다.
- */
-const KNOWN = {
-  Technique: {
-    why: "types.ts 는 PascalCase 리터럴, 계약은 슬러그. SPEC-06 §3.1 의 method 컬럼이 슬러그를 저장한다",
-    gap: "G-23",
-    normalize: (v) => v.toLowerCase(),
-  },
-  SweetLevel: {
-    why: "types.ts 는 0~3 숫자, 계약은 dry·semi_dry·semi_sweet·sweet. 숫자는 의미가 위치에 숨어 마이그레이션에서 뒤집힌다",
-    gap: "G-23",
-    // 순서로만 대응된다. 값 자체는 비교할 수 없다.
-    compareBy: "count",
-  },
-};
-
-/** `export type X = "a" | "b";` 에서 멤버를 뽑는다. */
-function unionMembers(name) {
-  const m = typesSrc.match(new RegExp(`export type ${name}\\s*=([^;]+);`));
-  if (!m) throw new Error(`types.ts 에 ${name} 이 없다`);
-  return [...m[1].matchAll(/"([^"]+)"|\b(\d+)\b/g)].map((x) => x[1] ?? x[2]);
-}
-
-/** `BASE_SLUGS` 의 값(슬러그)들. 기주는 한국어가 타입 값이고 슬러그가 맵이다. */
-function baseSlugs() {
-  const m = typesSrc.match(/BASE_SLUGS[^=]*=\s*\{([\s\S]*?)\n\};/);
-  if (!m) throw new Error("types.ts 에 BASE_SLUGS 가 없다");
-  return [...m[1].matchAll(/:\s*"([^"]+)"/g)].map((x) => x[1]);
-}
-
-const AXES = [
-  { name: "BaseSpirit", prototype: baseSlugs() },
-  { name: "StyleKey", prototype: unionMembers("StyleKey") },
-  { name: "FlavorKey", prototype: unionMembers("FlavorKey") },
-  { name: "Technique", prototype: unionMembers("Technique") },
-  { name: "SweetLevel", prototype: unionMembers("SweetLevel") },
-];
+/** 계약이 정본인 분류 축. */
+const AXES = ["BaseSpirit", "StyleKey", "FlavorKey", "SweetLevel", "Technique"];
 
 const failures = [];
-const accepted = [];
 
-for (const { name, prototype } of AXES) {
-  const contract = schemas[name]?.enum;
+for (const axis of AXES) {
+  const contract = schemas[axis]?.enum;
   if (!contract) {
-    failures.push(`${name}: 계약(openapi.json)에 없다`);
+    failures.push(`${axis}: 계약(openapi.json)에 없다 — 축이 사라졌거나 이름이 바뀌었다`);
     continue;
   }
 
-  const known = KNOWN[name];
-  const left = known?.normalize ? prototype.map(known.normalize) : prototype;
-
-  if (known?.compareBy === "count") {
-    if (left.length !== contract.length) {
-      failures.push(
-        `${name}: 개수가 다르다 — 프로토타입 ${left.length}종 / 계약 ${contract.length}종`,
-      );
-    } else {
-      accepted.push(`${name} (${known.gap}) — ${known.why}`);
-    }
-    continue;
-  }
-
-  const missing = left.filter((v) => !contract.includes(v));
-  const extra = contract.filter((v) => !left.includes(v));
-
-  if (missing.length || extra.length) {
+  // 1. `types.ts` 가 직접 선언하면 안 된다. `= components["schemas"][...]` 만 허용한다.
+  const declared = typesSrc.match(new RegExp(`export type ${axis}\\s*=\\s*([^;]+);`));
+  if (!declared) {
+    failures.push(`${axis}: types.ts 가 내보내지 않는다`);
+  } else if (!declared[1].includes('components["schemas"]')) {
     failures.push(
-      `${name}: 프로토타입에만 [${missing}] / 계약에만 [${extra}]`,
+      `${axis}: types.ts 가 직접 선언하고 있다 — 계약 생성물에서 가져와야 한다 (PRIN-T02)\n` +
+        `      ${declared[1].trim().slice(0, 80)}`,
     );
-  } else if (known) {
-    accepted.push(`${name} (${known.gap}) — ${known.why}`);
+  }
+
+  // 2. 레이블이 값마다 있어야 한다. 없으면 화면에 슬러그가 그대로 나간다.
+  const labels = schemas[axis]["x-labels"] ?? {};
+  const unlabeled = contract.filter((v) => !(v in labels));
+  if (unlabeled.length) {
+    failures.push(`${axis}: 한국어 레이블이 없는 값 [${unlabeled}]`);
+  }
+
+  // 3. 생성된 레이블 파일이 계약과 같은 값을 담고 있어야 한다.
+  const missingInFile = contract.filter((v) => !labelsSrc.includes(`${JSON.stringify(v)}:`));
+  if (missingInFile.length) {
+    failures.push(
+      `${axis}: generated/labels.ts 에 없는 값 [${missingInFile}] — npm run generate:types 를 돌린다`,
+    );
   }
 }
 
-console.log(`분류 축 ${AXES.length}종 대조`);
-for (const { name, prototype } of AXES) {
-  console.log(`  ${name.padEnd(11)} ${prototype.length}종`);
-}
-
-if (accepted.length) {
-  console.log("\n전환 시 표현이 바뀌는 축 (이슈 037):");
-  accepted.forEach((a) => console.log(`  · ${a}`));
+console.log(`분류 축 ${AXES.length}종이 계약에서 온다`);
+for (const axis of AXES) {
+  const n = schemas[axis]?.enum?.length ?? 0;
+  console.log(`  ${axis.padEnd(11)} ${n}종`);
 }
 
 if (failures.length) {
-  console.error("\n계약과 프로토타입이 어긋난다:");
+  console.error("\n계약과 어긋난다:");
   failures.forEach((f) => console.error(`  ✗ ${f}`));
   console.error(
-    "\n스펙(SPEC-06 · ADR-0002)이 정본이다. 코드를 몰래 맞추지 말고 GAPS.md 에 올린다.",
+    "\n분류 축의 정본은 Kotlin 이다 (PRIN-T02). types.ts 에 다시 적지 않는다.\n" +
+      "  cd apps/api && ./gradlew generateOpenApiDocs\n" +
+      "  npm run generate:types",
   );
   process.exit(1);
 }
 
-console.log("\n✓ 어긋남 없음");
+console.log("\n어긋남 없음");

@@ -12,6 +12,7 @@ import {
   STYLES_IN_CORPUS,
   STYLE_LABELS,
   SWEETNESS,
+  SWEET_LEVELS,
   facetCounts,
   filterCocktails,
   type AbvBand,
@@ -19,16 +20,18 @@ import {
   type Filters,
   type FlavorKey,
   type StyleKey,
+  type SweetLevel,
 } from "@kca/domain";
 import { CocktailCard } from "./cocktail-card";
 
 /** 필터는 URL 쿼리스트링에만 산다 — 공유 가능하되 색인 대상은 아니다 (PRD R-F2.1-1). */
 function readFilters(params: URLSearchParams): Filters {
+  // 당도가 숫자에서 슬러그가 됐다 (이슈 037). `?sweet=0` 이 아니라 `?sweet=dry` 다 —
+  // 필터 화면은 색인하지 않으므로(PRD R-F2.1-1) 옛 주소를 받아 줄 이유가 없다.
   const sweetRaw = params.get("sweet");
-  const sweet = sweetRaw === null ? -1 : Number(sweetRaw);
 
   return {
-    sweet: Number.isInteger(sweet) && sweet >= 0 && sweet <= 3 ? sweet : -1,
+    sweet: SWEET_LEVELS.includes(sweetRaw as SweetLevel) ? (sweetRaw as SweetLevel) : null,
     bases: (params.get("base")?.split(",").filter(Boolean) ?? []).filter((b): b is BaseSpirit =>
       BASES_IN_CORPUS.includes(b as BaseSpirit)
     ),
@@ -47,7 +50,7 @@ function readFilters(params: URLSearchParams): Filters {
 
 function toParams(f: Filters): string {
   const p = new URLSearchParams();
-  if (f.sweet >= 0) p.set("sweet", String(f.sweet));
+  if (f.sweet) p.set("sweet", f.sweet);
   if (f.bases.length) p.set("base", f.bases.join(","));
   if (f.styles.length) p.set("style", f.styles.join(","));
   if (f.flavors.length) p.set("flavor", f.flavors.join(","));
@@ -77,7 +80,7 @@ export function SearchScreen() {
   const counts = useMemo(() => facetCounts(filters), [filters]);
 
   const summary = [
-    filters.sweet < 0 ? "당도 전체" : SWEETNESS[filters.sweet][1],
+    filters.sweet ? SWEETNESS[filters.sweet][1] : "당도 전체",
     filters.bases.length ? filters.bases.join("/") : "기주 전체",
     filters.styles.length
       ? filters.styles.map((s) => STYLE_LABELS[s]).join("/")
@@ -151,26 +154,29 @@ export function SearchScreen() {
                 <input
                   type="radio"
                   name="sweetlvl"
-                  checked={filters.sweet < 0}
-                  onChange={() => apply({ sweet: -1 })}
+                  checked={filters.sweet === null}
+                  onChange={() => apply({ sweet: null })}
                 />
                 <span className="ko">전체</span>
                 <span className="en">All · {counts.sweetAll}</span>
               </label>
-              {SWEETNESS.map(([ko, en], i) => (
-                <label className="seg-opt" key={ko} title={en}>
-                  <input
-                    type="radio"
-                    name="sweetlvl"
-                    checked={filters.sweet === i}
-                    onChange={() => apply({ sweet: i })}
-                  />
-                  <span className="ko">{ko}</span>
-                  <span className="en">
-                    {en} · {counts.sweet[i]}
-                  </span>
-                </label>
-              ))}
+              {SWEET_LEVELS.map((level) => {
+                const [ko, en] = SWEETNESS[level];
+                return (
+                  <label className="seg-opt" key={level} title={en}>
+                    <input
+                      type="radio"
+                      name="sweetlvl"
+                      checked={filters.sweet === level}
+                      onChange={() => apply({ sweet: level })}
+                    />
+                    <span className="ko">{ko}</span>
+                    <span className="en">
+                      {en} · {counts.sweet[level]}
+                    </span>
+                  </label>
+                );
+              })}
             </div>
           </div>
 
