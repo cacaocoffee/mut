@@ -310,19 +310,42 @@ class LocationAbsenceTest {
     /**
      * RED 20·21 — 이벤트 payload 에 좌표가 들어가지 않는다.
      *
-     * `analytics_event` 와 `POST /events` 는 **이슈 034 가 만든다.** 지금 검증할 계약이 없다.
-     * 그래도 컬럼 전수 스캔(RED 1)이 그 테이블도 훑으므로, 좌표 컬럼이 생기면 잡힌다.
+     * ## 이 테스트는 한 번 뒤집혔다 (2026-08-14, 이슈 034)
      *
-     * payload 검증 쪽은 034 의 `owns` 라 여기서 만들지 않고 **넘길 항목으로 남긴다** —
-     * `EPICS-1B-PHASE2.md` 가 아니라 이슈 034 가 착수할 때 이 파일을 확인해야 한다.
+     * 이슈 033 을 쓸 때는 `analytics_event` 가 없어서 **"이벤트 테이블이 없다"** 를 확인했다.
+     * 이슈 034 가 그 테이블을 만들면서 빨갛게 됐고, **그게 이 테스트의 목적이었다** —
+     * 이벤트 저장소가 생기는 순간 좌표 정책을 다시 보게 만드는 것.
+     *
+     * 이제 실재하는 계약을 확인한다:
+     * - 컬럼에 좌표가 없다 (RED 1 의 전수 스캔이 이 테이블도 훑는다)
+     * - **payload 가 알려진 키만 받는다** — `EventType.allowedPayloadKeys` 밖은 저장되지 않고,
+     *   좌표가 섞여 오면 그 이벤트를 통째로 버린다 (`EventCollector` · `EventApiTest` RED 28)
+     *
+     * 여기서는 **열거에 좌표를 담을 자리가 있는지**만 본다. 런타임 동작은 `EventApiTest` 가 본다.
      */
     @Test
-    fun `RED20,21 - 이벤트 payload 는 이슈 034 가 만든다`() {
-        val eventTables = allColumns().map { it.first }.filter { it.contains("event") }.distinct()
+    fun `RED20,21 - 이벤트 payload 스키마에 좌표 자리가 없다`() {
+        val leaky = kr.kcocktail.common.analytics.EventType.entries
+            .flatMap { type -> type.allowedPayloadKeys.map { type.code to it } }
+            .filter { (_, key) -> SensitiveParams.isMasked(key) }
 
-        assertThat(eventTables)
-            .`as`("생기면 RED1 의 전수 스캔이 함께 훑는다")
-            .isEmpty()
+        assertAll(
+            {
+                assertThat(leaky)
+                    .`as`("payload 스키마가 좌표를 허용하면 EventCollector 가 그것을 저장한다")
+                    .isEmpty()
+            },
+            {
+                // 규칙이 헛돌지 않는지 — 열거를 실제로 읽었는가.
+                assertThat(kr.kcocktail.common.analytics.EventType.entries).isNotEmpty()
+            },
+            {
+                // 저장소가 생겼다. RED 1 이 이 테이블도 훑고 있다.
+                assertThat(allColumns().map { it.first })
+                    .`as`("이슈 034 가 만들었다 — 전수 스캔 대상이다")
+                    .contains("analytics_event")
+            },
+        )
     }
 
     // ── 헬퍼 ─────────────────────────────────────────────────────────────

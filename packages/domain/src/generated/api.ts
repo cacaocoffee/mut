@@ -494,6 +494,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 이벤트 수집
+         * @description 인증·CSRF 불필요. 배치 50건. 검증 실패한 이벤트는 버리고 나머지를 저장한다.
+         */
+        post: operations["collect"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/ingredients": {
         parameters: {
             query?: never;
@@ -857,6 +877,30 @@ export interface components {
         CsrfTokenResponse: {
             headerName: string;
             token: string;
+        };
+        EventBatch: {
+            /** @description 요청당 최대 50건 (SPEC-10 §7). 넘으면 400 이다 */
+            events: components["schemas"]["EventRequest"][];
+        };
+        /** @description 요청당 최대 50건 (SPEC-10 §7). 넘으면 400 이다 */
+        EventRequest: {
+            eventType?: string;
+            /** Format: date-time */
+            occurredAt?: string;
+            /** @description 쿼리스트링은 서버가 잘라 낸다 (SPEC-10 §3) */
+            path?: string;
+            payload?: {
+                [key: string]: Record<string, never>;
+            };
+            /** @description organic · internal · social · direct · unknown */
+            referrerType?: string;
+            /** @description 클라이언트 생성 UUID. 30분 무활동 시 갱신된다 */
+            sessionId?: string;
+            /**
+             * Format: int64
+             * @description 비로그인은 null
+             */
+            userId?: number;
         };
         FacetCounts: {
             abv: {
@@ -1760,6 +1804,30 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["SharedCollection"];
                 };
+            };
+        };
+    };
+    collect: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EventBatch"];
+            };
+        };
+        responses: {
+            /** @description 받았다. 본문 없음. 처리 결과를 알려 주지 않는다 */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
