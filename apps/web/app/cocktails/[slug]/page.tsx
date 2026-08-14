@@ -7,6 +7,7 @@ import { FlavorRadar } from "@/components/flavor-radar";
 import { PhotoSlot } from "@/components/photo-slot";
 import { cocktailDetail, publishedSlugs, relatedCocktails, usingApi, type RelatedItem } from "@/lib/api";
 import { fromApi, fromPrototype, prototypeSlugs, type CocktailView } from "@/lib/cocktail-view";
+import { SEARCH_PATH } from "@/lib/routes";
 
 /**
  * 칵테일 상세 — **SSG + ISR** (ISSUE-038 · `PRIN-T04` · SPEC-05 §4).
@@ -140,7 +141,7 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
         </div>
         <div>
           <Link
-            href="/"
+            href={SEARCH_PATH}
             className="btn btn-ghost"
             style={{ fontSize: 11, paddingLeft: 0, marginBottom: 14 }}
           >

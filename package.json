@@ -16,10 +16,12 @@
     "verify": "npm run check && npm run contract:check && npm run lint && npm run build",
     "generate:types": "node scripts/generate-types.mjs",
     "contract:check": "node scripts/generate-types.mjs --check",
+    "facet:parity": "tsx scripts/facet-parity.ts",
     "e2e": "npm run e2e --workspace @kca/web"
   },
   "devDependencies": {
     "openapi-typescript": "^7.13.0",
+    "tsx": "^4.23.8",
     "typescript": "^5"
   }
 }

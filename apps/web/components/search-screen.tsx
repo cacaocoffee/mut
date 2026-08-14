@@ -1,135 +1,149 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   ABV_BANDS,
-  ABV_BAND_KEYS,
-  BASES_IN_CORPUS,
+  BASE_SPIRIT_LABELS,
   DEFAULT_FILTERS,
-  FLAVORS_IN_CORPUS,
   FLAVOR_LABELS,
-  STYLES_IN_CORPUS,
   STYLE_LABELS,
   SWEETNESS,
   SWEET_LEVELS,
+  TECHNIQUES,
   facetCounts,
   filterCocktails,
+  toFilterQuery,
+  parseFilterQuery,
   type AbvBand,
   type BaseSpirit,
-  type Filters,
   type FlavorKey,
+  type Filters,
+  type SearchItem,
   type StyleKey,
-  type SweetLevel,
+  type Technique,
 } from "@kca/domain";
+import { SEARCH_PATH } from "@/lib/routes";
 import { CocktailCard } from "./cocktail-card";
 
-/** 필터는 URL 쿼리스트링에만 산다 — 공유 가능하되 색인 대상은 아니다 (PRD R-F2.1-1). */
-function readFilters(params: URLSearchParams): Filters {
-  // 당도가 숫자에서 슬러그가 됐다 (이슈 037). `?sweet=0` 이 아니라 `?sweet=dry` 다 —
-  // 필터 화면은 색인하지 않으므로(PRD R-F2.1-1) 옛 주소를 받아 줄 이유가 없다.
-  const sweetRaw = params.get("sweet");
+const ABV_LABELS = Object.fromEntries(ABV_BANDS.map((b) => [b.key, b.ko])) as Record<
+  AbvBand,
+  string
+>;
 
-  return {
-    sweet: SWEET_LEVELS.includes(sweetRaw as SweetLevel) ? (sweetRaw as SweetLevel) : null,
-    bases: (params.get("base")?.split(",").filter(Boolean) ?? []).filter((b): b is BaseSpirit =>
-      BASES_IN_CORPUS.includes(b as BaseSpirit)
-    ),
-    styles: (params.get("style")?.split(",").filter(Boolean) ?? []).filter((s): s is StyleKey =>
-      STYLES_IN_CORPUS.includes(s as StyleKey)
-    ),
-    flavors: (params.get("flavor")?.split(",").filter(Boolean) ?? []).filter(
-      (f): f is FlavorKey => FLAVORS_IN_CORPUS.includes(f as FlavorKey)
-    ),
-    abvBands: (params.get("abv")?.split(",").filter(Boolean) ?? []).filter((b): b is AbvBand =>
-      ABV_BAND_KEYS.includes(b as AbvBand)
-    ),
-    query: params.get("q") ?? "",
-  };
-}
-
-function toParams(f: Filters): string {
-  const p = new URLSearchParams();
-  if (f.sweet) p.set("sweet", f.sweet);
-  if (f.bases.length) p.set("base", f.bases.join(","));
-  if (f.styles.length) p.set("style", f.styles.join(","));
-  if (f.flavors.length) p.set("flavor", f.flavors.join(","));
-  if (f.abvBands.length) p.set("abv", f.abvBands.join(","));
-  if (f.query.trim()) p.set("q", f.query);
-  const s = p.toString();
-  return s ? `/?${s}` : "/";
-}
-
-export function SearchScreen() {
+/**
+ * 탐색 · 필터 화면 (ISSUE-040 · `FR-SEARCH-001`·`002`·`003`·`005`·`009`).
+ *
+ * ## 코퍼스를 통째로 받아 여기서 거른다
+ *
+ * SPEC-05 §4 — "Phase 1 규모에서는 전체 목록을 받아 클라이언트에서 거르는 편이 왕복 없이
+ * 즉각적이다." 필터를 만질 때마다 서버를 부르지 않는다. 코퍼스는 페이지(서버 컴포넌트)가
+ * **한 번** 받아 넘긴다.
+ *
+ * ## 패싯 카운트는 계약 모양으로 받는다
+ *
+ * `counts` 가 `GET /cocktails/facets` 의 응답 모양 그대로다 (SPEC-05 §5). 데이터가 커져
+ * 서버 계산으로 옮길 때 이 컴포넌트는 그대로 두고 `facetCounts` 호출만 fetch 로 바꾼다.
+ *
+ * ## 색인하지 않는다
+ *
+ * 필터 결과는 색인 대상이 아니다 (`PRIN-P06` · `NFR-S-02`). `noindex` 는 라우트가 건다.
+ */
+export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
-  const filters = useMemo(
-    () => readFilters(new URLSearchParams(searchParams.toString())),
-    [searchParams]
-  );
+  /**
+   * 지금 걸린 필터의 쿼리스트링.
+   *
+   * ## `useSearchParams()` 를 쓰지 않는다
+   *
+   * 이 경로는 미리 그려 두는 정적 페이지다 (SPEC-05 §4 — 필터는 클라이언트가 건다).
+   * 미리 그리는 시점에는 쿼리스트링이 없으므로 훅은 **빈 값**을 주고, 브라우저가
+   * `?base=gin` 으로 열어도 그대로 빈 값이었다 — 공유된 링크가 전체 목록을 보여 준다.
+   * `FR-SEARCH-005` 가 바로 그 링크를 위해 있는 조항이라 그렇게 둘 수 없다.
+   *
+   * 그래서 **주소창을 직접 읽는다.** 붙는 순간 한 번 읽고, 뒤로·앞으로에 붙어 다시 읽는다.
+   *
+   * ## 클릭이 상태를 먼저 바꾼다
+   *
+   * `router.replace` 는 곧바로 끝나지 않는다. 주소가 정본이면 칩 둘을 빠르게 눌렀을 때
+   * 두 번째 클릭이 첫 번째가 반영되기 전의 필터를 읽고 앞선 선택을 지운다. 그래서
+   * [queryRef] 를 먼저 갱신하고 주소는 뒤따라 맞춘다 — 화면은 즉시 바뀌고(`NFR-P-02`),
+   * 주소는 공유·새로고침을 위해 남는다.
+   */
+  const queryRef = useRef("");
+  const [query, setQueryState] = useState("");
+
+  const setQuery = useCallback((q: string) => {
+    queryRef.current = q;
+    setQueryState(q);
+  }, []);
+
+  useEffect(() => {
+    const read = () => setQuery(window.location.search.replace(/^\?/, ""));
+    read();
+    // `replace` 는 popstate 를 내지 않는다 — 아래 [apply] 가 직접 갱신한다.
+    window.addEventListener("popstate", read);
+    return () => window.removeEventListener("popstate", read);
+  }, [setQuery]);
+
+  const filters = useMemo(() => parseFilterQuery(new URLSearchParams(query)), [query]);
 
   const apply = useCallback(
     (patch: Partial<Filters>) => {
-      router.replace(toParams({ ...filters, ...patch }), { scroll: false });
+      const base = parseFilterQuery(new URLSearchParams(queryRef.current));
+      const q = toFilterQuery({ ...base, ...patch }).toString();
+      setQuery(q);
+
+      // `replace` 다 — 칩 하나에 히스토리 한 칸을 쓰면 뒤로가기가 화면을 못 벗어난다.
+      // 주소는 그대로 바뀌므로 공유·새로고침은 같다 (`FR-SEARCH-005`).
+      router.replace(q ? `${SEARCH_PATH}?${q}` : SEARCH_PATH, { scroll: false });
     },
-    [filters, router]
+    [router, setQuery]
   );
 
-  const results = useMemo(() => filterCocktails(filters), [filters]);
-  const counts = useMemo(() => facetCounts(filters), [filters]);
+  const results = useMemo(() => filterCocktails(corpus, filters), [corpus, filters]);
+  const counts = useMemo(() => facetCounts(corpus, filters), [corpus, filters]);
+  // 당도 "전체" 칸의 개수. 축의 선택만 뺀 결과라 다른 축은 그대로 반영된다.
+  const sweetAll = useMemo(
+    () => filterCocktails(corpus, { ...filters, sweet: null }).length,
+    [corpus, filters]
+  );
+
+  const toggle = <T extends string>(key: keyof Filters, current: T[], value: T) =>
+    apply({
+      [key]: current.includes(value) ? current.filter((x) => x !== value) : [...current, value],
+    });
 
   const summary = [
-    filters.sweet ? SWEETNESS[filters.sweet][1] : "당도 전체",
-    filters.bases.length ? filters.bases.join("/") : "기주 전체",
-    filters.styles.length
-      ? filters.styles.map((s) => STYLE_LABELS[s]).join("/")
-      : "스타일 전체",
+    filters.sweet ? SWEETNESS[filters.sweet][0] : "당도 전체",
+    filters.bases.length
+      ? filters.bases.map((b) => BASE_SPIRIT_LABELS[b]).join("/")
+      : "기주 전체",
+    filters.styles.length ? filters.styles.map((s) => STYLE_LABELS[s]).join("/") : "스타일 전체",
+    filters.methods.length
+      ? filters.methods.map((m) => TECHNIQUES[m].ko).join("/")
+      : "메이킹 전체",
     filters.flavors.length ? `${filters.flavors.length}개 향` : "향 전체",
     filters.abvBands.length
-      ? filters.abvBands.map((b) => ABV_BANDS.find((x) => x.key === b)!.ko).join("/")
+      ? filters.abvBands.map((b) => ABV_LABELS[b]).join("/")
       : "도수 전체",
   ].join(" · ");
-
-  const toggleBase = (b: BaseSpirit) =>
-    apply({
-      bases: filters.bases.includes(b)
-        ? filters.bases.filter((x) => x !== b)
-        : [...filters.bases, b],
-    });
-
-  const toggleStyle = (s: StyleKey) =>
-    apply({
-      styles: filters.styles.includes(s)
-        ? filters.styles.filter((x) => x !== s)
-        : [...filters.styles, s],
-    });
-
-  const toggleFlavor = (f: FlavorKey) =>
-    apply({
-      flavors: filters.flavors.includes(f)
-        ? filters.flavors.filter((x) => x !== f)
-        : [...filters.flavors, f],
-    });
-
-  const toggleAbv = (b: AbvBand) =>
-    apply({
-      abvBands: filters.abvBands.includes(b)
-        ? filters.abvBands.filter((x) => x !== b)
-        : [...filters.abvBands, b],
-    });
 
   return (
     <main className="shell">
       <header className="page-head">
         <div>
           <h1>
-            칵테일 탐색<span className="sub">Browse {results.length} of 24 entries</span>
+            칵테일 탐색
+            <span className="sub">
+              Browse {results.length} of {corpus.length} entries
+            </span>
           </h1>
         </div>
         <p className="lede">
-          당도 · 기주 · 맛/향 · 도수 4개 축으로 교차 검색합니다. 모든 수치는 표준 레시피 기준
-          실측값입니다.
+          기주 · 스타일 · 메이킹 · 당도 · 도수 · 맛/향 6개 축으로 교차 검색합니다. 모든 수치는
+          표준 레시피 기준 실측값입니다.
         </p>
       </header>
 
@@ -147,6 +161,7 @@ export function SearchScreen() {
             </button>
           </div>
 
+          {/* 당도만 단일값이다 (DECISIONS §1.11) — 라디오로 그 사실을 드러낸다 */}
           <div className="filter-group">
             <div className="filter-label">당도 SWEETNESS</div>
             <div className="seg seg-stack">
@@ -158,21 +173,24 @@ export function SearchScreen() {
                   onChange={() => apply({ sweet: null })}
                 />
                 <span className="ko">전체</span>
-                <span className="en">All · {counts.sweetAll}</span>
+                <span className="en">All · {sweetAll}</span>
               </label>
-              {SWEET_LEVELS.map((level) => {
+              {SWEET_LEVELS.filter((level) => level in counts.sweet).map((level) => {
                 const [ko, en] = SWEETNESS[level];
+                const n = counts.sweet[level];
                 return (
                   <label className="seg-opt" key={level} title={en}>
                     <input
                       type="radio"
                       name="sweetlvl"
                       checked={filters.sweet === level}
+                      disabled={n === 0 && filters.sweet !== level}
+                      aria-label={`${ko} ${n}개`}
                       onChange={() => apply({ sweet: level })}
                     />
                     <span className="ko">{ko}</span>
                     <span className="en">
-                      {en} · {counts.sweet[level]}
+                      {en} · {n}
                     </span>
                   </label>
                 );
@@ -180,102 +198,49 @@ export function SearchScreen() {
             </div>
           </div>
 
-          <div className="filter-group">
-            <div className="filter-label">
-              기주 BASE SPIRIT<span className="hint">복수 선택</span>
-            </div>
-            <div className="chip-row">
-              {BASES_IN_CORPUS.map((b) => {
-                const n = counts.bases[b];
-                const on = filters.bases.includes(b);
-                return (
-                  <button
-                    type="button"
-                    key={b}
-                    className="btn chip"
-                    aria-pressed={on}
-                    disabled={n === 0 && !on}
-                    onClick={() => toggleBase(b)}
-                  >
-                    {b}
-                    <span className="count">{n}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          <FacetChips
+            label="기주 BASE SPIRIT"
+            counts={counts.base}
+            selected={filters.bases}
+            labelOf={(slug) => BASE_SPIRIT_LABELS[slug as BaseSpirit]}
+            onToggle={(slug) => toggle("bases", filters.bases, slug as BaseSpirit)}
+          />
 
-          <div className="filter-group">
-            <div className="filter-label">
-              스타일 STYLE<span className="hint">복수 선택</span>
-            </div>
-            <div className="chip-row">
-              {STYLES_IN_CORPUS.map((s) => {
-                const n = counts.styles[s];
-                const on = filters.styles.includes(s);
-                return (
-                  <button
-                    type="button"
-                    key={s}
-                    className="btn chip"
-                    aria-pressed={on}
-                    disabled={n === 0 && !on}
-                    onClick={() => toggleStyle(s)}
-                  >
-                    {STYLE_LABELS[s]}
-                    <span className="count">{n}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          <FacetChips
+            label="스타일 STYLE"
+            counts={counts.style}
+            selected={filters.styles}
+            labelOf={(slug) => STYLE_LABELS[slug as StyleKey]}
+            onToggle={(slug) => toggle("styles", filters.styles, slug as StyleKey)}
+          />
 
-          <div className="filter-group">
-            <div className="filter-label">맛 / 향 FLAVOR PROFILE</div>
-            <div className="chip-row">
-              {FLAVORS_IN_CORPUS.map((k) => {
-                const n = counts.flavors[k];
-                const on = filters.flavors.includes(k);
-                return (
-                  <button
-                    type="button"
-                    key={k}
-                    className="chip-tag"
-                    aria-pressed={on}
-                    disabled={n === 0 && !on}
-                    onClick={() => toggleFlavor(k)}
-                  >
-                    {FLAVOR_LABELS[k]}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          <FacetChips
+            label="메이킹 METHOD"
+            counts={counts.method}
+            selected={filters.methods}
+            labelOf={(slug) => TECHNIQUES[slug as Technique].ko}
+            onToggle={(slug) => toggle("methods", filters.methods, slug as Technique)}
+          />
 
-          <div className="filter-group">
-            <div className="filter-label">
-              도수 ABV<span className="hint">복수 선택</span>
-            </div>
-            <div className="chip-row">
-              {ABV_BANDS.map((band) => {
-                const n = counts.abvBands[band.key];
-                const on = filters.abvBands.includes(band.key);
-                return (
-                  <button
-                    type="button"
-                    key={band.key}
-                    className="btn chip"
-                    aria-pressed={on}
-                    disabled={n === 0 && !on}
-                    onClick={() => toggleAbv(band.key)}
-                  >
-                    {band.ko}
-                    <span className="count">{n}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          <FacetChips
+            label="도수 ABV"
+            counts={counts.abv}
+            selected={filters.abvBands}
+            labelOf={(slug) => ABV_LABELS[slug as AbvBand]}
+            onToggle={(slug) => toggle("abvBands", filters.abvBands, slug as AbvBand)}
+          />
+
+          {/* 여섯 축 중 여기만 AND 다 — 고를수록 결과가 줄고, 불가능한 조합은 즉시 0 이다
+              (`FR-SEARCH-009`). 힌트 문구가 그 차이를 적어 준다. */}
+          <FacetChips
+            label="맛 / 향 FLAVOR PROFILE"
+            hint="전부 만족"
+            variant="chip-tag"
+            counts={counts.flavor}
+            selected={filters.flavors}
+            labelOf={(slug) => FLAVOR_LABELS[slug as FlavorKey]}
+            onToggle={(slug) => toggle("flavors", filters.flavors, slug as FlavorKey)}
+          />
 
           <div className="filter-group" style={{ borderBottom: 0 }}>
             <div className="filter-label">검색 KEYWORD</div>
@@ -304,7 +269,7 @@ export function SearchScreen() {
           {results.length > 0 ? (
             <div className="card-grid">
               {results.map((c) => (
-                <CocktailCard key={c.id} cocktail={c} />
+                <CocktailCard key={c.slug} cocktail={c} />
               ))}
             </div>
           ) : (
@@ -316,5 +281,66 @@ export function SearchScreen() {
         </section>
       </div>
     </main>
+  );
+}
+
+/**
+ * 한 축의 칩 줄.
+ *
+ * **`counts` 만 받는다** — 클라이언트 계산인지 서버 응답인지 모른다 (SPEC-05 §5).
+ * 계산 위치가 바뀌어도 이 컴포넌트는 그대로다.
+ *
+ * 규칙 셋:
+ * - **키가 곧 칩이다.** 코퍼스에 없는 값은 애초에 키가 없어 칩이 생기지 않는다 (ADR-0002 §5)
+ * - **개수를 글자로 병기한다.** 0 이라는 숫자가 비활성의 근거라 색에 기대지 않는다 (`NFR-A-08`)
+ * - `aria-label` 에 개수를 넣는다. 스크린리더는 옆의 작은 숫자를 이름으로 읽지 않는다 (`NFR-A-06`)
+ */
+function FacetChips({
+  label,
+  hint,
+  variant = "chip",
+  counts,
+  selected,
+  labelOf,
+  onToggle,
+}: {
+  label: string;
+  hint?: string;
+  /** 맛·향만 다르게 보인다 — 여섯 축 중 유일하게 AND 라 눈으로도 구분되게 둔다 */
+  variant?: "chip" | "chip-tag";
+  counts: Record<string, number>;
+  selected: string[];
+  labelOf: (slug: string) => string;
+  onToggle: (slug: string) => void;
+}) {
+  return (
+    <div className="filter-group">
+      <div className="filter-label">
+        {label}
+        <span className="hint">{hint ?? "복수 선택"}</span>
+      </div>
+      <div className="chip-row">
+        {Object.entries(counts).map(([slug, n]) => {
+          const on = selected.includes(slug);
+          return (
+            <button
+              type="button"
+              key={slug}
+              className={variant === "chip" ? "btn chip" : "chip-tag"}
+              aria-pressed={on}
+              // 고른 값은 0 이 되어도 누를 수 있게 둔다 — 끄지 못하면 그 조합에서 못 나온다
+              disabled={n === 0 && !on}
+              aria-label={`${labelOf(slug)} ${n}개`}
+              onClick={() => onToggle(slug)}
+            >
+              {labelOf(slug)}
+              <span className="count" aria-hidden="true">
+                {n}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }

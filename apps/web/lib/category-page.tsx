@@ -15,6 +15,7 @@ import {
   type Technique,
 } from "@kca/domain";
 import { CATEGORY_AXES, categories, cocktailsByAxis, usingApi, type CategoryAxis } from "./api";
+import { SEARCH_PATH } from "./routes";
 
 /**
  * 카테고리 페이지 (ISSUE-039 · `FR-COCKTAIL-029`·`030`·`031` · `R-C-2`).
@@ -139,7 +140,7 @@ export function CategoryPage({ axis, view }: { axis: CategoryAxis; view: Categor
 
   return (
     <main className="shell category-page">
-      <Link href="/" className="btn btn-ghost" style={{ fontSize: 11, paddingLeft: 0 }}>
+      <Link href={SEARCH_PATH} className="btn btn-ghost" style={{ fontSize: 11, paddingLeft: 0 }}>
         ← 탐색으로 BACK TO SEARCH
       </Link>
 

@@ -45,8 +45,9 @@ for (const { axis, slug, labelKo } of AXES) {
 test("RED4 - 3축 외의 카테고리 라우트가 없다", () => {
   const dirs = readdirSync(APP).filter((n) => statSync(join(APP, n)).isDirectory());
 
-  // `[slug]` 는 상세다 (이슈 038).
-  expect(dirs.sort()).toEqual(["[slug]", "base", "method", "style"]);
+  // `[slug]` 는 상세다 (이슈 038). `search` 는 필터 화면이고 `noindex` 라
+  // 카테고리가 아니다 (이슈 040 · SPEC-05 §4) — 축을 더하지 않으므로 조합도 못 만든다.
+  expect(dirs.sort()).toEqual(["[slug]", "base", "method", "search", "style"]);
 
   for (const forbidden of ["sweet", "abv", "flavor", "sweetness", "aroma"]) {
     expect(existsSync(join(APP, forbidden)), `${forbidden} 은 필터지 카테고리가 아니다`).toBe(false);
@@ -119,7 +120,8 @@ test("RED8 - 사이트맵의 모든 경로가 단일 축이다", async ({ reques
 
 /** RED 9 — 화면 어디에도 조합 링크가 없다. 상세(이슈 038)와 카테고리 양쪽을 본다. */
 test("RED9 - 내부 링크에 조합 경로가 없다", async ({ page }) => {
-  for (const path of ["/cocktails/negroni", "/cocktails/base/gin", "/"]) {
+  // `/` 대신 탐색 경로다 — 이슈 040 이 화면을 옮겼고 `/` 는 그리로 보내기만 한다.
+  for (const path of ["/cocktails/negroni", "/cocktails/base/gin", "/cocktails/search"]) {
     await page.goto(path);
 
     const combos = await page.getByRole("link").evaluateAll((els) =>

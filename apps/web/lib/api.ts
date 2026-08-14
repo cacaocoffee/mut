@@ -1,3 +1,4 @@
+import { PROTOTYPE_CORPUS, type SearchItem } from "@kca/domain";
 import type { components } from "@kca/domain/generated/api";
 
 /**
@@ -52,6 +53,70 @@ export async function publishedSlugs(): Promise<string[]> {
     console.warn(`[api] 목록 조회 실패 — 프로토타입 데이터로 빌드한다: ${describe(e)}`);
     return [];
   }
+}
+
+/**
+ * 탐색 화면이 거를 코퍼스 전체 (ISSUE-040 · SPEC-05 §4).
+ *
+ * ## 한 번만 받는다
+ *
+ * "Phase 1 규모에서는 전체 목록을 받아 클라이언트에서 거르는 편이 왕복 없이 즉각적이다."
+ * **필터마다 다시 부르지 않는다.** 페이지가 한 번 받아 화면에 넘긴다.
+ *
+ * `size=1000` 은 발행분 전부를 한 장에 담으려는 값이다. Phase 1 상한(500종)의 두 배라
+ * 지금은 페이지가 나뉘지 않는다. **넘어가면 뒷부분이 응답에서 빠진다** — 화면은 그것을
+ * 알아채지 못하므로 응답의 전체 개수와 받은 개수를 비교해 로그를 남긴다.
+ * 그 로그가 뜨는 때가 SPEC-05 §4 가 말한 "데이터가 커지면 서버 필터로 옮긴다" 는 시점이다.
+ *
+ * 실패하면 프로토타입 코퍼스다 — 필터 화면이 빈 채로 뜨는 것보다 낫다.
+ */
+export async function searchCorpus(): Promise<SearchItem[]> {
+  if (!usingApi) return PROTOTYPE_CORPUS;
+
+  try {
+    const res = await fetch(`${BASE}/api/v1/cocktails?size=1000`, {
+      next: { revalidate: 600 },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const body = (await res.json()) as {
+      items: CocktailListItem[];
+      page: { totalElements: number };
+    };
+    if (body.page.totalElements > body.items.length) {
+      console.warn(
+        `[api] 발행분 ${body.page.totalElements}종 중 ${body.items.length}종만 받았다 —` +
+          " 탐색 화면이 나머지를 걸러 내지 못한다. 서버 필터로 옮길 시점이다 (SPEC-05 §4).",
+      );
+    }
+    return body.items.map(toSearchItem);
+  } catch (e) {
+    console.warn(`[api] 코퍼스 조회 실패 — 프로토타입으로 거른다: ${describe(e)}`);
+    return PROTOTYPE_CORPUS;
+  }
+}
+
+/**
+ * 목록 한 줄 → 필터가 보는 한 줄.
+ *
+ * 이름만 바꾼다. 여기서 값을 손보기 시작하면 클라이언트 필터와 서버 필터가 갈라지고,
+ * 그것이 이슈 040 의 대조 테스트가 잡으려는 상황이다.
+ */
+export function toSearchItem(item: CocktailListItem): SearchItem {
+  return {
+    slug: item.slug,
+    nameKo: item.nameKo,
+    nameEn: item.nameEn,
+    summary: item.summary,
+    base: item.baseSpirit,
+    // `stylePrimary` 가 아니다 — 필터는 보유 스타일 전체와 맞춘다 (DECISIONS §1.11)
+    styles: item.styles,
+    method: item.method,
+    sweet: item.sweetness,
+    flavors: item.aromaTags,
+    abv: item.abv ?? null,
+    glass: item.glassType,
+  };
 }
 
 /**
