@@ -19,6 +19,12 @@ import type { components } from "@kca/domain/generated/api";
 export type CocktailDetail = components["schemas"]["CocktailDetail"];
 export type CocktailListItem = components["schemas"]["CocktailListItem"];
 export type RelatedItem = components["schemas"]["RelatedItem"];
+export type CategoryItem = components["schemas"]["CategoryItem"];
+export type CategoriesResponse = components["schemas"]["CategoriesResponse"];
+
+/** 카테고리 축 3종. **여기 없는 축은 카테고리가 아니다** (`PRIN-P06`). */
+export const CATEGORY_AXES = ["base", "style", "method"] as const;
+export type CategoryAxis = (typeof CATEGORY_AXES)[number];
 
 const BASE = process.env.KC_API_URL?.replace(/\/$/, "") ?? "";
 
@@ -96,6 +102,53 @@ export async function relatedCocktails(slug: string): Promise<RelatedItem[]> {
     return body.items;
   } catch (e) {
     console.warn(`[api] 배리에이션 조회 실패 (${slug}) — 비운다: ${describe(e)}`);
+    return [];
+  }
+}
+
+/**
+ * 3축 카테고리 (`FR-COCKTAIL-029` · 이슈 022).
+ *
+ * 항목이 0건인 카테고리는 API 가 이미 뺀다 — 목록만 있고 아무것도 없는 페이지는
+ * 색인 가치가 없다 (이슈 022 RED 10).
+ */
+export async function categories(): Promise<CategoriesResponse | null> {
+  if (!usingApi) return null;
+
+  try {
+    const res = await fetch(`${BASE}/api/v1/categories`, { next: { revalidate: 3600 } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    return (await res.json()) as CategoriesResponse;
+  } catch (e) {
+    console.warn(`[api] 카테고리 조회 실패 — 프로토타입으로 빌드한다: ${describe(e)}`);
+    return null;
+  }
+}
+
+/**
+ * 한 축의 발행분 목록.
+ *
+ * **축 하나만 넘긴다.** 둘을 넘기는 자리를 만들지 않는 것이 `R-C-2` 의 구현이다 —
+ * 조합을 만들 수 있는 함수가 있으면 언젠가 조합 경로가 생긴다.
+ */
+export async function cocktailsByAxis(
+  axis: CategoryAxis,
+  slug: string,
+): Promise<CocktailListItem[]> {
+  if (!usingApi) return [];
+
+  try {
+    const res = await fetch(
+      `${BASE}/api/v1/cocktails?${axis}=${encodeURIComponent(slug)}&size=100`,
+      { next: { revalidate: 3600 } },
+    );
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const body = (await res.json()) as { items: CocktailListItem[] };
+    return body.items;
+  } catch (e) {
+    console.warn(`[api] ${axis}=${slug} 목록 조회 실패 — 비운다: ${describe(e)}`);
     return [];
   }
 }
