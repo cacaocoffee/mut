@@ -292,16 +292,14 @@ class PrototypeSeedTest {
     /**
      * RED 24 — **서술만 채우면 발행된다.**
      *
-     * 이슈는 "24종 전부가 발행 게이트를 통과한다" 를 요구했지만, 같은 이슈가
-     * **draft 로 넣기**로 결정했다 (`tasting_note` 는 사람의 일이라 자동 생성이 `PRIN-P03` 위반).
-     * 두 요구가 그대로는 양립하지 않는다.
+     * 이슈는 "전부가 발행 게이트를 통과한다" 를 요구했다. 그런데 `tasting_note` 는
+     * 사람이 쓰는 값이라 없는 것을 지어낼 수 없다 (`PRIN-P03`).
      *
-     * 그래서 여기서 보는 것은 **`GATE-COCKTAIL-01` 을 뺀 나머지 전부**다 —
-     * 에디터가 서술을 채우는 순간 발행이 되는 상태인지. 그것이 이 이슈가 만들 수 있는 최선이고,
-     * 남은 하나가 무엇인지도 분명해진다.
+     * `summary` 가 향·맛 서술인 41종을 발행하고, 만드는 법만 적힌 8종은 draft 로 뒀다.
+     * 여기서는 **발행된 것이 게이트 여섯을 전부 통과하는지** 본다.
      */
     @Test
-    fun `RED24,26,27,28 - 서술을 뺀 모든 게이트를 통과한다`() {
+    fun `RED24,26,27,28 - 발행분이 모든 게이트를 통과한다`() {
         assertAll(
             {
                 // GATE-COCKTAIL-03 — 표준 레시피에 재료·스텝이 각각 1개 이상.
@@ -328,6 +326,15 @@ class PrototypeSeedTest {
                         """.trimIndent(),
                     ),
                 ).`as`("GATE-COCKTAIL-04").isZero()
+            },
+            {
+                // GATE-COCKTAIL-01 — 발행분에 향·맛 서술이 있다.
+                assertThat(
+                    jdbc.queryForList(
+                        "SELECT slug FROM cocktail WHERE status = 'published' AND tasting_note IS NULL",
+                        String::class.java,
+                    ),
+                ).`as`("RED25 · GATE-COCKTAIL-01").isEmpty()
             },
             {
                 // GATE-COCKTAIL-05 — 클래식이면 story 필수.
@@ -360,24 +367,38 @@ class PrototypeSeedTest {
     }
 
     /**
-     * RED 25 — **`tasting_note` 가 비어 있고, 그래서 `draft` 다.**
+     * RED 25 — **서술이 있는 것만 발행된다.**
      *
-     * 이것이 통과하면 안 되는 테스트가 아니라, **비어 있음을 고정하는** 테스트다.
-     * 나중에 누가 자동 생성으로 채우면 여기가 빨개진다 — `PRIN-P03` 위반이 조용히 들어오는
-     * 가장 그럴듯한 경로가 그것이다 ("일단 요약을 복사해 두자").
+     * `PRIN-P03` 이 `tasting_note` 를 발행 필수로 만든 이유는 **직접 만들어 보고 쓴 내용**
+     * 이어야 해서다. 프로토타입의 `summary` 가 그 자리를 대신하고 있었고
+     * (`validate.ts` 의 주석이 그렇게 적었다), 에디터 본인이 쓴 문장이라 옮겨도 어긋나지 않는다.
+     *
+     * **8종은 옮기지 않았다.** `summary` 에 만드는 법을 적어 둔 것들이라
+     * (`"온도는 −3℃ 이하로 유지한다"`) 향·맛 서술이 아니다. 게이트를 글자로만 통과시키지 않는다.
+     *
+     * 이 테스트가 지키는 것은 **서술 없이 발행된 것이 하나도 없다**는 쪽이다 —
+     * 그 반대(빈 것을 채우는 일)는 사람이 하고, 하면 발행 수가 늘어난다.
      */
     @Test
-    fun `RED25 - 서술이 비어 있고 전부 draft 다`() {
+    fun `RED25 - 서술 없이 발행된 것이 없다`() {
         assertAll(
             {
-                assertThat(count("SELECT count(*) FROM cocktail WHERE status <> 'draft'"))
-                    .`as`("서술 없이 발행된 것이 없다")
-                    .isZero()
+                assertThat(
+                    jdbc.queryForList(
+                        "SELECT slug FROM cocktail WHERE status = 'published' " +
+                            "AND (tasting_note IS NULL OR tasting_note !~ '\\S')",
+                        String::class.java,
+                    ),
+                ).`as`("GATE-COCKTAIL-01 — 서술이 없으면 발행되지 않는다").isEmpty()
             },
             {
-                assertThat(count("SELECT count(*) FROM cocktail WHERE tasting_note IS NOT NULL"))
-                    .`as`("PRIN-P03 — 만들어보지 않은 것은 쓰지 않는다. 요약을 복사하지 않았다")
-                    .isZero()
+                assertThat(count("SELECT count(*) FROM cocktail WHERE status = 'draft'"))
+                    .`as`("만드는 법만 적힌 8종은 draft 로 남는다")
+                    .isEqualTo(8)
+            },
+            {
+                assertThat(count("SELECT count(*) FROM cocktail WHERE status = 'published'"))
+                    .isEqualTo(41)
             },
             {
                 assertThat(count("SELECT count(*) FROM cocktail"))

@@ -330,14 +330,18 @@ function cocktailSeed(masters: Map<string, Master>): string {
   const blocks = COCKTAILS.map((c) => cocktailBlock(c, masters));
 
   return `${header("칵테일", COCKTAILS.length)}
--- ## draft 로 넣는다
+-- ## 서술이 있는 것만 발행한다
 --
--- \`tasting_note\` 가 발행 필수인데(GATE-COCKTAIL-01) 프로토타입에 그 필드가 없다.
--- **자동 생성하지 않는다** — \`PRIN-P03\` 이 "만들어보지 않은 것은 쓰지 않는다" 이고,
--- 향과 맛 서술이야말로 그 원칙이 지키려는 바로 그 값이다.
+-- \`tasting_note\` 는 발행 필수다 (GATE-COCKTAIL-01). \`PRIN-P03\` 이 그것을 요구한 이유는
+-- **직접 만들어 보고 쓴 내용**이어야 해서다 — 남의 설명을 옮기면 레시피 나열형 블로그와
+-- 구별되지 않는다.
 --
--- 에디터가 서술을 채우고 어드민에서 발행한다 (이슈 025 의 \`NFR-O-01\` 경로).
--- 그때까지 24종은 draft 이고, 공개 조회에는 안 나온다.
+-- 프로토타입의 \`summary\` 가 그 자리를 대신하고 있었다 (validate.ts 의 주석이 그렇게 적었다).
+-- 에디터 본인이 만들어 보고 쓴 문장이라 옮겨도 원칙에 어긋나지 않는다.
+--
+-- 다만 8종은 옮기지 않았다. \`summary\` 에 **만드는 법**을 적어 둔 것들이라
+-- ("온도는 −3℃ 이하로 유지한다") 향·맛 서술이 아니다. 그것을 tasting_note 에 넣으면
+-- 게이트를 글자로는 통과하고 뜻으로는 어긴다. 그 8종은 draft 로 남고 에디터가 채운다.
 
 DO $seed$
 DECLARE
@@ -365,7 +369,8 @@ function cocktailBlock(cocktail: Cocktail, masters: Map<string, Master>): string
   lines.push(`        INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             ${sql(cocktail.id)}, ${sql(cocktail.ko)}, ${sql(cocktail.en)}, ${sql(cocktail.summary)},
             ${sql(baseSlug)}, ${sql(cocktail.stylePrimary)}, ${sql(method)},
@@ -374,7 +379,8 @@ function cocktailBlock(cocktail: Cocktail, masters: Map<string, Master>): string
             ${cocktail.story ? "true" : "false"}, ${sql(storyOf(cocktail))},
             ${sql(cocktail.origin?.year)}, ${sql(cocktail.origin?.place)}, ${sql(cocktail.origin?.creator)},
             ${cocktail.profile ? `ARRAY[${cocktail.profile.join(", ")}]::SMALLINT[]` : "NULL"},
-            'draft'
+            ${sql(cocktail.tastingNote)},
+            ${cocktail.tastingNote ? "'published', now()" : "'draft', NULL"}
         ) RETURNING id INTO v_cocktail_id;`);
 
   for (const style of cocktail.styles) {
