@@ -1,6 +1,7 @@
 package kr.kcocktail.common.web.error
 
 import jakarta.servlet.http.HttpServletRequest
+import kr.kcocktail.common.logging.SensitiveParams
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
@@ -169,7 +170,17 @@ class ApiExceptionHandler(
      */
     @ExceptionHandler(Exception::class)
     fun onUnhandled(e: Exception, req: HttpServletRequest): ResponseEntity<ProblemDetail> {
-        log.error("처리되지 않은 예외: {} {}", req.method, req.requestURI, e)
+        // 쿼리스트링을 마스킹해서 남긴다 (SPEC-08 §5.2 · 이슈 033).
+        //
+        // 경로만 남기면 안전하지만 무엇이 터졌는지 알 수 없어, 조사하다 보면 결국 쿼리를
+        // 붙이게 된다. 붙이되 `SensitiveParams` 를 거치게 해서 좌표가 새지 않게 한다 —
+        // **정상 경로만 마스킹하면 예외 경로로 샌다** (RED 12).
+        log.error(
+            "처리되지 않은 예외: {} {}",
+            req.method,
+            SensitiveParams.maskUri(req.requestURI, req.queryString),
+            e,
+        )
         return problem(
             status = HttpStatus.INTERNAL_SERVER_ERROR,
             typeSlug = "internal-error",
