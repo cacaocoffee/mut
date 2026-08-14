@@ -4,14 +4,18 @@
 --    `npx tsx scripts/seed-from-prototype.ts` 로 다시 만든다.
 --    변환 규칙은 그 스크립트에 있고, 그것이 이관 근거다.
 
--- ## draft 로 넣는다
+-- ## 서술이 있는 것만 발행한다
 --
--- `tasting_note` 가 발행 필수인데(GATE-COCKTAIL-01) 프로토타입에 그 필드가 없다.
--- **자동 생성하지 않는다** — `PRIN-P03` 이 "만들어보지 않은 것은 쓰지 않는다" 이고,
--- 향과 맛 서술이야말로 그 원칙이 지키려는 바로 그 값이다.
+-- `tasting_note` 는 발행 필수다 (GATE-COCKTAIL-01). `PRIN-P03` 이 그것을 요구한 이유는
+-- **직접 만들어 보고 쓴 내용**이어야 해서다 — 남의 설명을 옮기면 레시피 나열형 블로그와
+-- 구별되지 않는다.
 --
--- 에디터가 서술을 채우고 어드민에서 발행한다 (이슈 025 의 `NFR-O-01` 경로).
--- 그때까지 24종은 draft 이고, 공개 조회에는 안 나온다.
+-- 프로토타입의 `summary` 가 그 자리를 대신하고 있었다 (validate.ts 의 주석이 그렇게 적었다).
+-- 에디터 본인이 만들어 보고 쓴 문장이라 옮겨도 원칙에 어긋나지 않는다.
+--
+-- 다만 8종은 옮기지 않았다. `summary` 에 **만드는 법**을 적어 둔 것들이라
+-- ("온도는 −3℃ 이하로 유지한다") 향·맛 서술이 아니다. 그것을 tasting_note 에 넣으면
+-- 게이트를 글자로는 통과하고 뜻으로는 어긴다. 그 8종은 draft 로 남고 에디터가 채운다.
 
 DO $seed$
 DECLARE
@@ -24,7 +28,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'negroni', '네그로니', 'Negroni', '동량 배합의 교본. 캄파리의 쓴맛과 베르무트의 단맛이 진의 주니퍼 위에서 정확히 상쇄된다.',
             'gin', 'spirit-forward', 'stir',
@@ -39,7 +44,8 @@ BEGIN
 세 재료를 같은 양으로 쓰는 구조 덕분에 네그로니는 레시피가 아니라 비율로 기억된다. 진을 45ml로 올리면 드라이해지고, 베르무트를 45ml로 올리면 디저트에 가까워진다. 아카이브에서는 1:1:1을 기준값으로 둔다.',
             '1919년경', '피렌체, 이탈리아', '카밀로 네그로니 백작 (구전)',
             ARRAY[2, 1, 5, 4, 4]::SMALLINT[],
-            'draft'
+            '동량 배합의 교본. 캄파리의 쓴맛과 베르무트의 단맛이 진의 주니퍼 위에서 정확히 상쇄된다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'spirit-forward');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'bitter');
@@ -69,7 +75,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'martini', '마티니', 'Dry Martini', '드라이 베르무트의 양이 전부를 결정한다. 온도는 −3℃ 이하로 유지한다.',
             'gin', 'spirit-forward', 'stir',
@@ -84,7 +91,8 @@ BEGIN
 아카이브 기준값은 6:1이다. 여기서 베르무트를 20ml까지 올리면 50-50, 5ml 이하로 내리면 사실상 차가운 진이다.',
             '1888년 이전', '뉴욕, 미국', '불명 — 마티네즈에서 파생',
             ARRAY[1, 1, 2, 4, 5]::SMALLINT[],
-            'draft'
+            NULL,
+            'draft', NULL
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'spirit-forward');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'herbal');
@@ -113,7 +121,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'gimlet', '김렛', 'Gimlet', '라임 코디얼의 단맛과 진의 골격이 만나는 가장 단순한 사워.',
             'gin', 'sour', 'shake',
@@ -128,7 +137,8 @@ BEGIN
 생라임과 시럽으로 만들면 산미가 날카롭고, 코디얼로 만들면 향이 둥글다. 두 방식은 다른 음료로 취급해도 무리가 없다.',
             '1928년 기록', '런던, 영국', '영국 해군 관행에서 유래',
             ARRAY[3, 4, 1, 2, 4]::SMALLINT[],
-            'draft'
+            '라임 코디얼의 단맛과 진의 골격이 만나는 가장 단순한 사워.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'sour');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'citrus');
@@ -153,7 +163,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'gintonic', '진토닉', 'Gin & Tonic', '희석의 정확도가 맛을 만든다. 얼음은 크고 단단할수록 좋다.',
             'gin', 'highball', 'build',
@@ -168,7 +179,8 @@ BEGIN
 토닉의 당도가 완성도를 좌우한다. 아카이브는 진 1 : 토닉 2.5~3을 기준으로 잡는다.',
             '1850년대', '인도 주둔 영국군', '키니네 복용 관행',
             ARRAY[2, 2, 3, 3, 2]::SMALLINT[],
-            'draft'
+            NULL,
+            'draft', NULL
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'highball');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'citrus');
@@ -193,7 +205,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'southside', '사우스사이드', 'Southside', '민트를 넣은 진 사워. 모히토의 진 버전으로 읽어도 된다.',
             'gin', 'sour', 'shake',
@@ -208,7 +221,8 @@ BEGIN
 민트를 세게 눌러 으깨면 풀비린내가 난다. 향만 깨우는 정도가 기준이다.',
             '1920년대', '시카고 / 뉴욕', '금주법 시대 클럽',
             ARRAY[3, 4, 1, 4, 3]::SMALLINT[],
-            'draft'
+            '민트를 넣은 진 사워. 모히토의 진 버전으로 읽어도 된다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'sour');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'herbal');
@@ -236,7 +250,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'mule', '모스코 뮬', 'Moscow Mule', '진저비어의 매운맛이 중심. 보드카는 뼈대만 세운다.',
             'vodka', 'highball', 'build',
@@ -251,7 +266,8 @@ BEGIN
 구리 머그는 마케팅에서 왔지만, 열전도가 빨라 실제로 잔이 더 차게 느껴진다.',
             '1941년', '로스앤젤레스, 미국', '잭 모건 · 존 마틴',
             ARRAY[3, 3, 1, 3, 2]::SMALLINT[],
-            'draft'
+            '진저비어의 매운맛이 중심. 보드카는 뼈대만 세운다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'highball');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'spicy');
@@ -276,7 +292,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'espresso', '에스프레소 마티니', 'Espresso Martini', '크레마 층이 완성도의 지표. 커피는 뽑은 직후에 쓴다.',
             'vodka', 'creamy', 'shake',
@@ -291,7 +308,8 @@ BEGIN
 거품은 커피의 오일과 이산화탄소에서 나온다. 뽑고 1분이 지난 에스프레소로는 같은 층이 생기지 않는다.',
             '1983년', '런던, 영국', '딕 브래드셀',
             ARRAY[3, 1, 4, 4, 3]::SMALLINT[],
-            'draft'
+            NULL,
+            'draft', NULL
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'creamy');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'bitter');
@@ -321,7 +339,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'bloody', '블러디 메리', 'Bloody Mary', '짠맛·감칠맛 계열. 단맛이 거의 없는 유일한 브런치 잔.',
             'vodka', 'highball', 'build',
@@ -336,7 +355,8 @@ BEGIN
 정답 레시피가 없는 대신 균형 원칙이 있다. 산 : 염 : 매운맛을 각각 따로 조절한다.',
             '1921년경', '파리 → 뉴욕', '페르낭 프티오',
             ARRAY[1, 3, 2, 3, 2]::SMALLINT[],
-            'draft'
+            '짠맛·감칠맛 계열. 단맛이 거의 없는 유일한 브런치 잔.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'highball');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'spicy');
@@ -364,7 +384,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'cosmo', '코즈모폴리탄', 'Cosmopolitan', '크랜베리의 색과 트리플 섹의 오렌지 향. 산미가 축이 된다.',
             'vodka', 'sour', 'shake',
@@ -379,7 +400,8 @@ BEGIN
 크랜베리를 60ml까지 늘리면 주스에 가까워진다. 30ml가 산미와 색을 모두 지키는 지점이다.',
             '1987년', '샌프란시스코, 미국', '토비 체키니 (통설)',
             ARRAY[3, 4, 1, 3, 3]::SMALLINT[],
-            'draft'
+            '크랜베리의 색과 트리플 섹의 오렌지 향. 산미가 축이 된다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'sour');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'fruity');
@@ -407,7 +429,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'oldfashioned', '올드 패션드', 'Old Fashioned', '술·설탕·비터스·물. 칵테일의 정의 그 자체.',
             'whisky', 'spirit-forward', 'stir',
@@ -422,7 +445,8 @@ BEGIN
 희석이 유일한 변수다. 큰 얼음 하나로 천천히 마시는 전제로 설계된 배합이다.',
             '1880년대', '루이빌, 미국', '펜던니스 클럽 (통설)',
             ARRAY[2, 1, 3, 4, 5]::SMALLINT[],
-            'draft'
+            NULL,
+            'draft', NULL
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'spirit-forward');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'spicy');
@@ -451,7 +475,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'manhattan', '맨해튼', 'Manhattan', '라이의 스파이스와 스위트 베르무트. 네그로니와 마티니 사이.',
             'whisky', 'spirit-forward', 'stir',
@@ -466,7 +491,8 @@ BEGIN
 개봉한 베르무트는 냉장 보관해도 3주가 한계다. 맨해튼이 실패하는 대부분의 이유가 여기에 있다.',
             '1880년대', '뉴욕, 미국', '맨해튼 클럽 (통설)',
             ARRAY[3, 1, 3, 4, 5]::SMALLINT[],
-            'draft'
+            '라이의 스파이스와 스위트 베르무트. 네그로니와 마티니 사이.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'spirit-forward');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'bitter');
@@ -494,7 +520,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'whiskeysour', '위스키 사워', 'Whiskey Sour', '사워 공식(술 2 : 산 1 : 당 1)의 표준 예시.',
             'whisky', 'sour', 'shake',
@@ -509,7 +536,8 @@ BEGIN
 흰자는 맛보다 질감을 위한 재료다. 넣지 않으면 산미가 더 뚜렷해진다.',
             '1862년 수록', '미국', '제리 토머스 저서',
             ARRAY[3, 5, 1, 3, 3]::SMALLINT[],
-            'draft'
+            NULL,
+            'draft', NULL
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'sour');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'sour');
@@ -538,7 +566,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'penicillin', '페니실린', 'Penicillin', '생강·꿀·레몬에 아일라 위스키의 연기를 얹은 현대 고전.',
             'whisky', 'sour', 'shake',
@@ -553,7 +582,8 @@ BEGIN
 연기를 섞지 않고 위에 띄우는 것이 핵심이다. 첫 향과 끝 맛이 분리된다.',
             '2005년', '뉴욕, 미국', '샘 로스',
             ARRAY[3, 4, 2, 5, 3]::SMALLINT[],
-            'draft'
+            '생강·꿀·레몬에 아일라 위스키의 연기를 얹은 현대 고전.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'sour');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'smoky');
@@ -582,7 +612,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'boulevardier', '불바디에', 'Boulevardier', '네그로니의 위스키 버전. 진보다 무게가 있고 단맛이 길다.',
             'whisky', 'spirit-forward', 'stir',
@@ -597,7 +628,8 @@ BEGIN
 위스키를 45ml로 올려 캄파리보다 우위에 두는 것이 현행 표준이다.',
             '1927년', '파리, 프랑스', '어스킨 그웬 (잡지 편집자)',
             ARRAY[3, 1, 4, 4, 4]::SMALLINT[],
-            'draft'
+            '네그로니의 위스키 버전. 진보다 무게가 있고 단맛이 길다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'spirit-forward');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'bitter');
@@ -622,7 +654,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'daiquiri', '다이키리', 'Daiquiri', '럼의 품질이 그대로 드러난다. 세 재료 뒤에 숨을 곳이 없다.',
             'rum', 'sour', 'shake',
@@ -637,7 +670,8 @@ BEGIN
 시럽 18ml는 라임의 산도에 따라 조정한다. 라임이 날카로운 계절에는 20ml까지 올린다.',
             '1898년경', '산티아고, 쿠바', '제닝스 콕스 (통설)',
             ARRAY[3, 4, 1, 3, 4]::SMALLINT[],
-            'draft'
+            NULL,
+            'draft', NULL
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'sour');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'citrus');
@@ -662,7 +696,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'mojito', '모히토', 'Mojito', '민트 향, 라임 산미, 탄산의 세 층이 분리되어 있어야 한다.',
             'rum', 'highball', 'build',
@@ -677,7 +712,8 @@ BEGIN
 크러시드 아이스는 희석 속도가 빠르다. 그래서 시럽이 20ml까지 들어간다.',
             '19세기', '하바나, 쿠바', '불명',
             ARRAY[3, 3, 1, 4, 2]::SMALLINT[],
-            'draft'
+            '민트 향, 라임 산미, 탄산의 세 층이 분리되어 있어야 한다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'highball');
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'sour');
@@ -710,7 +746,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'maitai', '마이 타이', 'Mai Tai', '오르자(아몬드 시럽)가 향의 중심. 과일 주스는 들어가지 않는다.',
             'rum', 'tiki', 'shake',
@@ -725,7 +762,8 @@ BEGIN
 두 종류의 럼을 쓰는 이유는 무게(자메이카)와 풀 향(아그리콜)을 동시에 얻기 위해서다.',
             '1944년', '오클랜드, 미국', '빅터 버제론',
             ARRAY[4, 4, 1, 5, 4]::SMALLINT[],
-            'draft'
+            '오르자(아몬드 시럽)가 향의 중심. 과일 주스는 들어가지 않는다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'tiki');
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'sour');
@@ -758,7 +796,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'darknstormy', '다크 앤 스토미', 'Dark ’n’ Stormy', '층을 만들어 마시는 구조. 섞지 않고 낸다.',
             'rum', 'highball', 'build',
@@ -773,7 +812,8 @@ BEGIN
 럼을 띄우면 첫 모금은 생강, 마지막은 당밀이다. 섞으면 이 대비가 사라진다.',
             '20세기 초', '버뮤다', '고슬링스 럼',
             ARRAY[4, 2, 1, 3, 2]::SMALLINT[],
-            'draft'
+            NULL,
+            'draft', NULL
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'highball');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'spicy');
@@ -798,7 +838,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'margarita', '마르가리타', 'Margarita', '소금·산·단맛 세 축의 균형. 데킬라는 100% 아가베를 쓴다.',
             'agave', 'sour', 'shake',
@@ -813,7 +854,8 @@ BEGIN
 쿠앵트로를 아가베 시럽으로 바꾸면 데킬라의 식물성 향이 훨씬 선명해진다.',
             '1930~40년대', '멕시코 / 미국 국경', '다수의 주장',
             ARRAY[3, 5, 1, 3, 4]::SMALLINT[],
-            'draft'
+            '소금·산·단맛 세 축의 균형. 데킬라는 100% 아가베를 쓴다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'sour');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'citrus');
@@ -841,7 +883,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'paloma', '팔로마', 'Paloma', '멕시코에서 실제로 가장 많이 마시는 데킬라 롱드링크.',
             'agave', 'highball', 'build',
@@ -856,7 +899,8 @@ BEGIN
 생자몽으로 만들면 완전히 다른 잔이 된다. 아카이브는 두 방식을 모두 표준으로 본다.',
             '1950년대', '멕시코', '불명',
             ARRAY[3, 3, 2, 3, 2]::SMALLINT[],
-            'draft'
+            NULL,
+            'draft', NULL
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'highball');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'citrus');
@@ -884,7 +928,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'sojuhighball', '소주 하이볼', 'Soju Highball', '증류식 소주의 곡물 향을 탄산으로 늘린 구조. 희석률이 관건.',
             'korean', 'highball', 'build',
@@ -899,7 +944,8 @@ BEGIN
 25도 소주는 1:2.5, 40도대는 1:4를 기준으로 잡는다. 곡물 향이 남는 선이다.',
             '2010년대', '서울, 한국', '국내 바 씬',
             ARRAY[2, 1, 1, 3, 2]::SMALLINT[],
-            'draft'
+            '증류식 소주의 곡물 향을 탄산으로 늘린 구조. 희석률이 관건.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'highball');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'citrus');
@@ -924,7 +970,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'munbae', '문배 올드 패션드', 'Munbae Old Fashioned', '문배주의 배·수수 향을 올드 패션드 구조에 넣은 응용 배합.',
             'korean', 'spirit-forward', 'stir',
@@ -939,7 +986,8 @@ BEGIN
 조청은 설탕보다 점도가 높아 5~8ml에서 이미 충분한 무게가 붙는다.',
             '2010년대 응용', '한국', '아카이브 편집부 배합',
             ARRAY[2, 1, 3, 5, 5]::SMALLINT[],
-            'draft'
+            '문배주의 배·수수 향을 올드 패션드 구조에 넣은 응용 배합.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'spirit-forward');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'smoky');
@@ -967,7 +1015,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'makgeolli', '막걸리 콜라다', 'Makgeolli Colada', '막걸리의 유산 향과 코코넛·파인애플. 가장 단 항목.',
             'korean', 'creamy', 'shake',
@@ -982,7 +1031,8 @@ BEGIN
 막걸리는 살균/비살균에 따라 산미 차이가 크다. 비살균 제품은 파인애플을 30ml로 줄인다.',
             '2020년대', '한국', '아카이브 편집부 배합',
             ARRAY[5, 2, 1, 3, 1]::SMALLINT[],
-            'draft'
+            '막걸리의 유산 향과 코코넛·파인애플. 가장 단 항목.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'creamy');
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'tiki');
@@ -1011,7 +1061,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'shrub', '시트러스 슈럽', 'Citrus Shrub (NA)', '식초 기반 시럽으로 산미의 층을 만든 무알콜 항목.',
             'non-alcoholic', 'highball', 'build',
@@ -1026,7 +1077,8 @@ BEGIN
 식초의 양이 3ml만 넘어도 균형이 무너진다. 슈럽 시럽으로 미리 배합해 쓰는 편이 안정적이다.',
             '17세기 보존법', '유럽 → 현대 바', '식초 보존 전통',
             ARRAY[3, 4, 2, 4, 0]::SMALLINT[],
-            'draft'
+            '식초 기반 시럽으로 산미의 층을 만든 무알콜 항목.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'highball');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'citrus');
@@ -1054,7 +1106,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'corpsereviver2', '콥스 리바이버 넘버 2', 'Corpse Reviver No.2', '시트러스의 새콤달콤함 위로 릴레의 와인 뉘앙스가 겹치고, 진의 보타니컬이 중심을 잡는다. 압생트는 끝에 미묘하게만 스친다.',
             'gin', 'sour', 'shake',
@@ -1069,7 +1122,8 @@ BEGIN
 지금의 넘버 2는 1930년 사보이 칵테일 북에서 굳어졌다. 책은 레시피 아래에 ''4잔을 연속으로 빠르게 마시면 되살아난 시체도 다시 죽을 것''이라고 적어 두었다. 원전은 동량 배합이지만 균형이 좋다고 보기 어려워 아카이브는 22.5ml 4등분을 기준으로 둔다.',
             '1930년', '런던, 영국', '해리 크래독 《The Savoy Cocktail Book》',
             ARRAY[3, 4, 1, 4, 3]::SMALLINT[],
-            'draft'
+            '시트러스의 새콤달콤함 위로 릴레의 와인 뉘앙스가 겹치고, 진의 보타니컬이 중심을 잡는다. 압생트는 끝에 미묘하게만 스친다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'sour');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'citrus');
@@ -1102,7 +1156,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'vesper', '베스퍼', 'Vesper', '잔을 입에 가져가면 레몬 향이 먼저 오고, 보타니컬과 술 자체의 단맛 뒤로 릴레의 와인스러운 뉘앙스가 살짝 남는다. 깔끔하지만 도수는 상당히 높다.',
             'gin', 'spirit-forward', 'shake',
@@ -1117,7 +1172,8 @@ BEGIN
 원전의 키나 릴레는 1986년에 퀴닌을 줄이고 단맛을 올리며 릴레 블랑으로 바뀌었다. 술만 들어가는데 왜 셰이킹인가는 오래된 질문인데, 스터로 만들어도 문제는 없고 차이는 결국 잔에 들어가는 물의 양이다.',
             '1953년', '소설 《카지노 로얄》', '이언 플레밍',
             ARRAY[1, 1, 1, 4, 5]::SMALLINT[],
-            'draft'
+            '잔을 입에 가져가면 레몬 향이 먼저 오고, 보타니컬과 술 자체의 단맛 뒤로 릴레의 와인스러운 뉘앙스가 살짝 남는다. 깔끔하지만 도수는 상당히 높다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'spirit-forward');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'citrus');
@@ -1146,7 +1202,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'whitenegroni', '화이트 네그로니', 'White Negroni', '진의 보타니컬이 중심을 잡고 수즈의 달큰하면서 쌉쌀한 뿌리 식물 캐릭터가 은은하게 올라온다. 클래식 네그로니보다 한껏 가볍고 섬세하다.',
             'gin', 'spirit-forward', 'stir',
@@ -1161,7 +1218,8 @@ BEGIN
 그래서 캄파리 자리에 수즈, 스위트 베르무트 자리에 릴레 블랑이 들어갔다. 이름은 블랙넬이 붙였는데, 네그로니의 어두운 적갈색과 정반대로 부르자는 뜻이었다. 실제 색은 금색에 가깝다.',
             '2001년', '메독, 프랑스', '웨인 콜린스 · 닉 블랙넬',
             ARRAY[2, 1, 4, 4, 4]::SMALLINT[],
-            'draft'
+            '진의 보타니컬이 중심을 잡고 수즈의 달큰하면서 쌉쌀한 뿌리 식물 캐릭터가 은은하게 올라온다. 클래식 네그로니보다 한껏 가볍고 섬세하다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'spirit-forward');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'bitter');
@@ -1190,7 +1248,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'stayuplate', '스테이 업 레이트', 'Stay Up Late', '진 피즈에 꼬냑을 얹은 구조라 사이드카와 진 피즈를 매시업한 듯한 맛이 난다. 유자는 전혀 들어가지 않는데 유자청 같은 인상이 남는다.',
             'gin', 'sour', 'shake',
@@ -1205,7 +1264,8 @@ BEGIN
 부록은 클럽 스태프를 취재해 덧붙인 목록인데, 이 잔은 모자 관리 부서의 베로니카 해롤드가 올린 것이다. 그녀가 만든 것인지는 알 수 없지만 이름만큼은 나이트클럽에 잘 어울린다. 원전은 비율이 꽤 달라 아카이브는 조정된 배합을 기준으로 둔다.',
             '1946년', '뉴욕, 미국', '《The Stork Club Bar Book》 부록 · 베로니카 해롤드',
             ARRAY[3, 4, 1, 4, 2]::SMALLINT[],
-            'draft'
+            '진 피즈에 꼬냑을 얹은 구조라 사이드카와 진 피즈를 매시업한 듯한 맛이 난다. 유자는 전혀 들어가지 않는데 유자청 같은 인상이 남는다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'sour');
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'highball');
@@ -1242,7 +1302,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'kaikanfizz', '카이칸 피즈', 'Kaikan Fizz', '우유가 들어간 진 피즈. 일반 진 피즈보다 부드럽고 실키하며, 칼피스나 밀키스를 살짝 떠올리게 하는 맛이 난다.',
             'gin', 'sour', 'shake',
@@ -1257,7 +1318,8 @@ BEGIN
 우유와 레몬을 같이 쓰는 건 사실 좋은 조합이 아니다. 레몬의 산이 우유의 단백질을 응고시키기 때문이다. 게다가 탄산수를 세게 부으면 거품이 넘친다. 그래서 일반 진 피즈보다 만들기 까다로운 잔으로 통한다.',
             '1945~1952년', '도쿄, 일본', '도쿄카이칸 메인 바',
             ARRAY[3, 3, 1, 3, 2]::SMALLINT[],
-            'draft'
+            '우유가 들어간 진 피즈. 일반 진 피즈보다 부드럽고 실키하며, 칼피스나 밀키스를 살짝 떠올리게 하는 맛이 난다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'sour');
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'creamy');
@@ -1291,7 +1353,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'caipiroska', '카이피로스카', 'Caipiroska', '달고 상큼해 리프레시하기 좋다. 맛이 비교적 직관적이고 단순한 편이다.',
             'vodka', 'sour', 'etc',
@@ -1306,7 +1369,8 @@ BEGIN
 국내에서는 카샤사를 구할 수는 있지만 쓸 곳이 많지 않다. 보드카가 훨씬 구하기 쉬워 원형보다 이쪽을 권하게 된다. 딸기나 블루베리를 같이 넣는 변형도 많다.',
             '1980~90년대 추정', '브라질', '미상',
             ARRAY[3, 5, 0, 3, 4]::SMALLINT[],
-            'draft'
+            '달고 상큼해 리프레시하기 좋다. 맛이 비교적 직관적이고 단순한 편이다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'sour');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'citrus');
@@ -1332,7 +1396,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'robroy', '롭 로이', 'Rob Roy', '바닐라 느낌이 적고 맨해튼보다 섬세하다. 생각보다 달큰하고 복잡하며, 쓰는 스카치에 따라 편차가 크다.',
             'whisky', 'spirit-forward', 'stir',
@@ -1347,7 +1412,8 @@ BEGIN
 다만 10년 앞선 1884년에 이미 스카치와 베르무트를 쓴 다른 이름의 칵테일이 있었고, 기주만 다른 맨해튼은 그보다도 먼저 있었다. 당시에는 스위트 베르무트가 들어간 칵테일이 크게 유행했다. 정말 이 호텔에서 ''탄생''했는지에는 의문이 남는다.',
             '1894년', '뉴욕, 미국', '월도프-아스토리아 호텔 (구전)',
             ARRAY[3, 1, 2, 4, 4]::SMALLINT[],
-            'draft'
+            '바닐라 느낌이 적고 맨해튼보다 섬세하다. 생각보다 달큰하고 복잡하며, 쓰는 스카치에 따라 편차가 크다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'spirit-forward');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'herbal');
@@ -1376,7 +1442,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'bobbyburns', '바비 번스', 'Bobby Burns', '아주 복합적이다. 스카치의 바닐라와 숙성감, 베르무트의 와인스러움과 향신료, 베네딕틴의 꿀과 허브까지 겹겹이 쌓인다. 나이트캡에 어울린다.',
             'whisky', 'spirit-forward', 'stir',
@@ -1391,7 +1458,8 @@ BEGIN
 가장 오래된 기록은 1899년까지 올라가지만 진저 코디얼이 들어가는 전혀 다른 배합이다. 1900년대 초에 베이비 번스라는 이름으로 지금과 비슷한 것이 기록됐고, 현재의 형태는 1930년 사보이 칵테일 북에서 굳어졌다. 재료와 시기를 보면 롭 로이의 변형으로 읽는 편이 자연스럽다.',
             '1930년', '런던, 영국', '해리 크래독 《The Savoy Cocktail Book》',
             ARRAY[3, 1, 2, 5, 4]::SMALLINT[],
-            'draft'
+            '아주 복합적이다. 스카치의 바닐라와 숙성감, 베르무트의 와인스러움과 향신료, 베네딕틴의 꿀과 허브까지 겹겹이 쌓인다. 나이트캡에 어울린다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'spirit-forward');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'herbal');
@@ -1420,7 +1488,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'oldpal', '올드 팔', 'Old Pal', '네그로니 특유의 묵직한 단맛 대신 가볍고 화사하다. 쌉쌀함·달달함·허브감이 화사하게 겹치고 라이의 바닐라가 살짝 비친다.',
             'whisky', 'spirit-forward', 'stir',
@@ -1435,7 +1504,8 @@ BEGIN
 그 ''저자''가 맥켈혼인지 모스인지는 논란이 있는데, 이 대목이 메인 칵테일 목록이 아니라 모스의 에세이에 있다는 점에서 최근에는 모스로 보는 쪽이 힘을 얻는다. 에세이의 배합은 ''이탈리안 베르무트''라고만 적혀 있어 지금의 드라이 베르무트 배합과는 거리가 있다. 원전에서 꽤 많이 변한 잔이다.',
             '1927년', '파리, 프랑스', '해리 맥켈혼 《Barflies and Cocktails》',
             ARRAY[2, 1, 4, 4, 4]::SMALLINT[],
-            'draft'
+            '네그로니 특유의 묵직한 단맛 대신 가볍고 화사하다. 쌉쌀함·달달함·허브감이 화사하게 겹치고 라이의 바닐라가 살짝 비친다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'spirit-forward');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'bitter');
@@ -1464,7 +1534,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'bananaboulevardier', '바나나 불바디에', 'Banana Boulevardier', '쨍하고 확실한 바나나 맛에 캄파리의 쌉쌀함과 버무스의 허브감이 붙고, 버번의 견과류가 중심을 잡는다. 단맛이 꽤 강한 편이다.',
             'whisky', 'spirit-forward', 'stir',
@@ -1479,7 +1550,8 @@ BEGIN
 바나나 리큐르와 캄파리의 비율을 조금 낮춰 잡는 편이 낫다. 그대로 만들면 단맛이 앞선다. 기주를 버번이 아니라 오버프루프 자메이칸 럼으로 바꾸면 훨씬 펑키한 네그로니 변형이 된다.',
             '2015년 8월', '휴스턴, 미국', '테리 윌리엄스 (Anvil Bar & Refuge)',
             ARRAY[4, 1, 3, 4, 4]::SMALLINT[],
-            'draft'
+            '쨍하고 확실한 바나나 맛에 캄파리의 쌉쌀함과 버무스의 허브감이 붙고, 버번의 견과류가 중심을 잡는다. 단맛이 꽤 강한 편이다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'spirit-forward');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'fruity');
@@ -1512,7 +1584,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'rumsoda', '럼앤소다', 'Rum & Soda', '열대과일과 바닐라, 후숙된 바나나가 은은하게 느껴지는 부담 없는 한 잔. 결국 럼 하이볼이라 어떤 럼을 쓰느냐가 맛의 전부를 정한다.',
             'rum', 'highball', 'build',
@@ -1527,7 +1600,8 @@ BEGIN
 럼은 오랫동안 선원과 노동자의 술이라는 이미지가 강했다. 이전 세대의 본드가 샴페인과 마티니처럼 상류층의 코드를 공유하는 술을 마셨다는 걸 생각하면, 첫 잔을 럼으로 고른 것은 거칠고 대담한 본드로 바뀌었다는 신호로 읽을 수 있다.',
             '미상', '바하마 (《카지노 로얄》 배경)', '미상',
             ARRAY[1, 0, 0, 3, 2]::SMALLINT[],
-            'draft'
+            '열대과일과 바닐라, 후숙된 바나나가 은은하게 느껴지는 부담 없는 한 잔. 결국 럼 하이볼이라 어떤 럼을 쓰느냐가 맛의 전부를 정한다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'highball');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'fruity');
@@ -1548,7 +1622,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'kingstonnegroni', '킹스톤 네그로니', 'Kingston Negroni', '클래식보다 허브감이 훨씬 덜하고 단순한데, 후숙된 바나나와 흑당·초콜릿·향신료가 통통 튄다. 복합성은 떨어져도 자극적인 매력이 있다.',
             'rum', 'spirit-forward', 'stir',
@@ -1563,7 +1638,8 @@ BEGIN
 자메이카 럼의 특징은 ''펑키함''이다. 과하게 후숙된 바나나, 열대 과일, 따뜻한 계열의 향신료가 삐죽삐죽 튀어나오는 캐릭터다. 클래식과 궁합이 나쁠 것 같지만 오히려 캄파리처럼 센 재료와 잘 맞물린다. 마실 때 도수감이 크게 느껴지지 않으니 주의해야 한다.',
             '2010년경', '뉴욕, 미국', '호아킨 시모',
             ARRAY[3, 1, 4, 4, 5]::SMALLINT[],
-            'draft'
+            '클래식보다 허브감이 훨씬 덜하고 단순한데, 후숙된 바나나와 흑당·초콜릿·향신료가 통통 튄다. 복합성은 떨어져도 자극적인 매력이 있다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'spirit-forward');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'fruity');
@@ -1593,7 +1669,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'bostoncooler', '보스턴 쿨러', 'Boston Cooler', '상큼 달달하고 생강의 알싸한 맛이 매력적이다. 약간의 탄산감이 붙어 모스코 뮬에 럼의 풍미가 더해진 느낌이 난다.',
             'rum', 'highball', 'shake',
@@ -1608,7 +1685,8 @@ BEGIN
 흥미로운 건 인지도다. 분명 서양에서 만들어진 것으로 보이는데 지금 서양에서는 거의 알려져 있지 않고 일본과 한국 정도에서만 통한다. 영어로 검색하면 진저에일에 바닐라 아이스크림을 얹은 디트로이트의 음료가 주로 나온다.',
             '미상', '미국 (추정)', '미상 (쿨러 계열)',
             ARRAY[3, 4, 1, 3, 2]::SMALLINT[],
-            'draft'
+            '상큼 달달하고 생강의 알싸한 맛이 매력적이다. 약간의 탄산감이 붙어 모스코 뮬에 럼의 풍미가 더해진 느낌이 난다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'highball');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'spicy');
@@ -1641,7 +1719,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'bnb', '비앤비', 'B&B', '베네딕틴의 사프란·꿀·허브 캐릭터에 꼬냑의 풍미가 겹친다. 재료가 둘뿐이고 베네딕틴의 맛은 정해져 있으니 어떤 꼬냑을 쓰느냐로 맛이 갈린다.',
             'brandy', 'spirit-forward', 'build',
@@ -1656,7 +1735,8 @@ BEGIN
 베네딕틴이 19세기에 상품화된 것을 생각하면 1910년 이전에 이미 이 조합이 있었을 가능성도 무리한 추측은 아니다. 인기가 있었던 모양인지 1937년에는 베네딕틴이 직접 베네딕틴 60%와 프랑스 브랜디 40%를 섞은 RTD 제품을 내놓기도 했다.',
             '1910년 이전', '미국', '미상 (1930년대 21 Club 설)',
             ARRAY[3, 0, 2, 5, 5]::SMALLINT[],
-            'draft'
+            '베네딕틴의 사프란·꿀·허브 캐릭터에 꼬냑의 풍미가 겹친다. 재료가 둘뿐이고 베네딕틴의 맛은 정해져 있으니 어떤 꼬냑을 쓰느냐로 맛이 갈린다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'spirit-forward');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'herbal');
@@ -1681,7 +1761,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'betweenthesheets', '비트윈 더 시츠', 'Between the Sheets', '원형인 사이드카보다 오렌지와 알코올에서 오는 단맛이 강하게 난다. 다만 복합성 자체는 사이드카보다 꽤 많이 떨어진다.',
             'brandy', 'sour', 'shake',
@@ -1696,7 +1777,8 @@ BEGIN
 구조상 사이드카에서 꼬냑을 줄이고 그만큼 럼을 채운 것이다. 이름은 ''침대 안에서''라는 뜻이고 나이트캡으로 마시는 잔이라고 하는데, 이런 신맛의 칵테일을 나이트캡으로 잘 마시지 않는 걸 보면 이름 때문에 붙은 설명 같다. 원전 배합은 알코올감이 너무 강해 아카이브는 레몬을 늘린 배합을 기준으로 둔다.',
             '1920~30년대', '파리, 프랑스', '해리 맥켈혼 (구전)',
             ARRAY[3, 4, 1, 3, 4]::SMALLINT[],
-            'draft'
+            '원형인 사이드카보다 오렌지와 알코올에서 오는 단맛이 강하게 난다. 다만 복합성 자체는 사이드카보다 꽤 많이 떨어진다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'sour');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'citrus');
@@ -1724,7 +1806,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'calvadostonic', '칼바도스 토닉', 'Calvados Tonic', '잔을 입으로 가져가면 향긋한 레몬과 달큰한 사과 향이 먼저 온다. 사과의 단맛과 토닉의 쌉쌀함이 청량하게 균형을 잡는다.',
             'brandy', 'highball', 'build',
@@ -1739,7 +1822,8 @@ BEGIN
 구조는 진토닉과 같지만 칼바도스가 달달한 사과 캐릭터를 가지고 있어 훨씬 달고 가볍다. 앙고스투라를 한 방울 넣으면 맛이 풍부해지고, 토닉을 줄이고 탄산수를 더하면 탄산감이 산다.',
             '미상', '노르망디, 프랑스 (칼바도스 산지)', '미상',
             ARRAY[3, 1, 2, 4, 2]::SMALLINT[],
-            'draft'
+            '잔을 입으로 가져가면 향긋한 레몬과 달큰한 사과 향이 먼저 온다. 사과의 단맛과 토닉의 쌉쌀함이 청량하게 균형을 잡는다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'highball');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'fruity');
@@ -1769,7 +1853,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'bamboo', '뱀부', 'Bamboo', '드라이하고 깔끔하며 약간 떫고 독특한 짠맛이 있다. 피노 셰리의 견과류와 베르무트의 허브·향신료가 조용히 겹친다.',
             'wine', 'spirit-forward', 'stir',
@@ -1784,7 +1869,8 @@ BEGIN
 주목할 점은 ''만들어졌다''가 아니라 ''소개되어 왔다''는 표현이다. 에핑어는 1880년대 초중반 미국 북서부 항구도시에서 술집을 운영했다. 그 영국인들이 거기서 맛보고 다른 도시로 옮겼을 가능성을 상상하게 하지만 더 이상의 기록은 없다. 1890~1910년대에 베르무트만 다른 아도니스가 나온 걸 보면 셰리와 베르무트의 조합 자체가 당시 새로운 것은 아니었다.',
             '1880년대 중반', '요코하마, 일본 (통설)', '루이스 에핑어 (통설)',
             ARRAY[1, 1, 2, 3, 2]::SMALLINT[],
-            'draft'
+            '드라이하고 깔끔하며 약간 떫고 독특한 짠맛이 있다. 피노 셰리의 견과류와 베르무트의 허브·향신료가 조용히 겹친다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'spirit-forward');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'nutty');
@@ -1809,7 +1895,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'adonis', '아도니스', 'Adonis', '감칠맛이 압도적이다. 와인스러움에 한약 같은 뉘앙스가 겹치고, 약간의 오렌지와 견과류 뒤로 향신료·허브·차의 캐릭터가 훅 지나간다.',
             'wine', 'spirit-forward', 'stir',
@@ -1824,7 +1911,8 @@ BEGIN
 월도프-아스토리아 호텔 설이 그럴듯한 이유는 여럿이다. 당시 셰리와 베르무트는 상류층이 즐기던 값비싼 술이라 고급 호텔에서나 취급했고, 이 호텔은 사교의 중심지였으며, 1931년과 1935년에 호텔의 레시피집이 따로 출판될 정도였다. 뱀부에서 드라이 베르무트를 스위트로 바꾼 잔이라 캐릭터를 어느 정도 공유한다.',
             '1913년 이전', '뉴욕, 미국', '월도프-아스토리아 호텔 (추정)',
             ARRAY[2, 1, 2, 4, 2]::SMALLINT[],
-            'draft'
+            '감칠맛이 압도적이다. 와인스러움에 한약 같은 뉘앙스가 겹치고, 약간의 오렌지와 견과류 뒤로 향신료·허브·차의 캐릭터가 훅 지나간다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'spirit-forward');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'nutty');
@@ -1850,7 +1938,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'pompier', '폼피에', 'Pompier', '덜 달지만 허브감과 와인스러움이 붙은, 약간은 복잡한 카시스 소다 같다. 복합미가 있는 잔은 아니고 맛 자체는 단순한 편이다.',
             'wine', 'highball', 'build',
@@ -1865,7 +1954,8 @@ BEGIN
 기주가 드라이 베르무트라는 점이 특이하다. 베르무트를 사 두고 쓸 곳이 없어 애를 먹는 경우에 특히 쓸모가 있다. 크렘 드 카시스는 제품마다 품질 차이가 극명하니 좋은 것을 고르는 편이 낫다.',
             '미상', '미상', '미상',
             ARRAY[3, 1, 1, 3, 1]::SMALLINT[],
-            'draft'
+            '덜 달지만 허브감과 와인스러움이 붙은, 약간은 복잡한 카시스 소다 같다. 복합미가 있는 잔은 아니고 맛 자체는 단순한 편이다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'highball');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'fruity');
@@ -1890,7 +1980,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'beeramericano', '비어 아메리카노', 'Beer Americano', '맥주가 들어간 것치고 쓴맛이 안 나고 오히려 들큰하면서 산뜻하다. 탄산 대신 폭신폭신한 질감이 캄파리의 쓴맛을 감싼다.',
             'liqueur', 'highball', 'build',
@@ -1905,7 +1996,8 @@ BEGIN
 토마소 세카는 맥주를 휘핑해 실질적으로 거품을 넣었다. 맥주 하면 청량한 탄산을 떠올리게 되지만 여기에는 탄산이 없고 폭신한 질감이 대신 들어간다. 클래식 아메리카노가 쓴맛을 가볍고 청량하게 즐기는 잔이라면, 이쪽은 무게감을 잃지 않으면서 부드럽게 가는 잔이다.',
             '2010년대 중반', '밀라노, 이탈리아', '토마소 세카 (Cafe Trussardi)',
             ARRAY[3, 1, 3, 3, 2]::SMALLINT[],
-            'draft'
+            '맥주가 들어간 것치고 쓴맛이 안 나고 오히려 들큰하면서 산뜻하다. 탄산 대신 폭신폭신한 질감이 캄파리의 쓴맛을 감싼다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'highball');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'bitter');
@@ -1935,7 +2027,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'sloeginfizz', '슬로 진 피즈', 'Sloe Gin Fizz', '베리류와 핵과류의 달큰한 과실감에 레몬의 상큼함이 붙어 새콤달콤함이 주를 이룬다. 슬로 진이 26%라 알코올감이 거의 느껴지지 않는다.',
             'liqueur', 'sour', 'shake',
@@ -1950,7 +2043,8 @@ BEGIN
 이 술은 19세기 말~20세기 초 영국에서 상업적으로 생산되기 시작했고, 같은 시기에 이미 여러 저서가 다양한 기주의 피즈를 소개하고 있었다. 두 흐름을 겹쳐 보면 이 잔은 19세기 말쯤 생겼을 것으로 짐작된다. 가정에서 만들던 술이 상업화를 거쳐 바의 문화로 편입된 독특한 이력이다.',
             '19세기 말 추정', '영국', '미상',
             ARRAY[4, 4, 0, 3, 1]::SMALLINT[],
-            'draft'
+            '베리류와 핵과류의 달큰한 과실감에 레몬의 상큼함이 붙어 새콤달콤함이 주를 이룬다. 슬로 진이 26%라 알코올감이 거의 느껴지지 않는다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'sour');
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'highball');
@@ -1981,7 +2075,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'shoyojurin', '조엽수림', 'Shoyojurin', '쌉쌀하고 달큰한 차의 맛이 이어지다 끝에 살짝 쌉쌀하고 텁텁한 여운이 남는다. 도수가 낮아 식후나 마지막 한 잔에 어울린다.',
             'liqueur', 'highball', 'build',
@@ -1996,7 +2091,8 @@ BEGIN
 조엽수림은 습기 많은 곳에 분포하는 상록 활엽수 중심의 삼림 군계를 가리킨다. 만화는 그 분포가 히말라야 중턱에서 동남아시아·중국·한반도를 거쳐 일본에 이르는 차의 길과 겹친다고 표현한다. 색과 이야기에 딱 맞는 이름이라는 뜻이다.',
             '미상', '일본', '후쿠니시 에이조 (구전)',
             ARRAY[3, 0, 3, 3, 1]::SMALLINT[],
-            'draft'
+            '쌉쌀하고 달큰한 차의 맛이 이어지다 끝에 살짝 쌉쌀하고 텁텁한 여운이 남는다. 도수가 낮아 식후나 마지막 한 잔에 어울린다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'highball');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'bitter');
@@ -2018,7 +2114,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'chinablue', '차이나 블루', 'China Blue', '리치의 달달하고 화려한 맛에 자몽의 신맛, 블루 큐라소의 달달한 시트러스가 겹친다. 간단하지만 복합적이고 비주얼이 화려하다.',
             'liqueur', 'highball', 'build',
@@ -2033,7 +2130,8 @@ BEGIN
 원래는 토닉이 들어가지 않고 자몽즙이 더 많이 들어가는 쇼트 스타일이었지만 지금은 롱 스타일이 더 대중적이다. 토닉 외의 재료를 셰이킹하는 바텐더도 있고 그편이 일체감은 낫다. 다만 연한 핑크색 위로 파란 큐라소를 부어 색이 변하는 연출은 이 방식에서만 나온다.',
             '미상', '도야마현, 일본', '우치다 테루히로 (Bar Hakubakan)',
             ARRAY[4, 3, 1, 3, 1]::SMALLINT[],
-            'draft'
+            '리치의 달달하고 화려한 맛에 자몽의 신맛, 블루 큐라소의 달달한 시트러스가 겹친다. 간단하지만 복합적이고 비주얼이 화려하다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'highball');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'fruity');
@@ -2063,7 +2161,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'spumoni', '스푸모니', 'Spumoni', '캄파리의 쌉쌀하고 시트러시한 맛이 자몽과 정말 잘 어울린다. 과하게 달지 않고 약간 쌉쌀하며 도수가 낮아 부담이 없다.',
             'liqueur', 'highball', 'build',
@@ -2078,7 +2177,8 @@ BEGIN
 이탈리아에서 스푸모니는 전통적인 아이스크림 디저트를 가리키고 이 칵테일과는 상관이 없어 보인다. 결국 이탈리아와의 접점은 캄파리 하나뿐이다. 이름의 어원이 이탈리아어라는 사실이 와전되어 칵테일 자체가 이탈리아에서 유래했다고 받아들여진 것 아닐까 싶다.',
             '미상', '미상', '미상',
             ARRAY[3, 3, 4, 3, 1]::SMALLINT[],
-            'draft'
+            '캄파리의 쌉쌀하고 시트러시한 맛이 자몽과 정말 잘 어울린다. 과하게 달지 않고 약간 쌉쌀하며 도수가 낮아 부담이 없다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'highball');
         INSERT INTO cocktail_aroma_tag (cocktail_id, aroma_tag) VALUES (v_cocktail_id, 'bitter');
@@ -2108,7 +2208,8 @@ BEGIN
         INSERT INTO cocktail (
             slug, name_ko, name_en, summary, base_spirit, style_primary, method, sweetness,
             glass_type, abv_override, is_classic, story,
-            origin_year, origin_place, origin_creator, flavor_profile, status
+            origin_year, origin_place, origin_creator, flavor_profile,
+            tasting_note, status, published_at
         ) VALUES (
             'romewithaview', '롬 윗 어 뷰', 'Rome with a View', '살짝 찌르는 듯한 상큼함에 쌉쌀함과 좋은 허브감이 얹힌다. 캄파리에서 자몽 같은 시트러스 캐릭터가 나오고, 저도수라 아주 편하게 마신다.',
             'liqueur', 'sour', 'shake',
@@ -2123,7 +2224,8 @@ BEGIN
 매킬로이는 쓴맛 나는 칵테일이 싫다는 손님에게 ''그럴 리가요, 이것 한 번 드셔 보세요'' 하며 이 잔을 내줬다고 한다. 구조는 피즈 계열과 아메리카노를 매시업한 느낌이다. 캄파리와 라임을 함께 쓰는 칵테일이 많지 않은데, 이 잔만 마셔 봐도 둘의 궁합을 알 수 있다.',
             '2008년', '뉴욕, 미국', '마이클 매킬로이 (Milk & Honey)',
             ARRAY[3, 4, 4, 4, 1]::SMALLINT[],
-            'draft'
+            '살짝 찌르는 듯한 상큼함에 쌉쌀함과 좋은 허브감이 얹힌다. 캄파리에서 자몽 같은 시트러스 캐릭터가 나오고, 저도수라 아주 편하게 마신다.',
+            'published', now()
         ) RETURNING id INTO v_cocktail_id;
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'sour');
         INSERT INTO cocktail_style (cocktail_id, style) VALUES (v_cocktail_id, 'highball');

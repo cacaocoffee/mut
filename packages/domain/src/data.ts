@@ -132,6 +132,7 @@ export const COCKTAILS: Cocktail[] = [
     method: "stir",
     summary:
       "동량 배합의 교본. 캄파리의 쓴맛과 베르무트의 단맛이 진의 주니퍼 위에서 정확히 상쇄된다.",
+    tastingNote: "동량 배합의 교본. 캄파리의 쓴맛과 베르무트의 단맛이 진의 주니퍼 위에서 정확히 상쇄된다.",
     ingredients: [
       { ko: "진", en: "Dry Gin", ml: 30 },
       {
@@ -217,6 +218,7 @@ export const COCKTAILS: Cocktail[] = [
     glass: "칵테일",
     method: "shake",
     summary: "라임 코디얼의 단맛과 진의 골격이 만나는 가장 단순한 사워.",
+    tastingNote: "라임 코디얼의 단맛과 진의 골격이 만나는 가장 단순한 사워.",
     ingredients: [
       { ko: "진", en: "Dry Gin", ml: 60 },
       { ko: "라임 주스", en: "Lime Juice", ml: 20 },
@@ -288,6 +290,7 @@ export const COCKTAILS: Cocktail[] = [
     glass: "칵테일",
     method: "shake",
     summary: "민트를 넣은 진 사워. 모히토의 진 버전으로 읽어도 된다.",
+    tastingNote: "민트를 넣은 진 사워. 모히토의 진 버전으로 읽어도 된다.",
     ingredients: [
       { ko: "진", en: "Dry Gin", ml: 50 },
       { ko: "레몬 주스", en: "Lemon Juice", ml: 20 },
@@ -322,6 +325,7 @@ export const COCKTAILS: Cocktail[] = [
     glass: "구리 머그",
     method: "build",
     summary: "진저비어의 매운맛이 중심. 보드카는 뼈대만 세운다.",
+    tastingNote: "진저비어의 매운맛이 중심. 보드카는 뼈대만 세운다.",
     ingredients: [
       { ko: "보드카", en: "Vodka", ml: 45 },
       { ko: "라임 주스", en: "Lime Juice", ml: 15 },
@@ -400,6 +404,7 @@ export const COCKTAILS: Cocktail[] = [
     glass: "하이볼",
     method: "build",
     summary: "짠맛·감칠맛 계열. 단맛이 거의 없는 유일한 브런치 잔.",
+    tastingNote: "짠맛·감칠맛 계열. 단맛이 거의 없는 유일한 브런치 잔.",
     ingredients: [
       { ko: "보드카", en: "Vodka", ml: 45 },
       { ko: "토마토 주스", en: "Tomato Juice", ml: 120 },
@@ -434,6 +439,7 @@ export const COCKTAILS: Cocktail[] = [
     glass: "칵테일",
     method: "shake",
     summary: "크랜베리의 색과 트리플 섹의 오렌지 향. 산미가 축이 된다.",
+    tastingNote: "크랜베리의 색과 트리플 섹의 오렌지 향. 산미가 축이 된다.",
     ingredients: [
       { ko: "시트론 보드카", en: "Citron Vodka", ml: 45 },
       {
@@ -513,6 +519,7 @@ export const COCKTAILS: Cocktail[] = [
     glass: "칵테일",
     method: "stir",
     summary: "라이의 스파이스와 스위트 베르무트. 네그로니와 마티니 사이.",
+    tastingNote: "라이의 스파이스와 스위트 베르무트. 네그로니와 마티니 사이.",
     ingredients: [
       { ko: "라이 위스키", en: "Rye Whiskey", ml: 60 },
       { ko: "스위트 베르무트", en: "Sweet Vermouth", ml: 30 },
@@ -586,6 +593,7 @@ export const COCKTAILS: Cocktail[] = [
     glass: "올드 패션드",
     method: "shake",
     summary: "생강·꿀·레몬에 아일라 위스키의 연기를 얹은 현대 고전.",
+    tastingNote: "생강·꿀·레몬에 아일라 위스키의 연기를 얹은 현대 고전.",
     ingredients: [
       { ko: "블렌디드 스코치", en: "Blended Scotch", ml: 50 },
       { ko: "아일라 싱글몰트", en: "Islay Single Malt", ml: 7 },
@@ -626,6 +634,7 @@ export const COCKTAILS: Cocktail[] = [
     glass: "올드 패션드",
     method: "stir",
     summary: "네그로니의 위스키 버전. 진보다 무게가 있고 단맛이 길다.",
+    tastingNote: "네그로니의 위스키 버전. 진보다 무게가 있고 단맛이 길다.",
     ingredients: [
       { ko: "버번 또는 라이", en: "Bourbon / Rye", ml: 45 },
       { ko: "캄파리", en: "Campari", ml: 30 },
@@ -692,6 +701,7 @@ export const COCKTAILS: Cocktail[] = [
     glass: "하이볼",
     method: "build",
     summary: "민트 향, 라임 산미, 탄산의 세 층이 분리되어 있어야 한다.",
+    tastingNote: "민트 향, 라임 산미, 탄산의 세 층이 분리되어 있어야 한다.",
     ingredients: [
       { ko: "화이트 럼", en: "White Rum", ml: 45 },
       { ko: "라임 주스", en: "Lime Juice", ml: 20 },
@@ -728,6 +738,7 @@ export const COCKTAILS: Cocktail[] = [
     glass: "올드 패션드",
     method: "shake",
     summary: "오르자(아몬드 시럽)가 향의 중심. 과일 주스는 들어가지 않는다.",
+    tastingNote: "오르자(아몬드 시럽)가 향의 중심. 과일 주스는 들어가지 않는다.",
     ingredients: [
       { ko: "자메이카 럼", en: "Jamaican Rum", ml: 30 },
       { ko: "아그리콜 럼", en: "Rhum Agricole", ml: 30 },
@@ -801,6 +812,7 @@ export const COCKTAILS: Cocktail[] = [
     glass: "쿠페",
     method: "shake",
     summary: "소금·산·단맛 세 축의 균형. 데킬라는 100% 아가베를 쓴다.",
+    tastingNote: "소금·산·단맛 세 축의 균형. 데킬라는 100% 아가베를 쓴다.",
     ingredients: [
       { ko: "블랑코 데킬라", en: "Blanco Tequila", ml: 50 },
       {
@@ -879,6 +891,7 @@ export const COCKTAILS: Cocktail[] = [
     glass: "하이볼",
     method: "build",
     summary: "증류식 소주의 곡물 향을 탄산으로 늘린 구조. 희석률이 관건.",
+    tastingNote: "증류식 소주의 곡물 향을 탄산으로 늘린 구조. 희석률이 관건.",
     ingredients: [
       {
         ko: "증류식 소주",
@@ -918,6 +931,7 @@ export const COCKTAILS: Cocktail[] = [
     glass: "올드 패션드",
     method: "stir",
     summary: "문배주의 배·수수 향을 올드 패션드 구조에 넣은 응용 배합.",
+    tastingNote: "문배주의 배·수수 향을 올드 패션드 구조에 넣은 응용 배합.",
     ingredients: [
       { ko: "문배주 40도", en: "Munbaeju 40%", ml: 60 },
       {
@@ -957,6 +971,7 @@ export const COCKTAILS: Cocktail[] = [
     glass: "하이볼",
     method: "shake",
     summary: "막걸리의 유산 향과 코코넛·파인애플. 가장 단 항목.",
+    tastingNote: "막걸리의 유산 향과 코코넛·파인애플. 가장 단 항목.",
     ingredients: [
       { ko: "막걸리", en: "Makgeolli", ml: 90 },
       {
@@ -996,6 +1011,7 @@ export const COCKTAILS: Cocktail[] = [
     glass: "하이볼",
     method: "build",
     summary: "식초 기반 시럽으로 산미의 층을 만든 무알콜 항목.",
+    tastingNote: "식초 기반 시럽으로 산미의 층을 만든 무알콜 항목.",
     ingredients: [
       {
         ko: "시트러스 슈럽 시럽",
@@ -1045,6 +1061,7 @@ export const COCKTAILS: Cocktail[] = [
     method: "shake",
     summary:
       "시트러스의 새콤달콤함 위로 릴레의 와인 뉘앙스가 겹치고, 진의 보타니컬이 중심을 잡는다. 압생트는 끝에 미묘하게만 스친다.",
+    tastingNote: "시트러스의 새콤달콤함 위로 릴레의 와인 뉘앙스가 겹치고, 진의 보타니컬이 중심을 잡는다. 압생트는 끝에 미묘하게만 스친다.",
     ingredients: [
       { ko: "진", en: "Dry Gin", ml: 22.5 },
       {
@@ -1091,6 +1108,7 @@ export const COCKTAILS: Cocktail[] = [
     method: "shake",
     summary:
       "잔을 입에 가져가면 레몬 향이 먼저 오고, 보타니컬과 술 자체의 단맛 뒤로 릴레의 와인스러운 뉘앙스가 살짝 남는다. 깔끔하지만 도수는 상당히 높다.",
+    tastingNote: "잔을 입에 가져가면 레몬 향이 먼저 오고, 보타니컬과 술 자체의 단맛 뒤로 릴레의 와인스러운 뉘앙스가 살짝 남는다. 깔끔하지만 도수는 상당히 높다.",
     ingredients: [
       { ko: "진", en: "Dry Gin", ml: 45 },
       { ko: "보드카", en: "Vodka", ml: 15 },
@@ -1132,6 +1150,7 @@ export const COCKTAILS: Cocktail[] = [
     method: "stir",
     summary:
       "진의 보타니컬이 중심을 잡고 수즈의 달큰하면서 쌉쌀한 뿌리 식물 캐릭터가 은은하게 올라온다. 클래식 네그로니보다 한껏 가볍고 섬세하다.",
+    tastingNote: "진의 보타니컬이 중심을 잡고 수즈의 달큰하면서 쌉쌀한 뿌리 식물 캐릭터가 은은하게 올라온다. 클래식 네그로니보다 한껏 가볍고 섬세하다.",
     ingredients: [
       { ko: "진", en: "Dry Gin", ml: 45 },
       { ko: "릴레 블랑", en: "Lillet Blanc", ml: 30 },
@@ -1173,6 +1192,7 @@ export const COCKTAILS: Cocktail[] = [
     method: "shake",
     summary:
       "진 피즈에 꼬냑을 얹은 구조라 사이드카와 진 피즈를 매시업한 듯한 맛이 난다. 유자는 전혀 들어가지 않는데 유자청 같은 인상이 남는다.",
+    tastingNote: "진 피즈에 꼬냑을 얹은 구조라 사이드카와 진 피즈를 매시업한 듯한 맛이 난다. 유자는 전혀 들어가지 않는데 유자청 같은 인상이 남는다.",
     ingredients: [
       { ko: "진", en: "Dry Gin", ml: 40 },
       { ko: "꼬냑", en: "Cognac", ml: 10 },
@@ -1216,6 +1236,7 @@ export const COCKTAILS: Cocktail[] = [
     method: "shake",
     summary:
       "우유가 들어간 진 피즈. 일반 진 피즈보다 부드럽고 실키하며, 칼피스나 밀키스를 살짝 떠올리게 하는 맛이 난다.",
+    tastingNote: "우유가 들어간 진 피즈. 일반 진 피즈보다 부드럽고 실키하며, 칼피스나 밀키스를 살짝 떠올리게 하는 맛이 난다.",
     ingredients: [
       { ko: "진", en: "Dry Gin", ml: 45 },
       { ko: "레몬 주스", en: "Lemon Juice", ml: 11 },
@@ -1253,6 +1274,7 @@ export const COCKTAILS: Cocktail[] = [
     glass: "올드 패션드",
     method: "etc",
     summary: "달고 상큼해 리프레시하기 좋다. 맛이 비교적 직관적이고 단순한 편이다.",
+    tastingNote: "달고 상큼해 리프레시하기 좋다. 맛이 비교적 직관적이고 단순한 편이다.",
     ingredients: [
       {
         ko: "보드카",
@@ -1293,6 +1315,7 @@ export const COCKTAILS: Cocktail[] = [
     method: "stir",
     summary:
       "바닐라 느낌이 적고 맨해튼보다 섬세하다. 생각보다 달큰하고 복잡하며, 쓰는 스카치에 따라 편차가 크다.",
+    tastingNote: "바닐라 느낌이 적고 맨해튼보다 섬세하다. 생각보다 달큰하고 복잡하며, 쓰는 스카치에 따라 편차가 크다.",
     ingredients: [
       {
         ko: "스카치 위스키",
@@ -1334,6 +1357,7 @@ export const COCKTAILS: Cocktail[] = [
     method: "stir",
     summary:
       "아주 복합적이다. 스카치의 바닐라와 숙성감, 베르무트의 와인스러움과 향신료, 베네딕틴의 꿀과 허브까지 겹겹이 쌓인다. 나이트캡에 어울린다.",
+    tastingNote: "아주 복합적이다. 스카치의 바닐라와 숙성감, 베르무트의 와인스러움과 향신료, 베네딕틴의 꿀과 허브까지 겹겹이 쌓인다. 나이트캡에 어울린다.",
     ingredients: [
       {
         ko: "스카치 위스키",
@@ -1379,6 +1403,7 @@ export const COCKTAILS: Cocktail[] = [
     method: "stir",
     summary:
       "네그로니 특유의 묵직한 단맛 대신 가볍고 화사하다. 쌉쌀함·달달함·허브감이 화사하게 겹치고 라이의 바닐라가 살짝 비친다.",
+    tastingNote: "네그로니 특유의 묵직한 단맛 대신 가볍고 화사하다. 쌉쌀함·달달함·허브감이 화사하게 겹치고 라이의 바닐라가 살짝 비친다.",
     ingredients: [
       { ko: "라이 위스키", en: "Rye Whiskey", ml: 20 },
       { ko: "캄파리", en: "Campari", ml: 20 },
@@ -1424,6 +1449,7 @@ export const COCKTAILS: Cocktail[] = [
     method: "stir",
     summary:
       "쨍하고 확실한 바나나 맛에 캄파리의 쌉쌀함과 버무스의 허브감이 붙고, 버번의 견과류가 중심을 잡는다. 단맛이 꽤 강한 편이다.",
+    tastingNote: "쨍하고 확실한 바나나 맛에 캄파리의 쌉쌀함과 버무스의 허브감이 붙고, 버번의 견과류가 중심을 잡는다. 단맛이 꽤 강한 편이다.",
     ingredients: [
       { ko: "버번 위스키", en: "Bourbon Whiskey", ml: 30 },
       { ko: "캄파리", en: "Campari", ml: 15 },
@@ -1461,6 +1487,7 @@ export const COCKTAILS: Cocktail[] = [
     method: "build",
     summary:
       "열대과일과 바닐라, 후숙된 바나나가 은은하게 느껴지는 부담 없는 한 잔. 결국 럼 하이볼이라 어떤 럼을 쓰느냐가 맛의 전부를 정한다.",
+    tastingNote: "열대과일과 바닐라, 후숙된 바나나가 은은하게 느껴지는 부담 없는 한 잔. 결국 럼 하이볼이라 어떤 럼을 쓰느냐가 맛의 전부를 정한다.",
     ingredients: [
       {
         ko: "바베이도스 럼",
@@ -1499,6 +1526,7 @@ export const COCKTAILS: Cocktail[] = [
     method: "stir",
     summary:
       "클래식보다 허브감이 훨씬 덜하고 단순한데, 후숙된 바나나와 흑당·초콜릿·향신료가 통통 튄다. 복합성은 떨어져도 자극적인 매력이 있다.",
+    tastingNote: "클래식보다 허브감이 훨씬 덜하고 단순한데, 후숙된 바나나와 흑당·초콜릿·향신료가 통통 튄다. 복합성은 떨어져도 자극적인 매력이 있다.",
     ingredients: [
       {
         ko: "자메이카 럼",
@@ -1545,6 +1573,7 @@ export const COCKTAILS: Cocktail[] = [
     method: "shake",
     summary:
       "상큼 달달하고 생강의 알싸한 맛이 매력적이다. 약간의 탄산감이 붙어 모스코 뮬에 럼의 풍미가 더해진 느낌이 난다.",
+    tastingNote: "상큼 달달하고 생강의 알싸한 맛이 매력적이다. 약간의 탄산감이 붙어 모스코 뮬에 럼의 풍미가 더해진 느낌이 난다.",
     ingredients: [
       {
         ko: "럼",
@@ -1588,6 +1617,7 @@ export const COCKTAILS: Cocktail[] = [
     method: "build",
     summary:
       "베네딕틴의 사프란·꿀·허브 캐릭터에 꼬냑의 풍미가 겹친다. 재료가 둘뿐이고 베네딕틴의 맛은 정해져 있으니 어떤 꼬냑을 쓰느냐로 맛이 갈린다.",
+    tastingNote: "베네딕틴의 사프란·꿀·허브 캐릭터에 꼬냑의 풍미가 겹친다. 재료가 둘뿐이고 베네딕틴의 맛은 정해져 있으니 어떤 꼬냑을 쓰느냐로 맛이 갈린다.",
     ingredients: [
       { ko: "꼬냑", en: "Cognac", ml: 30 },
       { ko: "베네딕틴 돔", en: "Bénédictine DOM", ml: 30 },
@@ -1622,6 +1652,7 @@ export const COCKTAILS: Cocktail[] = [
     method: "shake",
     summary:
       "원형인 사이드카보다 오렌지와 알코올에서 오는 단맛이 강하게 난다. 다만 복합성 자체는 사이드카보다 꽤 많이 떨어진다.",
+    tastingNote: "원형인 사이드카보다 오렌지와 알코올에서 오는 단맛이 강하게 난다. 다만 복합성 자체는 사이드카보다 꽤 많이 떨어진다.",
     ingredients: [
       { ko: "꼬냑", en: "VSOP Cognac", ml: 22.5 },
       { ko: "화이트 럼", en: "White Rum", ml: 22.5, sub: "숙성 럼을 써도 무방합니다. 색과 맛이 달라집니다." },
@@ -1657,6 +1688,7 @@ export const COCKTAILS: Cocktail[] = [
     method: "build",
     summary:
       "잔을 입으로 가져가면 향긋한 레몬과 달큰한 사과 향이 먼저 온다. 사과의 단맛과 토닉의 쌉쌀함이 청량하게 균형을 잡는다.",
+    tastingNote: "잔을 입으로 가져가면 향긋한 레몬과 달큰한 사과 향이 먼저 온다. 사과의 단맛과 토닉의 쌉쌀함이 청량하게 균형을 잡는다.",
     ingredients: [
       { ko: "칼바도스", en: "Calvados", ml: 40 },
       { ko: "토닉워터", en: "Tonic Water", ml: 120, sub: "토닉 100ml + 탄산수 20ml — 탄산감이 살아납니다." },
@@ -1694,6 +1726,7 @@ export const COCKTAILS: Cocktail[] = [
     method: "stir",
     summary:
       "드라이하고 깔끔하며 약간 떫고 독특한 짠맛이 있다. 피노 셰리의 견과류와 베르무트의 허브·향신료가 조용히 겹친다.",
+    tastingNote: "드라이하고 깔끔하며 약간 떫고 독특한 짠맛이 있다. 피노 셰리의 견과류와 베르무트의 허브·향신료가 조용히 겹친다.",
     ingredients: [
       {
         ko: "피노 셰리",
@@ -1733,6 +1766,7 @@ export const COCKTAILS: Cocktail[] = [
     method: "stir",
     summary:
       "감칠맛이 압도적이다. 와인스러움에 한약 같은 뉘앙스가 겹치고, 약간의 오렌지와 견과류 뒤로 향신료·허브·차의 캐릭터가 훅 지나간다.",
+    tastingNote: "감칠맛이 압도적이다. 와인스러움에 한약 같은 뉘앙스가 겹치고, 약간의 오렌지와 견과류 뒤로 향신료·허브·차의 캐릭터가 훅 지나간다.",
     ingredients: [
       { ko: "피노 셰리", en: "Fino Sherry", ml: 45 },
       { ko: "스위트 베르무트", en: "Sweet Vermouth", ml: 22.5 },
@@ -1767,6 +1801,7 @@ export const COCKTAILS: Cocktail[] = [
     method: "build",
     summary:
       "덜 달지만 허브감과 와인스러움이 붙은, 약간은 복잡한 카시스 소다 같다. 복합미가 있는 잔은 아니고 맛 자체는 단순한 편이다.",
+    tastingNote: "덜 달지만 허브감과 와인스러움이 붙은, 약간은 복잡한 카시스 소다 같다. 복합미가 있는 잔은 아니고 맛 자체는 단순한 편이다.",
     ingredients: [
       {
         ko: "드라이 베르무트",
@@ -1806,6 +1841,7 @@ export const COCKTAILS: Cocktail[] = [
     method: "build",
     summary:
       "맥주가 들어간 것치고 쓴맛이 안 나고 오히려 들큰하면서 산뜻하다. 탄산 대신 폭신폭신한 질감이 캄파리의 쓴맛을 감싼다.",
+    tastingNote: "맥주가 들어간 것치고 쓴맛이 안 나고 오히려 들큰하면서 산뜻하다. 탄산 대신 폭신폭신한 질감이 캄파리의 쓴맛을 감싼다.",
     ingredients: [
       { ko: "캄파리", en: "Campari", ml: 30 },
       { ko: "스위트 베르무트", en: "Sweet Vermouth", ml: 30 },
@@ -1848,6 +1884,7 @@ export const COCKTAILS: Cocktail[] = [
     method: "shake",
     summary:
       "베리류와 핵과류의 달큰한 과실감에 레몬의 상큼함이 붙어 새콤달콤함이 주를 이룬다. 슬로 진이 26%라 알코올감이 거의 느껴지지 않는다.",
+    tastingNote: "베리류와 핵과류의 달큰한 과실감에 레몬의 상큼함이 붙어 새콤달콤함이 주를 이룬다. 슬로 진이 26%라 알코올감이 거의 느껴지지 않는다.",
     ingredients: [
       { ko: "슬로 진", en: "Sloe Gin", ml: 45 },
       { ko: "레몬 주스", en: "Lemon Juice", ml: 20 },
@@ -1885,6 +1922,7 @@ export const COCKTAILS: Cocktail[] = [
     method: "build",
     summary:
       "쌉쌀하고 달큰한 차의 맛이 이어지다 끝에 살짝 쌉쌀하고 텁텁한 여운이 남는다. 도수가 낮아 식후나 마지막 한 잔에 어울린다.",
+    tastingNote: "쌉쌀하고 달큰한 차의 맛이 이어지다 끝에 살짝 쌉쌀하고 텁텁한 여운이 남는다. 도수가 낮아 식후나 마지막 한 잔에 어울린다.",
     ingredients: [
       { ko: "녹차 리큐르", en: "Green Tea Liqueur", ml: 45 },
       {
@@ -1923,6 +1961,7 @@ export const COCKTAILS: Cocktail[] = [
     method: "build",
     summary:
       "리치의 달달하고 화려한 맛에 자몽의 신맛, 블루 큐라소의 달달한 시트러스가 겹친다. 간단하지만 복합적이고 비주얼이 화려하다.",
+    tastingNote: "리치의 달달하고 화려한 맛에 자몽의 신맛, 블루 큐라소의 달달한 시트러스가 겹친다. 간단하지만 복합적이고 비주얼이 화려하다.",
     ingredients: [
       { ko: "리치 리큐르", en: "Lychee Liqueur", ml: 30, sub: "콰이페 또는 디타." },
       { ko: "자몽 주스", en: "Grapefruit Juice", ml: 45 },
@@ -1960,6 +1999,7 @@ export const COCKTAILS: Cocktail[] = [
     method: "build",
     summary:
       "캄파리의 쌉쌀하고 시트러시한 맛이 자몽과 정말 잘 어울린다. 과하게 달지 않고 약간 쌉쌀하며 도수가 낮아 부담이 없다.",
+    tastingNote: "캄파리의 쌉쌀하고 시트러시한 맛이 자몽과 정말 잘 어울린다. 과하게 달지 않고 약간 쌉쌀하며 도수가 낮아 부담이 없다.",
     ingredients: [
       { ko: "캄파리", en: "Campari", ml: 30 },
       { ko: "자몽 주스", en: "Grapefruit Juice", ml: 45 },
@@ -1997,6 +2037,7 @@ export const COCKTAILS: Cocktail[] = [
     method: "shake",
     summary:
       "살짝 찌르는 듯한 상큼함에 쌉쌀함과 좋은 허브감이 얹힌다. 캄파리에서 자몽 같은 시트러스 캐릭터가 나오고, 저도수라 아주 편하게 마신다.",
+    tastingNote: "살짝 찌르는 듯한 상큼함에 쌉쌀함과 좋은 허브감이 얹힌다. 캄파리에서 자몽 같은 시트러스 캐릭터가 나오고, 저도수라 아주 편하게 마신다.",
     ingredients: [
       { ko: "캄파리", en: "Campari", ml: 30 },
       { ko: "드라이 베르무트", en: "Dry Vermouth", ml: 30 },

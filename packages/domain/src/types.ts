@@ -108,6 +108,19 @@ export interface Cocktail {
 
   glass: string;
   summary: string;
+
+  /**
+   * 향과 맛 서술. **발행 필수**다 (`GATE-COCKTAIL-01` · `R-F1.1-2`).
+   *
+   * `PRIN-P03` 이 이것을 필수로 만든 이유는 "직접 만들어 보고 쓴 내용" 이어야 해서다 —
+   * 다른 사이트 설명을 옮기면 레시피 나열형 블로그와 구별되지 않는다.
+   *
+   * 없는 항목이 있다. 프로토타입의 `summary` 가 만드는 법을 적은 경우인데
+   * (`"온도는 −3℃ 이하로 유지한다"`), 그것은 향·맛 서술이 아니라서 옮기지 않았다.
+   * 그 항목들은 `draft` 로 남고 에디터가 채운다.
+   */
+  tastingNote?: string;
+
   ingredients: Ingredient[];
   steps: string[];
   origin: Origin;
