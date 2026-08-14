@@ -298,14 +298,50 @@ export const QUESTIONS: Question[] = [
 
 export type Answers = Partial<Record<QuestionKey, number | string>>;
 
+/**
+ * 답변을 쿼리스트링에서 읽는다 (이슈 041 RED 9 — 단계마다 주소가 바뀐다).
+ *
+ * **도수만 탐색 필터와 같은 어휘다** — `abv=high` 가 양쪽에서 같은 구간을 뜻한다
+ * (`FR-SEARCH-004` · ADR-0003). 당도·기주는 파인더가 **여러 값을 묶은 선택지**라
+ * 이름이 겹쳐도 뜻이 다르다: 탐색의 `sweet=semi_dry` 는 그 한 단계지만 파인더의 것은
+ * 가운데 두 단계를 덮는다. 두 화면의 주소를 서로 옮겨 붙이지 않는다 (SCREENS-03).
+ *
+ * 질문에 없는 값은 버린다 — 주소는 손으로 고칠 수 있고, 모르는 값에 화면이 멈추면 안 된다.
+ */
+export function parseAnswers(params: URLSearchParams): Answers {
+  const answers: Answers = {};
+
+  for (const question of QUESTIONS) {
+    const raw = params.get(question.key);
+    if (raw && question.options.some((o) => String(o.value) === raw)) {
+      answers[question.key] = raw;
+    }
+  }
+  return answers;
+}
+
+/** [parseAnswers] 의 역방향. 질문 순서를 지켜 주소가 흔들리지 않게 한다. */
+export function toAnswerQuery(answers: Answers, step: number): URLSearchParams {
+  const p = new URLSearchParams();
+
+  for (const question of QUESTIONS) {
+    const v = answers[question.key];
+    if (v !== undefined) p.set(question.key, String(v));
+  }
+  if (step > 0) p.set("step", String(step));
+  return p;
+}
+
 /** 답변으로 후보군을 좁힌다. 도수·당도·기주는 하드 필터, 향은 점수에만 반영. */
-export function quizCandidates(answers: Answers): Cocktail[] {
+export function quizCandidates(corpus: SearchItem[], answers: Answers): SearchItem[] {
   const abv = answers.abv as AbvBand | undefined;
   const sweet = answers.sweet as string | undefined;
   const base = answers.base as string | undefined;
 
-  return COCKTAILS.filter((x) => {
-    if (abv !== undefined && abvBandOf(x.abv) !== abv) return false;
+  return corpus.filter((x) => {
+    // 구간 정의는 `abvBandOf` 한 곳에서만 온다 (ADR-0003) — 탐색 필터가 쓰는 그 함수다.
+    // 파인더 전용 상수를 두면 두 화면이 다른 답을 낸다 (`FR-SEARCH-004`).
+    if (abv !== undefined && !bandsOf(x).includes(abv)) return false;
 
     // 파인더의 세 선택지는 당도 4단계를 **구간으로 묶은 것**이다 —
     // "살짝 달콤" 은 가운데 둘을 덮고, "달콤함 선호" 는 위 둘을 덮는다.
@@ -328,7 +364,7 @@ export function quizCandidates(answers: Answers): Cocktail[] {
 }
 
 /** 62점에서 출발해 향·당도·도수 일치도를 더한 매칭 점수(최대 98). */
-export function matchScore(x: Cocktail, answers: Answers): number {
+export function matchScore(x: SearchItem, answers: Answers): number {
   const flavor = answers.flavor as FlavorKey | undefined;
   const sweet = answers.sweet as string | undefined;
   const abv = answers.abv as AbvBand | undefined;
@@ -346,14 +382,14 @@ export function matchScore(x: Cocktail, answers: Answers): number {
   }
   // 구간은 이미 하드 필터라 가산점은 구간 **안에서의** 순위 조정용이다.
   // `high`는 위가 열려 있어 폭이 넓으므로 더 독한 쪽을 올린다.
-  if (abv === "high" && x.abv >= 28) s += 6;
+  if (abv === "high" && (x.abv ?? 0) >= 28) s += 6;
   if (base && base !== "any") s += 4;
 
   return Math.min(98, Math.round(s));
 }
 
-export function rankResults(answers: Answers, limit = 3) {
-  return quizCandidates(answers)
+export function rankResults(corpus: SearchItem[], answers: Answers, limit = 3) {
+  return quizCandidates(corpus, answers)
     .map((cocktail) => ({ cocktail, match: matchScore(cocktail, answers) }))
     .sort((a, b) => b.match - a.match)
     .slice(0, limit);

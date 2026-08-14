@@ -737,6 +737,19 @@
 
 /* ─────────────────────────  03 파인더  ───────────────────────── */
 
+/* 화면에는 없고 보조기기에만 있는 글. `display: none` 은 읽히지도 않으므로
+   자리를 1px 로 줄이고 잘라 낸다 (ISSUE-041 RED 22). */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .finder {
   max-width: 1120px;
 }
@@ -825,12 +838,46 @@
   color: var(--color-neutral-700);
   margin-top: 3px;
 }
+/* 고른 것을 색 말고도 알아볼 수 있게 (NFR-A-08). 테두리 색만 바뀌면 색각 이상에서
+   두 상자가 같아 보인다 — 글자로 한 번 더 말한다 (ISSUE-041). */
+.quiz-option__mark {
+  align-self: flex-start;
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--color-accent-800);
+  white-space: nowrap;
+}
 .quiz-foot {
   display: flex;
   justify-content: space-between;
   margin-top: 28px;
   padding-top: var(--space-4);
   border-top: 1px solid var(--color-divider);
+}
+/* 남은 후보 수. 답을 고를 때마다 바뀌므로 aria-live 로 읽힌다 (ISSUE-041 RED 23) */
+.quiz-count {
+  margin-top: 20px;
+  font-size: 12px;
+  color: var(--color-neutral-700);
+}
+.quiz-count b {
+  font-size: 15px;
+  color: var(--color-text);
+}
+/* 후보가 0이 된 자리. 남은 질문에 답해도 결과가 없다는 것을 그 자리에서 말한다 (RED 11) */
+.quiz-dead-end {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: var(--space-3);
+  padding: 12px;
+  border: 1px solid var(--color-accent);
+  background: var(--color-accent-100);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-accent-800);
 }
 .result-grid {
   display: grid;
