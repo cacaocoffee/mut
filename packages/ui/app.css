@@ -242,8 +242,11 @@
   opacity: 0.6;
   margin-left: 5px;
 }
+/* 0 건은 비활성. 흐리게만 두지 않는다 — 병기한 `0` 이 이유를 글자로 말하고
+   `disabled` 가 보조기기에 그대로 전달된다 (NFR-A-06 · NFR-A-08). */
 .chip:disabled {
   opacity: 0.32;
+  cursor: not-allowed;
 }
 /* 맛·향 태그 */
 /* 12px 바닥 — 이 칸은 맛/향 **한글** 레이블을 담는다. 10.5px 는 라틴 캡션이면
@@ -260,6 +263,13 @@
   border: 1px solid var(--color-divider);
   background: transparent;
   color: var(--color-neutral-800);
+}
+/* 맛·향에도 개수를 병기한다 — `R-F2.1-2` 는 **모든** 필터 값을 말한다 (ISSUE-040) */
+.chip-tag .count {
+  font-weight: 400;
+  font-size: 10px;
+  opacity: 0.6;
+  margin-left: 5px;
 }
 .chip-tag[aria-pressed="true"] {
   border-color: var(--color-accent);
