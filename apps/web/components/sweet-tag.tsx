@@ -1,24 +1,29 @@
 import { SWEETNESS } from "@kca/domain";
 import type { SweetLevel } from "@kca/domain";
 
-/** 당도 4단계를 accent 램프 위에서 단계적으로 진해지게 표기한다. */
+/**
+ * 당도 4단계를 accent 램프 위에서 단계적으로 진해지게 표기한다.
+ *
+ * 키가 슬러그다 (이슈 037). 예전에는 `0`~`3` 이었는데, **숫자는 의미가 순서에 숨어**
+ * 있어서 이 표만 보고는 `2` 가 무엇인지 알 수 없었다.
+ */
 const STYLES: Record<SweetLevel, React.CSSProperties> = {
-  0: {
+  dry: {
     background: "var(--color-neutral-200)",
     color: "var(--color-neutral-900)",
     border: "1px solid var(--color-neutral-400)",
   },
-  1: {
+  semi_dry: {
     background: "var(--color-accent-2-100)",
     color: "var(--color-accent-2-800)",
     border: "1px solid var(--color-accent-2-300)",
   },
-  2: {
+  semi_sweet: {
     background: "var(--color-accent-200)",
     color: "var(--color-accent-800)",
     border: "1px solid var(--color-accent-300)",
   },
-  3: {
+  sweet: {
     background: "var(--color-accent)",
     color: "var(--color-bg)",
     border: "1px solid var(--color-accent)",

@@ -51,8 +51,11 @@ export function validateCorpus(): string[] {
     if (c.steps.length === 0) errors.push(`${at} 제조 순서 없음`);
 
     // 무알콜인데 도수가 있거나, 그 반대인 경우
-    if (c.base === "무알콜" && c.abv > 0) errors.push(`${at} 무알콜인데 도수 ${c.abv}%`);
-    if (c.base !== "무알콜" && c.abv === 0) errors.push(`${at} 도수 0%인데 기주가 ${c.base}`);
+    if (c.base === "non-alcoholic" && c.abv > 0) errors.push(`${at} 무알콜인데 도수 ${c.abv}%`);
+    // 기주가 슬러그가 됐다 (이슈 037). 예전에는 `"무알콜"` 이었다.
+    if (c.base !== "non-alcoholic" && c.abv === 0) {
+      errors.push(`${at} 도수 0%인데 기주가 ${c.base}`);
+    }
   }
 
   return errors;

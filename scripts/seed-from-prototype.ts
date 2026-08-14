@@ -14,7 +14,7 @@
  *
  * | 프로토타입 | 스키마 | 변환 |
  * |---|---|---|
- * | `base: "진"` (한국어) | `base_spirit: "gin"` | `BASE_SLUGS` |
+ * | ~~`base: "진"` (한국어)~~ | `base_spirit: "gin"` | 이슈 037 이후 **값이 이미 슬러그다** |
  * | `sweet: 0\|1\|2\|3` | `sweetness: "dry"…` | 숫자 → 슬러그 |
  * | `id: "negroni"` | `slug` + DB 가 준 `id` | 이름 이동 |
  * | `ingredients[]` 인라인 | `recipe_ingredient.ingredient_id` FK | **마스터를 먼저 만든다** |
@@ -29,7 +29,7 @@
  */
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { BASE_SLUGS, COCKTAILS, type Cocktail, type Ingredient } from "@kca/domain";
+import { COCKTAILS, type Cocktail, type Ingredient } from "@kca/domain";
 
 /* ─────────────────  재료 마스터  ───────────────── */
 
@@ -275,17 +275,9 @@ function extractMasters(): Map<string, Master> {
 
 /* ─────────────────  값 변환  ───────────────── */
 
-/** `0`→`dry` … 프로토타입의 숫자를 스키마의 슬러그로 (RED 11). */
-const SWEETNESS = ["dry", "semi_dry", "semi_sweet", "sweet"] as const;
+// 당도도 이슈 037 이후 슬러그다 (`0` → `"dry"`). 변환표가 필요 없어졌다.
 
-/** `"Stir"` → `stir`. 프로토타입은 대문자, 스키마는 소문자 슬러그다. */
-const METHOD: Record<string, string> = {
-  Build: "build",
-  Shake: "shake",
-  Stir: "stir",
-  Blend: "blend",
-  Etc: "etc",
-};
+// 메이킹 방법도 이슈 037 이후 슬러그다. 변환표가 필요 없어졌다.
 
 function slugify(name: string): string {
   return name
@@ -360,8 +352,9 @@ $seed$;
 }
 
 function cocktailBlock(cocktail: Cocktail, masters: Map<string, Master>): string {
-  const baseSlug = BASE_SLUGS[cocktail.base];
-  const method = METHOD[cocktail.method] ?? "etc";
+  // 이슈 037 이후 `cocktail.base` 자체가 슬러그다. 예전에는 한국어라 맵을 거쳐야 했다.
+  const baseSlug = cocktail.base;
+  const method = cocktail.method;
   const lines: string[] = [];
 
   lines.push(`    -- ${cocktail.ko} (${cocktail.en})`);
@@ -376,7 +369,7 @@ function cocktailBlock(cocktail: Cocktail, masters: Map<string, Master>): string
         ) VALUES (
             ${sql(cocktail.id)}, ${sql(cocktail.ko)}, ${sql(cocktail.en)}, ${sql(cocktail.summary)},
             ${sql(baseSlug)}, ${sql(cocktail.stylePrimary)}, ${sql(method)},
-            ${sql(SWEETNESS[cocktail.sweet])}, ${sql(cocktail.glass)},
+            ${sql(cocktail.sweet)}, ${sql(cocktail.glass)},
             ${cocktail.abv === 0 ? "0" : cocktail.abv},
             ${cocktail.story ? "true" : "false"}, ${sql(storyOf(cocktail))},
             ${sql(cocktail.origin?.year)}, ${sql(cocktail.origin?.place)}, ${sql(cocktail.origin?.creator)},
