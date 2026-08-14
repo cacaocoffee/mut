@@ -1,40 +1,102 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
+  BASE_SPIRIT_LABELS,
   FLAVOR_LABELS,
   QUESTIONS,
   SWEETNESS,
+  parseAnswers,
   quizCandidates,
   rankResults,
+  toAnswerQuery,
   type Answers,
   type FlavorKey,
+  type SearchItem,
 } from "@kca/domain";
+import { FINDER_PATH } from "@/lib/routes";
 import { PhotoSlot } from "./photo-slot";
 import { SweetTag } from "./sweet-tag";
 
-export function FinderScreen() {
-  const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState<Answers>({});
+/**
+ * 취향 파인더 (ISSUE-041 · `FR-SEARCH-004` · ADR-0003).
+ *
+ * ## 도수 구간이 탐색 필터와 같은 정의다
+ *
+ * 질문 1의 선택지가 `ABV_BANDS` 를 그대로 편다 — **파인더 전용 도수 상수가 없다.**
+ * ADR-0003 이 "탐색 필터와 취향 파인더가 이 정의를 공유한다" 고 못박은 이유는 따로 두면
+ * 반드시 어긋나서다. 파인더가 "가볍게" 로 추천한 것을 탐색의 "저 ~10%" 에서 못 찾으면
+ * 두 화면이 서로를 부정한다.
+ *
+ * ## 답과 단계가 주소에 남는다
+ *
+ * 답을 고르면 쿼리스트링이 바뀐다 (RED 9). 새로고침해도 그 자리이고, 링크를 주면 같은
+ * 화면이 열린다. 탐색 화면과 같은 이유로 `useSearchParams()` 대신 주소창을 직접 읽는다 —
+ * 미리 그려 두는 경로에서 그 훅은 빈 값을 준다.
+ *
+ * ## 서버를 다시 부르지 않는다
+ *
+ * 코퍼스는 페이지가 한 번 받아 넘긴다. 단계 전환은 전부 브라우저 안에서 끝난다
+ * (SPEC-05 §4 · `NFR-P-02`).
+ */
+export function FinderScreen({ corpus }: { corpus: SearchItem[] }) {
+  const router = useRouter();
 
-  const candidates = useMemo(() => quizCandidates(answers), [answers]);
-  const results = useMemo(
-    () => (step >= QUESTIONS.length ? rankResults(answers) : []),
-    [answers, step]
+  const queryRef = useRef("");
+  const [query, setQueryState] = useState("");
+
+  const setQuery = useCallback((q: string) => {
+    queryRef.current = q;
+    setQueryState(q);
+  }, []);
+
+  useEffect(() => {
+    const read = () => setQuery(window.location.search.replace(/^\?/, ""));
+    read();
+    window.addEventListener("popstate", read);
+    return () => window.removeEventListener("popstate", read);
+  }, [setQuery]);
+
+  const params = useMemo(() => new URLSearchParams(query), [query]);
+  const answers = useMemo(() => parseAnswers(params), [params]);
+
+  // 주소의 단계가 답변 수보다 앞서면 아직 답하지 않은 질문을 결과로 친다.
+  // 답변 수로 상한을 걸어 링크를 손으로 고쳐도 흐름이 어긋나지 않게 한다.
+  const answered = QUESTIONS.filter((q) => answers[q.key] !== undefined).length;
+  const step = Math.min(Math.max(Number(params.get("step") ?? 0) || 0, 0), answered);
+
+  const go = useCallback(
+    (next: Answers, nextStep: number) => {
+      const q = toAnswerQuery(next, nextStep).toString();
+      setQuery(q);
+      router.replace(q ? `${FINDER_PATH}?${q}` : FINDER_PATH, { scroll: false });
+    },
+    [router, setQuery]
   );
 
+  const candidates = useMemo(() => quizCandidates(corpus, answers), [corpus, answers]);
   const done = step >= QUESTIONS.length;
+  const results = useMemo(
+    () => (done ? rankResults(corpus, answers) : []),
+    [corpus, answers, done]
+  );
+
   const question = QUESTIONS[Math.min(step, QUESTIONS.length - 1)];
 
   const pick = (value: number | string) => {
-    setAnswers((prev) => ({ ...prev, [question.key]: value }));
-    setStep((s) => s + 1);
+    const next = { ...answers, [question.key]: value };
+    // 뒤로 갔다가 다시 고르면 그 뒤의 답은 지운다 — 화면에 남은 답과 주소가 갈리지 않게 한다.
+    for (const later of QUESTIONS.slice(step + 1)) delete next[later.key];
+    go(next, step + 1);
   };
 
-  const reset = () => {
-    setAnswers({});
-    setStep(0);
+  const reset = () => go({}, 0);
+
+  const back = () => {
+    if (step === 0) return;
+    go(answers, step - 1);
   };
 
   const answerSummary = QUESTIONS.map((q) => {
@@ -77,10 +139,29 @@ export function FinderScreen() {
                 );
               })}
             </div>
-            <div style={{ marginTop: 20, fontSize: 11, color: "var(--color-neutral-700)" }}>
-              현재 후보{" "}
-              <b style={{ fontSize: 15, color: "var(--color-text)" }}>{candidates.length}</b>종
+
+            {/*
+              후보 수는 답을 고를 때마다 바뀐다. 화면을 보는 사람은 숫자가 줄어드는 것을
+              보지만 스크린리더는 알 수 없어 `aria-live` 로 읽어 준다 (RED 22·23).
+              `polite` 인 이유: 조작을 끊지 않고 다음 안내 자리에 끼워 읽는 편이 낫다.
+            */}
+            <div className="quiz-count" aria-live="polite">
+              현재 후보 <b>{candidates.length}</b>종
+              <span className="visually-hidden">
+                {` · 질문 ${Math.min(step + 1, QUESTIONS.length)} / ${QUESTIONS.length}`}
+              </span>
             </div>
+
+            {/*
+              RED 11 — 후보가 0이면 남은 질문에 답해도 결과가 없다. 막다른 길로 계속
+              걸어가게 두지 않고 그 자리에서 알린다.
+            */}
+            {candidates.length === 0 && (
+              <div className="quiz-dead-end" role="status">
+                <b>조건에 맞는 항목이 없습니다.</b>
+                <span>이전 단계로 돌아가 조건을 넓히거나 처음부터 다시 시작하세요.</span>
+              </div>
+            )}
           </aside>
 
           <section className="quiz-card">
@@ -92,27 +173,32 @@ export function FinderScreen() {
               {question.hint}
             </p>
             <div className="quiz-options">
-              {question.options.map((o) => (
-                <button
-                  type="button"
-                  key={String(o.value)}
-                  className="btn quiz-option"
-                  aria-pressed={answers[question.key] === o.value}
-                  onClick={() => pick(o.value)}
-                >
-                  <span>
-                    <span className="ko">{o.ko}</span>
-                    <span className="en">{o.en}</span>
-                  </span>
-                </button>
-              ))}
+              {question.options.map((o) => {
+                const on = answers[question.key] === o.value;
+                return (
+                  <button
+                    type="button"
+                    key={String(o.value)}
+                    className="btn quiz-option"
+                    aria-pressed={on}
+                    onClick={() => pick(o.value)}
+                  >
+                    <span>
+                      <span className="ko">{o.ko}</span>
+                      <span className="en">{o.en}</span>
+                    </span>
+                    {/* 고른 것을 색 말고도 알아볼 수 있게 표시한다 (`NFR-A-08`) */}
+                    {on && <span className="quiz-option__mark">선택함</span>}
+                  </button>
+                );
+              })}
             </div>
             <div className="quiz-foot">
               <button
                 type="button"
                 className="btn btn-secondary"
                 disabled={step === 0}
-                onClick={() => setStep((s) => Math.max(0, s - 1))}
+                onClick={back}
               >
                 ← 이전
               </button>
@@ -146,7 +232,7 @@ export function FinderScreen() {
           {results.length > 0 ? (
             <div className="result-grid">
               {results.map(({ cocktail, match }, i) => (
-                <article className="result-card" key={cocktail.id} data-rank={i + 1}>
+                <article className="result-card" key={cocktail.slug} data-rank={i + 1}>
                   <div className="result-card__head">
                     <span className="rank">RANK {i + 1}</span>
                     <span className="match">
@@ -154,14 +240,16 @@ export function FinderScreen() {
                       <span>%</span>
                     </span>
                   </div>
-                  <PhotoSlot ratio="4x3" caption={cocktail.en} />
+                  <PhotoSlot ratio="4x3" caption={cocktail.nameEn} />
                   <div className="result-card__body">
-                    <h3>{cocktail.ko}</h3>
+                    <h3>{cocktail.nameKo}</h3>
                     <div className="cocktail-card__en" style={{ marginBottom: 10 }}>
-                      {cocktail.en}
+                      {cocktail.nameEn}
                     </div>
                     <div className="tag-row" style={{ marginBottom: 10 }}>
-                      <span className="tag tag-neutral tag-bordered">{cocktail.base}</span>
+                      <span className="tag tag-neutral tag-bordered">
+                        {BASE_SPIRIT_LABELS[cocktail.base]}
+                      </span>
                       <SweetTag level={cocktail.sweet} en />
                       <span className="tag tag-neutral tag-bordered">{cocktail.abv}% ABV</span>
                     </div>
@@ -173,7 +261,10 @@ export function FinderScreen() {
                       과 {SWEETNESS[cocktail.sweet][1]} 당도, {cocktail.abv}% 도수가 조건 범위에
                       들어옵니다.
                     </p>
-                    <Link href={`/cocktails/${cocktail.id}`} className="btn btn-primary btn-block">
+                    <Link
+                      href={`/cocktails/${cocktail.slug}`}
+                      className="btn btn-primary btn-block"
+                    >
                       레시피 보기 →
                     </Link>
                   </div>

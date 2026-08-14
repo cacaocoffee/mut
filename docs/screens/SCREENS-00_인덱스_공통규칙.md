@@ -15,9 +15,9 @@
 
 | ID | 화면 | 경로 | 상태 |
 |---|---|---|---|
-| [SCREENS-01](./SCREENS-01_칵테일.md) | 칵테일 탐색 · 상세 · 카테고리 | `/` `/cocktails/*` | ✅ |
+| [SCREENS-01](./SCREENS-01_칵테일.md) | 칵테일 탐색 · 상세 · 카테고리 | `/cocktails/*` | ✅ |
 | SCREENS-02 | 바 탐색 · 상세 | `/bars/*` | ⬜ *(Phase 1b)* |
-| SCREENS-03 | 취향 파인더 | `/finder` | ⬜ |
+| [SCREENS-03](./SCREENS-03_파인더.md) | 취향 파인더 | `/finder` | ✅ |
 | SCREENS-04 | 마이 · 저장 | `/my/*` | ⬜ |
 | SCREENS-05 | 파트너 대시보드 | `/partner/*` | ⬜ *(Phase 1b)* |
 | [SCREENS-06](./SCREENS-06_어드민.md) | 어드민 CMS | `/admin/*` | ✅ |
