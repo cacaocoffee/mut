@@ -12,7 +12,7 @@
 
 | 화면 | 경로 | 상태 |
 |---|---|---|
-| [01-A 탐색](#01-a--탐색) | `/` | ✅ |
+| [01-A 탐색](#01-a--탐색) | `/cocktails/search` | ✅ |
 | [01-B 상세](#01-b--상세) | `/cocktails/{slug}` | ◐ |
 | [01-C 카테고리](#01-c--카테고리) | `/cocktails/{axis}/{slug}` | ⬜ |
 | [01-D 재료 사전](#01-d--재료-사전) | `/ingredients/{slug}` | ⬜ |
@@ -85,8 +85,12 @@ PRD가 "초기부터 넣지 않으면 나중에 UI를 다시 짜야 한다"고 �
 필터 상태는 쿼리스트링에 실린다 (`FR-SEARCH-005`).
 
 ```
-/?sweet=1&base=위스키&style=sour&flavor=citrus,herbal&abv=high&q=사워
+/cocktails/search?base=whisky&style=sour&method=stir&sweet=dry&abv=high&flavor=citrus,herbal&q=사워
 ```
+
+값이 슬러그이고 축이 여섯이다 (이슈 037·040). 예전 표기(`sweet=1`·`base=위스키`)는 없다 —
+파라미터 이름과 구분자가 `GET /cocktails` 와 같아야 나중에 서버 필터로 옮길 수 있다
+(SPEC-05 §4).
 
 - 뒤로 가기로 이전 필터 상태로 돌아간다
 - 공유하면 같은 결과가 열린다
