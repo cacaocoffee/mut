@@ -38,7 +38,10 @@ class SchemaLintTest {
 
     @Test
     fun `RED2 - Flyway 가 V001 을 적용한다`() {
-        val applied = PostgresSupport.flyway.info().applied().map { it.version.version }
+        // `version` 이 `null` 인 것은 **repeatable** 마이그레이션이다 (`R__seed_*`, 이슈 036).
+        // 걸러 내지 않으면 여기가 NPE 로 죽는다 — 시드가 들어온 날 실제로 그랬다.
+        val applied = PostgresSupport.flyway.info().applied()
+            .mapNotNull { it.version?.version }
         assertThat(applied).contains("001")
 
         migrate().use { conn ->
