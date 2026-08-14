@@ -2,7 +2,7 @@ package kr.kcocktail.user
 
 import kr.kcocktail.support.PostgresSupport
 import kr.kcocktail.user.internal.AccountClosureService
-import kr.kcocktail.user.internal.ClosureHook
+import kr.kcocktail.common.account.ClosureHook
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -128,9 +128,43 @@ class AccountClosureTest {
             .isEqualTo(1)
     }
 
+    /**
+     * RED 26 — **`user_id` 만 지우고 행은 남긴다** (SPEC-08 §5.3 · SPEC-10 §8, 이슈 034 가 풀었다).
+     *
+     * 북마크(RED 24)와 정반대다. 근거가 다르다:
+     *
+     * | | 처리 | 왜 |
+     * |---|---|---|
+     * | 북마크 | 행째 삭제 | 순수한 개인 취향 기록이다 |
+     * | 이벤트 | `user_id` 만 `NULL` | 행을 지우면 **집계가 소급해 바뀐다** |
+     *
+     * 지난달 조회수가 오늘 줄어들면 그 숫자로 아무것도 결정할 수 없다.
+     * 개인을 식별할 수 없게 만드는 것과 일어난 일을 없던 것으로 만드는 것은 다르다.
+     */
     @Test
-    @Disabled("analytics_event 는 이슈 034 (#36) 가 만든다 — user_id 를 NULL 로 익명화한다")
-    fun `RED26 - 탈퇴시 analytics_event user_id 는 NULL 로 익명화된다`() = Unit
+    fun `RED26 - 탈퇴시 analytics_event user_id 는 NULL 로 익명화된다`() {
+        val id = insertUser("close-with-events")
+        val session = java.util.UUID.randomUUID()
+        repeat(3) {
+            jdbc.update(
+                """
+                INSERT INTO analytics_event (event_type, session_id, user_id, occurred_at)
+                VALUES ('cocktail_view', ?::uuid, ?, now())
+                """.trimIndent(),
+                session.toString(), id,
+            )
+        }
+        val before = count("SELECT count(*) FROM analytics_event WHERE session_id = '$session'")
+
+        closure.close(id)
+
+        assertThat(count("SELECT count(*) FROM analytics_event WHERE user_id = $id"))
+            .`as`("RED26 — 개인 식별자는 사라진다")
+            .isZero()
+        assertThat(count("SELECT count(*) FROM analytics_event WHERE session_id = '$session'"))
+            .`as`("RED36 — 행 수가 그대로다. 집계가 소급해 바뀌지 않는다")
+            .isEqualTo(before)
+    }
 
     // ── 헬퍼 ───────────────────────────────────────────────────────────────
 

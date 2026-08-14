@@ -114,12 +114,21 @@ class CsrfIntegrationTest {
     /**
      * SPEC-08 §4.3 의 유일한 예외. 인증이 필요 없고 부작용이 집계뿐이라
      * CSRF 대신 **레이트 리밋(120rpm, 세션 기준)이 방어**한다.
+     *
+     * **실물 엔드포인트를 친다** (이슈 034). 스텁으로 확인하던 것보다 강하다 —
+     * 면제 목록에 경로가 있는 것과 그 경로가 실제로 통과하는 것은 다르다.
      */
     @Test
     fun `RED7 - POST events 는 CSRF 면제다`() {
-        assertThat(mvc.post("${ApiPaths.BASE}/events") { jsonBody() }.andReturn().response.status)
-            .`as`("토큰 없이도 통과한다")
-            .isEqualTo(200)
+        val result = mvc.post("${ApiPaths.BASE}/events") {
+            header(kr.kcocktail.common.web.idempotency.IdempotencyFilter.HEADER, "csrf-probe-${System.nanoTime()}")
+            jsonBody()
+            content = """{"events":[]}"""
+        }.andReturn()
+
+        assertThat(result.response.status)
+            .`as`("토큰 없이도 통과한다 — 202 는 수집 API 의 정상 응답이다")
+            .isEqualTo(202)
     }
 
     /** **면제 목록이 최소인지** 확인한다. 이게 이 이슈에서 제일 중요한 테스트다. */
@@ -224,9 +233,9 @@ class CsrfProbeController {
     @PostMapping("/probe/csrf/public")
     fun publicWrite() = mapOf("ok" to true)
 
-    /** 이벤트 수집 자리. 실물은 이슈 034(#36)다 — 여기서는 면제 등록만 확인한다. */
-    @PostMapping("/events")
-    fun events() = mapOf("accepted" to true)
+    // 이벤트 수집 스텁은 **없다.** 이슈 034(#36)가 실물을 만들었고,
+    // 스텁을 남겨 두면 `Ambiguous mapping` 으로 이 파일 전체가 컨텍스트조차 못 띄운다.
+    // RED 7 이 실물을 겨냥한다 — 스텁으로 확인하던 것보다 강하다.
 }
 
 @Profile(CsrfProbes.PROFILE)

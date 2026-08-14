@@ -621,6 +621,55 @@
         "required" : [ "headerName", "token" ],
         "type" : "object"
       },
+      "EventBatch" : {
+        "properties" : {
+          "events" : {
+            "description" : "요청당 최대 50건 (SPEC-10 §7). 넘으면 400 이다",
+            "items" : {
+              "$ref" : "#/components/schemas/EventRequest"
+            },
+            "type" : "array"
+          }
+        },
+        "required" : [ "events" ],
+        "type" : "object"
+      },
+      "EventRequest" : {
+        "description" : "요청당 최대 50건 (SPEC-10 §7). 넘으면 400 이다",
+        "properties" : {
+          "eventType" : {
+            "type" : "string"
+          },
+          "occurredAt" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "path" : {
+            "description" : "쿼리스트링은 서버가 잘라 낸다 (SPEC-10 §3)",
+            "type" : "string"
+          },
+          "payload" : {
+            "additionalProperties" : {
+              "type" : "object"
+            },
+            "type" : "object"
+          },
+          "referrerType" : {
+            "description" : "organic · internal · social · direct · unknown",
+            "type" : "string"
+          },
+          "sessionId" : {
+            "description" : "클라이언트 생성 UUID. 30분 무활동 시 갱신된다",
+            "type" : "string"
+          },
+          "userId" : {
+            "description" : "비로그인은 null",
+            "format" : "int64",
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
       "FacetCounts" : {
         "properties" : {
           "abv" : {
@@ -2359,6 +2408,37 @@
         },
         "summary" : "공유된 컬렉션",
         "tags" : [ "shared-collection-controller" ]
+      }
+    },
+    "/api/v1/events" : {
+      "post" : {
+        "description" : "인증·CSRF 불필요. 배치 50건. 검증 실패한 이벤트는 버리고 나머지를 저장한다.",
+        "operationId" : "collect",
+        "parameters" : [ {
+          "in" : "header",
+          "name" : "Idempotency-Key",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/EventBatch"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "202" : {
+            "description" : "받았다. 본문 없음. 처리 결과를 알려 주지 않는다"
+          }
+        },
+        "summary" : "이벤트 수집",
+        "tags" : [ "event-controller" ]
       }
     },
     "/api/v1/ingredients" : {

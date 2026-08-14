@@ -385,7 +385,7 @@ class RestConventionTest {
         val before = events.sideEffects.get()
 
         repeat(2) {
-            mvc.post("$BASE/events") {
+            mvc.post(PROBE) {
                 contentType = MediaType.APPLICATION_JSON
                 content = """{"name":"page_view"}"""
             }.andExpect { status { isOk() } }
@@ -443,7 +443,7 @@ class RestConventionTest {
 
     // ── 헬퍼 ───────────────────────────────────────────────────────────────
 
-    private fun postEvent(key: String, body: String) = mvc.post("$BASE/events") {
+    private fun postEvent(key: String, body: String) = mvc.post(PROBE) {
         contentType = MediaType.APPLICATION_JSON
         header(IdempotencyFilter.HEADER, key)
         content = body
@@ -466,6 +466,14 @@ class RestConventionTest {
 
     companion object {
         const val BASE = ApiPaths.BASE
+
+        /**
+         * 멱등 프로브 경로.
+         *
+         * 실제 수집 엔드포인트(`/events`)를 점유하지 않는다 — 이슈 034 가 그 자리를 채우면서
+         * `Ambiguous mapping` 으로 이 파일 전체가 죽었다. [EventProbe] 의 KDoc 참조.
+         */
+        const val PROBE = "$BASE/events/idempotency-probe"
 
         @JvmStatic
         @DynamicPropertySource

@@ -1,5 +1,6 @@
 package kr.kcocktail.user.internal
 
+import kr.kcocktail.common.account.ClosureHook
 import kr.kcocktail.user.repository.UserRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -17,11 +18,14 @@ import org.springframework.transaction.annotation.Transactional
  * 마지막 둘이 요점이다. **탈퇴는 "흔적을 전부 지운다"가 아니다** —
  * 개인을 식별할 수 없게 만들되, 일어난 일의 기록은 남긴다.
  *
- * ## 지금은 절반만 한다
+ * ## 훅이 계약이다
  *
- * `analytics_event`(이슈 034)와 `audit_log`(이슈 014)가 아직 없다.
- * [ClosureHook] 이 그 계약이고, 해당 이슈가 구현을 끼운다.
- * 훅이 없으면 그 이슈가 탈퇴 처리를 잊고, 잊었다는 사실도 드러나지 않는다.
+ * [ClosureHook] 은 `common` 에 있다 (이슈 034 에서 옮겼다). `user.internal` 에 두면
+ * 구현하는 쪽이 `user` 를 참조하게 되고, `common.analytics` 가 구현하는 순간
+ * `COMMON ──▶ USER` 라는 없는 화살표가 생긴다.
+ *
+ * `audit_log`(이슈 014)는 훅이 없다 — **아무것도 안 하는 것이 그쪽의 처리**다.
+ * `analytics_event`(이슈 034)가 `user_id` 를 `NULL` 로 익명화한다.
  */
 @Service
 class AccountClosureService(
@@ -35,15 +39,4 @@ class AccountClosureService(
         hooks.forEach { it.onAccountClosing(userId) }
         users.deleteById(userId)
     }
-}
-
-/**
- * 탈퇴 시 각 모듈이 자기 데이터를 정리하는 지점.
- *
- * `user` 모듈이 남의 테이블을 직접 건드리지 않는다 (`PRIN-T03`) —
- * 그렇게 하면 탈퇴 하나 때문에 모든 모듈이 서로를 참조하게 된다.
- */
-interface ClosureHook {
-    /** `user` 행이 삭제되기 **직전**에 불린다. 같은 트랜잭션이다. */
-    fun onAccountClosing(userId: Long)
 }

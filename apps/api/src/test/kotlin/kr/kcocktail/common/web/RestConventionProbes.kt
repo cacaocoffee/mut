@@ -111,10 +111,24 @@ class AdminProbe {
     fun list(): Map<String, Any> = mapOf("items" to emptyList<Any>())
 }
 
-/** 멱등 프로브. 부수효과를 세어 "정말 한 번만 일어났는지"를 본다. */
+/**
+ * 멱등 프로브. 부수효과를 세어 "정말 한 번만 일어났는지" 를 본다.
+ *
+ * ## 경로가 `/events` 가 아니다 (2026-08-14, 이슈 034)
+ *
+ * 처음에는 `/api/v1/events` 를 잡고 있었다. 실제 수집 엔드포인트가 없던 때라 자리가 비었는데,
+ * 이슈 034 가 그 자리를 채우면서 **`Ambiguous mapping` 으로 컨텍스트 자체가 안 떴다** —
+ * 이 파일의 테스트 전부가 한꺼번에 죽었다.
+ *
+ * 세션 초반에 `RestConventionProbes` 가 `/cocktails` 로 같은 일을 겪었다.
+ * **프로브는 실제 경로를 점유하지 않는다** — 하위 경로로 비켜선다.
+ *
+ * `/events` 아래인 것은 의도다: CSRF 면제가 그 접두사에 걸려 있어(`CsrfExemptions`)
+ * 프로브도 같은 조건에서 돈다. 여기서 보는 것은 멱등이지 CSRF 가 아니다.
+ */
 @Profile(RestProbes.PROFILE)
 @RestController
-@RequestMapping("${ApiPaths.BASE}/events")
+@RequestMapping("${ApiPaths.BASE}/events/idempotency-probe")
 class EventProbe {
     val sideEffects = AtomicInteger(0)
 
