@@ -38,7 +38,7 @@ const USAGE_ALSO = [
   "apps/web/components/finder-screen.tsx",
   "apps/web/components/search-screen.tsx",
   "apps/web/components/flavor-radar.tsx",
-  "apps/web/app/cocktails/[id]/page.tsx",
+  "apps/web/app/cocktails/[slug]/page.tsx",
 ];
 
 /** 사진 슬롯을 담는 그리드 — 트랙이 min-content 바닥을 가지면 안 된다 (게이트 3). */
@@ -290,7 +290,7 @@ for (const rel of USAGE_ALSO.concat(["apps/web/components/recipe-panel.tsx"])) {
 //     전부 챕터면 아무것도 챕터가 아니다. 폼·목록 레이블은 기능이 있으므로 남긴다.
 const EYEBROW_ALLOWED = [
   { file: "apps/web/components/search-screen.tsx", text: "필터 FILTERS", why: "필터 패널의 폼 레이블" },
-  { file: "apps/web/app/cocktails/[id]/page.tsx", text: "같은 기주 RELATED", why: "목록 레이블" },
+  { file: "apps/web/app/cocktails/[slug]/page.tsx", text: "같은 기주 RELATED", why: "목록 레이블" },
 ];
 for (const rel of USAGE_ALSO) {
   let text;
