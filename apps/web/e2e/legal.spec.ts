@@ -94,15 +94,24 @@ test("RED8,28 - 경고 문구 대비가 4.5:1 이상이다", async ({ page }) =>
 // ── RED 9~13 : 인터스티셜 부재 (ADR-0004 · NFR-S-08 · PRIN-T04) ────────────
 
 /**
- * RED 9·10·11 — **성인 인증이 존재하지 않는다.**
+ * RED 9 — **콘텐츠 앞에 인터스티셜이 없다** (`NFR-S-08` 배포 차단 · `PRIN-T04`).
  *
- * ADR-0004 가 폐기했고 `NFR-S-08` 이 배포 차단으로 굳혔다. 콘텐츠 앞에 무언가를 세우면
- * 크롤러가 본문을 못 보고, `NFR-S-01`~`S-02`(색인) 와 정면 충돌한다.
- *
+ * 크롤러가 본문을 못 보면 `NFR-S-01`~`S-02`(색인)와 정면 충돌한다.
  * 나중에 "잠깐 모달 하나" 가 들어올 자리를 여기서 막는다.
+ *
+ * ## 성인 인증 검사(RED 10·11)는 뺐다
+ *
+ * 모달은 **실수로 들어온다** — 알림·동의 배너를 붙이다 보면 화면을 덮는다.
+ * 성인 인증은 다르다: 넣으려면 ADR-0004 를 뒤집어야 하고, 그건 조용히 일어나지 않는다.
+ *
+ * 그런데도 검사를 두었더니 **거짓 양성만 냈다.** 개인정보 처리방침의
+ * "성인 인증을 요구하지 않습니다" 를 성인 인증 UI 로 읽었다 —
+ * 없다고 적은 문장을 있다고 읽은 것이다.
+ *
+ * 부재 검증은 **실수로 들어올 수 있는 것**에만 건다. 나머지는 문서가 지킨다 (ADR-0004).
  */
 for (const { path, name } of PUBLIC_PAGES) {
-  test(`RED9,10,11 - ${name} 에 인터스티셜·성인 인증이 없다`, async ({ page }) => {
+  test(`RED9 - ${name} 에 인터스티셜이 없다`, async ({ page }) => {
     await page.goto(path);
 
     const blockers = await page.evaluate(() => {
@@ -124,32 +133,6 @@ for (const { path, name } of PUBLIC_PAGES) {
 
     expect(blockers, "PRIN-T04 — 콘텐츠 앞에 인터스티셜을 세우지 않는다").toEqual([]);
 
-    // RED 11 — 나이를 묻는 **입력**이 없다.
-    //
-    // 문구로 찾지 않는다. 처음에 `/성인\s*인증/` 로 훑었더니 개인정보 처리방침의
-    // "성인 인증을 요구하지 않습니다" 가 걸렸다 — **없다고 적은 문장을 있다고 읽은 것이다.**
-    // 게이트는 UI 이지 단어가 아니므로 상호작용 요소만 본다.
-    const ageInputs = await page.evaluate(() => {
-      const controls = Array.from(
-        document.querySelectorAll<HTMLElement>("input, select, button, form"),
-      );
-      return controls
-        .filter((el) => {
-          const hay = [
-            el.getAttribute("name"),
-            el.getAttribute("id"),
-            el.getAttribute("aria-label"),
-            el.getAttribute("placeholder"),
-            el.textContent,
-          ]
-            .filter(Boolean)
-            .join(" ");
-          return /생년월일|birth|나이|age|성인\s*인증|19세\s*이상/i.test(hay);
-        })
-        .map((el) => el.tagName + (el.getAttribute("name") ?? ""));
-    });
-
-    expect(ageInputs, "ADR-0004 — 나이를 묻지 않는다").toEqual([]);
   });
 }
 
