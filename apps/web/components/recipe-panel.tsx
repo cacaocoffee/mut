@@ -1,22 +1,60 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { formatAmount, type Cocktail } from "@kca/domain";
+import { MAX_SERVINGS, formatQuantity, type DisplayUnit } from "@kca/domain";
 import { rememberLastViewed } from "@/lib/use-last-viewed";
+import type { CocktailView } from "@/lib/cocktail-view";
 
-const MAX_SERVINGS = 8;
+type Line = CocktailView["ingredients"][number];
 
-export function RecipePanel({ cocktail }: { cocktail: Cocktail }) {
+/** 고른 표기 단위를 기억해 둔다 (RED 16) — 잔마다 다시 고르게 하지 않는다. */
+const UNIT_KEY = "kca:recipe-unit";
+
+/**
+ * 재료 표 + 잔 수 · 단위 · 대체재 (ISSUE-043 · `FR-COCKTAIL-019`·`020`·`021`).
+ *
+ * ## 계산은 전부 여기서 끝난다
+ *
+ * 잔 수를 바꿔도 서버를 부르지 않는다 (RED 35). 필요한 것(수치 · 단위 · 배수 대상 판정)이
+ * 이미 응답에 있고, 환산 규칙은 `@kca/domain` 의 `formatQuantity` 한 곳에 있다.
+ *
+ * ## 무엇이 배수 대상인지는 서버가 정한다
+ *
+ * `isScalable` 은 계약 필드다 (이슈 010). `amountLabel` 이 있는지 화면이 다시 보지 않는다 —
+ * 그래야 어드민 미리보기와 이 화면이 같은 답을 낸다.
+ *
+ * ## 바뀐 것을 소리로도 알린다
+ *
+ * 잔 수·단위를 바꾸면 표의 숫자가 한꺼번에 바뀐다. 화면을 보는 사람은 알지만 스크린리더는
+ * 표를 다시 읽지 않으므로, 바뀐 결과를 한 줄로 읽어 준다 (`NFR-A-07`).
+ */
+export function RecipePanel({ slug, ingredients }: { slug: string; ingredients: Line[] }) {
   const [servings, setServings] = useState(1);
-  const [unit, setUnit] = useState<"ml" | "oz">("ml");
+  const [unit, setUnit] = useState<DisplayUnit>("ml");
   const [openSub, setOpenSub] = useState<number | null>(null);
 
   // 상세 탭이 마지막으로 본 칵테일로 돌아가도록 기록한다.
   useEffect(() => {
-    rememberLastViewed(cocktail.id);
-  }, [cocktail.id]);
+    rememberLastViewed(slug);
+  }, [slug]);
 
-  const substitute = openSub !== null ? cocktail.ingredients[openSub] : null;
+  // 저장해 둔 단위를 되살린다. 첫 그림은 `ml` 이라 서버가 그린 것과 어긋나지 않는다.
+  useEffect(() => {
+    const restore = () => {
+      const saved = window.localStorage.getItem(UNIT_KEY);
+      if (saved === "ml" || saved === "oz") setUnit(saved);
+    };
+    restore();
+  }, []);
+
+  const changeUnit = (next: DisplayUnit) => {
+    setUnit(next);
+    try {
+      window.localStorage.setItem(UNIT_KEY, next);
+    } catch {
+      // 사생활 보호 모드에서 저장이 막힐 수 있다. 이번 화면에서만 유지되면 된다.
+    }
+  };
 
   return (
     <>
@@ -55,7 +93,8 @@ export function RecipePanel({ cocktail }: { cocktail: Cocktail }) {
                   type="radio"
                   name="unit"
                   checked={unit === u}
-                  onChange={() => setUnit(u)}
+                  aria-label={`${u} 로 보기`}
+                  onChange={() => changeUnit(u)}
                 />
                 {u}
               </label>
@@ -63,6 +102,11 @@ export function RecipePanel({ cocktail }: { cocktail: Cocktail }) {
           </div>
         </div>
       </div>
+
+      {/* 표의 숫자가 한꺼번에 바뀐 것을 한 줄로 알린다 (RED 31) */}
+      <p className="recipe-live" aria-live="polite">
+        {servings}잔 기준 · {unit} 표기
+      </p>
 
       <table className="table" style={{ marginTop: 2 }}>
         <thead>
@@ -73,40 +117,75 @@ export function RecipePanel({ cocktail }: { cocktail: Cocktail }) {
           </tr>
         </thead>
         <tbody>
-          {cocktail.ingredients.map((ing, i) => (
-            <tr key={ing.ko}>
-              <td style={{ fontWeight: 500 }}>
-                {ing.ko}
-                <div className="ingredient-en">{ing.en}</div>
-              </td>
-              <td className="amount-cell">
-                {ing.amount ?? (ing.ml ? formatAmount(ing.ml, servings, unit) : "—")}
-              </td>
-              <td>
-                {ing.sub ? (
-                  <button
-                    type="button"
-                    className="tag tag-outline"
-                    style={{ cursor: "pointer", background: "transparent", whiteSpace: "nowrap" }}
-                    aria-expanded={openSub === i}
-                    onClick={() => setOpenSub(openSub === i ? null : i)}
-                  >
-                    {/* ⓘ 를 뺐다 — OS 마다 다르게 그려지는 글리프를 아이콘 자리에 쓰고 있었다.
-                        텍스트와 aria-expanded 만으로 어포던스가 성립한다 (ISSUE-054). */}
-                    대체 가능
-                  </button>
-                ) : null}
-              </td>
-            </tr>
+          {ingredients.map((line, i) => (
+            <RecipeRow
+              key={`${line.nameKo}-${i}`}
+              line={line}
+              servings={servings}
+              unit={unit}
+              open={openSub === i}
+              onToggle={() => setOpenSub(openSub === i ? null : i)}
+            />
           ))}
         </tbody>
       </table>
+    </>
+  );
+}
 
-      {substitute ? (
-        <dl className="substitute-note">
-          <dt>SUBSTITUTE · {substitute.ko}</dt>
-          <dd>{substitute.sub}</dd>
-        </dl>
+/**
+ * 한 줄과, 펼쳤을 때의 대체재 안내.
+ *
+ * 안내를 표 아래 한 자리에 모아 두면 어느 재료의 이야기인지 다시 찾아야 한다.
+ * 누른 줄 **바로 밑**에 편다 (`FR-COCKTAIL-021` · `R-F1.3-2`).
+ */
+function RecipeRow({
+  line,
+  servings,
+  unit,
+  open,
+  onToggle,
+}: {
+  line: Line;
+  servings: number;
+  unit: DisplayUnit;
+  open: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <>
+      <tr>
+        <td style={{ fontWeight: 500 }}>
+          {line.nameKo}
+          {line.isOptional && <span className="ingredient-optional">선택</span>}
+          <div className="ingredient-en">{line.nameEn}</div>
+        </td>
+        <td className="amount-cell">{formatQuantity(line, servings, unit)}</td>
+        <td>
+          {line.substitute ? (
+            <button
+              type="button"
+              className="tag tag-outline"
+              style={{ cursor: "pointer", background: "transparent", whiteSpace: "nowrap" }}
+              aria-expanded={open}
+              onClick={onToggle}
+            >
+              {/* ⓘ 를 뺐다 — OS 마다 다르게 그려지는 글리프를 아이콘 자리에 쓰고 있었다.
+                  텍스트와 aria-expanded 만으로 어포던스가 성립한다 (ISSUE-054). */}
+              대체 가능
+            </button>
+          ) : null}
+        </td>
+      </tr>
+      {open && line.substitute ? (
+        <tr>
+          <td colSpan={3}>
+            <dl className="substitute-note">
+              <dt>SUBSTITUTE · {line.nameKo}</dt>
+              <dd>{line.substitute}</dd>
+            </dl>
+          </td>
+        </tr>
       ) : null}
     </>
   );

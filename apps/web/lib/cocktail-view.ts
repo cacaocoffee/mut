@@ -41,10 +41,20 @@ export interface CocktailView {
   glassType: string;
   sweetness: { slug: string; ko: string; en: string };
 
+  /**
+   * 재료 줄. **미리 만든 문자열이 아니라 수치와 판정을 그대로 넘긴다** (ISSUE-043).
+   *
+   * 잔 수와 표기 단위는 화면에서 바뀌므로 여기서 문자열로 굳히면 환산할 것이 없다.
+   * `isScalable` 은 서버 판정을 그대로 옮긴 값이다 — 프론트가 다시 정하지 않는다.
+   */
   ingredients: {
     nameKo: string;
     nameEn: string;
-    amount: string;
+    amount: number | null;
+    unit: string | null;
+    amountLabel: string | null;
+    isScalable: boolean;
+    isOptional: boolean;
     substitute: string | null;
   }[];
   steps: string[];
@@ -86,7 +96,12 @@ export function fromApi(detail: CocktailDetail): CocktailView {
       nameKo: line.nameKo,
       nameEn: line.nameEn,
       // 계량한 것은 `amount`+`unit`, 아닌 것은 `amountLabel` 이다 (`"1조각"`).
-      amount: line.amountLabel ?? (line.amount != null ? `${line.amount}${line.unit ?? ""}` : ""),
+      amount: line.amount ?? null,
+      unit: line.unit ?? null,
+      amountLabel: line.amountLabel ?? null,
+      // 서버 판정을 그대로 옮긴다 (이슈 010 · 043 RED 6)
+      isScalable: line.isScalable,
+      isOptional: line.isOptional,
       // 대체는 재료 참조일 수도 안내 문구일 수도 있다 (`GATE-COCKTAIL-06` 이 둘 중 하나를 요구한다).
       substitute: line.substitute?.note ?? line.substitute?.nameKo ?? null,
     })),
@@ -140,7 +155,14 @@ export function fromPrototype(slug: string): CocktailView | null {
     ingredients: c.ingredients.map((i) => ({
       nameKo: i.ko,
       nameEn: i.en,
-      amount: i.amount ?? (i.ml != null ? `${i.ml}ml` : ""),
+      amount: i.ml ?? null,
+      unit: i.ml != null ? "ml" : null,
+      // 프로토타입의 `amount` 가 계약의 `amountLabel` 이다 — `"1조각"` 처럼 배수에서 빠지는 표기.
+      amountLabel: i.amount ?? null,
+      // **여기만 프론트가 판정한다.** 서버가 없을 때 쓰는 폴백이라 서버와 같은 규칙을 적는다
+      // (`amountLabel` 이 없고 `amount` 가 있으면 배수 대상 — `RecipeIngredient.isScalable`).
+      isScalable: i.amount == null && i.ml != null,
+      isOptional: false,
       substitute: i.sub ?? null,
     })),
     steps: c.steps,
