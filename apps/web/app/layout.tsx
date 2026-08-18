@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Archivo, Noto_Sans_KR, Noto_Serif_KR } from "next/font/google";
 import { SiteNav } from "@/components/site-nav";
+import { PathRecorder } from "@/components/analytics/path-recorder";
 import { LegalNotice } from "@/components/legal/legal-notice";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
@@ -70,6 +71,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body>
         <div className="page">
           <SiteNav />
+          {/* 지나온 화면을 적어 둔다 — `cocktail_view.entryPoint` 가 이것을 본다 (이슈 035) */}
+          <PathRecorder />
           {children}
           {/* NFR-L-01 — 모든 페이지 하단 고정. 배포 차단 조건이다.
               루트 레이아웃에 무조건 렌더한다: 페이지마다 붙이면 언젠가 빠뜨리고,

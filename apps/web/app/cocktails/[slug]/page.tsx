@@ -11,6 +11,7 @@ import {
 import { DetailActions } from "@/components/detail-actions";
 import { FlavorRadar } from "@/components/flavor-radar";
 import { RecipePanel } from "@/components/recipe-panel";
+import { TrackCocktailView } from "@/components/analytics/cocktail-view";
 import { PhotoSlot } from "@/components/photo-slot";
 import { cocktailDetail, publishedSlugs, relatedCocktails, usingApi, type RelatedItem } from "@/lib/api";
 import { fromApi, fromPrototype, prototypeSlugs, type CocktailView } from "@/lib/cocktail-view";
@@ -182,6 +183,10 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
           {/* 잔 수 · 단위 · 대체재는 브라우저에서 만진다 (이슈 043). 서버가 그린 표를
               그대로 두고 그 위에 컨트롤만 얹으면 두 벌이 되므로 표째로 넘긴다. */}
           <RecipePanel slug={c.slug} ingredients={c.ingredients} />
+
+          {/* SPEC-10 §4.1 — 어떤 칵테일이 실제로 읽히나. 서버에서는 알 수 없어(정적 생성)
+              브라우저에서 한 번 보낸다 (이슈 035). */}
+          <TrackCocktailView slug={c.slug} />
 
           <h4 className="section-head">제조 순서 METHOD</h4>
           <ol style={{ listStyle: "none", margin: 0, padding: 0 }}>
