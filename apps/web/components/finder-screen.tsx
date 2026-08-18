@@ -46,6 +46,8 @@ export function FinderScreen({ corpus }: { corpus: SearchItem[] }) {
 
   const queryRef = useRef("");
   const [query, setQueryState] = useState("");
+  /** 브라우저에서 붙었는가 — 탐색 화면과 같은 이유다 (`search-screen.tsx`). */
+  const [ready, setReady] = useState(false);
 
   const setQuery = useCallback((q: string) => {
     queryRef.current = q;
@@ -53,7 +55,10 @@ export function FinderScreen({ corpus }: { corpus: SearchItem[] }) {
   }, []);
 
   useEffect(() => {
-    const read = () => setQuery(window.location.search.replace(/^\?/, ""));
+    const read = () => {
+      setQuery(window.location.search.replace(/^\?/, ""));
+      setReady(true);
+    };
     read();
     window.addEventListener("popstate", read);
     return () => window.removeEventListener("popstate", read);
@@ -107,7 +112,7 @@ export function FinderScreen({ corpus }: { corpus: SearchItem[] }) {
     .join(" · ");
 
   return (
-    <main className="shell finder">
+    <main className="shell finder" data-ready={ready || undefined}>
       <header className="page-head" style={{ gridTemplateColumns: "1fr" }}>
         <div>
           <h1>

@@ -73,6 +73,14 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
    */
   const queryRef = useRef("");
   const [query, setQueryState] = useState("");
+  /**
+   * 브라우저에서 붙었는가.
+   *
+   * 미리 그린 HTML 은 필터가 걸리기 전 모습이고, 스크립트가 붙어야 칩이 눌린다.
+   * 그 사이에 누른 클릭은 아무 일도 하지 않는다 — 사람은 다시 누르지만 테스트는
+   * 못 누른 채로 기다리다 실패한다. 붙은 시점을 밖에서 볼 수 있게 표시한다.
+   */
+  const [ready, setReady] = useState(false);
 
   const setQuery = useCallback((q: string) => {
     queryRef.current = q;
@@ -80,7 +88,10 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
   }, []);
 
   useEffect(() => {
-    const read = () => setQuery(window.location.search.replace(/^\?/, ""));
+    const read = () => {
+      setQuery(window.location.search.replace(/^\?/, ""));
+      setReady(true);
+    };
     read();
     // `replace` 는 popstate 를 내지 않는다 — 아래 [apply] 가 직접 갱신한다.
     window.addEventListener("popstate", read);
@@ -131,7 +142,7 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
   ].join(" · ");
 
   return (
-    <main className="shell">
+    <main className="shell" data-ready={ready || undefined}>
       <header className="page-head">
         <div>
           <h1>

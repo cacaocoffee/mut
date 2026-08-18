@@ -30,6 +30,16 @@ async function candidateCount(page: Page): Promise<number> {
   return Number(await page.locator(".quiz-count b").innerText());
 }
 
+/**
+ * 화면이 브라우저에서 붙기를 기다린다.
+ *
+ * 미리 그린 HTML 위의 버튼은 스크립트가 붙기 전에는 눌러도 아무 일이 없다. 화면이
+ * `data-ready` 로 그 시점을 알린다 — `networkidle` 은 이 앱에서 가라앉지 않아 못 쓴다.
+ */
+async function ready(page: Page) {
+  await expect(page.locator("main[data-ready]")).toBeVisible();
+}
+
 function source(rel: string): string {
   return readFileSync(join(process.cwd(), rel), "utf8");
 }
@@ -50,15 +60,29 @@ test("RED1 - 도수 질문이 4구간이다", async ({ page }) => {
  * 거기 없는 이름이 하나라도 나오면 정의가 갈린 것이다.
  */
 test("RED2,3 - 구간 정의가 탐색 필터와 동일하다", async ({ page }) => {
+  // 화면을 한 번만 열고 [이전]으로 되돌아오며 네 선택지를 다 눌러 본다.
+  // 선택지마다 새로 열면 이 테스트 하나가 페이지를 여덟 번 그린다.
+  await page.goto(FINDER);
+  await ready(page);
+
+  const bandInUrl = () => new URL(page.url()).searchParams.get("abv");
+
   const finderBands: string[] = [];
   for (let i = 0; i < 4; i++) {
-    await page.goto(FINDER);
+    // [이전] 으로 돌아와도 앞 답은 주소에 남아 있다. 주소에 값이 **있는지**만 보면
+    // 아직 안 바뀐 앞 값을 읽는다 — 값이 **바뀔 때까지** 기다린다.
+    const before = bandInUrl();
     await options(page).nth(i).click();
-    await expect(page).toHaveURL(/abv=/);
-    finderBands.push(new URL(page.url()).searchParams.get("abv")!);
+    await expect.poll(bandInUrl).not.toBe(before);
+    finderBands.push(bandInUrl()!);
+
+    await page.getByRole("button", { name: /이전/ }).click();
+    await expect(page.locator(".quiz-kicker")).toContainText("QUESTION 1 / 4");
   }
 
   await page.goto(SEARCH);
+  await ready(page);
+
   const chips = page
     .locator(".filter-group")
     .filter({ hasText: "도수 ABV" })
@@ -66,10 +90,12 @@ test("RED2,3 - 구간 정의가 탐색 필터와 동일하다", async ({ page })
 
   const searchBands: string[] = [];
   for (let i = 0; i < (await chips.count()); i++) {
-    await page.goto(SEARCH);
     await chips.nth(i).click();
     await expect(page).toHaveURL(/abv=/);
     searchBands.push(new URL(page.url()).searchParams.get("abv")!);
+
+    await chips.nth(i).click(); // 끄고 다음 칩으로 — 켠 채로 두면 두 구간이 섞인다
+    await expect(page).not.toHaveURL(/abv=/);
   }
 
   expect(finderBands, "파인더가 4구간을 그대로 쓰지 않는다").toEqual(["na", "low", "mid", "high"]);
