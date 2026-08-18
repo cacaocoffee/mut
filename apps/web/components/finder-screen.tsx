@@ -17,6 +17,7 @@ import {
   type SearchItem,
 } from "@kca/domain";
 import { FINDER_PATH } from "@/lib/routes";
+import { finderStep } from "@/lib/analytics/events";
 import { PhotoSlot } from "./photo-slot";
 import { SweetTag } from "./sweet-tag";
 
@@ -95,6 +96,14 @@ export function FinderScreen({ corpus }: { corpus: SearchItem[] }) {
     // 뒤로 갔다가 다시 고르면 그 뒤의 답은 지운다 — 화면에 남은 답과 주소가 갈리지 않게 한다.
     for (const later of QUESTIONS.slice(step + 1)) delete next[later.key];
     go(next, step + 1);
+
+    // SPEC-10 §4.4 — 어느 질문에서 이탈하나. **`step = 4` 도달이 완주다** (완주 이벤트를
+    // 따로 두지 않는다). `candidateCount` 가 1~2로 급감하면 질문이 너무 좁게 거른다는 뜻이다.
+    finderStep({
+      step: (step + 1) as 1 | 2 | 3 | 4,
+      answered: String(value),
+      candidateCount: quizCandidates(corpus, next).length,
+    });
   };
 
   const reset = () => go({}, 0);

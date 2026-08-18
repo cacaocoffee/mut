@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { MAX_SERVINGS, formatQuantity, type DisplayUnit } from "@kca/domain";
 import { rememberLastViewed } from "@/lib/use-last-viewed";
 import type { CocktailView } from "@/lib/cocktail-view";
+import { recipeInteract } from "@/lib/analytics/events";
 
 type Line = CocktailView["ingredients"][number];
 
@@ -47,8 +48,15 @@ export function RecipePanel({ slug, ingredients }: { slug: string; ingredients: 
     restore();
   }, []);
 
+  /** SPEC-10 §4.5 — 상세에서 실제로 뭘 만지나. 아무도 안 쓰는 컨트롤은 화면을 복잡하게만 한다. */
+  const changeServings = (next: number) => {
+    setServings(next);
+    recipeInteract({ cocktailSlug: slug, action: "servings_change", detail: String(next) });
+  };
+
   const changeUnit = (next: DisplayUnit) => {
     setUnit(next);
+    recipeInteract({ cocktailSlug: slug, action: "unit_toggle", detail: next });
     try {
       window.localStorage.setItem(UNIT_KEY, next);
     } catch {
@@ -65,7 +73,7 @@ export function RecipePanel({ slug, ingredients }: { slug: string; ingredients: 
             <button
               type="button"
               className="btn"
-              onClick={() => setServings((n) => Math.max(1, n - 1))}
+              onClick={() => changeServings(Math.max(1, servings - 1))}
               disabled={servings === 1}
               aria-label="잔 수 줄이기"
             >
@@ -77,7 +85,7 @@ export function RecipePanel({ slug, ingredients }: { slug: string; ingredients: 
             <button
               type="button"
               className="btn"
-              onClick={() => setServings((n) => Math.min(MAX_SERVINGS, n + 1))}
+              onClick={() => changeServings(Math.min(MAX_SERVINGS, servings + 1))}
               disabled={servings === MAX_SERVINGS}
               aria-label="잔 수 늘리기"
             >
@@ -124,7 +132,18 @@ export function RecipePanel({ slug, ingredients }: { slug: string; ingredients: 
               servings={servings}
               unit={unit}
               open={openSub === i}
-              onToggle={() => setOpenSub(openSub === i ? null : i)}
+              onToggle={() => {
+                const opening = openSub !== i;
+                setOpenSub(opening ? i : null);
+                // 펼칠 때만 센다. 접는 것은 같은 관심의 뒷면이라 두 번 세면 부풀린다.
+                if (opening) {
+                  recipeInteract({
+                    cocktailSlug: slug,
+                    action: "substitute_open",
+                    detail: line.nameKo,
+                  });
+                }
+              }}
             />
           ))}
         </tbody>
