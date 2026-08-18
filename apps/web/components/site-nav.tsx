@@ -3,14 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLastViewed } from "@/lib/use-last-viewed";
-import { FINDER_PATH, SEARCH_PATH } from "@/lib/routes";
+import { FINDER_PATH, SEARCH_PATH, UNIFIED_SEARCH_PATH } from "@/lib/routes";
 
 export function SiteNav() {
   const pathname = usePathname();
   const lastViewed = useLastViewed();
 
   // 국문과 영문을 나눠 둔다 — 560px 아래에서 영문만 감춘다 (ISSUE-051 #69).
-  // 레이블을 두 줄로 접는 대신 짧게 쓴다. `01`·`02`·`03` 이 화면 순서를 계속 드러낸다.
+  // 레이블을 두 줄로 접는 대신 짧게 쓴다. `01`~`04` 가 화면 순서를 계속 드러낸다.
   const tabs = [
     { href: SEARCH_PATH, ko: "01 탐색", en: "SEARCH", match: (p: string) => p === SEARCH_PATH },
     {
@@ -21,6 +21,12 @@ export function SiteNav() {
       match: (p: string) => p.startsWith("/cocktails/") && p !== SEARCH_PATH,
     },
     { href: FINDER_PATH, ko: "03 파인더", en: "FINDER", match: (p: string) => p === FINDER_PATH },
+    {
+      href: UNIFIED_SEARCH_PATH,
+      ko: "04 검색",
+      en: "FIND",
+      match: (p: string) => p === UNIFIED_SEARCH_PATH,
+    },
   ];
 
   return (

@@ -1215,3 +1215,139 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ── 통합 검색 (ISSUE-042) ─────────────────────────────────────────────── */
+
+.search-box {
+  position: relative;
+  max-width: 640px;
+  margin-top: var(--space-6);
+}
+.search-box__input {
+  width: 100%;
+  font-size: 15px;
+  padding: 12px 14px;
+}
+/* 제안 목록은 결과 위에 뜬다. 자리를 밀면 목록이 나타날 때마다 화면이 튄다. */
+.search-box__list {
+  position: absolute;
+  z-index: 20;
+  left: 0;
+  right: 0;
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+  background: var(--color-bg);
+  border: 1px solid var(--color-divider);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 8%);
+}
+.search-box__option {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 9px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--color-divider);
+}
+.search-box__option:last-child {
+  border-bottom: 0;
+}
+/* 키보드와 마우스가 같은 표시를 쓴다 — 둘이 다르면 어디가 골라진 상태인지 흐려진다 */
+.search-box__option[data-active="true"] {
+  background: var(--color-accent-100);
+}
+.search-box__option .ko {
+  font-size: 14px;
+  font-weight: 700;
+}
+.search-box__option .en {
+  font-size: 11px;
+  color: var(--color-neutral-700);
+}
+.search-box__option .type {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--color-accent-800);
+}
+
+.search-status {
+  margin-top: var(--space-4);
+  font-size: 13px;
+}
+.search-status__hint {
+  margin: 0;
+  color: var(--color-neutral-700);
+}
+.search-status__count {
+  margin: 0;
+}
+.search-status__count b {
+  font-size: 17px;
+}
+.search-status__error {
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--color-accent);
+  background: var(--color-accent-100);
+  color: var(--color-accent-800);
+}
+.search-status__empty p {
+  margin: 0 0 6px;
+}
+.search-status__empty a {
+  font-weight: 700;
+}
+
+.search-groups {
+  margin-top: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+.search-group__count {
+  margin-left: 10px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-neutral-700);
+}
+.search-group__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--color-divider);
+}
+.search-group__item {
+  border-bottom: 1px solid var(--color-divider);
+}
+.search-group__item a,
+.search-group__plain {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 12px 2px;
+}
+.search-group__item a:hover {
+  background: var(--color-accent-100);
+}
+/* 갈 곳이 없는 타입(재료 사전 미구현)은 링크처럼 보이지 않아야 한다 */
+.search-group__plain {
+  color: var(--color-neutral-700);
+  cursor: default;
+}
+.search-group__item .ko {
+  font-size: 15px;
+  font-weight: 700;
+}
+.search-group__item .en {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--color-neutral-700);
+}
+
+@media (max-width: 560px) {
+  .search-box {
+    max-width: none;
+  }
+}
