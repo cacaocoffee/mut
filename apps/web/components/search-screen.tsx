@@ -24,6 +24,7 @@ import {
   type Technique,
 } from "@kca/domain";
 import { SEARCH_PATH } from "@/lib/routes";
+import { filterApply, type FilterAxis } from "@/lib/analytics/events";
 import { CocktailCard } from "./cocktail-card";
 
 const ABV_LABELS = Object.fromEntries(ABV_BANDS.map((b) => [b.key, b.ko])) as Record<
@@ -101,16 +102,31 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
   const filters = useMemo(() => parseFilterQuery(new URLSearchParams(query)), [query]);
 
   const apply = useCallback(
-    (patch: Partial<Filters>) => {
+    (patch: Partial<Filters>, touched?: { axis: FilterAxis; value: string }) => {
       const base = parseFilterQuery(new URLSearchParams(queryRef.current));
-      const q = toFilterQuery({ ...base, ...patch }).toString();
+      const next = { ...base, ...patch };
+      const q = toFilterQuery(next).toString();
       setQuery(q);
+
+      // SPEC-10 §4.2 — 축이 여섯인데 실제로 뭘 쓰나. 결과 수는 **적용한 뒤**의 것이라
+      // 여기서 바로 센다 (이슈 049). 초기화처럼 축이 특정되지 않는 조작은 세지 않는다.
+      //
+      // **주소를 바꾸기 전에** 센다. 뒤에 두면 라우터가 흔들릴 때(빠른 연속 조작으로
+      // 이동이 겹칠 때) 그 조작이 통째로 안 세어진다 — 사용자는 분명히 눌렀는데 기록이 없다.
+      if (touched) {
+        filterApply({
+          axis: touched.axis,
+          value: touched.value,
+          resultCount: filterCocktails(corpus, next).length,
+          activeAxisCount: activeAxes(next),
+        });
+      }
 
       // `replace` 다 — 칩 하나에 히스토리 한 칸을 쓰면 뒤로가기가 화면을 못 벗어난다.
       // 주소는 그대로 바뀌므로 공유·새로고침은 같다 (`FR-SEARCH-005`).
       router.replace(q ? `${SEARCH_PATH}?${q}` : SEARCH_PATH, { scroll: false });
     },
-    [router, setQuery]
+    [corpus, router, setQuery]
   );
 
   const results = useMemo(() => filterCocktails(corpus, filters), [corpus, filters]);
@@ -121,10 +137,24 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
     [corpus, filters]
   );
 
-  const toggle = <T extends string>(key: keyof Filters, current: T[], value: T) =>
-    apply({
-      [key]: current.includes(value) ? current.filter((x) => x !== value) : [...current, value],
-    });
+  /**
+   * 축 하나를 켜고 끈다.
+   *
+   * 지금 걸린 값을 **주소에서 다시 읽는다.** 화면이 그린 시점의 값(`filters`)으로 계산하면
+   * 빠르게 두 개를 누를 때 두 번째 클릭이 첫 번째를 지운다 — 다시 그려지기 전이라
+   * 그 값에는 첫 번째 선택이 없다.
+   */
+  const toggle = <T extends string>(key: keyof Filters, axis: FilterAxis, value: T) => {
+    const live = parseFilterQuery(new URLSearchParams(queryRef.current));
+    const current = live[key] as T[];
+    const on = current.includes(value);
+
+    apply(
+      { [key]: on ? current.filter((x) => x !== value) : [...current, value] },
+      // 끄는 것도 그 축을 만진 것이다. 값이 비면 해제다.
+      { axis, value: on ? "" : value }
+    );
+  };
 
   const summary = [
     filters.sweet ? SWEETNESS[filters.sweet][0] : "당도 전체",
@@ -181,7 +211,7 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
                   type="radio"
                   name="sweetlvl"
                   checked={filters.sweet === null}
-                  onChange={() => apply({ sweet: null })}
+                  onChange={() => apply({ sweet: null }, { axis: "sweet", value: "" })}
                 />
                 <span className="ko">전체</span>
                 <span className="en">All · {sweetAll}</span>
@@ -197,7 +227,7 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
                       checked={filters.sweet === level}
                       disabled={n === 0 && filters.sweet !== level}
                       aria-label={`${ko} ${n}개`}
-                      onChange={() => apply({ sweet: level })}
+                      onChange={() => apply({ sweet: level }, { axis: "sweet", value: level })}
                     />
                     <span className="ko">{ko}</span>
                     <span className="en">
@@ -214,7 +244,7 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
             counts={counts.base}
             selected={filters.bases}
             labelOf={(slug) => BASE_SPIRIT_LABELS[slug as BaseSpirit]}
-            onToggle={(slug) => toggle("bases", filters.bases, slug as BaseSpirit)}
+            onToggle={(slug) => toggle("bases", "base", slug as BaseSpirit)}
           />
 
           <FacetChips
@@ -222,7 +252,7 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
             counts={counts.style}
             selected={filters.styles}
             labelOf={(slug) => STYLE_LABELS[slug as StyleKey]}
-            onToggle={(slug) => toggle("styles", filters.styles, slug as StyleKey)}
+            onToggle={(slug) => toggle("styles", "style", slug as StyleKey)}
           />
 
           <FacetChips
@@ -230,7 +260,7 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
             counts={counts.method}
             selected={filters.methods}
             labelOf={(slug) => TECHNIQUES[slug as Technique].ko}
-            onToggle={(slug) => toggle("methods", filters.methods, slug as Technique)}
+            onToggle={(slug) => toggle("methods", "method", slug as Technique)}
           />
 
           <FacetChips
@@ -238,7 +268,7 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
             counts={counts.abv}
             selected={filters.abvBands}
             labelOf={(slug) => ABV_LABELS[slug as AbvBand]}
-            onToggle={(slug) => toggle("abvBands", filters.abvBands, slug as AbvBand)}
+            onToggle={(slug) => toggle("abvBands", "abv", slug as AbvBand)}
           />
 
           {/* 여섯 축 중 여기만 AND 다 — 고를수록 결과가 줄고, 불가능한 조합은 즉시 0 이다
@@ -250,7 +280,7 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
             counts={counts.flavor}
             selected={filters.flavors}
             labelOf={(slug) => FLAVOR_LABELS[slug as FlavorKey]}
-            onToggle={(slug) => toggle("flavors", filters.flavors, slug as FlavorKey)}
+            onToggle={(slug) => toggle("flavors", "flavor", slug as FlavorKey)}
           />
 
           <div className="filter-group" style={{ borderBottom: 0 }}>
@@ -261,7 +291,7 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
               placeholder="네그로니 / Negroni"
               value={filters.query}
               aria-label="칵테일 이름 검색"
-              onChange={(e) => apply({ query: e.target.value })}
+              onChange={(e) => apply({ query: e.target.value }, { axis: "query", value: e.target.value })}
             />
           </div>
         </aside>
@@ -294,6 +324,20 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
     </main>
   );
 }
+
+/** 지금 걸려 있는 축의 수. 키워드도 한 축으로 센다 (SPEC-10 §4.2). */
+function activeAxes(f: Filters): number {
+  return [
+    f.bases.length > 0,
+    f.styles.length > 0,
+    f.methods.length > 0,
+    f.sweet !== null,
+    f.abvBands.length > 0,
+    f.flavors.length > 0,
+    f.query.trim().length > 0,
+  ].filter(Boolean).length;
+}
+
 
 /**
  * 한 축의 칩 줄.
