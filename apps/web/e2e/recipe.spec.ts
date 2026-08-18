@@ -290,17 +290,21 @@ test("RED31 - 잔 수·단위 변경이 스크린리더에 안내된다", async 
 test("RED34,35 - 서버가 끊겨도 환산이 되고 즉시 끝난다", async ({ page, context }) => {
   await ready(page, NEGRONI);
 
-  // 네트워크를 끊고 만진다. 환산에 서버가 필요했다면 여기서 표가 멈춘다 —
-  // 요청 수를 세는 것보다 분명하다 (프레임워크의 링크 프리페치가 섞이지 않는다).
-  await context.setOffline(true);
-
+  // RED 34 — 반영이 즉시인가. 선이 붙어 있는 상태에서 한 번 잰다. 여기 걸리는 시간에는
+  // 테스트 쪽 폴링 간격이 섞이므로 **멈춤을 잡는 눈금**이지 INP 자체가 아니다 —
+  // 실제 계측은 이슈 046 의 Lighthouse 다 (SPEC-04 §9.1).
   const started = Date.now();
   await addServing(page);
   await expect(amountOf(page, "진")).toHaveText("60 ml");
-  await chooseUnit(page, "oz");
-  await expect(amountOf(page, "진")).toHaveText("2 oz");
   const elapsed = Date.now() - started;
+  expect(elapsed, `조작 반영에 ${elapsed}ms 걸렸다`).toBeLessThan(3000);
 
+  // RED 35 — 선을 끊고 만진다. 환산에 서버가 필요했다면 여기서 표가 멈춘다.
+  // 요청 수를 세는 것보다 분명하다 (프레임워크의 링크 프리페치가 섞이지 않는다).
+  await context.setOffline(true);
+  await addServing(page);
+  await expect(amountOf(page, "진")).toHaveText("90 ml");
+  await chooseUnit(page, "oz");
+  await expect(amountOf(page, "진")).toHaveText("3 oz");
   await context.setOffline(false);
-  expect(elapsed, `조작 반영에 ${elapsed}ms 걸렸다`).toBeLessThan(1000);
 });

@@ -5,7 +5,6 @@ import {
   AXES,
   AXES_KO,
   COCKTAILS,
-  formatQuantity,
   relatedCocktails as prototypeRelated,
   getCocktail,
 } from "@kca/domain";
@@ -16,6 +15,8 @@ import { PhotoSlot } from "@/components/photo-slot";
 import { cocktailDetail, publishedSlugs, relatedCocktails, usingApi, type RelatedItem } from "@/lib/api";
 import { fromApi, fromPrototype, prototypeSlugs, type CocktailView } from "@/lib/cocktail-view";
 import { SEARCH_PATH } from "@/lib/routes";
+import { recipeJsonLd } from "@/lib/structured-data";
+import { openGraph } from "@/lib/site";
 
 /**
  * 칵테일 상세 — **SSG + ISR** (ISSUE-038 · `PRIN-T04` · SPEC-05 §4).
@@ -92,35 +93,13 @@ export async function generateMetadata({
     title: `${c.nameKo} ${c.nameEn}`,
     description: c.tastingNote ?? c.summary,
     alternates: { canonical: `/cocktails/${c.slug}` },
-    openGraph: {
+    // 카드 이미지는 파일 규약이 붙인다 (`opengraph-image.tsx`) — 여기 다시 적지 않는다.
+    openGraph: openGraph({
       title: `${c.nameKo} · ${c.nameEn}`,
       description: c.tastingNote ?? c.summary,
+      url: `/cocktails/${c.slug}`,
       type: "article",
-    },
-  };
-}
-
-/** Schema.org Recipe — 구글 리치 결과 근거 (`R-F1.1-6`). 확장은 이슈 044 다. */
-function recipeJsonLd(c: CocktailView) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "Recipe",
-    name: `${c.nameKo} ${c.nameEn}`,
-    description: c.tastingNote ?? c.summary,
-    recipeCategory: "Cocktail",
-    recipeCuisine: c.base.labelKo,
-    recipeYield: "1 serving",
-    keywords: [c.base.labelKo, c.method.labelKo, c.glassType, ...c.aromaTags.map((t) => t.labelKo)].join(", "),
-    // 구조화 데이터는 **1잔 · ml 기준**이다. 화면에서 잔 수를 바꿔도 여기는 안 바뀐다 —
-    // 검색엔진이 읽는 것은 레시피 원본이지 지금 보고 있는 배수가 아니다.
-    recipeIngredient: c.ingredients.map((i) =>
-      `${formatQuantity(i, 1, "ml")} ${i.nameKo}`.trim(),
-    ),
-    recipeInstructions: c.steps.map((text, i) => ({
-      "@type": "HowToStep",
-      position: i + 1,
-      text,
-    })),
+    }),
   };
 }
 

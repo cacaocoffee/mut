@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { COCKTAILS } from "@kca/domain";
 import { CATEGORY_AXES, publishedSlugs, usingApi } from "@/lib/api";
 import { categorySlugs } from "@/lib/category-page";
+import { SITE_URL } from "@/lib/site";
 
 /**
  * 사이트맵 (ISSUE-039 · `NFR-S-03`·`S-04`).
@@ -37,7 +38,8 @@ export const ALLOWED_PATTERNS = [
 ] as const;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = (process.env.KC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
+  // 절대 주소는 한 곳에서 온다 (이슈 044) — 슬래시 하나 차이로 갈리지 않게.
+  const base = SITE_URL;
   const now = new Date();
 
   const paths: string[] = ["/", "/finder", "/privacy", "/terms"];

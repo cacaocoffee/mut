@@ -292,21 +292,24 @@ test("RED22,23 - 단계 진행과 후보 수가 스크린리더에 안내된다"
  * 코퍼스는 이미 브라우저에 있다 (SPEC-05 §4). 단계마다 서버를 부르면 파인더를 클라이언트에
  * 둔 이유가 사라지고 `NFR-P-02`(INP ≤ 200ms)도 지키기 어려워진다.
  */
-test("RED24,25 - 단계 전환이 서버를 부르지 않고 즉시 끝난다", async ({ page }) => {
+test("RED24,25 - 서버가 끊겨도 단계가 넘어가고 즉시 끝난다", async ({ page, context }) => {
   await page.goto(FINDER);
+  await ready(page);
 
-  const calls: string[] = [];
-  page.on("request", (r) => {
-    if (/\/api\/v1\/|_rsc=/.test(r.url())) calls.push(r.url());
-  });
-
+  // RED 24 — 반영이 즉시인가. 선이 붙은 상태에서 한 번 잰다. 폴링 간격이 섞이므로
+  // **멈춤을 잡는 눈금**이지 INP 자체가 아니다 — 실제 계측은 이슈 046 이다.
   const started = Date.now();
   await options(page).first().click();
   await expect(page.locator(".quiz-kicker")).toContainText("QUESTION 2 / 4");
   const elapsed = Date.now() - started;
+  expect(elapsed, `단계 전환에 ${elapsed}ms 걸렸다`).toBeLessThan(3000);
 
-  expect(calls, "단계를 넘길 때 서버를 부르고 있다").toEqual([]);
-  expect(elapsed, `단계 전환에 ${elapsed}ms 걸렸다`).toBeLessThan(1000);
+  // RED 25 — 선을 끊고 넘긴다. 서버가 필요했다면 여기서 멈춘다. 요청 수를 세면
+  // 프레임워크의 링크 프리페치가 섞여 무엇을 재는지 흐려진다.
+  await context.setOffline(true);
+  await options(page).first().click();
+  await expect(page.locator(".quiz-kicker")).toContainText("QUESTION 3 / 4");
+  await context.setOffline(false);
 });
 
 // ── RED 26 : 법적 (NFR-L-01) ────────────────────────────────────────────
