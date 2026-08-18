@@ -47,14 +47,17 @@ jobs:
       - name: 계약 드리프트
         run: npm run contract:check
 
-      - name: 타입
-        run: npx tsc --noEmit -p apps/web
-
       - name: lint
         run: npm run lint
 
+      # 빌드가 먼저다 — `PageProps`·`LayoutProps` 는 Next 가 빌드하며 `.next/types` 에
+      # 써 주는 전역 타입이라, 깨끗한 체크아웃에서 타입 검사를 먼저 돌리면 없는 이름이 된다.
       - name: 빌드
         run: npm run build
+
+      # 빌드는 앱 코드만 본다. 이 단계가 e2e 스펙까지 함께 검사한다.
+      - name: 타입
+        run: npx tsc --noEmit -p apps/web
 
       # NFR-P-04 — **경고다.** 넘었다고 배포를 막지 않는다 (SPEC-04 §9.1).
       # 스크립트도 종료 코드 0 으로 끝나지만, 여기 한 줄을 더 둬서 성격을 워크플로에도 적어 둔다.
