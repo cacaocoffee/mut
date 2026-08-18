@@ -227,14 +227,6 @@ export function toFilterQuery(f: Filters): URLSearchParams {
   return p;
 }
 
-/** 재료 용량을 인분 배수와 단위에 맞춰 표기한다. */
-export function formatAmount(ml: number, servings: number, unit: "ml" | "oz"): string {
-  const total = ml * servings;
-  if (unit === "ml") return `${Math.round(total * 10) / 10} ml`;
-  const oz = total / 30;
-  return `${(Math.round(oz * 100) / 100).toFixed(2).replace(/0$/, "").replace(/\.$/, "")} oz`;
-}
-
 /* ─────────────────────────  취향 파인더  ───────────────────────── */
 
 export type QuestionKey = "abv" | "sweet" | "flavor" | "base";

@@ -600,6 +600,22 @@
   font-weight: 800;
   font-size: 15px;
 }
+/* 잔 수·단위를 바꾼 결과를 한 줄로 알린다. 표 전체가 바뀌는 것을 스크린리더는
+   다시 읽지 않는다 (ISSUE-043 · NFR-A-07). */
+.recipe-live {
+  margin: 6px 0 0;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--color-neutral-700);
+}
+/* 빼도 되는 재료. 계약의 `isOptional` 을 글자로 옮긴다 — 색으로만 흐리면 뜻이 안 선다. */
+.ingredient-optional {
+  margin-left: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--color-accent-800);
+}
 .amount-cell {
   text-align: right;
   font-variant-numeric: tabular-nums;

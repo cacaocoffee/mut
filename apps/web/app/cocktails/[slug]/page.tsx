@@ -1,9 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AXES, AXES_KO, COCKTAILS, relatedCocktails as prototypeRelated, getCocktail } from "@kca/domain";
+import {
+  AXES,
+  AXES_KO,
+  COCKTAILS,
+  formatQuantity,
+  relatedCocktails as prototypeRelated,
+  getCocktail,
+} from "@kca/domain";
 import { DetailActions } from "@/components/detail-actions";
 import { FlavorRadar } from "@/components/flavor-radar";
+import { RecipePanel } from "@/components/recipe-panel";
 import { PhotoSlot } from "@/components/photo-slot";
 import { cocktailDetail, publishedSlugs, relatedCocktails, usingApi, type RelatedItem } from "@/lib/api";
 import { fromApi, fromPrototype, prototypeSlugs, type CocktailView } from "@/lib/cocktail-view";
@@ -103,7 +111,11 @@ function recipeJsonLd(c: CocktailView) {
     recipeCuisine: c.base.labelKo,
     recipeYield: "1 serving",
     keywords: [c.base.labelKo, c.method.labelKo, c.glassType, ...c.aromaTags.map((t) => t.labelKo)].join(", "),
-    recipeIngredient: c.ingredients.map((i) => `${i.amount} ${i.nameKo}`.trim()),
+    // 구조화 데이터는 **1잔 · ml 기준**이다. 화면에서 잔 수를 바꿔도 여기는 안 바뀐다 —
+    // 검색엔진이 읽는 것은 레시피 원본이지 지금 보고 있는 배수가 아니다.
+    recipeIngredient: c.ingredients.map((i) =>
+      `${formatQuantity(i, 1, "ml")} ${i.nameKo}`.trim(),
+    ),
     recipeInstructions: c.steps.map((text, i) => ({
       "@type": "HowToStep",
       position: i + 1,
@@ -188,23 +200,9 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
 
       <div className="detail-body">
         <section>
-          <h4 className="section-head section-head--flush">재료 INGREDIENTS</h4>
-          <table className="table">
-            <tbody>
-              {c.ingredients.map((i) => (
-                <tr key={`${i.nameKo}-${i.amount}`}>
-                  <th scope="row" style={{ width: "58%", fontWeight: 400 }}>
-                    {i.nameKo}
-                    <span className="en" style={{ display: "block", fontSize: 11 }}>
-                      {i.nameEn}
-                    </span>
-                    {i.substitute && <p className="sub">대체 · {i.substitute}</p>}
-                  </th>
-                  <td style={{ fontWeight: 500 }}>{i.amount}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {/* 잔 수 · 단위 · 대체재는 브라우저에서 만진다 (이슈 043). 서버가 그린 표를
+              그대로 두고 그 위에 컨트롤만 얹으면 두 벌이 되므로 표째로 넘긴다. */}
+          <RecipePanel slug={c.slug} ingredients={c.ingredients} />
 
           <h4 className="section-head">제조 순서 METHOD</h4>
           <ol style={{ listStyle: "none", margin: 0, padding: 0 }}>
