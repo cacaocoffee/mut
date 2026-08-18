@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import type { components } from "@kca/domain/generated/api";
 import { ENTITY_LABELS, SearchBox } from "@/components/search-box";
 import { SEARCH_PATH } from "@/lib/routes";
+import { track } from "@/lib/analytics/core";
 
 type SearchResponse = components["schemas"]["SearchResponse"];
 
@@ -79,6 +80,17 @@ export function UnifiedSearch() {
           ? { kind: "done", result: (await res.json()) as SearchResponse }
           : { kind: "error", status: res.status };
         setAnswered({ q: term, answer });
+
+        // SPEC-10 §4.3 — **0건이 곧 수요가 확인된 콘텐츠 후보다.**
+        // `hadChosung` 은 **서버가 판정한 값을 그대로** 옮긴다 (이슈 024) — 여기서 다시
+        // 판정하면 "콘텐츠가 없다" 와 "초성 색인이 고장났다" 를 나눌 수 없게 된다.
+        if (answer.kind === "done" && answer.result.matchedCount === 0) {
+          track("search_miss", {
+            query: answer.result.query,
+            matchedCount: 0,
+            hadChosung: answer.result.hadChosung,
+          });
+        }
       } catch {
         if (live) setAnswered({ q: term, answer: { kind: "error", status: 0 } });
       }
