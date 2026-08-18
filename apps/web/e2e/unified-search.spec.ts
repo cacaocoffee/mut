@@ -194,7 +194,12 @@ test("RED17 - 초성 판정을 화면이 다시 하지 않는다", () => {
   for (const rel of ["app/search/unified-search.tsx", "components/search-box.tsx"]) {
     const source = readFileSync(join(process.cwd(), rel), "utf8");
     expect(source, `${rel} 에 초성 판정이 있다 — 서버 응답을 쓴다`).not.toMatch(/ㄱ-ㅎ/);
-    expect(source, `${rel} 가 hadChosung 을 만들고 있다`).not.toMatch(/hadChosung\s*[:=]/);
+  }
+
+  // 계측에 실을 때도 **서버가 준 값 그대로**여야 한다 (이슈 035 가 여기에 심었다).
+  const screen = readFileSync(join(process.cwd(), "app/search/unified-search.tsx"), "utf8");
+  for (const [, value] of screen.matchAll(/hadChosung:\s*([^,\n]+)/g)) {
+    expect(value.trim(), "hadChosung 을 화면이 만들고 있다").toMatch(/result\.hadChosung/);
   }
 });
 
