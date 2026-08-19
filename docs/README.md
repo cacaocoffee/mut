@@ -47,6 +47,12 @@
 | SCREENS-05 파트너 대시보드 | | ⬜ |
 | [SCREENS-06 어드민](./screens/SCREENS-06_어드민.md) | 할 일 · 편집 · 재료 마스터 · 감사 로그 | ✅ |
 
+## 릴리즈
+
+| 문서 | 무엇 |
+|---|---|
+| [RELEASE-CHECKLIST](./RELEASE-CHECKLIST.md) | 배포 전에 **사람이** 확인하는 것 (SPEC-04 §9.2·§9.3). 자동 검사는 CI 에 있다 |
+
 ## 추적
 
 | 문서 | 무엇 | 상태 |
@@ -62,6 +68,8 @@
 | [ADR-0002](./decisions/ADR-0002-taxonomy.md) | 분류 체계 — 당도 4단계 · 향 태그 10개 · 스타일 축 신설 · 슬러그 정리 |
 | [ADR-0003](./decisions/ADR-0003-graph-source-and-abv-bands.md) | 시그니처는 에디터·메뉴판은 파트너 / 도수 필터 4구간 통일 |
 | [ADR-0004](./decisions/ADR-0004-age-gate.md) | 전면 성인 인증 게이트를 두지 않는다 (법률 검토 대기 조건부) |
+| [ADR-0005](./decisions/ADR-0005-ui-package-scope.md) | `app.css` 는 우리 것, `styles.css` 는 시안 것 — 정본 개정 절차 |
+| [ADR-0006](./decisions/ADR-0006-btn-primary-contrast.md) | 흰 글자를 얹는 면은 `accent-700` — `.btn-primary` 대비 (G-16) |
 
 ## 미결
 

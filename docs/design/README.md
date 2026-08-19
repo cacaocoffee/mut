@@ -71,7 +71,7 @@
 
 | 클래스 | 무엇 |
 |---|---|
-| `.btn` + `.btn-primary` `.btn-secondary` `.btn-ghost` `.btn-icon` `.btn-block` | 액션. primary는 accent 단색 채움 |
+| `.btn` + `.btn-primary` `.btn-secondary` `.btn-ghost` `.btn-icon` `.btn-block` | 액션. primary는 단색 채움 — 바탕은 `app.css` 에서 `accent-700` 로 덮는다 ([ADR-0006](../decisions/ADR-0006-btn-primary-contrast.md)) |
 | `.tag` + `.tag-accent` `.tag-neutral` `.tag-outline` | 램프에서 틴트한 작은 라벨 |
 | `.field` + `label`, `.input`, `.radio` + `.dot`, `.seg` + `.seg-opt` | 폼. 네이티브 요소 기반, 스크립트 없음 |
 | `.card` + `.card-kicker` `.card-title` `.card-body` `.card-meta`, `.elev-sm/md/lg` | 콘텐츠 카드와 elevation |

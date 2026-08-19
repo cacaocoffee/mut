@@ -23,10 +23,12 @@ const STYLES: Record<SweetLevel, React.CSSProperties> = {
     color: "var(--color-accent-800)",
     border: "1px solid var(--color-accent-300)",
   },
+  // 흰 글자를 얹는 면은 accent 가 아니라 accent-700 이다 (G-16 · ADR-0006) —
+  // accent 바탕은 3.76:1 이라 11px 글자에 못 쓴다.
   sweet: {
-    background: "var(--color-accent)",
+    background: "var(--color-accent-700)",
     color: "var(--color-bg)",
-    border: "1px solid var(--color-accent)",
+    border: "1px solid var(--color-accent-700)",
   },
 };
 
