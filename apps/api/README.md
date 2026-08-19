@@ -22,6 +22,17 @@ Kotlin + Spring Boot 3.x · PostgreSQL 16 (`PRIN-T01` · [SPEC-05 §1](../../doc
 ./gradlew bootRun        # 서버 (DB 필요)
 ```
 
+### 운영 태스크 (DB 필요)
+
+```bash
+./gradlew verifyInvariants   # 발행분 불변식 전수 검증 — 위반이면 exit 1 (NFR-D-01)
+./gradlew reindexSearch      # search_document 전수 재작성 (G-34)
+```
+
+**시드를 SQL 로 넣었으면 `reindexSearch` 를 한 번 돌린다.** 색인은 발행 이벤트를 듣고
+채워지는데 시드는 애플리케이션을 거치지 않아 이벤트가 없다 — 발행분이 통합 검색에서
+안 나오는 상태가 그것이다.
+
 ## 로컬 DB
 
 테스트는 Testcontainers 가 알아서 띄운다. **직접 DB 를 세울 필요는 `bootRun` 할 때뿐이다.**
