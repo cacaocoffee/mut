@@ -48,6 +48,14 @@ interface IngredientAdminFacade {
      * (DECISIONS §1.2) — 301번째 재료가 데이터를 깨뜨리지는 않는다.
      */
     fun capacity(): IngredientCapacity
+
+    /**
+     * 레시피 편집이 재료를 고를 때 쓰는 목록 (이슈 051).
+     *
+     * 공개 사전(`/ingredients`)을 쓸 수 없다 — 승인된 것만 나가서 방금 만든 재료를
+     * 레시피에 넣을 수가 없다. 여기는 **미승인도 준다** (DECISIONS §1.1).
+     */
+    fun search(query: String?, limit: Int): List<AdminIngredientResponse>
 }
 
 /** `Size` 상한은 `V008__ingredient.sql` 의 컬럼 길이와 같다 — 어긋나면 DB 가 500 으로 막는다. */

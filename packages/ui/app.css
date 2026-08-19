@@ -1665,3 +1665,61 @@ figcaption {
 .btn-primary:active {
   background: var(--color-accent-900);
 }
+
+/* ── 어드민 레시피 편집 (ISSUE-051) ──────────────────────────────────────── */
+.admin-recipe {
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 2px solid var(--color-divider);
+}
+.admin-recipe__picker {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
+}
+.admin-recipe__picker .admin-field {
+  flex: 1;
+}
+.admin-recipe__found {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--color-divider);
+}
+.admin-recipe__found li + li {
+  border-top: 1px solid var(--color-divider);
+}
+/* 수량 · 단위 · 표기 · 역할 · 선택 여부가 한 줄에 선다. 좁아지면 접힌다 */
+.admin-recipe__row {
+  display: grid;
+  grid-template-columns: 80px 110px 1fr 120px auto;
+  gap: var(--space-3);
+  align-items: end;
+}
+.admin-field--check {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+.admin-recipe__steps {
+  margin: 0;
+  padding-left: var(--space-4);
+}
+.admin-recipe__steps li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-2);
+  align-items: start;
+  padding: 6px 0;
+}
+
+@media (max-width: 720px) {
+  .admin-recipe__row {
+    grid-template-columns: 1fr 1fr;
+  }
+  .admin-recipe__picker {
+    flex-wrap: wrap;
+  }
+}

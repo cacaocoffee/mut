@@ -215,6 +215,17 @@ class AbvCalculatorTest {
                         .`as`("총 부피 0 — 나눌 수 없다")
                         .isNull()
                 },
+                {
+                    // 이슈 051 에서 드러났다. 0 을 돌려주면 진 베이스 칵테일이 무알콜로
+                    // 저장되려다 `ck_cocktail__non_alcoholic` 에 막혀 500 이 된다 —
+                    // 재료 마스터에 도수를 아직 안 채운 초안이 그 상태다.
+                    assertThat(
+                        AbvCalculator.calculate(
+                            listOf(Input(abv = null, amount = 45), Input(abv = null, amount = 15)),
+                            Technique.STIR,
+                        ),
+                    ).`as`("도수를 아는 재료가 하나도 없다 — 모르는 것이지 0도가 아니다").isNull()
+                },
             ),
         )
     }
