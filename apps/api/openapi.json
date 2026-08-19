@@ -1555,10 +1555,10 @@
         "type" : "string",
         "x-labels" : {
           "blend" : "블렌드",
-          "build" : "잔에서 조립",
+          "build" : "빌드",
           "etc" : "기타",
-          "shake" : "흔들어 섞기",
-          "stir" : "휘저어 섞기"
+          "shake" : "쉐이킹",
+          "stir" : "스터"
         }
       },
       "UpdateCocktailRequest" : {

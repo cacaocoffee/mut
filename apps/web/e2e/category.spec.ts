@@ -19,7 +19,7 @@ import { join } from "node:path";
 const AXES = [
   { axis: "base", slug: "gin", labelKo: "진" },
   { axis: "style", slug: "highball", labelKo: "하이볼" },
-  { axis: "method", slug: "stir", labelKo: "휘저어 섞기" },
+  { axis: "method", slug: "stir", labelKo: "스터" },
 ];
 
 const APP = join(process.cwd(), "app/cocktails");

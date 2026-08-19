@@ -289,8 +289,8 @@ class CocktailDetailApiTest {
 
         mvc.get(detailUri("negroni")).andExpect {
             jsonPath("$.classification.method.slug") { value("stir") }
-            // 이름은 "무엇을 하는지"로 쓴다 (G-32) — `스터` 는 그 자체로 뜻이 통하지 않는다
-            jsonPath("$.classification.method.labelKo") { value("휘저어 섞기") }
+            // 바에서 쓰는 말을 그대로 쓴다 (G-32) — 풀어 쓴 "휘저어 섞기" 가 아니다
+            jsonPath("$.classification.method.labelKo") { value("스터") }
         }
     }
 
