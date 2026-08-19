@@ -49,3 +49,25 @@ test("RED5 - 재료 상한은 경고이고 승인을 막지 않는다", () => {
   // 경고가 차단으로 바뀌면 여기서 걸린다 — 승인 버튼은 상한과 무관하게 그려져야 한다
   expect(page, "경고가 승인을 막는다고 쓰여 있지 않다").toContain("승인을 막지는");
 });
+
+// ── 검증 태스크 (FR-ADMIN-004) ───────────────────────────────────────────
+
+없는화면이다("/admin/tasks");
+
+/** RED 8 — 검증 태스크는 `editor` 도 처리한다. 역할로 가리는 곳이 없어야 한다. */
+test("RED8 - 검증 태스크에는 역할 분기가 없다", () => {
+  const page = read("app/admin/tasks/page.tsx");
+  expect(page, "태스크 화면이 admin 전용이 됐다").not.toContain("requireAdminRole");
+  expect(page, "역할로 화면을 가린다").not.toMatch(/role === "admin"/);
+});
+
+/**
+ * RED 11 — 넘길 때는 사유가 필수다 (DECISIONS §1.11).
+ *
+ * 서버도 거부하지만, 사유 없이 눌리는 버튼을 두면 사람이 서버 오류로 그 규칙을 배우게 된다.
+ */
+test("RED11 - 사유 없이 넘길 수 없다", () => {
+  expect(read("components/admin/task-resolve.tsx"), "사유가 비어도 넘김이 눌린다").toMatch(
+    /disabled=\{busy \|\| reason\.trim\(\) === ""\}/,
+  );
+});

@@ -73,3 +73,20 @@ export async function pendingIngredients(): Promise<AdminIngredient[]> {
 export async function ingredientCapacity(): Promise<IngredientCapacity | null> {
   return get<IngredientCapacity>("/ingredients/capacity");
 }
+
+// ── 검증 태스크 (ISSUE-048 · `FR-ADMIN-004`) ──────────────────────────────
+
+export type VerificationTask = components["schemas"]["VerificationTaskItem"];
+
+/** 검증 태스크 큐. 정렬은 최근 탐지순으로 서버가 고정한다 (인덱스가 그 순서다). */
+export async function verificationTasks(filter: {
+  status?: string;
+  taskType?: string;
+}): Promise<VerificationTask[]> {
+  const query = new URLSearchParams({ size: "50" });
+  if (filter.status) query.set("status", filter.status);
+  if (filter.taskType) query.set("taskType", filter.taskType);
+
+  const body = await get<{ items: VerificationTask[] }>(`/tasks?${query}`);
+  return body?.items ?? [];
+}

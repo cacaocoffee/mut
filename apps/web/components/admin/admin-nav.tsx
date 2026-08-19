@@ -15,6 +15,7 @@ const SECTIONS = [
   { href: "/admin/cocktails", ko: "칵테일", en: "COCKTAILS" },
   // 목록은 `editor` 도 본다 — 승인 버튼만 `admin` 이다 (SPEC-08 §2).
   { href: "/admin/ingredients", ko: "재료", en: "INGREDIENTS" },
+  { href: "/admin/tasks", ko: "검증 태스크", en: "TASKS" },
 ] as const;
 
 export function AdminNav() {

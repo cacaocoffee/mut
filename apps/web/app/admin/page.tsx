@@ -39,6 +39,15 @@ export default async function AdminDashboard() {
             통과시키면 승인 단계가 없는 것과 같다 (<code>SPEC-08 §2</code>).
           </span>
         </li>
+        <li>
+          <Link href="/admin/tasks">
+            <b>검증 태스크</b>
+          </Link>
+          <span>
+            배치가 찾아낸 불변식 위반과 게이트 우회가 여기로 온다 (<code>FR-ADMIN-004</code>).
+            넘길 때는 사유가 필요하다.
+          </span>
+        </li>
       </ul>
 
       <h2 className="admin__section-head">여기서 못 하는 것</h2>
