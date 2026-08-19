@@ -154,3 +154,101 @@ test("RED18,19 - packages/ui 토큰을 쓰고 시안을 고치지 않았다", ()
   // 색을 직접 적지 않고 토큰으로만 쓴다
   expect(adminBlock, "hex 를 직접 적었다").not.toMatch(/#[0-9a-fA-F]{3,6}\b/);
 });
+
+// ── ISSUE-047 : 편집 화면 ─────────────────────────────────────────────────
+//
+// 어드민은 세션이 없으면 404 라 브라우저로 들어갈 수 없다 (API 가 OAuth 뿐이라 로컬에서
+// 세션을 만들 수 없다). 그래서 **원칙이 코드에 남았는지**를 본다 — 화면 동작 확인은
+// 세션을 만들 수 있게 되는 날 붙인다.
+
+const FORM = "components/admin/cocktail-form.tsx";
+
+/**
+ * RED 1 — 게이트 실패를 **전부 한 번에** 보여 준다 (`FR-ADMIN-003`).
+ *
+ * 하나씩 고치게 하면 에디터가 발행까지 몇 번을 왕복해야 하는지 모른다. 서버가 `violations`
+ * 를 통째로 주므로(SPEC-07 §1.4) 화면은 자르지 않고 전부 그린다.
+ */
+test("RED1,2,3,4 - 게이트 실패를 자르지 않고 전부 그린다", () => {
+  const form = readFileSync(join(process.cwd(), FORM), "utf8");
+
+  expect(form, "violations 를 그리지 않는다").toMatch(/violations\.map\(/);
+  expect(form, "목록을 잘라 보여 준다 — 전부 한 번에가 요구다").not.toMatch(
+    /violations[\s\S]{0,80}\.slice\(/,
+  );
+  // 필드·이유·코드 셋 다 (RED 2·3·4). 코드는 문구가 바뀌어도 남는 스펙 ID 다.
+  for (const part of ["v.field", "v.message", "v.code"]) {
+    expect(form, `${part} 를 보여 주지 않는다`).toContain(part);
+  }
+});
+
+/** RED 7 · 15 — UI 는 보조다. 저장·발행 판정을 화면이 흉내 내지 않는다 (`PRIN-T05`). */
+test("RED7,15 - 게이트를 화면이 복제하지 않는다", () => {
+  const form = readFileSync(join(process.cwd(), FORM), "utf8");
+
+  // 서버 게이트 ID 를 화면이 판정에 쓰면 두 벌이 된다. 받은 것을 그리기만 해야 한다.
+  expect(form, "GATE- 규칙을 화면이 판정하고 있다").not.toMatch(/if\s*\([^)]*GATE-/);
+  expect(form, "발행이 서버를 거치지 않는다").toMatch(/cocktails\/\$\{cocktail!\.id\}\/\$\{action\}/);
+});
+
+/** RED 8·9 — 대표 스타일 후보가 고른 스타일로 좁혀진다 (`FR-COCKTAIL-002`). */
+test("RED8,9 - 대표 스타일은 고른 것 중에서만", () => {
+  const form = readFileSync(join(process.cwd(), FORM), "utf8");
+
+  expect(form, "후보를 전체 목록에서 고르게 한다").toMatch(
+    /options=\{Object\.fromEntries\(\s*form\.styles\.map/,
+  );
+  // 목록에서 빠진 대표는 비운다 — 없는 값을 대표로 둘 수 없다
+  expect(form).toMatch(/stylePrimary: next\.includes\(f\.stylePrimary\)/);
+});
+
+/** RED 10·11 — 향·맛 1~3개 (`FR-COCKTAIL-008`). */
+test("RED10,11 - 향·맛은 1~3개다", () => {
+  const form = readFileSync(join(process.cwd(), FORM), "utf8");
+
+  expect(form).toMatch(/FLAVOR_MAX = 3/);
+  expect(form, "4개째를 막지 않는다").toMatch(/disabled=\{!on && form\.aromaTags\.length >= FLAVOR_MAX\}/);
+  expect(form, "0개인데 저장이 열려 있다").toMatch(/form\.aromaTags\.length > 0/);
+});
+
+/** RED 12·13 — 발행 뒤에는 주소가 굳는다 (`FR-COCKTAIL-014`). */
+test("RED12,13 - 발행 뒤 slug 입력란이 잠긴다", () => {
+  const form = readFileSync(join(process.cwd(), FORM), "utf8");
+
+  expect(form).toMatch(/slugLocked = status !== "draft"/);
+  expect(form, "잠그지 않는다").toMatch(/name="slug"[\s\S]{0,120}disabled=\{slugLocked\}/);
+});
+
+/** RED 19·20 — 갈 수 있는 곳만 보인다. `draft → archived` 직행은 없다 (DECISIONS §1.4). */
+test("RED19,20 - 전이 버튼이 현재 상태에 맞다", () => {
+  const form = readFileSync(join(process.cwd(), FORM), "utf8");
+
+  expect(form).toMatch(/status === "draft" &&[\s\S]{0,200}publish/);
+  expect(form).toMatch(/status === "published" &&[\s\S]{0,400}archive/);
+
+  // draft 화면에 보관 버튼이 있으면 안 된다 — 초안을 보관하는 것은 지우는 것에 가깝다
+  const draftBlock = form.slice(form.indexOf('status === "draft"'), form.indexOf('status === "published"'));
+  expect(draftBlock, "초안에서 보관으로 직행하는 버튼이 있다").not.toContain("archive");
+});
+
+/**
+ * RED 22 — **프리텍스트 재료 입력란을 만들지 않는다** (`PRIN-D01`).
+ *
+ * 있으면 언젠가 쓰이고, 그 순간 역검색과 바 연결이 무너진다. 재료는 마스터에서 고른다.
+ */
+test("RED22 - 재료를 손으로 적는 칸이 없다", () => {
+  const form = readFileSync(join(process.cwd(), FORM), "utf8");
+
+  for (const forbidden of ["ingredientName", "ingredientText", "customIngredient"]) {
+    expect(form, `${forbidden} 입력란이 생겼다 — PRIN-D01`).not.toContain(forbidden);
+  }
+});
+
+/** 프록시는 상태 코드를 그대로 옮긴다 — 화면이 422·409 로 분기한다 (SPEC-07 §1.4). */
+test("어드민 프록시가 상태 코드를 그대로 넘긴다", () => {
+  const proxy = readFileSync(join(process.cwd(), "app/api/admin/[...path]/route.ts"), "utf8");
+
+  expect(proxy).toMatch(/status:\s*res\.status/);
+  expect(proxy, "쿠키·CSRF 를 넘기지 않는다").toMatch(/"cookie", "x-csrf-token"/);
+  expect(proxy, "본문 모양을 바꾸고 있다").not.toMatch(/JSON\.parse\(/);
+});

@@ -1,0 +1,55 @@
+import { headers } from "next/headers";
+
+/**
+ * 어드민 API 프록시 (ISSUE-047).
+ *
+ * 브라우저가 API 를 직접 못 부른다 — 다른 오리진이고 CORS 를 열지 않았다 (이슈 042·035 와
+ * 같은 사정). **그대로 옮기기만 한다**: 경로·질의·본문·상태 코드를 손대지 않는다.
+ * 여기서 모양을 바꾸면 계약이 둘이 되고, 서버가 막는 것을 화면이 통과시키게 된다.
+ *
+ * 세션 쿠키를 넘긴다 (SPEC-07 §1.2). CSRF 토큰도 그대로 옮긴다 — 쓰기 요청은 서버가
+ * `X-CSRF-Token` 을 요구한다.
+ */
+const BASE = process.env.KC_API_URL?.replace(/\/$/, "") ?? "";
+
+async function proxy(request: Request, path: string[]): Promise<Response> {
+  if (!BASE) return Response.json({ error: "API 주소가 없다" }, { status: 503 });
+
+  const incoming = await headers();
+  const url = new URL(request.url);
+  const target = `${BASE}/api/v1/admin/${path.join("/")}${url.search}`;
+
+  const forward: Record<string, string> = {};
+  // 인증·CSRF·본문 형식만 옮긴다. 나머지 헤더는 상류가 스스로 판단한다.
+  for (const name of ["cookie", "x-csrf-token", "content-type"]) {
+    const value = incoming.get(name);
+    if (value) forward[name] = value;
+  }
+
+  const body = request.method === "GET" || request.method === "HEAD" ? undefined : await request.text();
+
+  try {
+    const res = await fetch(target, { method: request.method, headers: forward, body, cache: "no-store" });
+
+    // 422(게이트 실패)·409(이미 발행)를 그대로 넘긴다 — 화면이 그 코드로 분기한다.
+    return new Response(await res.text(), {
+      status: res.status,
+      headers: { "Content-Type": res.headers.get("content-type") ?? "application/json" },
+    });
+  } catch (e) {
+    console.warn(`[admin-proxy] 상류 호출 실패: ${e instanceof Error ? e.message : String(e)}`);
+    return Response.json({ error: "API 를 부르지 못했다" }, { status: 502 });
+  }
+}
+
+type Ctx = { params: Promise<{ path: string[] }> };
+
+export async function GET(request: Request, ctx: Ctx) {
+  return proxy(request, (await ctx.params).path);
+}
+export async function POST(request: Request, ctx: Ctx) {
+  return proxy(request, (await ctx.params).path);
+}
+export async function PATCH(request: Request, ctx: Ctx) {
+  return proxy(request, (await ctx.params).path);
+}
