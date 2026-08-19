@@ -176,18 +176,30 @@ test.describe("카드 그리드 (ISSUE-051)", () => {
 /**
  * 헤더의 워드마크 (MUT).
  *
- * 이름을 글자로 적지 않고 그림으로 세웠다 — 그림은 조용히 사라진다. 404 든 경로 오타든
- * 화면에는 빈칸만 남고 아무도 못 알아챈다. **불러와졌는지**(자연 크기가 0이 아닌지)까지 본다.
+ * 이름을 글자로 적지 않고 그림으로 세웠다 — 그림은 조용히 사라진다. 화면에는 빈칸만
+ * 남고 아무도 못 알아챈다. **보이는지가 아니라 그려졌는지**를 본다.
  *
- * `alt` 는 이름 그 자체라 스크린리더가 읽을 것이 있는지도 함께 본다 (`NFR-A-01` 계열).
+ * 예전 판(`next/image` + png)이 정확히 그렇게 실패했다. 요소는 자리를 차지하는데
+ * DPR 2 이상에서 그림이 안 왔고, 그때 이 테스트는 DPR 1 로만 돌아 통과했다.
+ * 인라인 SVG 로 바꾸면서 배율과 무관해졌지만, 검사는 그려진 폭을 직접 재는 쪽으로 남긴다.
+ *
+ * `aria-label` 은 이름 그 자체라 스크린리더가 읽을 것이 있는지도 함께 본다 (`NFR-A-01` 계열).
  */
 test("헤더에 워드마크가 뜬다", async ({ page }) => {
   await page.goto("/cocktails/search");
 
-  const mark = page.locator(".nav-brand img");
+  const mark = page.locator(".nav-brand svg");
   await expect(mark).toBeVisible();
-  await expect(mark).toHaveAttribute("alt", "MUT");
+  await expect(mark).toHaveAttribute("aria-label", "MUT");
 
-  const loaded = await mark.evaluate((el) => (el as HTMLImageElement).naturalWidth > 0);
-  expect(loaded, "워드마크 파일을 못 불러왔다").toBe(true);
+  // **자리만 있고 안 그려지는 경우**를 잡는다. 예전 png 판이 정확히 그렇게 실패했다 —
+  // 요소는 74×56 으로 자리를 차지하는데 그림이 없어 태그라인만 떠 있었다.
+  const drawn = await mark.evaluate(
+    (el) => (el.querySelector("path") as SVGGraphicsElement | null)?.getBBox().width ?? 0,
+  );
+  expect(drawn, "워드마크가 자리만 차지하고 그려지지 않았다").toBeGreaterThan(0);
+
+  // `ㅅ` 획이 읽히는 최소 높이. 이 밑으로 내리면 `멋` 이 얼룩이 된다 (34px 이었다).
+  const box = (await mark.boundingBox())!;
+  expect(box.height, `워드마크가 ${box.height}px 다 — 48px 밑이면 획이 뭉갠다`).toBeGreaterThanOrEqual(48);
 });
