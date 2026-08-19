@@ -27,9 +27,14 @@ export default defineConfig({
   /**
    * `next start` 로 **프로덕션 빌드**를 띄운다. `next dev` 가 아니다 —
    * 개발 서버는 CSS 를 다르게 주입해서 배치 검증의 대상으로 부적절하다.
+   *
+   * `PW_SKIP_BUILD` 가 있으면 빌드를 건너뛴다. CI 는 앞 단계에서 이미 빌드했고,
+   * 여기서 다시 지으면 같은 것을 두 번 짓는다.
    */
   webServer: {
-    command: "npm run build && npm run start -- --port 3100",
+    command: process.env.PW_SKIP_BUILD
+      ? "npm run start -- --port 3100"
+      : "npm run build && npm run start -- --port 3100",
     url: "http://127.0.0.1:3100",
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
