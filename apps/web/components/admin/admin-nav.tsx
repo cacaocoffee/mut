@@ -15,6 +15,7 @@ import { usePathname } from "next/navigation";
  */
 const SECTIONS = [
   { href: "/admin", ko: "대시보드", en: "OVERVIEW" },
+  { href: "/admin/cocktails", ko: "칵테일", en: "COCKTAILS" },
 ] as const;
 
 export function AdminNav() {
@@ -28,7 +29,11 @@ export function AdminNav() {
           href={s.href}
           className="admin__nav-item"
           // 지금 어디인지 (RED 17). 색이 아니라 상태로 알린다.
-          aria-current={pathname === s.href ? "page" : undefined}
+          aria-current={
+            pathname === s.href || (s.href !== "/admin" && pathname.startsWith(s.href))
+              ? "page"
+              : undefined
+          }
         >
           {s.ko} <span className="en">{s.en}</span>
         </Link>
