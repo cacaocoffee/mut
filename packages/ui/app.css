@@ -1744,3 +1744,106 @@ figcaption {
     flex-wrap: wrap;
   }
 }
+
+/* ┌─ 탐색의 이름 검색 칸 ───────────────────────────────────────────────────┐
+   필터 패널 맨 아래에 있던 것을 두 컬럼 위로 올렸다. 가장 자주 손이 가는 것이
+   가장 눈에 안 띄는 자리에 있었고, 그래서 통합 검색이 탭으로 따로 있어야 할 것처럼
+   보였다. 전폭이어야 아래 전체에 걸린다는 것이 형태로 읽힌다.
+   └────────────────────────────────────────────────────────────────────────┘ */
+.search-field {
+  padding: 24px 0 0;
+}
+.search-field__label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-neutral-700);
+  margin-bottom: 8px;
+}
+.search-field__box {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-2);
+}
+/* 입력이 남는 폭을 다 먹는다 — 이것이 주역이라는 표시다 */
+.search-field__input {
+  flex: 1;
+  min-width: 0;
+  font-size: 18px;
+  padding: 14px var(--space-3);
+}
+/* `type="search"` 의 브라우저 기본 ✕. 아래 버튼과 나란히 서면 무엇을 눌러야 하는지
+   알 수 없다. 기본 쪽을 감춘다 — 이름이 없어 스크린리더가 못 읽고 모양도 제각각이다 */
+.search-field__input::-webkit-search-cancel-button {
+  display: none;
+}
+.search-field__clear {
+  flex: none;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.search-field__note {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--color-neutral-700);
+}
+/* 검색 칸을 걷어내면서 향/맛 묶음이 패널의 마지막이 됐다. 끝 줄은 선을 긋지 않는다 */
+.filter-panel .filter-group:last-child {
+  border-bottom: 0;
+}
+
+/* ┌─ 결과 쪽 넘김 ──────────────────────────────────────────────────────────┐
+   코퍼스는 통째로 받고 필터도 클라이언트가 걸지만(SPEC-05 §4), 거른 결과를 전부
+   그리는 것은 별개다. Phase 1 목표가 500종이라 필터를 안 걸면 500장이 DOM 에 오른다.
+   └────────────────────────────────────────────────────────────────────────┘ */
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: 32px;
+  padding-top: 18px;
+  border-top: 2px solid var(--color-divider);
+}
+.pager__range {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-neutral-700);
+}
+.pager__nums {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.pager__num,
+.pager__step {
+  /* 터치 타깃 — WCAG 2.5.8. 탭과 같은 기준이다 */
+  min-height: 44px;
+  min-width: 44px;
+  font-size: 13px;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--color-neutral-700); /* 5.83:1 */
+}
+.pager__num:hover:not([aria-current]),
+.pager__step:not(:disabled):hover {
+  background: transparent;
+  color: var(--color-text);
+}
+/* 탭과 같은 표시 방법이다 — 채움이 아니라 밑줄 (ISSUE-055 가 정한 규칙) */
+.pager__num[aria-current="page"] {
+  color: var(--color-accent-700); /* 6.41:1 */
+  border-bottom-color: var(--color-accent);
+  font-weight: var(--font-heading-weight);
+}
+.pager__step:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.pager__gap {
+  padding: 0 var(--space-1);
+  color: var(--color-neutral-700);
+}

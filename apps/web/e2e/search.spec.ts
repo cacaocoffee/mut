@@ -133,15 +133,16 @@ test("RED4 - 당도 필터가 동작한다", async ({ page }) => {
 /**
  * RED 7 — **보유 재료 축이 없다** (P2).
  *
- * `FR-SEARCH-001` 이 6축을 셌고 보유 재료는 그 안에 없다. 역검색은 Phase 2 다
- * (`countsForStock` 를 목록 응답에서 뺀 것과 같은 결정, SPEC-07 §5).
+ * `FR-SEARCH-001` 이 6축을 셌고 보유 재료는 그 안에 없다. 역검색(내 술장)은 **자기 화면**을
+ * 갖는다 (`R-F2.2-*`) — 코퍼스에 재료를 얹지 않는 것과 같은 결정이다 (SPEC-07 §5).
  */
 test("RED7 - 보유 재료 축이 없다", async ({ page }) => {
   await page.goto(SEARCH);
 
-  // 6축 + 검색어 한 칸. 일곱 번째가 늘면 축이 늘어난 것이다.
+  // 칩 축 5개 + 당도(라디오) 하나. 일곱 번째가 늘면 축이 늘어난 것이다.
+  // (검색어 칸은 패널 밖 `.search-field` 로 나갔다 — 축이 아니라 축 전체에 걸리는 것이라서다.)
   const labels = await page.locator(".filter-label").allInnerTexts();
-  expect(labels).toHaveLength(AXES.length + 2);
+  expect(labels).toHaveLength(AXES.length + 1);
   expect(labels.join(" ")).not.toMatch(/재료|보유|STOCK|INGREDIENT/i);
 });
 
@@ -564,4 +565,85 @@ test("탐색 화면이 /cocktails/search 에 있다", async ({ page }) => {
   expect(res?.status()).toBe(200);
   // 이동이 응답으로 오는지 화면에서 일어나는지는 프레임워크의 사정이다. 도착지만 본다.
   await expect(page, "`/` 가 탐색으로 보내지 않는다").toHaveURL(new RegExp(`${SEARCH}$`));
+});
+
+// ── 검색이 탐색 안으로 들어왔다 ───────────────────────────────────────────
+
+/**
+ * 이름 검색은 **필터 패널 밖**에 있다.
+ *
+ * 예전에는 패널 맨 아래 한 칸이었다. 가장 자주 손이 가는 것이 가장 눈에 안 띄는 자리에
+ * 있었고, 그래서 통합 검색이 탭으로 따로 있어야 할 것처럼 보였다. 자리를 지키는 이유는
+ * 배치가 곧 "이것이 아래 전체에 걸린다" 는 말이기 때문이다.
+ */
+test("검색 칸이 필터 패널 밖에 있다", async ({ page }) => {
+  await page.goto(SEARCH);
+
+  const field = page.locator(".search-field");
+  await expect(field).toBeVisible();
+  await expect(page.locator(".filter-panel .search-field")).toHaveCount(0);
+
+  // 필터 패널보다 먼저 온다 — 문서 순서가 곧 읽는 순서이고 탭 순서다.
+  const first = await page.evaluate(() => {
+    const q = document.querySelector(".search-field");
+    const panel = document.querySelector(".filter-panel");
+    return q && panel ? q.compareDocumentPosition(panel) & Node.DOCUMENT_POSITION_FOLLOWING : 0;
+  });
+  expect(first, "검색 칸이 필터 패널보다 뒤에 있다").toBeTruthy();
+});
+
+/** 검색어와 필터는 **AND** 다. 한쪽이 다른 쪽을 지우지 않는다. */
+test("검색어와 필터가 함께 걸린다", async ({ page }) => {
+  await page.goto(SEARCH);
+
+  const box = page.getByLabel("칵테일 이름 검색");
+  await box.fill("네그로니");
+  // 네그로니 · 화이트 네그로니 · 킹스톤 네그로니
+  await expectResults(page, 3);
+
+  // 기주를 럼으로 좁히면 킹스톤 네그로니만 남는다 — 검색어가 살아 있다는 뜻이다
+  await axisChips(page, "기주 BASE SPIRIT").filter({ hasText: "럼" }).first().click();
+  await expectResults(page, 1);
+  await expect(page.locator(".cocktail-card").first()).toContainText("킹스톤");
+});
+
+/** 검색어를 한 번에 비운다. 글자를 하나씩 지우면 그때마다 결과가 다시 계산된다. */
+test("검색어를 지우는 버튼이 있다", async ({ page }) => {
+  await page.goto(SEARCH);
+
+  const box = page.getByLabel("칵테일 이름 검색");
+  // 값이 없을 때는 나오지 않는다 — 누를 것이 없는 버튼을 두지 않는다
+  await expect(page.getByRole("button", { name: "검색어 지우기" })).toHaveCount(0);
+
+  await box.fill("네그로니");
+  await page.getByRole("button", { name: "검색어 지우기" }).click();
+
+  await expect(box).toHaveValue("");
+  await expectResults(page, 49);
+});
+
+// ── 쪽 넘김 ───────────────────────────────────────────────────────────────
+
+/**
+ * 거른 결과를 **전부 그리지 않는다**.
+ *
+ * 코퍼스를 통째로 받아 클라이언트에서 거르는 것은 그대로다 (SPEC-05 §4). 그래야 칩 옆
+ * 숫자가 실시간으로 맞는다. 다만 **그리는 것**은 한 쪽뿐이다 — Phase 1 목표가 500 종이라
+ * (SPEC-07 §1.5) 필터를 안 걸면 500장이 한꺼번에 DOM 에 오른다.
+ *
+ * 지금 코퍼스는 49종이라 한 쪽에 다 들어간다. 그 경계를 여기 적어 둔다 —
+ * 코퍼스가 `PAGE_SIZE` 를 넘기는 날 이 테스트가 먼저 말해 준다.
+ */
+test("한 쪽에 다 들어가면 쪽 넘김이 없다", async ({ page }) => {
+  await page.goto(SEARCH);
+
+  const total = await page.locator(".cocktail-card").count();
+  expect(total, "코퍼스가 한 쪽을 넘었다 — 쪽 넘김 동작을 여기서 함께 봐야 한다").toBeLessThanOrEqual(50);
+  await expect(page.locator(".pager")).toHaveCount(0);
+});
+
+/** 주소로 들어온 쪽이 범위를 넘으면 마지막 쪽으로 당긴다. 빈 화면을 보지 않는다. */
+test("범위를 넘는 쪽 번호는 마지막 쪽이 된다", async ({ page }) => {
+  await page.goto(`${SEARCH}?page=99`);
+  await expect(page.locator(".cocktail-card").first()).toBeVisible();
 });
