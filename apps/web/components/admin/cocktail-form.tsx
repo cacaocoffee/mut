@@ -9,7 +9,7 @@ import {
   SWEET_LEVEL_LABELS,
   TECHNIQUE_LABELS,
 } from "@kca/domain";
-import type { AdminCocktail, Violation } from "@/lib/admin-api";
+import type { AdminCocktail, ValidationProblem, Violation } from "@/lib/admin-api";
 
 /**
  * 칵테일 편집 (ISSUE-047 · `FR-ADMIN-002`·`003` · `FR-COCKTAIL-002`·`008`·`014`).
@@ -105,7 +105,7 @@ export function CocktailForm({ cocktail }: { cocktail: AdminCocktail | null }) {
   /** 게이트 실패(422)는 `violations` 를 전부 받아 그린다. 나머지는 한 줄로 알린다. */
   async function showFailure(res: Response) {
     if (res.status === 422) {
-      const body = (await res.json()) as { violations?: Violation[] };
+      const body = (await res.json()) as Partial<ValidationProblem>;
       setViolations(body.violations ?? []);
       setMessage("아직 발행할 수 없습니다 — 아래를 모두 채워 주세요");
       return;
