@@ -2,9 +2,9 @@ import Link from "next/link";
 import {
   BASE_SPIRIT_LABELS,
   FLAVOR_LABELS,
-  TECHNIQUES,
+  TECHNIQUE_LABELS,
   type SearchItem,
-} from "@kca/domain";
+} from "@mut/domain";
 import { PhotoSlot } from "./photo-slot";
 import { SweetTag } from "./sweet-tag";
 
@@ -45,7 +45,7 @@ export function CocktailCard({ cocktail }: { cocktail: SearchItem }) {
         </div>
         <div className="cocktail-card__foot">
           <span>
-            {TECHNIQUES[cocktail.method].ko} · {cocktail.glass}
+            {TECHNIQUE_LABELS[cocktail.method]} · {cocktail.glass}
           </span>
           <em>상세 →</em>
         </div>

@@ -3,14 +3,14 @@ import {
   FLAVOR_KEY_LABELS,
   STYLE_KEY_LABELS,
   SWEETNESS,
-  TECHNIQUES,
+  TECHNIQUE_LABELS,
   getCocktail,
   type BaseSpirit,
   type Cocktail,
   type StyleKey,
   type SweetLevel,
   type Technique,
-} from "@kca/domain";
+} from "@mut/domain";
 import type { CocktailDetail } from "./api";
 
 /**
@@ -146,7 +146,7 @@ export function fromPrototype(slug: string): CocktailView | null {
     base: { slug: c.base, labelKo: BASE_SPIRIT_LABELS[c.base as BaseSpirit] },
     stylePrimary: { slug: c.stylePrimary, labelKo: STYLE_KEY_LABELS[c.stylePrimary as StyleKey] },
     styles: c.styles.map((s) => ({ slug: s, labelKo: STYLE_KEY_LABELS[s as StyleKey] })),
-    method: { slug: c.method, labelKo: TECHNIQUES[c.method as Technique].ko },
+    method: { slug: c.method, labelKo: TECHNIQUE_LABELS[c.method as Technique] },
 
     abv: c.abv,
     glassType: c.glass,

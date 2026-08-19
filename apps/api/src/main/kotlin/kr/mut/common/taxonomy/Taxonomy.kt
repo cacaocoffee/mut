@@ -1,4 +1,4 @@
-package kr.kcocktail.common.taxonomy
+package kr.mut.common.taxonomy
 
 /**
  * 분류 축 5종. **이 파일이 정본이다** (`PRIN-T02`).
@@ -77,9 +77,12 @@ enum class StyleKey(override val slug: String, override val labelKo: String) : S
  * > 컬럼은 물리 설계, enum 은 도메인 어휘이고 프로토타입 `types.ts` 도 `Technique` 를 쓴다.
  */
 enum class Technique(override val slug: String, override val labelKo: String) : Slugged {
-    BUILD("build", "빌드"),
-    SHAKE("shake", "셰이크"),
-    STIR("stir", "스터"),
+    // **무엇을 하는지로 쓴다** (G-32). `스터`·`빌드`는 그 자체로 뜻이 통하지 않아
+    // 화면이 `data.ts` 에 표시 문구를 따로 들고 있었고, API 를 붙이면 같은 자리에
+    // 다른 이름이 나왔다. 이름은 한 벌이어야 한다 — 정본은 여기다 (`PRIN-T02`).
+    BUILD("build", "잔에서 조립"),
+    SHAKE("shake", "흔들어 섞기"),
+    STIR("stir", "휘저어 섞기"),
     BLEND("blend", "블렌드"),
     ETC("etc", "기타"),
     ;
