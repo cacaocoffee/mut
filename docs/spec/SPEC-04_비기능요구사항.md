@@ -89,7 +89,7 @@ ADR-0001이 "본문 크기 텍스트에 accent를 쓸 때는 `--color-accent-700
 각주로 적어뒀지만 **코드가 따르지 않고 있었다.** 각주는 강제되지 않는다는 증거다 —
 그래서 이 문서가 `NFR-A-01`을 배포 차단 조건으로 올린다.
 
-### 2.4 남은 결정 — `.btn-primary`
+### 2.4 결정됨 — `.btn-primary` (2026-08-19)
 
 `.btn-primary`는 accent 배경 위에 `--color-bg` 글자로, 대비가 **3.76:1**이다.
 14px/800 레이블은 WCAG의 "큰 글자"(18.66px+ bold)에 미치지 못해 **본문 기준 4.5:1이 적용되고, 미달이다.**
@@ -103,7 +103,13 @@ ADR-0001이 "본문 크기 텍스트에 accent를 쓸 때는 `--color-accent-700
 | 나 | 레이블을 18.66px+ bold로 키워 "큰 글자" 기준(3:1) 충족 | 버튼이 커진다 |
 | 다 | 현행 유지 + 예외로 문서화 | AA 미달을 안고 간다 |
 
-미결로 두고 [G-16](../prd/GAPS.md#g-16)에 남긴다.
+**가로 정했다** ([ADR-0006](../decisions/ADR-0006-btn-primary-contrast.md), 이슈 050).
+흰 글자를 얹는 면만 `--color-accent-700`(6.41:1)으로 하고, accent 는 글자·테두리·강조선에
+그대로 남는다. 시안 정본은 손대지 않고 `app.css` 에서 덮는다 (ADR-0005 결정 1).
+
+같은 조합이 쓰인 자리를 전부 바꿨다 — `.btn-primary` · `.chip[aria-pressed]` ·
+`.seg-opt:has(input:checked)` · `SweetTag` 의 `sweet`, 그리고 선택된 칸 안에서 2.26:1 이던
+`.seg-stack .seg-opt .en` 의 `opacity`. 한 곳만 고치면 화면마다 빨강이 두 가지가 된다.
 
 ---
 

@@ -140,7 +140,7 @@ SPEC-05 §2: `npm workspaces`는 `apps/web`과 `packages/*`만 관리하고 `app
 `app.css`가 시안 밖인 근거는 ADR-0001 결정 2다 — 시안에 없는 모션 값을 거기 두면서
 "시안 정본을 원본과 어긋나게 두지 않기 위해서"라고 적었다.
 
-대비 문제(`NFR-A`)를 `styles.css`에서 발견하면 여전히 GAPS로 간다 (예: `.btn-primary` 3.76:1 → [이슈 050](https://github.com/cacaocoffee/k-cocktail-archive/issues/52)).
+대비 문제(`NFR-A`)를 `styles.css`에서 발견하면 여전히 GAPS로 간다 (예: `.btn-primary` 3.76:1 → 이슈 050 → [ADR-0006](../decisions/ADR-0006-btn-primary-contrast.md)).
 **절차가 열렸다는 뜻이지 프리패스가 아니다.**
 
 ### 4.1 `PRIN-P02` — 만들면 안 되는 것
