@@ -53,3 +53,73 @@ async function get<T>(path: string): Promise<T | null> {
     return null;
   }
 }
+
+// ── 재료 승인 (ISSUE-048 · `FR-ADMIN-007`) ────────────────────────────────
+
+export type AdminIngredient = components["schemas"]["AdminIngredientResponse"];
+export type IngredientCapacity = components["schemas"]["IngredientCapacity"];
+
+/** 승인 대기 큐. `editor` 도 본다 — 승인만 `admin` 이다 (SPEC-08 §2). 이름순은 서버가 고정한다. */
+export async function pendingIngredients(): Promise<AdminIngredient[]> {
+  return (await get<AdminIngredient[]>("/ingredients/pending")) ?? [];
+}
+
+/**
+ * 승인된 재료 수와 상한.
+ *
+ * 상한을 넘어도 **승인을 막지 않는다** (DECISIONS §1.2) — 경고다. 막으면 300번째 재료가
+ * 필요한 날 아무도 아무것도 못 한다.
+ */
+export async function ingredientCapacity(): Promise<IngredientCapacity | null> {
+  return get<IngredientCapacity>("/ingredients/capacity");
+}
+
+// ── 검증 태스크 (ISSUE-048 · `FR-ADMIN-004`) ──────────────────────────────
+
+export type VerificationTask = components["schemas"]["VerificationTaskItem"];
+
+/** 검증 태스크 큐. 정렬은 최근 탐지순으로 서버가 고정한다 (인덱스가 그 순서다). */
+export async function verificationTasks(filter: {
+  status?: string;
+  taskType?: string;
+}): Promise<VerificationTask[]> {
+  const query = new URLSearchParams({ size: "50" });
+  if (filter.status) query.set("status", filter.status);
+  if (filter.taskType) query.set("taskType", filter.taskType);
+
+  const body = await get<{ items: VerificationTask[] }>(`/tasks?${query}`);
+  return body?.items ?? [];
+}
+
+// ── 감사 로그 (ISSUE-048 · `FR-ADMIN-005`) ────────────────────────────────
+
+export type AuditLogEntry = components["schemas"]["AuditLogItem"];
+
+export type AuditFilter = {
+  entityType?: string;
+  action?: string;
+  actorUserId?: string;
+  from?: string;
+  to?: string;
+};
+
+/**
+ * 감사 로그. **`admin` 만 부를 수 있다** (SPEC-08 §2.2).
+ *
+ * 필터는 AND 로 묶이고 정렬은 최신순으로 서버가 고정한다. 전체 건수를 함께 돌려주는
+ * 이유는 필터가 걸린 화면에서 "몇 건 중 몇 건" 이 안 보이면 거른 것인지 없는 것인지
+ * 알 수 없어서다.
+ */
+export async function auditLogs(
+  filter: AuditFilter,
+): Promise<{ items: AuditLogEntry[]; total: number }> {
+  const query = new URLSearchParams({ size: "50" });
+  for (const [key, value] of Object.entries(filter)) {
+    if (value) query.set(key, value);
+  }
+
+  const body = await get<{ items: AuditLogEntry[]; page: { totalElements: number } }>(
+    `/audit-logs?${query}`,
+  );
+  return { items: body?.items ?? [], total: body?.page.totalElements ?? 0 };
+}

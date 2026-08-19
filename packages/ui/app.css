@@ -1579,3 +1579,64 @@ figcaption {
     gap: 2px;
   }
 }
+
+/* ── 어드민 재료 승인 (ISSUE-048) ──────────────────────────────────────────
+   시안 정본(`styles.css`)은 손대지 않는다. 어드민 전용 색을 만들지 않고 토큰만 쓴다. */
+.admin-warn {
+  margin: var(--space-2) 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-accent-700);
+  color: var(--color-accent-800);
+  background: var(--color-accent-100);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.admin-inline {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* ── 어드민 검증 태스크 (ISSUE-048) ────────────────────────────────────── */
+.admin-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-divider);
+}
+.admin-task__resolve {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+}
+.admin-task__resolve .admin-form__actions {
+  padding-top: 0;
+  border-top: none;
+}
+
+/* ── 어드민 감사 로그 (ISSUE-048) ──────────────────────────────────────────
+   무엇이 바뀌었는지만 줄로 남긴다 — 전체 값을 늘어놓지 않는다 */
+.admin-diff {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-top: var(--space-2);
+}
+.admin-diff th,
+.admin-diff td {
+  padding: 6px 8px;
+  border: 1px solid var(--color-divider);
+  text-align: left;
+  vertical-align: top;
+  word-break: break-word;
+}
+.admin-diff thead th {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-neutral-700);
+}
