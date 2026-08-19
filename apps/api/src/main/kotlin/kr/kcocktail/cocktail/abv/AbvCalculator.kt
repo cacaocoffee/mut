@@ -23,6 +23,7 @@ import java.math.RoundingMode
  * |---|---|
  * | `Blend` · `Etc` | 희석률을 정할 수 없다 (SPEC-02 §2.4). **수동** |
  * | 대상 재료 0개 | `0` 이 아니라 `null` — 아래 참조 |
+ * | 도수를 **아는** 재료가 0개 | 같은 이유로 `null`. "모른다" 와 "0도" 는 다르다 |
  * | 가니시 · 비-ml · 수량 없음 | 계산 대상에서 제외 |
  *
  * ## 0 이 아니라 null 인 이유
@@ -61,6 +62,12 @@ object AbvCalculator {
 
         val totalVolume = target.fold(BigDecimal.ZERO) { acc, it -> acc + it.amountMl!! }
         if (totalVolume.signum() == 0) return null // 전부 0ml — 나눌 수 없다
+
+        // 도수를 아는 재료가 **하나도 없으면** 계산이 아니라 추측이다 (ISSUE-051 에서 드러났다).
+        // 0 을 쓰면 진 베이스 칵테일이 `abv = 0` 으로 저장되고 `ck_cocktail__non_alcoholic`
+        // (무알콜 ⟺ 0도)이 그것을 막는다 — 에디터에게는 원인 모를 500 으로 보인다.
+        // 일부만 비어 있으면 지금대로 0 으로 다룬다. 아는 값이 있을 때는 낮게 잡는 쪽이 안전하다.
+        if (target.all { it.abv == null }) return null
 
         val weighted = target.fold(BigDecimal.ZERO) { acc, it ->
             acc + (it.abv ?: BigDecimal.ZERO) * it.amountMl!!
