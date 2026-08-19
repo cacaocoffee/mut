@@ -136,6 +136,24 @@ tasks.register<Test>("generateOpenApiDocs") {
  * DB 를 붙잡으므로 `check` 에 매달지 않는다. 로컬에서 `./gradlew verifyInvariants` 로 부르고,
  * CI 는 배포 직전 스텝에서 실제 DB 를 가리켜 돌린다.
  */
+/**
+ * 검색 색인 되살리기 (이슈 053 · G-34).
+ *
+ * 시드가 SQL 로 들어오면 발행 이벤트가 없어 색인이 비어 있다. 운영에서도 색인이 깨졌을 때
+ * 되살릴 길이 이것뿐이라 태스크로 둔다.
+ */
+tasks.register<JavaExec>("reindexSearch") {
+    description = "search_document 를 전수 재작성 (G-34)"
+    group = "application"
+    mainClass.set("kr.kcocktail.KcocktailApplicationKt")
+    classpath = sourceSets["main"].runtimeClasspath
+    args(
+        "--kcocktail.search.reindex-cli=true",
+        "--kcocktail.verification.scheduled=false",
+        "--spring.main.web-application-type=none",
+    )
+}
+
 tasks.register<JavaExec>("verifyInvariants") {
     description = "발행분 불변식 전수 검증 — 위반이 있으면 exit 1 (NFR-D-01)"
     group = "verification"
