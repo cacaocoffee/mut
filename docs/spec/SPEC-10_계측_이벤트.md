@@ -70,12 +70,16 @@
 
 | payload | |
 |---|---|
-| `axis` | `sweet` · `base` · `style` · `flavor` · `abv` · `query` |
+| `axis` | `sweet` · `base` · `style` · **`method`** · `flavor` · `abv` · `query` |
 | `value` | 선택값 |
 | `resultCount` | 적용 후 결과 수 |
 | `activeAxisCount` | 동시에 걸린 축 개수 |
 
-**무엇을 답하나** — 축이 여섯인데 실제로 뭘 쓰나. **안 쓰는 축은 UI에서 내릴 수 있다.**
+`method`(메이킹)는 이슈 040 이 `FR-SEARCH-001` 을 채우며 더한 축이다. 이 문서는 그 전에
+쓰였고 화면은 이미 그 축을 보내고 있었다 — 목록에서 빼면 **메이킹만 판단 대상 밖**이 된다
+([G-37](../prd/GAPS.md#g-37)).
+
+**무엇을 답하나** — 축이 일곱인데 실제로 뭘 쓰나. **안 쓰는 축은 UI에서 내릴 수 있다.**
 `resultCount`가 0인 비율이 높은 축은 패싯 카운트가 제 역할을 못 하고 있다는 신호다.
 
 ### 4.3 `search_miss` ★
