@@ -77,12 +77,12 @@ enum class StyleKey(override val slug: String, override val labelKo: String) : S
  * > 컬럼은 물리 설계, enum 은 도메인 어휘이고 프로토타입 `types.ts` 도 `Technique` 를 쓴다.
  */
 enum class Technique(override val slug: String, override val labelKo: String) : Slugged {
-    // **무엇을 하는지로 쓴다** (G-32). `스터`·`빌드`는 그 자체로 뜻이 통하지 않아
-    // 화면이 `data.ts` 에 표시 문구를 따로 들고 있었고, API 를 붙이면 같은 자리에
-    // 다른 이름이 나왔다. 이름은 한 벌이어야 한다 — 정본은 여기다 (`PRIN-T02`).
-    BUILD("build", "잔에서 조립"),
-    SHAKE("shake", "흔들어 섞기"),
-    STIR("stir", "휘저어 섞기"),
+    // **바에서 쓰는 말을 그대로 쓴다** (G-32). `스터`·`쉐이킹`은 업계 용어라
+    // 풀어 쓰면 오히려 낯설다 — 레시피 본문도 이미 "얼음을 채우고 스터한다" 로 쓴다.
+    // 이름은 한 벌이어야 한다 — 정본은 여기다 (`PRIN-T02`).
+    BUILD("build", "빌드"),
+    SHAKE("shake", "쉐이킹"),
+    STIR("stir", "스터"),
     BLEND("blend", "블렌드"),
     ETC("etc", "기타"),
     ;

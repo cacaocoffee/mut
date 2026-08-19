@@ -55,11 +55,14 @@
   padding-bottom: 0;
 }
 /* 워드마크가 들어오면서 글자 대신 그림이 선다 (MUT). 높이를 정하고 폭은 비율이 정한다 —
-   마크가 세로로 긴 편이라 폭을 고정하면 탭 줄이 눌린다. */
+   마크가 세로로 긴 편이라 폭을 고정하면 탭 줄이 눌린다.
+
+   `align-items` 가 baseline 이었는데, 이 마크는 `M U T` 아래 `ㅅ` 획이 붙은 2단이라
+   baseline 이 맨 아래 획에 걸려 태그라인이 마크에서 떨어져 보였다. 아래끝을 맞춘다. */
 .site-nav .nav-brand {
   display: flex;
-  align-items: baseline;
-  gap: 10px;
+  align-items: flex-end;
+  gap: 12px;
   /* .nav-brand 의 margin-right: auto 는 가로 배치용이었다 — 세로에서는 무의미하다 */
   margin-right: 0;
   font-size: 22px;
@@ -67,10 +70,13 @@
   color: inherit;
   text-decoration: none;
 }
-.site-nav .nav-brand img {
-  height: 34px;
+/* 34px 이었는데 그때는 아래 `ㅅ` 획이 뭉개져 **`멋` 이 안 읽혔다**. 이 마크의 요점이
+   `M U T` 아래 획이 붙어 `멋` 으로 읽히는 것이라, 그게 죽으면 로고가 얼룩이 된다.
+   2단짜리 그림에 한 줄 워드마크의 높이를 준 것이 원인이었다. */
+.site-nav .nav-brand svg {
+  height: 56px;
   width: auto;
-  /* 마크 자체가 잉크색이라 배경만 비운다. 어두운 배경으로 뒤집을 때 여기만 고치면 된다 */
+  /* `currentColor` 라 글자색을 따라간다. 어두운 배경으로 뒤집어도 여기는 안 고친다 */
   display: block;
 }
 /* 탭 줄을 브랜드와 가르는 얇은 선. 바깥 2px 규칙선(.nav)이 마스트헤드 바닥을 맡는다 */
@@ -85,6 +91,8 @@
   letter-spacing: 0.14em;
   font-weight: 400;
   color: var(--color-accent-700);
+  /* 아래끝을 맞춘 뒤 획 끝에 딱 붙지 않게 조금 띄운다 */
+  padding-bottom: 6px;
 }
 .tabs {
   display: flex;
@@ -1238,6 +1246,9 @@
      국문만 남겨도 `01`·`02`·`03` 이 화면 순서를 그대로 드러낸다. */
   .tab .en { display: none; }
   .site-nav .nav-brand small { display: none; }
+  /* 태그라인이 빠지면 마크만 남는다. 좁은 화면에서 마스트헤드가 본문을 밀지 않게
+     줄이되, `ㅅ` 획이 읽히는 선(48px) 밑으로는 내리지 않는다. */
+  .site-nav .nav-brand svg { height: 48px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

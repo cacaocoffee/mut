@@ -674,7 +674,7 @@ class Component extends DCLogic {
         specs: [
           { label:'ABV', value:d.abv + '%', sub:'표준 배합 기준' },
           { label:'GLASSWARE', value:d.glass, sub:'권장 잔' },
-          { label:'TECHNIQUE', value:d.method, sub:d.method === 'Stir' ? '휘저어 섞기' : d.method === 'Shake' ? '흔들어 섞기' : '잔에서 조립' },
+          { label:'TECHNIQUE', value:d.method, sub:d.method === 'Stir' ? '스터' : d.method === 'Shake' ? '쉐이킹' : '빌드' },
           { label:'SWEETNESS', value:SW[d.sw][1], sub:SW[d.sw][0] + ' · 4단계 중 ' + (d.sw + 1) }
         ]
       },
