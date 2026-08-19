@@ -236,10 +236,11 @@
   background: var(--color-accent);
   color: var(--color-bg);
 }
+/* 개수는 부모 글자색을 그대로 물려받는다. `opacity` 로 흐리면 실효 대비가 4.5:1 아래로
+   떨어진다 — axe 가 `.count` 를 22곳에서 잡았다 (ISSUE-046). 작게 쓰는 것으로 충분하다. */
 .chip .count {
   font-weight: 400;
   font-size: 10px;
-  opacity: 0.6;
   margin-left: 5px;
 }
 /* 0 건은 비활성. 흐리게만 두지 않는다 — 병기한 `0` 이 이유를 글자로 말하고
@@ -268,7 +269,6 @@
 .chip-tag .count {
   font-weight: 400;
   font-size: 10px;
-  opacity: 0.6;
   margin-left: 5px;
 }
 .chip-tag[aria-pressed="true"] {
@@ -790,8 +790,10 @@
 .quiz-nav-item[data-state="current"] {
   color: var(--color-accent-700);
 }
+/* 아직 안 푼 질문. `opacity: 0.45` 였는데 실효 대비가 AA 아래였다 (ISSUE-046) —
+   흐림은 색으로 표현한다. `neutral-700` 은 5.83:1 이다 (SPEC-04 §2.1). */
 .quiz-nav-item[data-state="pending"] {
-  opacity: 0.45;
+  color: var(--color-neutral-700);
 }
 .quiz-nav-item .n {
   font-size: 11px;
@@ -1366,4 +1368,37 @@
   .search-box {
     max-width: none;
   }
+}
+
+/* ── 대비 보정 (ISSUE-046 · NFR-A-01) ─────────────────────────────────────
+   시안(styles.css)은 고치지 않는다 (ADR-0005). 우리 층에서 덮는다.
+
+   `.btn-ghost` 가 `--color-accent` 를 **글자색**으로 쓰는데 3.76:1 이라 본문 AA(4.5:1)에
+   미달이다. SPEC-04 §2.1 의 실측표가 "accent 를 본문에 쓰지 않는다 — `accent-700`" 이라
+   적었고(`NFR-A-01`), 그 표가 배포 차단의 근거다. `accent-700` 은 6.41:1 이다.        */
+.btn-ghost {
+  color: var(--color-accent-700);
+}
+.btn-ghost:hover {
+  background: color-mix(in srgb, var(--color-accent-700) 10%, transparent);
+}
+
+/* 시안이 `accent` 를 **글자색**으로 쓴 자리들. 3.76:1 이라 본문 AA 에 못 미친다 —
+   `accent-700`(6.41:1)로 덮는다. 색상 계열은 그대로라 보기에는 거의 같다.
+   `NFR-A-01` 이 배포 차단이고 SPEC-04 §2.1 실측표가 근거다. */
+.tag-outline,
+.card .en,
+.card .summary,
+.card .meta {
+  color: var(--color-accent-700);
+}
+
+/* 표 머리글이 글자색을 60% 로 흐려 4.23:1 이었다. 흐림은 토큰으로 표현한다. */
+.table th {
+  color: var(--color-neutral-700);
+}
+
+/* 사진 자리표시자의 설명(`figcaption`)이 글자색 55% 라 3.66:1 이었다. */
+figcaption {
+  color: var(--color-neutral-700);
 }

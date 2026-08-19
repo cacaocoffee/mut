@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "lhci": "lhci autorun"
   },
   "dependencies": {
     "@kca/domain": "*",
@@ -17,6 +18,8 @@
     "react-dom": "19.2.8"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.62.1",
     "@types/node": "^20",
     "@types/react": "^19",

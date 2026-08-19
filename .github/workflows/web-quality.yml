@@ -1,0 +1,95 @@
+# ISSUE-046 — 프론트 품질 게이트 (SPEC-04 §9.1)
+#
+# > **배포를 막는 것**과 경고만 하는 것을 구분한다.
+# > 전부를 차단으로 만들면 아무것도 못 나간다. (SPEC-04 §9)
+#
+# | 검사 | 근거 | 성격 |
+# |---|---|---|
+# | `npm run check` · 계약 · lint · 타입 | `NFR-D-01` | 차단 |
+# | e2e (axe · 사이트맵 · 화면 동작) | `NFR-A-01~03`·`A-05`, `NFR-S-02~03` | 차단 |
+# | Lighthouse | `NFR-P-01~03` | 차단 |
+# | 번들 크기 | `NFR-P-04` | **경고** |
+#
+# ## 잡이 하나인 이유 — **빌드를 한 번만 한다**
+#
+# 잡을 나누면 러너마다 `npm ci` 와 `next build` 를 다시 한다. 처음에 셋으로 나눴다가
+# 같은 빌드를 세 번 짓고 있었다. 검사들이 전부 **같은 산출물**을 봐야 하기도 한다 —
+# 따로 지으면 e2e 가 본 것과 Lighthouse 가 본 것이 다른 빌드일 수 있다.
+#
+# api.yml · contract.yml 과 나눈 이유: 저쪽은 서버와 계약을 보고 이쪽은 **화면**을 본다.
+name: web-quality
+
+on:
+  push:
+    branches: [main]
+    paths: &paths
+      - "apps/web/**"
+      - "packages/ui/**"
+      - "packages/domain/**"
+      - "scripts/**"
+      - ".github/workflows/web-quality.yml"
+  pull_request:
+    paths: *paths
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      - name: 브라우저 받기
+        run: npx playwright install --with-deps chromium
+        working-directory: apps/web
+
+      # ── 빌드 전에 할 수 있는 것 ──────────────────────────────────────────
+      # 코퍼스 불변식 · 분류 축 대조 · CSS 게이트 · 색 왕복 · 대비 · 이미지 (NFR-D-01)
+      - name: check
+        run: npm run check
+
+      # 생성 타입이 최신인가. 계약과 화면이 갈라지면 여기서 멈춘다 (PRIN-T02)
+      - name: 계약 드리프트
+        run: npm run contract:check
+
+      - name: lint
+        run: npm run lint
+
+      # ── 빌드 (한 번) ────────────────────────────────────────────────────
+      - name: 빌드
+        run: npm run build
+
+      # `PageProps`·`LayoutProps` 는 빌드가 `.next/types` 에 써 주는 전역 타입이라
+      # 빌드 뒤에 검사한다. 빌드는 앱 코드만 보므로 이 단계가 e2e 스펙까지 함께 본다.
+      - name: 타입
+        run: npx tsc --noEmit -p apps/web
+
+      # NFR-P-04 — **경고다.** 넘었다고 배포를 막지 않는다 (SPEC-04 §9.1).
+      - name: 번들 예산 (경고)
+        continue-on-error: true
+        run: npm run bundle:budget
+
+      # ── 방금 지은 것을 띄워서 보는 것들 ─────────────────────────────────
+      # axe(접근성) · 사이트맵 allowlist · 화면 동작이 한 번의 기동으로 끝난다.
+      - name: e2e
+        env:
+          PW_SKIP_BUILD: "1"
+        run: npm run e2e
+
+      # 상세·카테고리는 2.0s, 나머지는 2.5s (SPEC-04 §1.1) — 기준은 lighthouserc.js 에 있다.
+      - name: Lighthouse
+        run: npm run lhci
+
+      - name: 실패 리포트 보존
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-quality-reports
+          path: |
+            apps/web/playwright-report/
+            apps/web/.lighthouseci/
+          retention-days: 7

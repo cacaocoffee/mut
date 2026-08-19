@@ -221,6 +221,8 @@ test("RED14 - 파인더 후보가 같은 조건의 탐색 결과와 일치한다
   for (const band of ["low", "mid", "high"]) {
     for (const base of BASES) {
       await page.goto(`${FINDER}?abv=${band}&sweet=dry&base=${base.finder}&step=3`);
+      // 주소의 답은 브라우저에서 적용된다. 붙기 전에 읽으면 코퍼스 전체가 나온다.
+      await ready(page);
       const finderCount = await candidateCount(page);
       if (finderCount === 0) continue; // 0 끼리 맞은 것은 아무것도 지키지 않는다
 

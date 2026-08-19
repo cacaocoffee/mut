@@ -83,6 +83,19 @@ const APP_PROVIDED = ["--font-archivo", "--font-noto-sans", "--font-noto-serif"]
  * 라틴 전용 레이블(.spec-strip dt · .seg-stack .en)은 여기 없다 — 그 자리는 9.5px 로 둔다.
  */
 const HANGUL_BEARING = [".chip-tag", ".cocktail-card__foot"];
+
+/**
+ * 본문 글자색으로 쓸 수 없는 토큰 (SPEC-04 §2.1 실측표 · `NFR-A-01`·`A-03`).
+ *
+ * | 토큰 | 대비 |
+ * |---|---|
+ * | `--color-accent` | 3.76:1 |
+ * | `--color-neutral-600` | 3.85:1 |
+ * | `--color-neutral-500` | 2.59:1 |
+ *
+ * 배경으로 쓰는 것은 막지 않는다 — 문제는 **글자**다.
+ */
+const TEXT_FORBIDDEN = ["--color-accent", "--color-neutral-600", "--color-neutral-500"];
 const HANGUL_MIN_PX = 12;
 
 const EXCEPTIONS = [
@@ -100,6 +113,21 @@ const EXCEPTIONS = [
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** 중괄호 깊이를 세며 규칙을 뽑는다. @media 안쪽도 규칙으로 잡되 at 을 기록한다. */
+/**
+ * 큰 글자인가 — WCAG 는 **24px 이상**, 또는 **18.66px 이상이면서 굵게**를 큰 글자로 본다.
+ *
+ * 큰 글자의 기준은 3:1 이라(`NFR-A-02`) accent(3.76:1)를 쓸 수 있다. 같은 규칙 안에 적힌
+ * 크기만 본다 — 다른 곳에서 정해진 크기는 알 수 없고, 그쪽은 axe 가 그려진 것으로 잡는다.
+ */
+function isLargeText(decls) {
+  const size = parseFloat(prop(decls, "font-size") ?? "");
+  if (!size) return false;
+
+  const weight = prop(decls, "font-weight") ?? "";
+  const bold = /bold|[7-9]00/.test(weight);
+  return size >= 24 || (size >= 18.66 && bold);
+}
+
 function parseRules(css) {
   const src = css.replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, " "));
   const rules = [];
@@ -226,6 +254,23 @@ for (const rel of FILES) {
     if (rel === "packages/ui/styles.css" && /#[0-9a-fA-F]{6}\b/.test(r.decls)) {
       fail("oklch_only", rel, r.line, sel,
         "시안 정본에 hex 리터럴 — oklch() 로 적거나 토큰을 참조한다");
+    }
+
+    // 14. text_contrast_tokens — 본문에 못 쓰는 토큰이 글자색으로 왔는가 (ISSUE-046).
+    //
+    // SPEC-04 §2.1 실측표: accent 3.76:1 · neutral-600 3.85:1 · neutral-500 2.59:1 —
+    // 셋 다 본문 AA(4.5:1) 미달이라 `NFR-A-01`·`A-03` 이 **배포 차단**으로 뒀다.
+    //
+    // axe(`e2e/a11y.spec.ts`)는 **그려진 것**을 보고 이 게이트는 **적힌 것**을 본다.
+    // 조건부 클래스처럼 그 화면에서 안 그려지는 자리는 axe 가 못 잡는다 (이슈 046 RED 21).
+    if (OURS.includes(rel) && !isLargeText(r.decls)) {
+      const color = prop(r.decls, "color");
+      for (const token of TEXT_FORBIDDEN) {
+        if (color && color.includes(`var(${token})`)) {
+          fail("text_contrast_tokens", rel, r.line, sel,
+            `${token} 를 글자색으로 썼다 — 본문 AA 미달이다 (SPEC-04 §2.1). accent-700 · neutral-700 이상을 쓴다`);
+        }
+      }
     }
 
     // 13. hangul_min_size — 한글은 x-height 가 커서 10px 대에서 획이 뭉갠다.
