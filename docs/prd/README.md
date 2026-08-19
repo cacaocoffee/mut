@@ -1,10 +1,10 @@
 # PRD — 읽는 곳 라우팅
 
-출처는 하나다: [`K-Cocktail-Archive_PRD_v1.md`](./K-Cocktail-Archive_PRD_v1.md) (768줄).
+출처는 하나다: [`MUT_PRD_v1.md`](./MUT_PRD_v1.md) (768줄).
 쪼개서 복제하지 않는다 — 복제본은 반드시 원본과 어긋난다. 대신 **필요한 구간만 열어라.**
 
 ```
-Read docs/prd/K-Cocktail-Archive_PRD_v1.md offset=<시작줄> limit=<길이>
+Read docs/prd/MUT_PRD_v1.md offset=<시작줄> limit=<길이>
 ```
 
 ## 작업 → 열 구간

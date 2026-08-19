@@ -1,7 +1,7 @@
 import { test, expect, type Page, type Route } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import type { components } from "@kca/domain/generated/api";
+import type { components } from "@mut/domain/generated/api";
 
 type EventRequest = components["schemas"]["EventRequest"];
 type Batch = { idempotencyKey?: string; events: EventRequest[] };
@@ -393,7 +393,7 @@ test("RED23 - 전송이 막혀도 화면이 그대로 돈다", async ({ page }) 
 /** 이벤트 이름과 payload 키는 서버가 정한다 — 모르는 것은 조용히 버려진다. */
 test("다섯 이벤트의 이름과 키가 서버 계약과 같다", () => {
   const contract = readFileSync(
-    join(process.cwd(), "../../apps/api/src/main/kotlin/kr/kcocktail/common/analytics/EventType.kt"),
+    join(process.cwd(), "../../apps/api/src/main/kotlin/kr/mut/common/analytics/EventType.kt"),
     "utf8",
   );
 

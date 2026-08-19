@@ -1,11 +1,11 @@
-# K-Cocktail Archive — 작업 규칙
+# MUT — 작업 규칙
 
 > 이 파일은 세션 시작 시 자동으로 읽힌다. 새 규칙은 여기에 적는다.
 > `apps/web/AGENTS.md`와 `apps/web/CLAUDE.md`는 `next dev`가 생성·갱신하는 파일이라 손대지 않는다.
 
 ## 작업은 GitHub 이슈에서 집는다
 
-원격: **`cacaocoffee/k-cocktail-archive`** (private). 커밋 author 는 `cacaocoffee <cacaocoffee16@gmail.com>`.
+원격: **`cacaocoffee/mut`** (private). 커밋 author 는 `cacaocoffee <cacaocoffee16@gmail.com>`.
 
 ```bash
 gh issue list --state open --label wave-0     # 착수 가능한 것
@@ -50,7 +50,7 @@ PRD 전문(841줄)을 통째로 읽지 말 것. `docs/prd/README.md`의 표가 �
 | 도메인 규칙 · 불변식 | `docs/spec/SPEC-02_도메인모델.md` |
 | 분류 3축 (기주 · 스타일 · 메이킹) | `packages/domain/src/types.ts` <br> *API 연동 후에는 Kotlin + OpenAPI 생성물 (`PRIN-T02`)* |
 | 칵테일 데이터 | `packages/domain/src/data.ts` *(→ Postgres 시드로 이관 예정)* |
-| 그 외 제품 요구사항 | `docs/prd/K-Cocktail-Archive_PRD_v1.md` (v1.1) |
+| 그 외 제품 요구사항 | `docs/prd/MUT_PRD_v1.md` (v1.1) |
 
 어긋난 걸 발견하면 코드를 몰래 맞추지 말고 `GAPS.md`에 올린다.
 **PRD 부록 A.1 · A.2 · A.6은 폐기됐다** — 구현 근거로 인용하지 않는다 (ADR-0001).

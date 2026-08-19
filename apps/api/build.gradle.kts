@@ -9,7 +9,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.6"
 }
 
-group = "kr.kcocktail"
+group = "kr.mut"
 version = "0.1.0"
 
 kotlin {
@@ -145,11 +145,11 @@ tasks.register<Test>("generateOpenApiDocs") {
 tasks.register<JavaExec>("reindexSearch") {
     description = "search_document 를 전수 재작성 (G-34)"
     group = "application"
-    mainClass.set("kr.kcocktail.KcocktailApplicationKt")
+    mainClass.set("kr.mut.MutApplicationKt")
     classpath = sourceSets["main"].runtimeClasspath
     args(
-        "--kcocktail.search.reindex-cli=true",
-        "--kcocktail.verification.scheduled=false",
+        "--mut.search.reindex-cli=true",
+        "--mut.verification.scheduled=false",
         "--spring.main.web-application-type=none",
     )
 }
@@ -157,11 +157,11 @@ tasks.register<JavaExec>("reindexSearch") {
 tasks.register<JavaExec>("verifyInvariants") {
     description = "발행분 불변식 전수 검증 — 위반이 있으면 exit 1 (NFR-D-01)"
     group = "verification"
-    mainClass.set("kr.kcocktail.KcocktailApplicationKt")
+    mainClass.set("kr.mut.MutApplicationKt")
     classpath = sourceSets["main"].runtimeClasspath
     args(
-        "--kcocktail.verification.cli=true",
-        "--kcocktail.verification.scheduled=false",
+        "--mut.verification.cli=true",
+        "--mut.verification.scheduled=false",
         "--spring.main.web-application-type=none",
     )
 }

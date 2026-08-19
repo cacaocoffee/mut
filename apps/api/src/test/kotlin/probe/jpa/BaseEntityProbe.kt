@@ -3,12 +3,12 @@ package probe.jpa
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Table
-import kr.kcocktail.common.entity.BaseEntity
+import kr.mut.common.entity.BaseEntity
 
 /**
  * `BaseEntity` 검증용 프로브다. 도메인 엔티티가 아니다 (ISSUE-002).
  *
- * ## 왜 `kr.kcocktail` 밖에 있나
+ * ## 왜 `kr.mut` 밖에 있나
  *
  * 앱 패키지 안에 두면 **모든 `@SpringBootTest` 의 엔티티 스캔에 걸린다.**
  * `ddl-auto: validate` 가 `entity_probe.probe` 를 찾다가 실패하고,

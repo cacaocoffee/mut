@@ -5,7 +5,7 @@
  * ADR-0005 결정 3 이 램프 표기 변경을 **"표기 변경이지 값 변경이 아니다"**로 규정했다.
  * 그 주장을 사람이 지키는 대신 이 스크립트가 지킨다 — 표기를 바꾸다 값이 밀리면 여기서 걸린다.
  *
- * BASELINE 은 시안 원본(`docs/design/source/K-Cocktail-Archive.dc.html`)에서 온 값이고
+ * BASELINE 은 시안 원본(`docs/design/source/MUT.dc.html`)에서 온 값이고
  * **손으로 고치지 않는다.** 색을 정말 바꿔야 한다면 ADR 을 먼저 쓴다 (SPEC-00 §4).
  *
  *   node scripts/color-parity.mjs             대조 (npm run check 가 부른다)

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MAX_SERVINGS, formatQuantity, type DisplayUnit } from "@kca/domain";
+import { MAX_SERVINGS, formatQuantity, type DisplayUnit } from "@mut/domain";
 import { rememberLastViewed } from "@/lib/use-last-viewed";
 import type { CocktailView } from "@/lib/cocktail-view";
 import { recipeInteract } from "@/lib/analytics/events";
@@ -9,7 +9,7 @@ import { recipeInteract } from "@/lib/analytics/events";
 type Line = CocktailView["ingredients"][number];
 
 /** 고른 표기 단위를 기억해 둔다 (RED 16) — 잔마다 다시 고르게 하지 않는다. */
-const UNIT_KEY = "kca:recipe-unit";
+const UNIT_KEY = "mut:recipe-unit";
 
 /**
  * 재료 표 + 잔 수 · 단위 · 대체재 (ISSUE-043 · `FR-COCKTAIL-019`·`020`·`021`).
@@ -17,7 +17,7 @@ const UNIT_KEY = "kca:recipe-unit";
  * ## 계산은 전부 여기서 끝난다
  *
  * 잔 수를 바꿔도 서버를 부르지 않는다 (RED 35). 필요한 것(수치 · 단위 · 배수 대상 판정)이
- * 이미 응답에 있고, 환산 규칙은 `@kca/domain` 의 `formatQuantity` 한 곳에 있다.
+ * 이미 응답에 있고, 환산 규칙은 `@mut/domain` 의 `formatQuantity` 한 곳에 있다.
  *
  * ## 무엇이 배수 대상인지는 서버가 정한다
  *

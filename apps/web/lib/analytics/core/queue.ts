@@ -1,4 +1,4 @@
-import type { components } from "@kca/domain/generated/api";
+import type { components } from "@mut/domain/generated/api";
 import { sessionId } from "./session";
 import { currentReferrerType } from "./referrer";
 

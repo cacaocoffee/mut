@@ -1,5 +1,5 @@
 {
-  "name": "@kca/web",
+  "name": "@mut/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -11,8 +11,8 @@
     "lhci": "lhci autorun"
   },
   "dependencies": {
-    "@kca/domain": "*",
-    "@kca/ui": "*",
+    "@mut/domain": "*",
+    "@mut/ui": "*",
     "next": "16.3.0",
     "react": "19.2.8",
     "react-dom": "19.2.8"

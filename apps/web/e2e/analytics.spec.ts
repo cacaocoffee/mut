@@ -1,7 +1,7 @@
 import { test, expect, type Page, type Route } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import type { components } from "@kca/domain/generated/api";
+import type { components } from "@mut/domain/generated/api";
 
 type EventRequest = components["schemas"]["EventRequest"];
 type Batch = { idempotencyKey?: string; events: EventRequest[] };
@@ -202,7 +202,7 @@ test("RED1,4,5 - sessionId 가 UUID 이고 localStorage 에 남는다", async ({
   expect(event.userId, "비로그인은 userId 가 없다").toBeUndefined();
 
   // 탭 간 공유라 localStorage 다 (DECISIONS §1.11)
-  const stored = await page.evaluate(() => window.localStorage.getItem("kca:analytics-session"));
+  const stored = await page.evaluate(() => window.localStorage.getItem("mut:analytics-session"));
   expect(stored, "세션이 저장되지 않았다").toContain(event.sessionId!);
 });
 
@@ -231,7 +231,7 @@ test("RED2 - 30분이 지나면 세션이 갱신된다", async ({ page }) => {
   const [first] = await flushed(page, batches, "cocktail_view");
 
   await page.evaluate(() => {
-    const key = "kca:analytics-session";
+    const key = "mut:analytics-session";
     const stored = JSON.parse(window.localStorage.getItem(key)!) as { id: string };
     // 31분 전으로 민다
     window.localStorage.setItem(
@@ -439,7 +439,7 @@ test("보내는 이름과 키가 서버 계약과 같다", async ({ page }) => {
   const [view] = await flushed(page, batches, "cocktail_view");
 
   const contract = readFileSync(
-    join(process.cwd(), "../../apps/api/src/main/kotlin/kr/kcocktail/common/analytics/EventType.kt"),
+    join(process.cwd(), "../../apps/api/src/main/kotlin/kr/mut/common/analytics/EventType.kt"),
     "utf8",
   );
   expect(contract).toContain('COCKTAIL_VIEW("cocktail_view"');

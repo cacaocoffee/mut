@@ -21,7 +21,7 @@ import { NextResponse, type NextRequest } from "next/server";
  * 계약에 `/me` 가 없어 역할을 물어볼 곳이 없다. **어드민 엔드포인트를 그대로 두드려**
  * 답을 쓴다 — 화면이 허용한 사람을 서버가 막는 상태가 생기지 않는다.
  */
-const BASE = process.env.KC_API_URL?.replace(/\/$/, "") ?? "";
+const BASE = process.env.MUT_API_URL?.replace(/\/$/, "") ?? "";
 
 export const config = {
   // 어드민만 본다. 공개 화면에 한 홉을 더할 이유가 없다.
@@ -31,7 +31,7 @@ export const config = {
 export async function middleware(request: NextRequest) {
   const cookie = request.headers.get("cookie");
 
-  if (!BASE) return notFound("KC_API_URL 이 없다");
+  if (!BASE) return notFound("MUT_API_URL 이 없다");
   if (!cookie) return notFound("세션 쿠키가 없다");
 
   try {

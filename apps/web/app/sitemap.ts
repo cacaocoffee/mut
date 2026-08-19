@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { COCKTAILS } from "@kca/domain";
+import { COCKTAILS } from "@mut/domain";
 import { CATEGORY_AXES, publishedSlugs, usingApi } from "@/lib/api";
 import { categorySlugs } from "@/lib/category-page";
 import { SITE_URL } from "@/lib/site";

@@ -1,5 +1,5 @@
 {
-  "name": "k-cocktail-archive",
+  "name": "mut",
   "version": "0.1.0",
   "private": true,
   "workspaces": [
@@ -7,18 +7,18 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run dev --workspace @kca/web",
-    "build": "npm run build --workspace @kca/web",
-    "start": "npm run start --workspace @kca/web",
-    "lint": "npm run lint --workspace @kca/web",
+    "dev": "npm run dev --workspace @mut/web",
+    "build": "npm run build --workspace @mut/web",
+    "start": "npm run start --workspace @mut/web",
+    "lint": "npm run lint --workspace @mut/web",
     "typecheck": "tsc -p apps/web --noEmit",
-    "check": "npm run check --workspace @kca/domain && node scripts/taxonomy-parity.mjs && node scripts/css-guard.mjs && node scripts/color-parity.mjs && node scripts/contrast-check.mjs && node scripts/image-guard.mjs",
+    "check": "npm run check --workspace @mut/domain && node scripts/taxonomy-parity.mjs && node scripts/css-guard.mjs && node scripts/color-parity.mjs && node scripts/contrast-check.mjs && node scripts/image-guard.mjs",
     "verify": "npm run check && npm run contract:check && npm run lint && npm run build",
     "generate:types": "node scripts/generate-types.mjs",
     "contract:check": "node scripts/generate-types.mjs --check",
     "facet:parity": "tsx scripts/facet-parity.ts",
-    "e2e": "npm run e2e --workspace @kca/web",
-    "lhci": "npm run lhci --workspace @kca/web",
+    "e2e": "npm run e2e --workspace @mut/web",
+    "lhci": "npm run lhci --workspace @mut/web",
     "bundle:budget": "node scripts/bundle-budget.mjs"
   },
   "devDependencies": {

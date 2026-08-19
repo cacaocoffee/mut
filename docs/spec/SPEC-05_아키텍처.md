@@ -22,7 +22,7 @@
 apps/
   web/                Next.js — 공개 페이지 + 어드민 UI
   api/                Kotlin + Spring Boot (Gradle)
-    src/main/kotlin/kr/kcocktail/
+    src/main/kotlin/kr/mut/
       cocktail/  ingredient/  bar/  partner/
       content/   user/        stock/  search/  admin/
       common/            공통 · 어댑터 · 감사

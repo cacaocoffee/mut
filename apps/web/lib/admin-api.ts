@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import type { components } from "@kca/domain/generated/api";
+import type { components } from "@mut/domain/generated/api";
 
 /**
  * 어드민 조회 (ISSUE-047).
@@ -24,7 +24,7 @@ export type Violation = components["schemas"]["Violation"];
 /** 422 응답 전체. `violations` 는 실패한 항목을 **전부** 담는다 (`FR-ADMIN-003`). */
 export type ValidationProblem = components["schemas"]["ValidationProblem"];
 
-const BASE = process.env.KC_API_URL?.replace(/\/$/, "") ?? "";
+const BASE = process.env.MUT_API_URL?.replace(/\/$/, "") ?? "";
 
 export async function adminCocktails(status?: string): Promise<AdminCocktail[]> {
   const query = status ? `?status=${encodeURIComponent(status)}&size=100` : "?size=100";

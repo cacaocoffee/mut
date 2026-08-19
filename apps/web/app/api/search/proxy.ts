@@ -27,14 +27,14 @@ import { headers } from "next/headers";
  * 없고, 그러면 API 는 다시 프론트 서버 IP 하나만 본다. 호스팅이 정해지면([G-07](../../../../../docs/prd/GAPS.md))
  * 그 앞단이 이 헤더를 붙이는지 확인해야 한다.
  */
-const BASE = process.env.KC_API_URL?.replace(/\/$/, "") ?? "";
+const BASE = process.env.MUT_API_URL?.replace(/\/$/, "") ?? "";
 
 export async function proxySearch(request: Request, path: "" | "/suggest"): Promise<Response> {
   const q = new URL(request.url).searchParams.get("q") ?? "";
 
   if (!BASE) {
     // 주소가 없으면 검색만 안 된다. 다른 화면은 프로토타입 데이터로 돈다 (`lib/api.ts`).
-    console.warn("[search] KC_API_URL 이 없다 — 검색을 쓸 수 없다");
+    console.warn("[search] MUT_API_URL 이 없다 — 검색을 쓸 수 없다");
     return Response.json({ error: "검색을 쓸 수 없습니다" }, { status: 503 });
   }
 

@@ -4,7 +4,7 @@
 |---|---|
 | 상태 | 확정 |
 | 일자 | 2026-08-19 |
-| 결정자 | 제품 (이슈 [050](https://github.com/cacaocoffee/k-cocktail-archive/issues/52)) |
+| 결정자 | 제품 (이슈 [050](https://github.com/cacaocoffee/mut/issues/52)) |
 | 관련 갭 | [G-16](../prd/GAPS.md#g-16) 잔여 |
 | 관련 ADR | [ADR-0001](./ADR-0001-design-system.md) · [ADR-0005](./ADR-0005-ui-package-scope.md) 결정 1 |
 | 관련 스펙 | [SPEC-04 §2.4](../spec/SPEC-04_비기능요구사항.md) · `NFR-A-01` |

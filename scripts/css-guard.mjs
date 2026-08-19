@@ -383,7 +383,7 @@ for (const [name, where] of defined) {
 }
 
 // 9. token_defined_where_used — 패키지가 쓰는 토큰은 패키지가 정의한다.
-//    소비자가 하나뿐이라 지금은 안 드러나지만, @kca/ui 를 다른 곳에서 가져가면
+//    소비자가 하나뿐이라 지금은 안 드러나지만, @mut/ui 를 다른 곳에서 가져가면
 //    값이 조용히 사라진다.
 for (const [name, where] of used) {
   if (!defined.has(name) && !APP_PROVIDED.includes(name)) {

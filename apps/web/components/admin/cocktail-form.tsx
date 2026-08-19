@@ -8,7 +8,7 @@ import {
   STYLE_KEY_LABELS,
   SWEET_LEVEL_LABELS,
   TECHNIQUE_LABELS,
-} from "@kca/domain";
+} from "@mut/domain";
 import type { AdminCocktail, ValidationProblem, Violation } from "@/lib/admin-api";
 
 /**

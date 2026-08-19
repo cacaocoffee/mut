@@ -11,7 +11,7 @@
  * ## 어떻게 도는가
  *
  * ```
- * KC_API_URL=http://localhost:8080 npm run facet:parity
+ * MUT_API_URL=http://localhost:8080 npm run facet:parity
  * ```
  *
  * 주소가 없으면 **아무것도 확인하지 않았다고 말하고 종료 코드 0** 이다. API 를 띄우지 않은
@@ -25,21 +25,21 @@ import {
   type FacetCounts,
   type Filters,
   type SearchItem,
-} from "@kca/domain";
-import type { components } from "@kca/domain/generated/api";
+} from "@mut/domain";
+import type { components } from "@mut/domain/generated/api";
 
 type CocktailListItem = components["schemas"]["CocktailListItem"];
 
-const BASE = (process.env.KC_API_URL ?? "").replace(/\/$/, "");
+const BASE = (process.env.MUT_API_URL ?? "").replace(/\/$/, "");
 const REQUIRE_API = process.argv.includes("--require-api");
 
 if (!BASE) {
-  const message = "KC_API_URL 이 없다 — 서버 대조를 하지 않았다";
+  const message = "MUT_API_URL 이 없다 — 서버 대조를 하지 않았다";
   if (REQUIRE_API) {
     console.error(`✗ ${message}. CI 는 API 없이 통과시키지 않는다.`);
     process.exit(1);
   }
-  console.log(`· ${message}. 확인하려면 KC_API_URL 을 주고 다시 돌린다.`);
+  console.log(`· ${message}. 확인하려면 MUT_API_URL 을 주고 다시 돌린다.`);
   process.exit(0);
 }
 

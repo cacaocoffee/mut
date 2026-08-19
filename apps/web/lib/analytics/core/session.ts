@@ -16,7 +16,7 @@
  * 탭을 여럿 열어도 한 방문이어야 한다 (DECISIONS §1.11). `sessionStorage` 는 탭마다 달라
  * 한 사람이 탭 셋을 열면 방문 셋으로 세어진다.
  */
-const KEY = "kca:analytics-session";
+const KEY = "mut:analytics-session";
 
 /** SPEC-10 §3 — 30분 무활동. */
 const IDLE_MS = 30 * 60 * 1000;

@@ -15,7 +15,7 @@ import {
   type Answers,
   type FlavorKey,
   type SearchItem,
-} from "@kca/domain";
+} from "@mut/domain";
 import { FINDER_PATH } from "@/lib/routes";
 import { finderStep } from "@/lib/analytics/events";
 import { PhotoSlot } from "./photo-slot";

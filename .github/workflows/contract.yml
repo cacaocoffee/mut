@@ -101,6 +101,8 @@ jobs:
       postgres:
         image: postgres:16-alpine
         env:
+          # 데이터베이스 이름은 옛 이름 그대로다 — 롤이 V001 안에 있고 마이그레이션은
+          # 불변이라 짝을 맞춘다 (G-40). 아래 DB_URL 과 같은 값이어야 한다
           POSTGRES_DB: kcocktail
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -140,8 +142,8 @@ jobs:
           DB_URL: jdbc:postgresql://localhost:5432/kcocktail
           DB_USER: postgres
           DB_PASSWORD: postgres
-          KC_RATE_LIMIT_ENABLED: "false" # 대조가 수십 번 부른다. 429 를 대조 실패로 읽지 않는다
-          KC_VERIFICATION_SCHEDULED: "false"
+          MUT_RATE_LIMIT_ENABLED: "false" # 대조가 수십 번 부른다. 429 를 대조 실패로 읽지 않는다
+          MUT_VERIFICATION_SCHEDULED: "false"
         run: |
           JAR=$(ls build/libs/*.jar | grep -v plain | head -1)
           nohup java -jar "$JAR" > "$RUNNER_TEMP/api.log" 2>&1 &
@@ -158,7 +160,7 @@ jobs:
 
       - name: 클라이언트 · 서버 패싯 대조
         env:
-          KC_API_URL: http://localhost:8080
+          MUT_API_URL: http://localhost:8080
         # --require-api: 주소가 없으면 통과가 아니라 실패다. CI 는 관용하지 않는다.
         run: npm run facet:parity -- --require-api
 

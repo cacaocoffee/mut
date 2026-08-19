@@ -1,7 +1,7 @@
 import { test, expect, type Locator, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { ML_PER_OZ, MAX_SERVINGS, formatQuantity } from "@kca/domain";
+import { ML_PER_OZ, MAX_SERVINGS, formatQuantity } from "@mut/domain";
 
 /**
  * ISSUE-043 — 상세 인터랙션: 잔 수 · 단위 · 대체재
@@ -9,7 +9,7 @@ import { ML_PER_OZ, MAX_SERVINGS, formatQuantity } from "@kca/domain";
  *
  * ## 두 층을 따로 본다
  *
- * 환산 **규칙**은 `@kca/domain` 의 순수 함수라 값으로 바로 잰다 — 30ml 를 두 잔으로 하면
+ * 환산 **규칙**은 `@mut/domain` 의 순수 함수라 값으로 바로 잰다 — 30ml 를 두 잔으로 하면
  * 60ml 인가, `1조각` 은 그대로인가, `dash` 는 oz 로 안 바뀌는가. 브라우저를 띄워 확인할
  * 성질이 아니고, 표에서 읽으면 자릿수·공백까지 함께 걸려 무엇이 틀렸는지 흐려진다.
  *
