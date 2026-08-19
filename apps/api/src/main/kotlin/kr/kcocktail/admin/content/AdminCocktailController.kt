@@ -1,6 +1,9 @@
 package kr.kcocktail.admin.content
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
 import kr.kcocktail.cocktail.api.AdminCocktailResponse
@@ -10,6 +13,7 @@ import kr.kcocktail.cocktail.api.PublishResponse
 import kr.kcocktail.cocktail.api.UpdateCocktailRequest
 import kr.kcocktail.common.security.authz.Action
 import kr.kcocktail.common.web.ApiPaths
+import kr.kcocktail.common.web.error.ValidationProblemResponse
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -93,6 +97,13 @@ class AdminCocktailController(
     @Operation(
         summary = "발행",
         description = "게이트 실패는 422 + violations 전부. 이미 발행됐으면 409.",
+    )
+    // 실패 응답의 모양을 계약에 싣는다 (G-39). 이것이 없으면 생성 TS 에 `violations` 가
+    // 안 나오고, 프론트가 손으로 적은 타입은 서버가 필드명을 바꿔도 안 깨진다.
+    @ApiResponse(
+        responseCode = "422",
+        description = "발행 게이트 실패. violations 에 남은 조건이 전부 담긴다",
+        content = [Content(schema = Schema(implementation = ValidationProblemResponse::class))],
     )
     fun publish(@PathVariable id: Long, http: HttpServletRequest): PublishResponse {
         actor.require(http, Action.PUBLISH)

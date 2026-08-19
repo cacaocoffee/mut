@@ -979,6 +979,10 @@ GET /api/v1/search?q=네그로니  →  matchedCount: 0
 
 ### G-39
 
+✅ **해결 (2026-08-19)** — 422 응답에 스키마를 달아 계약에 실었다 (`ValidationProblemResponse`).
+생성물에 `ValidationProblem`·`Violation` 이 나오고, 프론트가 손으로 적던 타입을 지웠다.
+서버가 필드 이름을 바꾸면 이제 **프론트 빌드가 깨진다.**
+
 **에러 본문(`violations`)이 계약 타입에 없다** *(이슈 047)*
 
 SPEC-07 §1.4 가 `violations` 를 응답 규약으로 정했고 서버에 `Violation` 데이터 클래스가

@@ -1163,6 +1163,34 @@ export interface components {
             sweetness?: string;
             tastingNote?: string;
         };
+        /** @description 도메인 규칙 위반. `violations` 에 실패한 항목을 **전부** 담는다 (FR-ADMIN-003) */
+        ValidationProblem: {
+            /** @description 사람이 읽을 설명 */
+            detail?: string;
+            /**
+             * @description 요청 경로
+             * @example /api/v1/admin/cocktails/1/publish
+             */
+            instance?: string;
+            /**
+             * Format: int32
+             * @description HTTP 상태
+             * @example 422
+             */
+            status: number;
+            /**
+             * @description 짧은 제목
+             * @example 발행 조건 미충족
+             */
+            title: string;
+            /**
+             * @description RFC 7807 문제 유형 URI
+             * @example /problems/validation
+             */
+            type: string;
+            /** @description 실패한 항목 전부. 비어 있지 않다 */
+            violations: components["schemas"]["Violation"][];
+        };
         VerificationTaskItem: {
             adminPath?: string;
             code: string;
@@ -1181,6 +1209,12 @@ export interface components {
             resolvedBy?: number;
             status: string;
             taskType: string;
+        };
+        /** @description 실패한 항목 전부. 비어 있지 않다 */
+        Violation: {
+            code: string;
+            field?: string;
+            message: string;
         };
     };
     responses: never;
@@ -1329,13 +1363,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
-            200: {
+            /** @description 발행 게이트 실패. violations 에 남은 조건이 전부 담긴다 */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["PublishResponse"];
+                    "*/*": components["schemas"]["ValidationProblem"];
                 };
             };
         };
