@@ -84,6 +84,7 @@ ADMIN ──governs──▶ 전부 (발행 상태 · 감사)
 | `/cocktails/[slug]` | **SSG + ISR** | 발행 시 on-demand | ✅ |
 | `/cocktails/base/[slug]` 외 카테고리 2종 | **SSG + ISR** | 발행 시 on-demand | ✅ |
 | `/cocktails/search?…` | 클라이언트 필터 | — | ❌ `noindex` |
+| `/finder` · `/finder?base=…&step=…` | 셸 정적 + 클라이언트 진행 | — | ✅ **canonical `/finder`** |
 | `/bars/[slug]` | **SSG + ISR** | 발행 시 on-demand | ✅ |
 | `/bars?…` 목록·지도 | 클라이언트 | — | ❌ `noindex` |
 | `/stories/[slug]` | SSG + ISR | 발행 시 | ✅ |
@@ -94,6 +95,12 @@ ADMIN ──governs──▶ 전부 (발행 상태 · 감사)
 
 **on-demand 재생성** — 어드민에서 발행하면 API가 프론트의 revalidate 훅을 호출한다.
 에디터가 발행하고 나서 반영을 기다리지 않아야 한다 (PRD 12장 — 개발자 없이 발행).
+
+**파인더가 `noindex` 가 아닌 이유** — 답이 붙은 주소는 같은 화면의 **다른 상태**이지 다른
+문서가 아니다. 탐색 필터(`/cocktails/search?…`)는 결과 목록 자체가 색인 가치를 갖지 않지만,
+파인더는 주소와 무관하게 같은 질문 화면이다. 그래서 진입 화면은 색인하고 답이 붙은 주소는
+canonical 로 `/finder` 에 합친다 — 조합마다 중복 문서가 생기는 것은 `PRIN-P06` 이 막는다.
+답을 쿼리스트링에 싣는 것은 **공유 가능해야 하기 때문**이다 (이슈 041 · `FR-SEARCH-005`).
 
 **필터를 서버로 보내지 않는 이유** — 필터 결과는 색인 대상이 아니고(`PRIN-P06`),
 Phase 1 규모(칵테일 100 · 바 100)에서는 전체 목록을 받아 클라이언트에서 거르는 편이
