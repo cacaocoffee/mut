@@ -53,3 +53,23 @@ async function get<T>(path: string): Promise<T | null> {
     return null;
   }
 }
+
+// ── 재료 승인 (ISSUE-048 · `FR-ADMIN-007`) ────────────────────────────────
+
+export type AdminIngredient = components["schemas"]["AdminIngredientResponse"];
+export type IngredientCapacity = components["schemas"]["IngredientCapacity"];
+
+/** 승인 대기 큐. `editor` 도 본다 — 승인만 `admin` 이다 (SPEC-08 §2). 이름순은 서버가 고정한다. */
+export async function pendingIngredients(): Promise<AdminIngredient[]> {
+  return (await get<AdminIngredient[]>("/ingredients/pending")) ?? [];
+}
+
+/**
+ * 승인된 재료 수와 상한.
+ *
+ * 상한을 넘어도 **승인을 막지 않는다** (DECISIONS §1.2) — 경고다. 막으면 300번째 재료가
+ * 필요한 날 아무도 아무것도 못 한다.
+ */
+export async function ingredientCapacity(): Promise<IngredientCapacity | null> {
+  return get<IngredientCapacity>("/ingredients/capacity");
+}

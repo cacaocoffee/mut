@@ -23,15 +23,21 @@ export default async function AdminDashboard() {
 
       <ul className="admin__list">
         <li>
-          <b>칵테일 편집 · 발행</b>
+          <Link href="/admin/cocktails">
+            <b>칵테일 편집 · 발행</b>
+          </Link>
           <span>
-            이슈 047 이 만든다. 발행 조건 패널이 무엇이 모자란지 한 화면에 보여 준다
-            (<code>NFR-O-01</code>).
+            발행 조건 패널이 무엇이 모자란지 한 화면에 보여 준다 (<code>NFR-O-01</code>).
           </span>
         </li>
         <li>
-          <b>재료 승인 · 검증 태스크 · 감사 로그</b>
-          <span>이슈 048 이 만든다.</span>
+          <Link href="/admin/ingredients">
+            <b>재료 승인</b>
+          </Link>
+          <span>
+            새 재료는 승인 대기로 들어간다. 승인은 admin 만 한다 — 만든 사람이 스스로
+            통과시키면 승인 단계가 없는 것과 같다 (<code>SPEC-08 §2</code>).
+          </span>
         </li>
       </ul>
 

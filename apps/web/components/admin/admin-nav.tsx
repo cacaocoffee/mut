@@ -4,18 +4,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 /**
- * 어드민 네비게이션 (ISSUE-045).
+ * 어드민 네비게이션 (ISSUE-045·048).
  *
  * ## 없는 화면은 링크하지 않는다
  *
- * 칵테일 편집은 [이슈 047](https://github.com/cacaocoffee/k-cocktail-archive/issues/49),
- * 재료 승인·태스크·감사는 [048](https://github.com/cacaocoffee/k-cocktail-archive/issues/50)
- * 이 만든다. 자리를 미리 링크로 만들면 눌렀을 때 아무 일도 안 일어나는 버튼이 남는다 —
- * 그 화면들이 생길 때 여기 한 줄씩 는다.
+ * 자리를 미리 링크로 만들면 눌렀을 때 아무 일도 안 일어나는 버튼이 남는다.
  */
 const SECTIONS = [
   { href: "/admin", ko: "대시보드", en: "OVERVIEW" },
   { href: "/admin/cocktails", ko: "칵테일", en: "COCKTAILS" },
+  // 목록은 `editor` 도 본다 — 승인 버튼만 `admin` 이다 (SPEC-08 §2).
+  { href: "/admin/ingredients", ko: "재료", en: "INGREDIENTS" },
 ] as const;
 
 export function AdminNav() {

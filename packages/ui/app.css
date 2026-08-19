@@ -1579,3 +1579,20 @@ figcaption {
     gap: 2px;
   }
 }
+
+/* ── 어드민 재료 승인 (ISSUE-048) ──────────────────────────────────────────
+   시안 정본(`styles.css`)은 손대지 않는다. 어드민 전용 색을 만들지 않고 토큰만 쓴다. */
+.admin-warn {
+  margin: var(--space-2) 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-accent-700);
+  color: var(--color-accent-800);
+  background: var(--color-accent-100);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.admin-inline {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
