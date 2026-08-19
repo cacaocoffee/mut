@@ -110,12 +110,12 @@ test.describe("내비 탭 (ISSUE-051 · ISSUE-055)", () => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    // 통합 검색이 04 로 붙었다 (ISSUE-042). 탭이 늘면 320px 에서 가장 먼저 무너지는 자리라
-    // 개수를 여기 적어 둔다 — 늘릴 때 이 줄을 고치며 한 번 더 재게 된다.
+    // 상세를 내비에서 뺐다 (G-32 뒤 마스트헤드 정리) — 탭이 늘면 320px 에서 가장 먼저
+    // 무너지는 자리라 개수를 여기 적어 둔다. 늘릴 때 이 줄을 고치며 한 번 더 재게 된다.
     const tabs = page.locator(".tab");
-    await expect(tabs).toHaveCount(4);
+    await expect(tabs).toHaveCount(3);
 
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 3; i++) {
       const lines = await tabs.nth(i).evaluate((el) => el.getClientRects().length);
       const text = await tabs.nth(i).innerText();
       expect(lines, `"${text.replace(/\n/g, " ")}" 이 ${lines}줄이다`).toBe(1);

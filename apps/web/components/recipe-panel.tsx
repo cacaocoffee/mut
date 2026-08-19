@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { MAX_SERVINGS, formatQuantity, type DisplayUnit } from "@mut/domain";
-import { rememberLastViewed } from "@/lib/use-last-viewed";
 import type { CocktailView } from "@/lib/cocktail-view";
 import { recipeInteract } from "@/lib/analytics/events";
 
@@ -33,11 +32,6 @@ export function RecipePanel({ slug, ingredients }: { slug: string; ingredients: 
   const [servings, setServings] = useState(1);
   const [unit, setUnit] = useState<DisplayUnit>("ml");
   const [openSub, setOpenSub] = useState<number | null>(null);
-
-  // 상세 탭이 마지막으로 본 칵테일로 돌아가도록 기록한다.
-  useEffect(() => {
-    rememberLastViewed(slug);
-  }, [slug]);
 
   // 저장해 둔 단위를 되살린다. 첫 그림은 `ml` 이라 서버가 그린 것과 어긋나지 않는다.
   useEffect(() => {
