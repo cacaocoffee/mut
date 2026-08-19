@@ -1,0 +1,38 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+/**
+ * 어드민 네비게이션 (ISSUE-045).
+ *
+ * ## 없는 화면은 링크하지 않는다
+ *
+ * 칵테일 편집은 [이슈 047](https://github.com/cacaocoffee/k-cocktail-archive/issues/49),
+ * 재료 승인·태스크·감사는 [048](https://github.com/cacaocoffee/k-cocktail-archive/issues/50)
+ * 이 만든다. 자리를 미리 링크로 만들면 눌렀을 때 아무 일도 안 일어나는 버튼이 남는다 —
+ * 그 화면들이 생길 때 여기 한 줄씩 는다.
+ */
+const SECTIONS = [
+  { href: "/admin", ko: "대시보드", en: "OVERVIEW" },
+] as const;
+
+export function AdminNav() {
+  const pathname = usePathname();
+
+  return (
+    <nav className="admin__nav" aria-label="어드민 메뉴">
+      {SECTIONS.map((s) => (
+        <Link
+          key={s.href}
+          href={s.href}
+          className="admin__nav-item"
+          // 지금 어디인지 (RED 17). 색이 아니라 상태로 알린다.
+          aria-current={pathname === s.href ? "page" : undefined}
+        >
+          {s.ko} <span className="en">{s.en}</span>
+        </Link>
+      ))}
+    </nav>
+  );
+}

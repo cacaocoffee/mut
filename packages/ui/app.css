@@ -1402,3 +1402,75 @@
 figcaption {
   color: var(--color-neutral-700);
 }
+
+/* ── 어드민 (ISSUE-045) ────────────────────────────────────────────────────
+   내부 도구라 공개 화면보다 조용하다. 토큰은 같은 것을 쓴다 — 어드민만의 색을 만들면
+   시안이 두 벌이 된다 (SPEC-05 §1: 디자인 시스템을 공유하려고 같은 앱에 둔다). */
+.admin__head {
+  padding-top: var(--space-8);
+}
+.admin__body {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: var(--space-6);
+  margin-top: var(--space-6);
+}
+.admin__nav {
+  display: flex;
+  flex-direction: column;
+  border-top: 2px solid var(--color-divider);
+}
+.admin__nav-item {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-divider);
+  font-size: 13px;
+  font-weight: 700;
+}
+.admin__nav-item .en {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--color-neutral-700);
+}
+.admin__nav-item[aria-current="page"] {
+  color: var(--color-accent-700);
+}
+.admin__section-head {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-neutral-700);
+  margin: var(--space-6) 0 var(--space-2);
+}
+.admin__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--color-divider);
+}
+.admin__list li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--color-divider);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.admin__list b {
+  font-size: 14px;
+}
+.admin__foot {
+  margin-top: var(--space-6);
+  font-size: 13px;
+}
+
+@media (max-width: 720px) {
+  .admin__body {
+    grid-template-columns: 1fr;
+  }
+  .admin__nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+}
