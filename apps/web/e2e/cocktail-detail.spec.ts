@@ -104,6 +104,9 @@ test("RED14,15,16,17 - 3축이 링크되고 축 조합 링크가 없다", async 
   await page.goto(DETAIL);
 
   const taxa = page.getByRole("navigation", { name: "분류" });
+  // `evaluateAll` 은 기다리지 않는다 — 링크가 그려진 것을 먼저 확인한다.
+  await expect(taxa.getByRole("link").first()).toBeVisible();
+
   const hrefs = await taxa.getByRole("link").evaluateAll((els) =>
     els.map((e) => (e as HTMLAnchorElement).getAttribute("href") ?? ""),
   );

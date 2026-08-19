@@ -99,30 +99,36 @@ test("RED16~20 - 그려진 글자의 대비가 AA 다", async ({ page }) => {
  */
 test("RED23,24 - 포커스 링이 2px accent 다", async ({ page }) => {
   await page.goto("/cocktails/search");
+  await expect(page.locator("main[data-ready]")).toBeVisible();
 
-  const chip = page.locator("button.chip").first();
-  await chip.focus();
-  await page.keyboard.press("Tab");
-  await page.keyboard.press("Shift+Tab"); // 키보드로 온 포커스여야 `:focus-visible` 이 붙는다
+  // `:focus-visible` 은 **키보드로 옮긴 포커스**에만 붙는다. `focus()` 로 준 포커스는
+  // 브라우저에 따라 해당되지 않아, Tab 으로 옮겨 가며 처음 걸리는 것을 본다.
+  let style: { width: string; color: string; style: string } | null = null;
 
-  const style = await chip.evaluate((el) => {
-    const s = getComputedStyle(el);
-    return { width: s.outlineWidth, color: s.outlineColor, style: s.outlineStyle };
-  });
+  for (let i = 0; i < 12 && !style; i++) {
+    await page.keyboard.press("Tab");
+    style = await page.evaluate(() => {
+      const el = document.activeElement as HTMLElement | null;
+      if (!el || el === document.body || !el.matches(":focus-visible")) return null;
 
-  expect(style.style, "아웃라인이 없다 — 기본 링만 지운 상태다").not.toBe("none");
-  expect(parseFloat(style.width), `아웃라인이 ${style.width} 다`).toBeGreaterThanOrEqual(2);
-  // 색은 `oklch()` 로 적혀 있고 브라우저는 그것을 `lab()`·`oklch()`·`rgb()` 중 하나로
-  // 돌려준다. 표기가 아니라 **실제 색**을 본다 — 캔버스에 한 픽셀 칠해 값을 읽는다.
-  const rgb = await chip.evaluate((el, color) => {
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d")!;
+      const s = getComputedStyle(el);
+      return { width: s.outlineWidth, color: s.outlineColor, style: s.outlineStyle };
+    });
+  }
+
+  expect(style, "탭으로 옮긴 포커스에 아무 표시가 없다").not.toBeNull();
+  expect(style!.style, "아웃라인이 없다 — 기본 링만 지운 상태다").not.toBe("none");
+  expect(parseFloat(style!.width), `아웃라인이 ${style!.width} 다`).toBeGreaterThanOrEqual(2);
+
+  // 색은 `oklch()` 로 적혀 있고 브라우저는 `lab()`·`rgb()` 중 하나로 돌려준다.
+  // 표기가 아니라 **실제 색**을 본다 — 캔버스에 한 픽셀 칠해 값을 읽는다.
+  const rgb = await page.evaluate((color) => {
+    const ctx = document.createElement("canvas").getContext("2d")!;
     ctx.fillStyle = color;
     ctx.fillRect(0, 0, 1, 1);
     return Array.from(ctx.getImageData(0, 0, 1, 1).data).slice(0, 3);
-  }, style.color);
+  }, style!.color);
 
-  // accent = #ec3013 (236, 48, 19). 브라우저마다 마지막 자리가 흔들려 여유를 둔다.
   const [r, g, b] = rgb;
   expect(
     Math.abs(r - 236) < 12 && Math.abs(g - 48) < 12 && Math.abs(b - 19) < 12,
