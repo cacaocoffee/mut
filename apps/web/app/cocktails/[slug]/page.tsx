@@ -7,7 +7,7 @@ import {
   COCKTAILS,
   relatedCocktails as prototypeRelated,
   getCocktail,
-} from "@kca/domain";
+} from "@mut/domain";
 import { DetailActions } from "@/components/detail-actions";
 import { FlavorRadar } from "@/components/flavor-radar";
 import { RecipePanel } from "@/components/recipe-panel";
@@ -115,8 +115,11 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
     { label: "ABV", value: c.abv != null ? `${c.abv}%` : "—", sub: "표준 배합 기준" },
     { label: "STYLE", value: c.stylePrimary.labelKo, sub: "대표 스타일" },
     { label: "GLASSWARE", value: c.glassType, sub: "권장 잔" },
-    { label: "TECHNIQUE", value: c.method.slug, sub: c.method.labelKo },
-    { label: "SWEETNESS", value: c.sweetness.en, sub: `${c.sweetness.ko} · 4단계` },
+    // 값은 한국어로 통일한다 — 라벨(위)이 이미 영문이라 값까지 영문이면 한 줄에서 두 번
+    // 영어를 읽는다. 예전에는 메이킹만 슬러그(`stir`)를, 당도만 영문(`Dry`)을 보여 줘서
+    // 다섯 칸의 언어가 제각각이었다.
+    { label: "TECHNIQUE", value: c.method.labelKo, sub: "메이킹 방법" },
+    { label: "SWEETNESS", value: c.sweetness.ko, sub: `${c.sweetness.en} · 4단계` },
   ];
 
   return (

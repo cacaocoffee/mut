@@ -172,3 +172,22 @@ test.describe("카드 그리드 (ISSUE-051)", () => {
     expect(spill, `카드 ${spill.length}장이 그리드 밖으로 ${spill.join("·")}px 나갔다`).toEqual([]);
   });
 });
+
+/**
+ * 헤더의 워드마크 (MUT).
+ *
+ * 이름을 글자로 적지 않고 그림으로 세웠다 — 그림은 조용히 사라진다. 404 든 경로 오타든
+ * 화면에는 빈칸만 남고 아무도 못 알아챈다. **불러와졌는지**(자연 크기가 0이 아닌지)까지 본다.
+ *
+ * `alt` 는 이름 그 자체라 스크린리더가 읽을 것이 있는지도 함께 본다 (`NFR-A-01` 계열).
+ */
+test("헤더에 워드마크가 뜬다", async ({ page }) => {
+  await page.goto("/cocktails/search");
+
+  const mark = page.locator(".nav-brand img");
+  await expect(mark).toBeVisible();
+  await expect(mark).toHaveAttribute("alt", "MUT");
+
+  const loaded = await mark.evaluate((el) => (el as HTMLImageElement).naturalWidth > 0);
+  expect(loaded, "워드마크 파일을 못 불러왔다").toBe(true);
+});

@@ -9,12 +9,12 @@ import { OG_SIZE, renderOgCard } from "@/lib/og-card";
  */
 export const size = OG_SIZE;
 export const contentType = "image/png";
-export const alt = "K-Cocktail Archive";
+export const alt = "MUT";
 
 export default async function OpengraphImage() {
   return renderOgCard({
-    nameKo: "칵테일 아카이브",
-    nameEn: "K-Cocktail Archive",
+    nameKo: "당신의 취향, 당신의 멋",
+    nameEn: "MUT",
     meta: "기주 · 스타일 · 메이킹 · 당도 · 도수 · 맛/향",
   });
 }
