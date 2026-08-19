@@ -37,20 +37,18 @@ const PAIRS = [
   { where: ".cocktail-card__foot em", fg: "--color-accent-700", bg: "--color-surface" },
   { where: ".substitute-note", fg: "--color-accent-900", bg: "--color-accent-100" },
   { where: ".loading-block p", fg: "--color-neutral-700", bg: "--color-bg" },
+  // G-16 이 여기서 닫힌다 (ADR-0006) — 흰 글자를 얹는 면은 accent 가 아니라 accent-700 이다.
+  { where: ".btn-primary / .chip[aria-pressed]", fg: "--color-bg", bg: "--color-accent-700" },
 ];
 
 /**
  * 알려진 미달. **고치라고 남겨둔 것이지 봐주는 것이 아니다.**
  * 늘어나면 토큰 쪽을 고쳐야 한다는 신호다.
+ *
+ * 지금은 비어 있다 — 마지막 한 건이던 `.btn-primary` 3.76:1 을 ADR-0006 이 닫았다.
+ * 다시 채우려면 GAPS 등재와 ADR 이 먼저다 (SPEC-00 §4).
  */
-const KNOWN = [
-  {
-    where: ".chip[aria-pressed] / .btn-primary",
-    fg: "--color-bg",
-    bg: "--color-accent",
-    why: "3.76:1 — G-16 등재, 이슈 050(#52)이 BLOCKED 로 들고 있는 제품 결정. 임의로 못 고친다",
-  },
-];
+const KNOWN = [];
 
 // ── 파싱 ─────────────────────────────────────────────────────────────────────
 

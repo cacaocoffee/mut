@@ -38,21 +38,16 @@ function axe(page: Page) {
 }
 
 /**
- * 지금은 봐주는 것 — **accent 바탕에 올린 글자** (`G-16`).
+ * **봐주는 위반이 없다.**
  *
- * `--color-accent`(#ec3013) 위의 `--color-bg` 글자는 3.76:1 이라 본문 AA 에 미달이다.
- * 선택된 칩·당도 세그먼트·`.btn-primary` 가 전부 이 조합이고, **고치려면 accent 를 어둡게
- * 하거나 그 자리에 accent 를 쓰지 않기로 정해야 한다** — 시안의 정체성에 닿는 결정이라
- * [G-16](../../../docs/prd/GAPS.md) 에 올라가 있고 이슈 050(#52)이 `BLOCKED` 로 들고 있다.
- * 임의로 고치지 않는다 (ADR-0005 — 시안은 우리 것이 아니다).
+ * 하나 있었다 — accent 바탕(#ec3013) 위의 흰 글자 3.76:1 (`G-16`). 선택된 칩과
+ * `.btn-primary` 가 그 조합이었고, 시안의 정체성에 닿는 결정이라 이슈 050(#52)이 들고
+ * 있었다. [ADR-0006](../../../docs/decisions/ADR-0006-btn-primary-contrast.md) 이
+ * **흰 글자를 얹는 면만 accent-700 으로** 정해서(6.41:1) 예외가 없어졌다.
  *
- * **줄이는 것이 목적이다.** 결정이 나면 이 예외가 통째로 없어진다.
+ * 다시 예외를 만들려면 GAPS 등재와 ADR 이 먼저다 (SPEC-00 §4). 여기에 필터를 되살리는
+ * 것으로 시작하지 않는다.
  */
-const G16_BACKGROUND = "background color: #ec3013";
-
-function excusable(summary: string | null | undefined): boolean {
-  return (summary ?? "").includes(G16_BACKGROUND);
-}
 
 for (const { path, label } of PUBLIC_PAGES) {
   test(`RED2 - ${label} 화면에 axe 위반이 없다`, async ({ page }) => {
@@ -63,9 +58,7 @@ for (const { path, label } of PUBLIC_PAGES) {
 
     // 어디가 왜 걸렸는지 한 줄로 남긴다. 규칙 이름만 나오면 고칠 자리를 못 찾는다.
     const summary = violations.flatMap((v) =>
-      v.nodes
-        .filter((n) => !excusable(n.failureSummary))
-        .map((n) => `${v.id} (${v.impact}) — ${n.target.join(" ")}`),
+      v.nodes.map((n) => `${v.id} (${v.impact}) — ${n.target.join(" ")}`),
     );
     expect(summary, `${label}: ${summary.join(" / ")}`).toEqual([]);
   });
@@ -83,9 +76,9 @@ test("RED16~20 - 그려진 글자의 대비가 AA 다", async ({ page }) => {
     const { violations } = await axe(page).withRules(["color-contrast"]).analyze();
 
     const failures = violations.flatMap((v) =>
-      v.nodes
-        .filter((n) => !excusable(n.failureSummary))
-        .map((n) => `${label} ${n.target.join(" ")} — ${n.failureSummary?.split("\n")[1]?.trim()}`),
+      v.nodes.map(
+        (n) => `${label} ${n.target.join(" ")} — ${n.failureSummary?.split("\n")[1]?.trim()}`,
+      ),
     );
     expect(failures, failures.join(" / ")).toEqual([]);
   }
