@@ -40,17 +40,21 @@ export const STYLE_LABELS: Record<StyleKey, string> = {
 export const STYLE_KEYS = Object.keys(STYLE_LABELS) as StyleKey[];
 
 /**
- * 메이킹 방법 — 표시명과 필요 도구. 이 축은 사실상 난이도를 대신한다 (PRD 5.3).
+ * 메이킹 방법에 필요한 도구. 이 축은 사실상 난이도를 대신한다 (PRD 5.3).
+ *
+ * **표시 문구가 여기 없다** (G-32). 예전에는 `ko` 를 함께 들고 있었는데, 계약도 같은 축의
+ * 한국어 이름을 갖고 있어 **같은 자리에 두 이름이 나왔다** — 프로토타입이면 "휘저어 섞기",
+ * API 를 붙이면 "스터". 이름의 정본은 계약이다 (`PRIN-T02`) — `TECHNIQUE_LABELS` 를 쓴다.
  *
  * **키가 곧 슬러그다.** 예전에는 `Build` 같은 대문자 리터럴을 키로 쓰고 `slug` 를 따로
  * 들고 있었는데, 이슈 037 이후 값 자체가 슬러그라 그 칸이 필요 없어졌다.
  */
-export const TECHNIQUES: Record<Technique, { ko: string; tools: string }> = {
-  build: { ko: "잔에서 조립", tools: "잔, 바스푼" },
-  shake: { ko: "흔들어 섞기", tools: "셰이커" },
-  stir: { ko: "휘저어 섞기", tools: "믹싱글라스" },
-  blend: { ko: "블렌드", tools: "블렌더" },
-  etc: { ko: "기타", tools: "스로잉 · 머들링 · 인퓨징 · 직화" },
+export const TECHNIQUES: Record<Technique, { tools: string }> = {
+  build: { tools: "잔, 바스푼" },
+  shake: { tools: "셰이커" },
+  stir: { tools: "믹싱글라스" },
+  blend: { tools: "블렌더" },
+  etc: { tools: "스로잉 · 머들링 · 인퓨징 · 직화" },
 };
 
 /**

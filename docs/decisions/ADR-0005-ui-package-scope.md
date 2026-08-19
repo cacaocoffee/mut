@@ -84,7 +84,7 @@ CONVENTIONS §4의 한 줄을 이 표로 대체한다.
 
 ### 3. 내비 재구성 — 취향이다. 그렇게 적는다
 
-시안 원본(`K-Cocktail-Archive.dc.html:23-30`)은 브랜드 좌측 + 번호 탭 3개 우측 + sticky를
+시안 원본(`MUT.dc.html:23-30`)은 브랜드 좌측 + 번호 탭 3개 우측 + sticky를
 **명시적으로 그렸다.** 현재 구현은 시안에 충실하다. 이건 드리프트 수정이 아니라 **시안에 대한 이견**이다.
 
 감사 스킬의 근거는 "이 형태가 가장 많이 지목되는 AI 내비 지문"이라는 것이다.
@@ -92,7 +92,7 @@ CONVENTIONS §4의 한 줄을 이 표로 대체한다.
 (번호 탭이 3개 화면의 순서를 드러낸다)도 여전히 유효하다.
 
 **320px 파손은 이것과 별개다.** 그건 실제 결함이고 형태를 바꾸지 않고도 고쳐진다
-([ISSUE-051](https://github.com/cacaocoffee/k-cocktail-archive/issues/69)에서 그렇게 고쳤다).
+([ISSUE-051](https://github.com/cacaocoffee/mut/issues/69)에서 그렇게 고쳤다).
 재구성은 그 위에 얹는 별도 판단이다.
 
 > **기록** — 이 개정은 제품 소유자가 명시적으로 지시했다. 근거는 취향이고, 그 사실을 여기 남긴다.
@@ -113,7 +113,7 @@ CONVENTIONS §4의 한 줄을 이 표로 대체한다.
 |---|---|---|
 | 램프 표기 | 없음 — 값이 같으므로 되돌릴 이유가 생기지 않는다 | — |
 | 한글 12px 바닥 | 시안 저자가 한글 검증을 거친 크기 지정을 내놓으면 그쪽을 따른다 | 낮음 |
-| **내비 마스트헤드** | **사용자 조사·계측에서 번호 탭이 더 낫다는 근거가 나오면 되돌린다.** `cross_nav`([SPEC-10](../spec/SPEC-10_계측_이벤트.md))가 붙으면 화면 간 이동률로 판정할 수 있다 | **`app.css` 의 `.site-nav` 블록 하나만 지우면 된다** — [ISSUE-053](https://github.com/cacaocoffee/k-cocktail-archive/issues/71) 에서 `styles.css` 의 `.nav`·`.nav-brand` 를 diff 0줄로 남겼다 |
+| **내비 마스트헤드** | **사용자 조사·계측에서 번호 탭이 더 낫다는 근거가 나오면 되돌린다.** `cross_nav`([SPEC-10](../spec/SPEC-10_계측_이벤트.md))가 붙으면 화면 간 이동률로 판정할 수 있다 | **`app.css` 의 `.site-nav` 블록 하나만 지우면 된다** — [ISSUE-053](https://github.com/cacaocoffee/mut/issues/71) 에서 `styles.css` 의 `.nav`·`.nav-brand` 를 diff 0줄로 남겼다 |
 
 `packages/ui` 수정 권한 자체를 되돌리는 조건은 **없다.** 결정 1은 충돌 해소이지 완화가 아니다 —
 `styles.css`의 3단 절차는 그대로 남는다.

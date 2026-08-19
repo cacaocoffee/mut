@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════════════
-   K-Cocktail Archive — 화면 레이아웃 층.
+   MUT — 화면 레이아웃 층.
    styles.css(Modernist 토큰·컴포넌트) 위에 얹는다. 색·간격·라운드는 전부
    토큰에서 가져오고, 여기서는 배치와 반응형만 다룬다.
 
@@ -15,7 +15,7 @@
   --ease: cubic-bezier(0.2, 0, 0, 1);
 
   /* 세리프 폴백을 여기 둔다. 이 파일이 `.editorial` 등에서 --font-serif 를 쓰는데
-     정의는 apps/web/app/globals.css 에만 있었다 — @kca/ui 를 다른 소비자가 가져가면
+     정의는 apps/web/app/globals.css 에만 있었다 — @mut/ui 를 다른 소비자가 가져가면
      세리프가 조용히 사라진다. 앱의 :root 가 뒤에 와서 next/font 값으로 덮는다. */
   --font-serif: Georgia, "Noto Serif KR", serif;
 }
@@ -31,7 +31,7 @@
   padding: 0 var(--space-8) 64px;
 }
 /* ┌─ 마스트헤드 ────────────────────────────────────────────────────────────┐
-   시안(K-Cocktail-Archive.dc.html:23-30)은 브랜드 좌측 + 번호 탭 우측을 그렸다.
+   시안(MUT.dc.html:23-30)은 브랜드 좌측 + 번호 탭 우측을 그렸다.
    이 블록이 그 형태를 덮는다. **근거는 취향이다** — ADR-0005 결정 3 이 그렇게 적었고,
    되돌리는 조건은 `cross_nav` 계측(SPEC-10)이다.
 
@@ -54,6 +54,8 @@
   padding-top: var(--space-3);
   padding-bottom: 0;
 }
+/* 워드마크가 들어오면서 글자 대신 그림이 선다 (MUT). 높이를 정하고 폭은 비율이 정한다 —
+   마크가 세로로 긴 편이라 폭을 고정하면 탭 줄이 눌린다. */
 .site-nav .nav-brand {
   display: flex;
   align-items: baseline;
@@ -62,6 +64,14 @@
   margin-right: 0;
   font-size: 22px;
   padding-bottom: 10px;
+  color: inherit;
+  text-decoration: none;
+}
+.site-nav .nav-brand img {
+  height: 34px;
+  width: auto;
+  /* 마크 자체가 잉크색이라 배경만 비운다. 어두운 배경으로 뒤집을 때 여기만 고치면 된다 */
+  display: block;
 }
 /* 탭 줄을 브랜드와 가르는 얇은 선. 바깥 2px 규칙선(.nav)이 마스트헤드 바닥을 맡는다 */
 .site-nav .tabs {

@@ -30,7 +30,7 @@ import { notFound } from "next/navigation";
  * SPEC-07 §1.2 — 서버 컴포넌트에서 API 를 부를 때 **들어온 쿠키를 그대로 전달**한다.
  * 세션은 `httpOnly` 라 브라우저 JS 가 못 읽고, 서버가 옮기는 수밖에 없다.
  */
-const BASE = process.env.KC_API_URL?.replace(/\/$/, "") ?? "";
+const BASE = process.env.MUT_API_URL?.replace(/\/$/, "") ?? "";
 
 /** 어드민에 들어올 수 있는 두 역할. `member` 는 여기까지 오지 못한다 (미들웨어가 404). */
 export type AdminRole = "admin" | "editor";
@@ -52,7 +52,7 @@ export type AdminAccess =
  * 섞이지 않는다.
  */
 export const adminAccess = cache(async (): Promise<AdminAccess> => {
-  if (!BASE) return { kind: "unavailable", reason: "KC_API_URL 이 없다" };
+  if (!BASE) return { kind: "unavailable", reason: "MUT_API_URL 이 없다" };
 
   const cookie = (await headers()).get("cookie");
   if (!cookie) return { kind: "unauthenticated" };

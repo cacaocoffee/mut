@@ -9,7 +9,7 @@
 공통 규칙은 반복하지 않는다. **여기 없으면 SCREENS-00을 따른다.**
 
 > **이 문서는 설계가 아니라 기록이다.** 화면이 먼저 있었고([SPEC-01 §6](../spec/SPEC-01_시스템개요_범위.md)의
-> 프로토타입 3화면 중 하나) [이슈 041](https://github.com/cacaocoffee/k-cocktail-archive/issues/43)이
+> 프로토타입 3화면 중 하나) [이슈 041](https://github.com/cacaocoffee/mut/issues/43)이
 > 데이터 출처를 API로 바꾸면서 남긴다. [G-09](../prd/GAPS.md#g-09)·[G-18](../prd/GAPS.md#g-18)의
 > "SCREENS-03 미작성"이 여기서 풀린다.
 
@@ -147,7 +147,7 @@
 ### 계측
 
 [SPEC-10 §4.4](../spec/SPEC-10_계측_이벤트.md) `finder_step`(`step`·`answered`·`candidateCount`)은
-**[이슈 049](https://github.com/cacaocoffee/k-cocktail-archive/issues/51)가 심는다.**
+**[이슈 049](https://github.com/cacaocoffee/mut/issues/51)가 심는다.**
 기반(이슈 035)이 아직 없어 이 화면에는 호출 지점만 비어 있다.
 `step=4` 도달이 완주 판정이고 `finder_complete`는 두지 않는다.
 

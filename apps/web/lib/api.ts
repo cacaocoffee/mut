@@ -1,5 +1,5 @@
-import { PROTOTYPE_CORPUS, type SearchItem } from "@kca/domain";
-import type { components } from "@kca/domain/generated/api";
+import { PROTOTYPE_CORPUS, type SearchItem } from "@mut/domain";
+import type { components } from "@mut/domain/generated/api";
 
 /**
  * 공개 API 클라이언트 (ISSUE-038 · SPEC-07 §5).
@@ -11,7 +11,7 @@ import type { components } from "@kca/domain/generated/api";
  *
  * ## 주소가 없으면 프로토타입 데이터로 빌드한다
  *
- * `KC_API_URL` 이 비어 있으면 API 를 부르지 않고 `packages/domain` 의 배열을 쓴다.
+ * `MUT_API_URL` 이 비어 있으면 API 를 부르지 않고 `packages/domain` 의 배열을 쓴다.
  * 이 폴백이 없으면 **API 를 띄우지 않은 사람은 `npm run build` 를 못 한다** —
  * 화면 작업과 서버 작업이 서로를 막게 된다.
  *
@@ -27,7 +27,7 @@ export type CategoriesResponse = components["schemas"]["CategoriesResponse"];
 export const CATEGORY_AXES = ["base", "style", "method"] as const;
 export type CategoryAxis = (typeof CATEGORY_AXES)[number];
 
-const BASE = process.env.KC_API_URL?.replace(/\/$/, "") ?? "";
+const BASE = process.env.MUT_API_URL?.replace(/\/$/, "") ?? "";
 
 export const usingApi = BASE.length > 0;
 

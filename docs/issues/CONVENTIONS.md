@@ -7,7 +7,7 @@
 
 ## 0. 이슈는 GitHub 에 있다
 
-**정본은 [GitHub Issues](https://github.com/cacaocoffee/k-cocktail-archive/issues) 다.** 저장소 안의 `ISSUE-*.md` 는 이관 후 지웠다 —
+**정본은 [GitHub Issues](https://github.com/cacaocoffee/mut/issues) 다.** 저장소 안의 `ISSUE-*.md` 는 이관 후 지웠다 —
 상태를 두 곳에 적으면 반드시 어긋나기 때문이다. [`INDEX.md`](INDEX.md) 는 웨이브 편성·의존 DAG·결합점만 남긴 **지도**다.
 
 ```bash
@@ -23,7 +23,7 @@ gh issue view  15 --json body --jq .body > /tmp/issue.md
 ```bash
 gh issue list --search "in:title [051]"
 ```
-진행률은 [마일스톤](https://github.com/cacaocoffee/k-cocktail-archive/milestones)이 웨이브별로 보여준다.
+진행률은 [마일스톤](https://github.com/cacaocoffee/mut/milestones)이 웨이브별로 보여준다.
 
 ---
 

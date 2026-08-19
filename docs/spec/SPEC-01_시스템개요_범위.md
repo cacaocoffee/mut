@@ -4,7 +4,7 @@
 |---|---|
 | 버전 | v1.0 |
 | 최종 수정 | 2026-08-06 |
-| 상위 문서 | [SPEC-00 개발원칙](./SPEC-00_개발원칙.md) · [PRD v1.1](../prd/K-Cocktail-Archive_PRD_v1.md) |
+| 상위 문서 | [SPEC-00 개발원칙](./SPEC-00_개발원칙.md) · [PRD v1.1](../prd/MUT_PRD_v1.md) |
 
 ## 1. 한 줄 정의
 

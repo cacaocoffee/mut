@@ -2,9 +2,9 @@ package probe.jpa
 
 import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityManagerFactory
-import kr.kcocktail.KcocktailApplication
-import kr.kcocktail.common.entity.BaseEntity
-import kr.kcocktail.support.PostgresSupport
+import kr.mut.MutApplication
+import kr.mut.common.entity.BaseEntity
+import kr.mut.support.PostgresSupport
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.within
 import org.junit.jupiter.api.BeforeAll
@@ -34,20 +34,20 @@ import java.time.temporal.ChronoUnit
  *
  * ## 프로브 테이블을 별도 스키마에 둔다
  *
- * `public` 에 만들면 [kr.kcocktail.architecture.SchemaLintTest] 가 그것까지 린트하고,
+ * `public` 에 만들면 [kr.mut.architecture.SchemaLintTest] 가 그것까지 린트하고,
  * 두 테스트의 실행 순서에 결과가 끌려간다. 스키마를 갈라 서로를 모르게 한다.
  */
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-// probe 패키지가 kr.kcocktail 밖이라 Spring 이 @SpringBootApplication 을 못 찾는다. 명시한다.
-@ContextConfiguration(classes = [KcocktailApplication::class])
+// probe 패키지가 kr.mut 밖이라 Spring 이 @SpringBootApplication 을 못 찾는다. 명시한다.
+@ContextConfiguration(classes = [MutApplication::class])
 // @EntityScan 은 기본 스캔을 **대체한다.** 프로브만 적으면 도메인 엔티티가 관리 대상에서
 // 빠지고, 그것을 쓰는 리포지토리가 "Not a managed type" 으로 죽는다.
 //
 // 클래스를 하나씩 적지 않는다 — 모듈이 생길 때마다 여기를 고쳐야 하고,
 // 고치는 것을 잊으면 **그 모듈과 무관한 이 테스트가** 빨개진다 (ISSUE-005·008 에서 연달아 겪었다).
 // 앱 루트를 통째로 잡고 프로브 패키지만 더한다.
-@EntityScan(basePackages = ["kr.kcocktail", "probe.jpa"])
+@EntityScan(basePackages = ["kr.mut", "probe.jpa"])
 class BaseEntityProbeTest {
 
     @Autowired

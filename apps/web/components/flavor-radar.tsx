@@ -1,4 +1,4 @@
-import { AXES, type Profile } from "@kca/domain";
+import { AXES, type Profile } from "@mut/domain";
 
 const CX = 130;
 const CY = 118;

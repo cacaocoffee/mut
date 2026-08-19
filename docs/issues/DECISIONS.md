@@ -217,7 +217,7 @@ SPEC-05 §8 이 Spring Batch 를 지정했지만, §3 이 이 항목의 판단 �
 | **D-4** | `2 dash`가 `amount_label`인가 `amount+unit`인가 — 시드 방식에 달렸다 | 036 · 043 | 에디터 |
 | **D-5** | oz 표기 — **정확값(1.0141) vs 바텐딩 관례(30ml 반올림)** | 043 | 에디터 |
 | ~~D-6~~ | ~~이미지 업로드·OG 이미지 전략~~ | — | ✅ **해결** (2026-08-12) — 리포지토리 직접 저장. [§1.12](#112-이미지-저장-d-6-해결-2026-08-12) |
-| **D-7** | 개인정보 처리방침·이용약관 문안 | 032 · 050 | **문서 작성** — [A00 §7](https://github.com/cacaocoffee/k-cocktail-archive/issues/1)로 **변호사 자문 불요**가 됐다 |
+| **D-7** | 개인정보 처리방침·이용약관 문안 | 032 · 050 | **문서 작성** — [A00 §7](https://github.com/cacaocoffee/mut/issues/1)로 **변호사 자문 불요**가 됐다 |
 | ~~D-8~~ | ~~`profile` 5축 SPEC-06 추가~~ | — | ✅ **해결** — `cocktail.flavor_profile SMALLINT[5]` 추가 |
 | ~~D-9~~ | ~~`.btn-primary` 대비 3.76:1 — 가/나/다~~ | — | ✅ **해결** (2026-08-19) — **가**. 흰 글자를 얹는 면은 `accent-700` ([ADR-0006](../decisions/ADR-0006-btn-primary-contrast.md)) |
 

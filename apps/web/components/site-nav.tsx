@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useLastViewed } from "@/lib/use-last-viewed";
 import { FINDER_PATH, SEARCH_PATH, UNIFIED_SEARCH_PATH } from "@/lib/routes";
@@ -31,9 +32,19 @@ export function SiteNav() {
 
   return (
     <nav className="nav site-nav">
-      <span className="nav-brand">
-        K-COCKTAIL ARCHIVE<small>KR / EN 아카이브</small>
-      </span>
+      {/* 워드마크가 곧 이름이다 — 글자로 한 번 더 적지 않는다. `next/image` 를 쓰는 이유는
+          포맷 변환이다: png 를 그대로 걸면 `image-guard` 가 막는다 (`NFR-P-06`). */}
+      <Link href={SEARCH_PATH} className="nav-brand" aria-label="MUT 홈으로">
+        <Image
+          src="/brand/mut-mark.png"
+          alt="MUT"
+          width={725}
+          height={545}
+          priority
+          sizes="72px"
+        />
+        <small>당신의 취향, 당신의 멋</small>
+      </Link>
       {/* btn-secondary 를 뺐다 — 테두리 상자였는데 이제 밑줄 인디케이터다 (ISSUE-055) */}
       <div className="tabs">
         {tabs.map((t) => (

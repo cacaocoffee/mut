@@ -85,7 +85,7 @@ export async function renderOgCard({ nameKo, nameEn, meta }: OgCard): Promise<Im
         }}
       >
         <div style={{ display: "flex", fontSize: 28, letterSpacing: 4, color: OG_PALETTE.muted }}>
-          K-COCKTAIL ARCHIVE
+          MUT
         </div>
 
         <div style={{ display: "flex", flexDirection: "column" }}>

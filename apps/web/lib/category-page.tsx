@@ -7,13 +7,13 @@ import {
   FLAVOR_KEY_LABELS,
   STYLE_KEY_LABELS,
   SWEETNESS,
-  TECHNIQUES,
+  TECHNIQUE_LABELS,
   type BaseSpirit,
   type FlavorKey,
   type StyleKey,
   type SweetLevel,
   type Technique,
-} from "@kca/domain";
+} from "@mut/domain";
 import { CATEGORY_AXES, categories, cocktailsByAxis, usingApi, type CategoryAxis } from "./api";
 import { SEARCH_PATH } from "./routes";
 
@@ -53,7 +53,7 @@ const AXIS = {
   method: {
     ko: "메이킹",
     en: "METHOD",
-    labelOf: (slug: string) => TECHNIQUES[slug as Technique]?.ko,
+    labelOf: (slug: string) => TECHNIQUE_LABELS[slug as Technique],
     matches: (c: (typeof COCKTAILS)[number], slug: string) => c.method === slug,
   },
 } as const satisfies Record<CategoryAxis, unknown>;

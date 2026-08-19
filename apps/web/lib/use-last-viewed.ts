@@ -2,8 +2,8 @@
 
 import { useSyncExternalStore } from "react";
 
-const KEY = "kca:last-viewed";
-const EVENT = "kca:last-viewed";
+const KEY = "mut:last-viewed";
+const EVENT = "mut:last-viewed";
 
 /** 시안의 초기 `sel` 값과 같다. 아직 아무것도 안 본 상태의 상세 탭 목적지. */
 export const DEFAULT_COCKTAIL_ID = "negroni";

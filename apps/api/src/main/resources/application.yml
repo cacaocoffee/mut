@@ -1,7 +1,9 @@
 spring:
   application:
-    name: kcocktail-api
+    name: mut-api
   datasource:
+    # 데이터베이스와 롤 이름만 옛 이름이다 — 롤이 `V001` 안에 있고 적용된 마이그레이션은
+    # 고치지 않는다 (G-40). 호스팅이 정해져 DB 를 새로 만드는 날 함께 바꾼다.
     url: ${DB_URL:jdbc:postgresql://localhost:5432/kcocktail}
     username: ${DB_USER:kcocktail_app}
     password: ${DB_PASSWORD:}
@@ -48,34 +50,34 @@ logging:
 # ISSUE-005 — 세션 쿠키 (SPEC-08 §4.1)
 # 도메인은 환경변수다. 호스팅이 미정이고(G-07), SPEC-07 §1.2 가
 # "프론트와 API 가 같은 상위 도메인"을 요구한다.
-kcocktail:
+mut:
   # SPEC-08 §6 — 기본값은 스펙 표 그대로. 사고 시 배포 없이 조이라고 열어 둔다.
   rate-limit:
-    enabled: ${KC_RATE_LIMIT_ENABLED:true}
+    enabled: ${MUT_RATE_LIMIT_ENABLED:true}
     limits: {}
   session:
-    cookie-name: ${KC_SESSION_COOKIE_NAME:KCSESSION}
-    secure: ${KC_SESSION_SECURE:true}
-    cookie-domain: ${KC_SESSION_COOKIE_DOMAIN:}
+    cookie-name: ${MUT_SESSION_COOKIE_NAME:KCSESSION}
+    secure: ${MUT_SESSION_SECURE:true}
+    cookie-domain: ${MUT_SESSION_COOKIE_DOMAIN:}
   # SPEC-07 §4 — 방향이 반대인 유일한 호출. 백엔드가 프론트를 부른다.
   # 기본이 꺼짐인 이유: 로컬에서 프론트를 안 띄웠다고 발행이 막히면 안 된다.
   # 운영은 프로파일 검사가 켜기를 강제한다 (RevalidateStartupCheck).
   # SPEC-06 §4.3 — 앱 강제 불변식의 일 1회 이중 확인 (NFR-D-01·D-02·D-04).
   # `cli: true` 면 한 번 돌고 종료 코드를 남긴다 (배포 게이트).
   verification:
-    scheduled: ${KC_VERIFICATION_SCHEDULED:true}
-    cli: ${KC_VERIFICATION_CLI:false}
+    scheduled: ${MUT_VERIFICATION_SCHEDULED:true}
+    cli: ${MUT_VERIFICATION_CLI:false}
   # FR-INGREDIENT-001 — "국내 유통 기준 200~300개". 넘으면 경고지 차단이 아니다
   # (DECISIONS §1.2 — 상한 근거가 역검색 UX 이지 무결성이 아니다).
   # 상수가 아니라 설정인 이유: 250 이 맞는지 350 이 맞는지는 목록을 띄워 봐야 알고,
   # 경고 하나 조정하자고 배포하지 않는다 (이슈 026 RED 20).
   ingredient:
-    approved-cap: ${KC_INGREDIENT_APPROVED_CAP:300}
+    approved-cap: ${MUT_INGREDIENT_APPROVED_CAP:300}
   revalidate:
-    enabled: ${KC_REVALIDATE_ENABLED:false}
-    url: ${KC_FRONTEND_URL:}
-    secret: ${KC_REVALIDATE_SECRET:}
-    timeout-ms: ${KC_REVALIDATE_TIMEOUT_MS:2000}
+    enabled: ${MUT_REVALIDATE_ENABLED:false}
+    url: ${MUT_FRONTEND_URL:}
+    secret: ${MUT_REVALIDATE_SECRET:}
+    timeout-ms: ${MUT_REVALIDATE_TIMEOUT_MS:2000}
   # ISSUE-030 — 소셜 로그인 (SPEC-08 §4.2 · §5.1)
   #
   # 시크릿에 기본값을 두지 않는다. 빠뜨린 채로 기동하면 로그인 시도 때 제공자가 401 을 주고,
@@ -89,9 +91,9 @@ kcocktail:
   # CI 가 카카오 장애를 따라 빨개진다. 비우면 제공자 기본값이다.
   oauth:
     # 제공자 콘솔에 등록한 값과 글자 단위로 같아야 한다. 오픈 리다이렉트의 1차 방어선이다.
-    redirect-base: ${KC_OAUTH_REDIRECT_BASE:http://localhost:8080}
+    redirect-base: ${MUT_OAUTH_REDIRECT_BASE:http://localhost:8080}
     # 로그인 후 되돌아갈 수 있는 프론트 주소. 목록 밖이면 첫 항목으로 간다 (거부가 아니다).
-    allowed-returns: ${KC_OAUTH_ALLOWED_RETURNS:http://localhost:3000}
+    allowed-returns: ${MUT_OAUTH_ALLOWED_RETURNS:http://localhost:3000}
     kakao:
       client-id: ${KAKAO_CLIENT_ID:}
       client-secret: ${KAKAO_CLIENT_SECRET:}

@@ -1,4 +1,4 @@
-# apps/api — K-Cocktail Archive API
+# apps/api — MUT API
 
 Kotlin + Spring Boot 3.x · PostgreSQL 16 (`PRIN-T01` · [SPEC-05 §1](../../docs/spec/SPEC-05_아키텍처.md))
 
@@ -38,8 +38,8 @@ Kotlin + Spring Boot 3.x · PostgreSQL 16 (`PRIN-T01` · [SPEC-05 §1](../../doc
 테스트는 Testcontainers 가 알아서 띄운다. **직접 DB 를 세울 필요는 `bootRun` 할 때뿐이다.**
 
 ```bash
-docker run -d --name kcocktail-db -p 5432:5432 \
-  -e POSTGRES_DB=kcocktail -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres \
+docker run -d --name mut-db -p 5432:5432 \
+  -e POSTGRES_DB=mut -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres \
   postgres:16-alpine
 
 ./gradlew bootRun   # Flyway 가 기동 시 V001 을 적용한다
@@ -87,7 +87,7 @@ REVOKE DELETE ON cocktail FROM kcocktail_app;
 | 속성 | 값 | 왜 |
 |---|---|---|
 | `httpOnly` | 항상 | JS 가 못 읽는다 → XSS 로 탈취되지 않는다 (`NFR-SEC-01`) |
-| `Secure` | `KC_SESSION_SECURE` | 로컬 `http://localhost` 에서만 `false` |
+| `Secure` | `MUT_SESSION_SECURE` | 로컬 `http://localhost` 에서만 `false` |
 | `SameSite` | `Lax` | 크로스 사이트 POST 는 막고 링크 이동은 살린다 |
 | 저장소 | Spring Session **JDBC** | SPEC-08 §9 — Phase 1 은 DB 로 충분. Redis 는 인스턴스가 늘면 |
 
@@ -122,9 +122,9 @@ SPEC-07 §1.2 가 인증 방식으로 호스팅에 제약을 걸었다 — **호
 
 | 환경변수 | 기본값 | 비고 |
 |---|---|---|
-| `KC_SESSION_SECURE` | `true` | 로컬만 `false` |
-| `KC_SESSION_COOKIE_DOMAIN` | (비움) | 서브도메인 공유가 필요하면 `.example.kr` |
-| `KC_SESSION_COOKIE_NAME` | `KCSESSION` | |
+| `MUT_SESSION_SECURE` | `true` | 로컬만 `false` |
+| `MUT_SESSION_COOKIE_DOMAIN` | (비움) | 서브도메인 공유가 필요하면 `.example.kr` |
+| `MUT_SESSION_COOKIE_NAME` | `KCSESSION` | |
 
 ## CSRF · 레이트 리밋 (SPEC-08 §4.3 · §6)
 
@@ -160,7 +160,7 @@ CSRF 대신 레이트 리밋이 방어한다. 설정 파일로 빼지 않는 이
 한도는 설정으로 덮는다 — 사고가 났을 때 배포 없이 조인다.
 
 ```yaml
-kcocktail:
+mut:
   rate-limit:
     limits:
       search: 30
@@ -189,7 +189,7 @@ val body = MarkdownSanitizer.sanitize(request.body)   // 저장 직전
 ## 구조 (SPEC-05 §2)
 
 ```
-src/main/kotlin/kr/kcocktail/
+src/main/kotlin/kr/mut/
 ├─ cocktail/ ingredient/ search/ user/ admin/     ← Phase 1a
 ├─ bar/ partner/ content/ stock/                  ← Phase 1b·2 (빈 패키지)
 └─ common/                                        ← 공용 커널

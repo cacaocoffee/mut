@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "이용약관",
-  description: "K-Cocktail Archive 이용에 관한 약관.",
+  description: "MUT 이용에 관한 약관.",
   robots: { index: false, follow: true },
 };
 

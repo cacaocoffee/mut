@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "개인정보 처리방침",
-  description: "K-Cocktail Archive 가 수집하는 항목과 이용 목적.",
+  description: "MUT 가 수집하는 항목과 이용 목적.",
   // 문안이 확정되기 전까지 색인되지 않게 한다. 플레이스홀더가 검색에 걸리면
   // 그 자체가 잘못된 고지가 된다.
   robots: { index: false, follow: true },

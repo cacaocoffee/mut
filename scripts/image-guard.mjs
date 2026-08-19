@@ -8,11 +8,14 @@
  * | 히어로 밖은 `loading="lazy"` | `NFR-P-06` (차단) |
  * | 반응형 `sizes` 를 준다 | `NFR-P-06` (차단) |
  *
- * ## 지금은 검사할 이미지가 없다
+ * ## 사진은 아직 없고 로고만 있다
  *
- * 화면의 이미지는 전부 자리표시자다 (`PhotoSlot` — 해칭 무늬와 캡션). 실제 사진 자산이
+ * 콘텐츠 사진은 전부 자리표시자다 (`PhotoSlot` — 해칭 무늬와 캡션). 실제 사진 자산이
  * 없어서이고(G-07 이미지 저장소 미정), **그래서 이 게이트를 지금 세운다** —
  * 첫 사진이 들어오는 날 규칙을 기억하는 사람이 없어도 여기서 걸린다.
+ *
+ * 지금 걸리는 것은 헤더의 워드마크 하나다. 몇 개를 봤는지 함께 찍는다 — "통과" 만
+ * 나오면 검사기가 아무것도 안 보고 있는 상태와 구분되지 않는다.
  *
  *   node scripts/image-guard.mjs        (npm run check 가 부른다)
  */
@@ -27,6 +30,7 @@ const SCAN = ["apps/web/app", "apps/web/components", "apps/web/lib"];
 const EAGER_ALLOWED = /hero|opengraph/i;
 
 const findings = [];
+let checked = 0;
 
 function walk(dir) {
   for (const name of readdirSync(dir)) {
@@ -49,6 +53,7 @@ function inspect(abs) {
 
   for (const m of source.matchAll(/<(img|Image)\s([^>]*)>/gs)) {
     const [, tag, attrs] = m;
+    checked += 1;
     const line = source.slice(0, m.index).split("\n").length;
     const where = `${rel}:${line} <${tag}>`;
 
@@ -76,4 +81,8 @@ if (findings.length > 0) {
   process.exit(1);
 }
 
-console.log("image-guard: 통과 — 검사 대상 이미지 없음 (전부 자리표시자, G-07)");
+console.log(
+  checked === 0
+    ? "image-guard: 통과 — 검사 대상 이미지 없음 (전부 자리표시자, G-07)"
+    : `image-guard: ${checked}개 통과`,
+);

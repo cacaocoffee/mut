@@ -1,7 +1,7 @@
 # 디자인 — Modernist
 
 시안 출처: Claude Design 프로젝트 `27a7afff-c9db-44e9-834a-359e928c9b81`
-원본 사본: [`source/K-Cocktail-Archive.dc.html`](./source/K-Cocktail-Archive.dc.html)
+원본 사본: [`source/MUT.dc.html`](./source/MUT.dc.html)
 
 > **PRD 부록 A를 읽지 말 것.** 그건 시안을 못 본 상태에서 쓴 제안안이고 폐기됐다.
 > 경위는 [ADR-0001](../decisions/ADR-0001-design-system.md).

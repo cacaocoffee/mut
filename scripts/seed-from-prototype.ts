@@ -29,7 +29,7 @@
  */
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { COCKTAILS, type Cocktail, type Ingredient } from "@kca/domain";
+import { COCKTAILS, type Cocktail, type Ingredient } from "@mut/domain";
 
 /* ─────────────────  재료 마스터  ───────────────── */
 

@@ -28,13 +28,13 @@ interface Trail {
 
 declare global {
   interface Window {
-    __kcaTrail?: Trail;
+    __mutTrail?: Trail;
   }
 }
 
 function trail(): Trail {
   if (typeof window === "undefined") return { previous: null, current: null };
-  return (window.__kcaTrail ??= { previous: null, current: null });
+  return (window.__mutTrail ??= { previous: null, current: null });
 }
 
 /** 화면이 바뀔 때마다 부른다. 직전 경로를 밀어 둔다. */

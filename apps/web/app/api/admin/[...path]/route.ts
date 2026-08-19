@@ -10,7 +10,7 @@ import { headers } from "next/headers";
  * 세션 쿠키를 넘긴다 (SPEC-07 §1.2). CSRF 토큰도 그대로 옮긴다 — 쓰기 요청은 서버가
  * `X-CSRF-Token` 을 요구한다.
  */
-const BASE = process.env.KC_API_URL?.replace(/\/$/, "") ?? "";
+const BASE = process.env.MUT_API_URL?.replace(/\/$/, "") ?? "";
 
 async function proxy(request: Request, path: string[]): Promise<Response> {
   if (!BASE) return Response.json({ error: "API 주소가 없다" }, { status: 503 });

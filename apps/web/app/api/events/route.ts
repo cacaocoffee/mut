@@ -19,7 +19,7 @@ import { headers } from "next/headers";
  * 수집이 안 되는 것보다 화면이 멈추는 것이 나쁘다 (`NFR-R-04`). 상류가 죽었든 주소가
  * 없든 **`202`** 로 답한다 — 클라이언트는 어차피 결과를 보지 않고, 재시도하지도 않는다.
  */
-const BASE = process.env.KC_API_URL?.replace(/\/$/, "") ?? "";
+const BASE = process.env.MUT_API_URL?.replace(/\/$/, "") ?? "";
 
 /** 서버가 요구하는 헤더 이름 (`IdempotencyFilter.HEADER`). */
 const IDEMPOTENCY_HEADER = "Idempotency-Key";

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { components } from "@kca/domain/generated/api";
+import type { components } from "@mut/domain/generated/api";
 import { ENTITY_LABELS, SearchBox } from "@/components/search-box";
 import { SEARCH_PATH } from "@/lib/routes";
 import { track } from "@/lib/analytics/core";

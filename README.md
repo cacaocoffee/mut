@@ -1,10 +1,15 @@
-# K-Cocktail Archive
+<p align="center">
+  <img src="apps/web/public/brand/mut-lockup.png" alt="MUT — 당신의 취향, 당신의 멋" width="360">
+</p>
+
+# MUT — 당신의 취향, 당신의 멋
 
 국내 칵테일 · 바 큐레이션 플랫폼. 레시피 DB와 바 큐레이션을 하나의 그래프로 묶는다.
 
-**현재 상태 — 스펙 완료 · 프론트 프로토타입.**
-칵테일 24종이 정적 배열에 있고 탐색 · 상세 · 파인더 3개 화면이 동작한다.
-백엔드(Kotlin/Spring)와 어드민은 아직 코드가 없다.
+**현재 상태 — Phase 1a 구현 완료.**
+Kotlin/Spring API · Postgres 시드 41종 · 어드민(편집 · 레시피 · 재료 승인 · 검증 태스크 ·
+감사 로그) · 공개 화면 5종이 동작한다. e2e 237건이 CI 에서 돈다.
+남은 것은 호스팅 · 이미지 저장소 같은 **사업 결정**이다 ([G-07](docs/prd/GAPS.md)).
 
 ```bash
 npm install
@@ -16,8 +21,10 @@ npm run check      # 코퍼스 불변식만 (빠름)
 ## 구조
 
 ```
+apps/api/                 Kotlin/Spring — 도메인 · 어드민 API · 배치
+  src/main/kotlin/kr/mut/   모듈 경계는 SPEC-05 §3 방향표가 정본
 apps/web/                 Next.js 16 (App Router)
-  app/                      / · /cocktails/[id] · /finder
+  app/                      /cocktails/search · /cocktails/[slug] · /finder · /search · /admin
   components/               화면 단위 컴포넌트
 packages/domain/          타입 · 데이터 · 검색/파인더 로직 — 프레임워크 비의존
   src/types.ts              분류 3축의 정본
@@ -42,9 +49,10 @@ docs/                     문서 23개 — 아래 참조
 | 시스템 스펙 | [`docs/spec/`](docs/spec/) — SPEC-00~08 · 10 |
 | 화면 명세 | [`docs/screens/`](docs/screens/) |
 | 디자인 | [`docs/design/README.md`](docs/design/README.md) |
-| 결정 기록 | [`docs/decisions/`](docs/decisions/) — ADR 4건 |
+| 결정 기록 | [`docs/decisions/`](docs/decisions/) — ADR 6건 |
+| 배포 전 사람 확인 | [`docs/RELEASE-CHECKLIST.md`](docs/RELEASE-CHECKLIST.md) |
 | 추적 · 게이트 | [`docs/TRACE-00_추적매트릭스.md`](docs/TRACE-00_추적매트릭스.md) |
-| 아직 안 정해진 것 | [`docs/prd/GAPS.md`](docs/prd/GAPS.md) — 17건 중 2건 남음 |
+| 아직 안 정해진 것 | [`docs/prd/GAPS.md`](docs/prd/GAPS.md) |
 
 ## 범위
 
@@ -90,7 +98,7 @@ Phase 1을 둘로 나눴다 ([SPEC-01 §4](docs/spec/SPEC-01_시스템개요_범
 
 | | 성격 |
 |---|---|
-| 호스팅 · 이미지 저장소 결정 | **사업/인프라** — 스펙으로 풀리지 않는다 |
+| 호스팅 · 이미지 저장소 결정 | **사업/인프라** — 스펙으로 풀리지 않는다 ([G-07](docs/prd/GAPS.md)) |
 | 법률 검토 1회 | **외부** — [ADR-0004](docs/decisions/ADR-0004-age-gate.md)의 전제 확인 포함 |
-| Kotlin/Spring 백엔드 착수 | 구현 |
-| 어드민 UI 구현 | 구현 — 명세는 [SCREENS-06](docs/screens/SCREENS-06_어드민.md) |
+| 시드 데이터 다듬기 | 에디터 판단 — 계량 표기 · oz 반올림 ([DECISIONS](docs/issues/DECISIONS.md) D-3~D-5) |
+| Phase 1b 바 · 제휴 | 스펙 완료, 착수 보류 |

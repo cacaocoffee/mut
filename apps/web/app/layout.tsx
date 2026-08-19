@@ -44,8 +44,9 @@ const DESCRIPTION =
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "K-Cocktail Archive",
-    template: "%s · K-Cocktail Archive",
+    // 검색 결과에 이름만 뜨면 무엇을 하는 곳인지 알 수 없다. 태그라인이 그 자리를 맡는다
+    default: "MUT — 당신의 취향, 당신의 멋",
+    template: "%s · MUT",
   },
   description: DESCRIPTION,
   openGraph: {

@@ -1,5 +1,5 @@
 import type { CocktailView } from "./cocktail-view";
-import { formatQuantity } from "@kca/domain";
+import { formatQuantity } from "@mut/domain";
 import { SITE_URL } from "./site";
 
 /**

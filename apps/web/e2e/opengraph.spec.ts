@@ -141,7 +141,7 @@ test("RED20 - 공개 페이지 전부에 OG 가 있다", async ({ request }) => 
     expect(metaOf(source, "og:title"), `${path} 에 og:title 이 없다`).not.toBeNull();
     expect(metaOf(source, "og:image"), `${path} 에 og:image 가 없다`).toMatch(/^https?:\/\//);
     expect(metaOf(source, "og:site_name"), `${path} 에 사이트 이름이 없다`).toBe(
-      "K-Cocktail Archive",
+      "MUT",
     );
   }
 });

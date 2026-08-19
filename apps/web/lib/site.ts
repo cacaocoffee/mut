@@ -5,12 +5,12 @@
  * 카카오톡도 구글도 상대 경로를 따라오지 않는다. 세 곳이 각자 환경변수를 읽으면
  * 슬래시 하나 차이로 갈리므로 여기서 한 번만 정리한다.
  *
- * 호스팅이 미정이라(G-07) 기본값은 로컬이다. 배포에서 `KC_SITE_URL` 을 넣는다.
+ * 호스팅이 미정이라(G-07) 기본값은 로컬이다. 배포에서 `MUT_SITE_URL` 을 넣는다.
  */
-export const SITE_URL = (process.env.KC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
+export const SITE_URL = (process.env.MUT_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
 
 /** 카드에 찍히는 이름. 브랜드 표기는 한 곳에서 온다. */
-export const SITE_NAME = "K-Cocktail Archive";
+export const SITE_NAME = "MUT";
 
 /**
  * 페이지가 자기 OG 를 적을 때 쓰는 바탕.

@@ -63,7 +63,7 @@ export function searchItemOf(c: Cocktail): SearchItem {
   };
 }
 
-/** 빌드 부트스트랩용 코퍼스. `KC_API_URL` 이 있으면 쓰지 않는다. */
+/** 빌드 부트스트랩용 코퍼스. `MUT_API_URL` 이 있으면 쓰지 않는다. */
 export const PROTOTYPE_CORPUS: SearchItem[] = COCKTAILS.map(searchItemOf);
 
 export interface Filters {

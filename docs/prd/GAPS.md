@@ -407,7 +407,7 @@ ADR-0001이 각주로 경고했지만 강제되지 않았다. `accent-700`(6.41:
 **나머지는 사업 결정이라 스펙으로 풀리지 않는다.**
 
 **진행 (2026-08-07)** — **에디터 채용 형태 해소**: 사용자 본인 + 주변인이 맡는다.
-`GATE-COCKTAIL-01`이 막는 `tasting_note` 작성 담당이 확보됐다 ([이슈 036](https://github.com/cacaocoffee/k-cocktail-archive/issues/38)).
+`GATE-COCKTAIL-01`이 막는 `tasting_note` 작성 담당이 확보됐다 ([이슈 036](https://github.com/cacaocoffee/mut/issues/38)).
 나머지 9건은 여전히 사업 결정이다.
 
 ---
@@ -452,7 +452,7 @@ TRACE-00은 스스로를 "구현 경로를 갖는지 확인하는 문서"라 규
 | **나** | **저장·컬렉션은 API만 1a, 화면은 1b** | `FR-USER-004`의 "공유 링크 생성"까지 API로 충족. **파인더는 프로토타입 화면이 이미 있어 SCREENS-03을 "기존 화면 문서화"로 가볍게** |
 | 다 | 해당 FR을 Phase 2로 내린다 | SPEC-01 §4.1 개정 — 범위 축소 |
 
-**나안을 택했다** — [이슈 031](https://github.com/cacaocoffee/k-cocktail-archive/issues/33)을 API 범위로 축소하고 화면은 1b로 넘긴다.
+**나안을 택했다** — [이슈 031](https://github.com/cacaocoffee/mut/issues/33)을 API 범위로 축소하고 화면은 1b로 넘긴다.
 
 ### G-19
 
@@ -471,7 +471,7 @@ TRACE-00 §3.5의 `FR-USER-002` ERD 칸에 `ingredient_brand.is_sponsored` 병�
 **그건 태스크 발생 조건이지 큐 저장소가 아니다.** 큐를 구현하려면 테이블이 필요하다.
 [SPEC-06 §4.3](../spec/SPEC-06_데이터모델_ERD.md)이 "위반 건을 관리자 태스크로 올린다"고 한 것도 저장소를 전제한다.
 
-→ [이슈 016](https://github.com/cacaocoffee/k-cocktail-archive/issues/18)·[022](https://github.com/cacaocoffee/k-cocktail-archive/issues/24)가 만들되 **SPEC-06 개정이 선행**돼야 한다.
+→ [이슈 016](https://github.com/cacaocoffee/mut/issues/18)·[022](https://github.com/cacaocoffee/mut/issues/24)가 만들되 **SPEC-06 개정이 선행**돼야 한다.
 
 **부수 발견** — [TRACE-00 §3.5](../TRACE-00_추적매트릭스.md)의 `FR-USER-002` ERD 칸이 `article.is_sponsored` 하나뿐이다.
 `article`은 Phase 2라 **1a에 경로가 없어 보인다.** FR 본문은 "`R-F1.3-3`의 광고성 구분 표기와 같은 지점에서 처리한다"고 했으므로
@@ -489,12 +489,12 @@ TRACE-00 §3.5의 `FR-USER-002` ERD 칸에 `ingredient_brand.is_sponsored` 병�
 
 SPEC-07 §1.3이 "스코프 상세는 SPEC-08"이라고 **명시적으로 위임**했으므로 SPEC-08이 이긴다.
 SPEC-08 §2.2의 권한 분리(중립성 장치) 논리와도 맞는다.
-→ **`admin` 승인으로 구현**([이슈 026](https://github.com/cacaocoffee/k-cocktail-archive/issues/28)). **SPEC-03 문구를 고칠지 결정 필요.**
+→ **`admin` 승인으로 구현**([이슈 026](https://github.com/cacaocoffee/mut/issues/28)). **SPEC-03 문구를 고칠지 결정 필요.**
 
 **② 카테고리 소개 문구** — `FR-COCKTAIL-031`은 **P1**인데 `NFR-S-07`은 **"발행 차단"**(배포 차단급)이다.
 P1 기능이 P0 발행을 막는 구조다.
 → 보수적으로 **구조는 1a에 만들되 없어도 발행은 된다**로 구현. `NFR-S-07`의 차단은 P1 착수 시 적용
-([이슈 022](https://github.com/cacaocoffee/k-cocktail-archive/issues/24)·[039](https://github.com/cacaocoffee/k-cocktail-archive/issues/41)). **둘 중 하나의 우선순위를 맞춰야 한다.**
+([이슈 022](https://github.com/cacaocoffee/mut/issues/24)·[039](https://github.com/cacaocoffee/mut/issues/41)). **둘 중 하나의 우선순위를 맞춰야 한다.**
 
 ### G-21
 
@@ -692,15 +692,15 @@ CONVENTIONS §4의 한 줄을 이 표로 교체했다. **`styles.css`의 3단 �
 | 한글 담는 칸 12px 바닥 | 접근성 — [G-16](#g-16)과 같은 원인(시안이 한글 미검증) | 있음 (부분) |
 | **내비 마스트헤드 재구성** | **취향** — 근거는 외부 스킬의 의견이고 측정된 것이 아니다 | **있음** |
 
-⚠️ **셋째는 시안이 의도한 형태를 덮는다.** 시안 원본 `K-Cocktail-Archive.dc.html:23-30`이
+⚠️ **셋째는 시안이 의도한 형태를 덮는다.** 시안 원본 `MUT.dc.html:23-30`이
 브랜드 좌측 + 번호 탭 3개 우측을 명시적으로 그렸고 현재 구현은 거기 충실했다.
 제품 소유자 지시로 진행하되 **`styles.css`의 `.nav`는 건드리지 않아** 되돌리는 비용을 낮게 뒀다.
 되돌리는 조건은 `cross_nav` 계측이다 (ADR-0005).
 
-**이슈** — [#69](https://github.com/cacaocoffee/k-cocktail-archive/issues/69) 반응형 바닥 ·
-[#70](https://github.com/cacaocoffee/k-cocktail-archive/issues/70) 토큰 규율 ·
-[#71](https://github.com/cacaocoffee/k-cocktail-archive/issues/71) 아이브로우·내비 ·
-[#72](https://github.com/cacaocoffee/k-cocktail-archive/issues/72) 램프·한글 바닥
+**이슈** — [#69](https://github.com/cacaocoffee/mut/issues/69) 반응형 바닥 ·
+[#70](https://github.com/cacaocoffee/mut/issues/70) 토큰 규율 ·
+[#71](https://github.com/cacaocoffee/mut/issues/71) 아이브로우·내비 ·
+[#72](https://github.com/cacaocoffee/mut/issues/72) 램프·한글 바닥
 
 > **남는 위험** — 형태 드리프트에는 자동 검증이 없다. 램프 값만 `color-parity.mjs`가 잡는다.
 > 개정이 쌓이면 `docs/design/source/`는 점점 참조 문서가 아니게 된다.
@@ -719,7 +719,7 @@ CONVENTIONS §4의 한 줄을 이 표로 교체했다. **`styles.css`의 3단 �
 
 놓친 구분이 이것이다 — **Facade 를 거치면 `repository` 직행만 막힌다. 모듈 간 화살표는 그대로 반대다.** `ModuleBoundaryTest` 의 `RED6`(방향표 위반)·`RED7`(순환)이 둘 다 걸렸다.
 
-**해결 (2026-08-12)** — 같은 이슈가 적어 둔 **2안**으로 갔다. `SEARCH ──reads──▶ COCKTAIL · INGREDIENT` 가 방향표에 있고, `search` 는 여러 도메인을 읽으라고 있는 모듈이다. `GET /ingredients/{slug}/cocktails` 를 `kr.kcocktail.search.ingredient` 로 옮겼다.
+**해결 (2026-08-12)** — 같은 이슈가 적어 둔 **2안**으로 갔다. `SEARCH ──reads──▶ COCKTAIL · INGREDIENT` 가 방향표에 있고, `search` 는 여러 도메인을 읽으라고 있는 모듈이다. `GET /ingredients/{slug}/cocktails` 를 `kr.mut.search.ingredient` 로 옮겼다.
 
 > **URL 과 모듈은 별개다.** URL 은 사용자가 읽는 자원 구조이고 모듈은 코드의 의존 방향이다.
 > `search/list/CocktailListController` 가 `/cocktails` 를 잡는 것과 같은 패턴이다.
@@ -752,7 +752,7 @@ CONVENTIONS §4의 한 줄을 이 표로 교체했다. **`styles.css`의 3단 �
 **함께 처리한 것 두 가지.**
 
 - **감사 확장** — 재료 승인을 `audit_log`에 남긴다 (`AuditAction.APPROVE`, `V023`). `PRIN-T08`이 열거한 4종에 없지만 [DECISIONS §1.3](../issues/DECISIONS.md)이 추가로 확정했다. 근거는 `PRIN-D01`이다 — 누가 통과시켰는지 없으면 오염을 되짚을 수 없다. [G-26](#g-26)의 `slug_change_attempt`와 같은 성격의 확장이다.
-- **상한이 설정이 됐다** — `IngredientService.APPROVED_CAP` 상수를 `kcocktail.ingredient.approved-cap`으로 뺐다. `FR-INGREDIENT-001`의 "200~300개"는 범위이고 근거도 "역검색 UX"라는 관찰이다. 250인지 350인지는 목록을 띄워 봐야 알고, **경고 하나 조정하자고 배포하지 않는다.**
+- **상한이 설정이 됐다** — `IngredientService.APPROVED_CAP` 상수를 `mut.ingredient.approved-cap`으로 뺐다. `FR-INGREDIENT-001`의 "200~300개"는 범위이고 근거도 "역검색 UX"라는 관찰이다. 250인지 350인지는 목록을 띄워 봐야 알고, **경고 하나 조정하자고 배포하지 않는다.**
 
 > **덤으로 발견한 결함** — 매핑이 없는 경로가 404가 아니라 **500**이었다. 부트 3.2부터 이 경우는 `NoHandlerFoundException`이 아니라 `NoResourceFoundException`으로 오는데 `ApiExceptionHandler`가 옛 예외만 걸고 있어 catch-all이 받았다. 상태가 틀린 것보다 나쁜 게 따라온다 — 없는 경로를 긁는 봇 하나가 `ERROR` 로그를 채워 진짜 500을 묻는다. `RestConventionTest`에 회귀 테스트를 세웠다.
 
@@ -822,7 +822,7 @@ CONVENTIONS §4의 한 줄을 이 표로 교체했다. **`styles.css`의 3단 �
 둘 다 의도된 것이다 — [`types.ts`](../../packages/domain/src/types.ts) 가 "분류 축의 한국어 이름은
 계약, **화면 표시 문구**는 `data.ts`" 라고 나눴다. 문제는 **같은 화면이 출처에 따라 다른 이름을
 보여 준다**는 것이다: 카테고리 페이지는 API 가 붙으면 `스터`, 프로토타입이면 `휘저어 섞기` 다
-(`KC_API_URL` 을 주고 `apps/web/e2e/category.spec.ts` 를 돌리면 그 자리에서 깨진다).
+(`MUT_API_URL` 을 주고 `apps/web/e2e/category.spec.ts` 를 돌리면 그 자리에서 깨진다).
 
 이슈 040 의 필터 칩은 `TECHNIQUES` 쪽을 쓴다 — 칩은 "무엇을 하는지" 를 말해야 하고
 `스터`·`빌드`는 그 자체로는 뜻이 통하지 않는다.
@@ -954,7 +954,7 @@ GET /api/v1/search?q=네그로니  →  matchedCount: 0
 [SPEC-10 §4.2](../spec/SPEC-10_계측_이벤트.md) 가 `filter_apply.axis` 를 여섯으로 적었다 —
 `sweet` · `base` · `style` · `flavor` · `abv` · `query`. 그런데 화면의 필터 축은
 **기주 · 스타일 · 메이킹 · 당도 · 도수 · 맛/향** 여섯에 키워드까지 일곱이다.
-`method`(메이킹)는 [이슈 040](https://github.com/cacaocoffee/k-cocktail-archive/issues/42)이
+`method`(메이킹)는 [이슈 040](https://github.com/cacaocoffee/mut/issues/42)이
 `FR-SEARCH-001` 을 채우며 더한 축이고, SPEC-10 은 그 전에 쓰였다.
 
 **보내기로 했다.** 이 이벤트의 쓰임이 "축이 여섯인데 실제로 뭘 쓰나 — **안 쓰는 축은 UI 에서
@@ -1028,3 +1028,23 @@ DB · CMS · 백엔드 스택이 확정되면서 SPEC-05·06·07이 나왔고, �
 3. **SPEC-04 NFR** ([G-16](#g-16)) — accent 대비 3:1 제약 명문화 포함
 
 **호스팅 · 이미지 저장소**는 위와 병행해 결정한다. 스펙을 더 써도 풀리지 않는 항목이다.
+
+### G-40
+
+**DB 롤과 데이터베이스 이름만 옛 이름으로 남았다** *(이슈 052 — MUT 이름 바꾸기)*
+
+`kcocktail` → `mut` 로 저장소·패키지·환경변수·문서를 전부 바꿨는데 **셋을 남겼다.**
+
+| 남은 것 | 어디 | 왜 |
+|---|---|---|
+| `kcocktail_app` · `kcocktail_migrate` · `kcocktail_web` 롤 | `V001__baseline.sql` | **적용된 마이그레이션은 불변이다** (CONVENTIONS §4) |
+| `kcocktail` 데이터베이스 | `application.yml` 기본값 · CI 워크플로 | 롤과 짝이라 한쪽만 바꾸면 더 헷갈린다 |
+
+마이그레이션을 고치면 Flyway 체크섬이 달라져 **이미 적용된 곳에서 부팅이 막힌다.** 지금은
+로컬과 테스트컨테이너뿐이라 고쳐도 티가 안 나지만, 그 규칙을 한 번 어기면 다음 사람이
+"운영에 안 나갔으니 괜찮다"를 다시 판단해야 한다.
+
+**남은 일**: 바꾸려면 새 마이그레이션에서 `ALTER ROLE … RENAME TO` 를 하고, 데이터베이스
+이름은 배포 시점에 새 이름으로 만든다 (`ALTER DATABASE … RENAME` 은 접속을 끊어야 한다).
+호스팅이 정해지는 날([G-07](#g-07)) 함께 하는 것이 싸다 — 그때 DB 를 새로 만든다.
+

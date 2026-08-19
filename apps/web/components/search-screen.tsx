@@ -10,7 +10,7 @@ import {
   STYLE_LABELS,
   SWEETNESS,
   SWEET_LEVELS,
-  TECHNIQUES,
+  TECHNIQUE_LABELS,
   facetCounts,
   filterCocktails,
   toFilterQuery,
@@ -22,7 +22,7 @@ import {
   type SearchItem,
   type StyleKey,
   type Technique,
-} from "@kca/domain";
+} from "@mut/domain";
 import { SEARCH_PATH } from "@/lib/routes";
 import { filterApply, type FilterAxis } from "@/lib/analytics/events";
 import { CocktailCard } from "./cocktail-card";
@@ -163,7 +163,7 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
       : "기주 전체",
     filters.styles.length ? filters.styles.map((s) => STYLE_LABELS[s]).join("/") : "스타일 전체",
     filters.methods.length
-      ? filters.methods.map((m) => TECHNIQUES[m].ko).join("/")
+      ? filters.methods.map((m) => TECHNIQUE_LABELS[m]).join("/")
       : "메이킹 전체",
     filters.flavors.length ? `${filters.flavors.length}개 향` : "향 전체",
     filters.abvBands.length
@@ -259,7 +259,7 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
             label="메이킹 METHOD"
             counts={counts.method}
             selected={filters.methods}
-            labelOf={(slug) => TECHNIQUES[slug as Technique].ko}
+            labelOf={(slug) => TECHNIQUE_LABELS[slug as Technique]}
             onToggle={(slug) => toggle("methods", "method", slug as Technique)}
           />
 

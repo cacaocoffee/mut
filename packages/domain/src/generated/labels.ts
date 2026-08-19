@@ -60,9 +60,9 @@ export const SWEET_LEVEL_LABELS = {
 
 /** 축 3 · 메이킹 방법 (단일값 필수) */
 export const TECHNIQUE_LABELS = {
-  "build": "빌드",
-  "shake": "셰이크",
-  "stir": "스터",
+  "build": "잔에서 조립",
+  "shake": "흔들어 섞기",
+  "stir": "휘저어 섞기",
   "blend": "블렌드",
   "etc": "기타",
 } as const;

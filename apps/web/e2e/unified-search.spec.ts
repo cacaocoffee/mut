@@ -1,7 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import type { components } from "@kca/domain/generated/api";
+import type { components } from "@mut/domain/generated/api";
 
 type SearchResponse = components["schemas"]["SearchResponse"];
 type SearchHit = components["schemas"]["SearchHit"];

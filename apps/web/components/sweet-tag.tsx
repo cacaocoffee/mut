@@ -1,5 +1,5 @@
-import { SWEETNESS } from "@kca/domain";
-import type { SweetLevel } from "@kca/domain";
+import { SWEETNESS } from "@mut/domain";
+import type { SweetLevel } from "@mut/domain";
 
 /**
  * 당도 4단계를 accent 램프 위에서 단계적으로 진해지게 표기한다.
