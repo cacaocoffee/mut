@@ -177,6 +177,105 @@
         "required" : [ "aliases", "category", "domesticAvailability", "id", "isApproved", "nameEn", "nameKo", "slug" ],
         "type" : "object"
       },
+      "AdminRecipeIngredient" : {
+        "properties" : {
+          "amount" : {
+            "type" : "number"
+          },
+          "amountLabel" : {
+            "type" : "string"
+          },
+          "countsForStock" : {
+            "type" : "boolean"
+          },
+          "ingredientId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "ingredientSlug" : {
+            "type" : "string"
+          },
+          "isApproved" : {
+            "type" : "boolean"
+          },
+          "isOptional" : {
+            "type" : "boolean"
+          },
+          "nameKo" : {
+            "type" : "string"
+          },
+          "position" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "role" : {
+            "type" : "string"
+          },
+          "substituteIngredientId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "substituteNote" : {
+            "type" : "string"
+          },
+          "unit" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "countsForStock", "ingredientId", "isApproved", "isOptional", "position" ],
+        "type" : "object"
+      },
+      "AdminRecipeResponse" : {
+        "properties" : {
+          "abvCalculated" : {
+            "type" : "number"
+          },
+          "cocktailId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "exists" : {
+            "type" : "boolean"
+          },
+          "ingredients" : {
+            "items" : {
+              "$ref" : "#/components/schemas/AdminRecipeIngredient"
+            },
+            "type" : "array"
+          },
+          "note" : {
+            "type" : "string"
+          },
+          "servingCount" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "steps" : {
+            "items" : {
+              "$ref" : "#/components/schemas/AdminRecipeStep"
+            },
+            "type" : "array"
+          }
+        },
+        "required" : [ "cocktailId", "exists", "ingredients", "servingCount", "steps" ],
+        "type" : "object"
+      },
+      "AdminRecipeStep" : {
+        "properties" : {
+          "stepNo" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "techniqueRef" : {
+            "type" : "string"
+          },
+          "text" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "stepNo", "text" ],
+        "type" : "object"
+      },
       "AuditLogItem" : {
         "properties" : {
           "action" : {
@@ -1077,6 +1176,53 @@
         "required" : [ "availability", "brands", "nameKo", "slug" ],
         "type" : "object"
       },
+      "RecipeIngredientInput" : {
+        "properties" : {
+          "amount" : {
+            "type" : "number"
+          },
+          "amountLabel" : {
+            "type" : "string"
+          },
+          "countsForStock" : {
+            "type" : "boolean"
+          },
+          "ingredientId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "isOptional" : {
+            "type" : "boolean"
+          },
+          "role" : {
+            "type" : "string"
+          },
+          "substituteIngredientId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "substituteNote" : {
+            "type" : "string"
+          },
+          "unit" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "ingredientId", "isOptional" ],
+        "type" : "object"
+      },
+      "RecipeStepInput" : {
+        "properties" : {
+          "techniqueRef" : {
+            "type" : "string"
+          },
+          "text" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "text" ],
+        "type" : "object"
+      },
       "RecipeVersion" : {
         "properties" : {
           "ingredients" : {
@@ -1166,6 +1312,33 @@
           }
         },
         "required" : [ "dismiss" ],
+        "type" : "object"
+      },
+      "SaveRecipeRequest" : {
+        "properties" : {
+          "ingredients" : {
+            "items" : {
+              "$ref" : "#/components/schemas/RecipeIngredientInput"
+            },
+            "type" : "array"
+          },
+          "note" : {
+            "type" : "string"
+          },
+          "servingCount" : {
+            "format" : "int32",
+            "maximum" : 8,
+            "minimum" : 1,
+            "type" : "integer"
+          },
+          "steps" : {
+            "items" : {
+              "$ref" : "#/components/schemas/RecipeStepInput"
+            },
+            "type" : "array"
+          }
+        },
+        "required" : [ "ingredients", "servingCount", "steps" ],
         "type" : "object"
       },
       "SearchGroup" : {
@@ -1796,6 +1969,72 @@
         "tags" : [ "admin-cocktail-controller" ]
       }
     },
+    "/api/v1/admin/cocktails/{id}/recipe" : {
+      "get" : {
+        "description" : "아직 없으면 exists=false 인 빈 레시피. draft 도 본다.",
+        "operationId" : "find_3",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminRecipeResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "표준 레시피 조회",
+        "tags" : [ "admin-cocktail-recipe-controller" ]
+      },
+      "put" : {
+        "description" : "통째로 덮는다. 재료 순서와 스텝 번호는 1부터 다시 매겨진다. 저장 직후 abv_calculated 를 다시 채운다. 게이트는 검사하지 않는다 — 발행이 본다.",
+        "operationId" : "save",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SaveRecipeRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminRecipeResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "표준 레시피 저장",
+        "tags" : [ "admin-cocktail-recipe-controller" ]
+      }
+    },
     "/api/v1/admin/cocktails/{id}/unpublish" : {
       "post" : {
         "description" : "published → draft. 게이트를 검사하지 않는다.",
@@ -1826,6 +2065,45 @@
       }
     },
     "/api/v1/admin/ingredients" : {
+      "get" : {
+        "description" : "editor·admin. 이름·영문명·슬러그를 한 번에 본다. 이름순 고정.",
+        "operationId" : "search_1",
+        "parameters" : [ {
+          "description" : "이름 · 영문명 · 슬러그의 일부",
+          "in" : "query",
+          "name" : "q",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "limit",
+          "required" : false,
+          "schema" : {
+            "default" : 30,
+            "format" : "int32",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/AdminIngredientResponse"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "재료 검색 (미승인 포함)",
+        "tags" : [ "admin-ingredient-controller" ]
+      },
       "post" : {
         "description" : "editor 이상. 생성 시점은 항상 승인 대기(is_approved=false)다.",
         "operationId" : "create",

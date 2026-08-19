@@ -1,6 +1,7 @@
 package kr.kcocktail.admin.ingredient
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
 import kr.kcocktail.admin.content.AdminActor
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
@@ -101,6 +103,27 @@ class AdminIngredientController(
     fun find(@PathVariable id: Long, http: HttpServletRequest): AdminIngredientResponse {
         actor.require(http, Action.WRITE_CONTENT)
         return ingredients.find(id)
+    }
+
+    /**
+     * 재료 고르기 (이슈 051).
+     *
+     * 레시피 편집이 재료를 찾을 때 쓴다. **미승인도 나온다** — 승인을 기다리며 초안을
+     * 멈추게 하지 않는다 (DECISIONS §1.1). 발행은 `GATE-COCKTAIL-04` 가 막는다.
+     */
+    @GetMapping
+    @Operation(
+        summary = "재료 검색 (미승인 포함)",
+        description = "editor·admin. 이름·영문명·슬러그를 한 번에 본다. 이름순 고정.",
+    )
+    fun search(
+        @Parameter(description = "이름 · 영문명 · 슬러그의 일부")
+        @RequestParam(required = false) q: String?,
+        @RequestParam(defaultValue = "30") limit: Int,
+        http: HttpServletRequest,
+    ): List<AdminIngredientResponse> {
+        actor.require(http, Action.WRITE_CONTENT)
+        return ingredients.search(q, limit.coerceIn(1, 100))
     }
 
     /**

@@ -70,6 +70,26 @@ interface IngredientRepository : JpaRepository<Ingredient, Long> {
      */
     fun findByIsApprovedFalseOrderByNameKo(): List<Ingredient>
 
+    /**
+     * 어드민 재료 고르기 (이슈 051).
+     *
+     * **미승인도 나온다** — 레시피를 쓰다 새 재료가 필요하면 승인을 기다리지 않는다
+     * (DECISIONS §1.1). 발행 게이트가 `GATE-COCKTAIL-04` 로 막는다.
+     *
+     * 이름·영문명·슬러그를 한 번에 본다. 에디터가 무엇으로 기억하는지는 재료마다 다르다 —
+     * `Angostura` 를 "앙고스투라" 로 찾는 사람과 `angostura-bitters` 로 찾는 사람이 있다.
+     */
+    @Query(
+        """
+        SELECT i FROM Ingredient i
+         WHERE :q IS NULL
+            OR lower(i.nameKo) LIKE lower(concat('%', :q, '%'))
+            OR lower(i.nameEn) LIKE lower(concat('%', :q, '%'))
+            OR lower(i.slug)   LIKE lower(concat('%', :q, '%'))
+         ORDER BY i.nameKo
+        """,
+    )
+    fun searchForAdmin(@Param("q") q: String?, pageable: Pageable): List<Ingredient>
 }
 
 // 참조 중인 재료의 삭제는 **FK 가 막는다** (RED 24).

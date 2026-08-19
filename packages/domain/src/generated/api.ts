@@ -116,6 +116,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/cocktails/{id}/recipe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 표준 레시피 조회
+         * @description 아직 없으면 exists=false 인 빈 레시피. draft 도 본다.
+         */
+        get: operations["find_3"];
+        /**
+         * 표준 레시피 저장
+         * @description 통째로 덮는다. 재료 순서와 스텝 번호는 1부터 다시 매겨진다. 저장 직후 abv_calculated 를 다시 채운다. 게이트는 검사하지 않는다 — 발행이 본다.
+         */
+        put: operations["save"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/cocktails/{id}/unpublish": {
         parameters: {
             query?: never;
@@ -143,7 +167,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * 재료 검색 (미승인 포함)
+         * @description editor·admin. 이름·영문명·슬러그를 한 번에 본다. 이름순 고정.
+         */
+        get: operations["search_1"];
         put?: never;
         /**
          * 재료 생성
@@ -742,6 +770,41 @@ export interface components {
             slug: string;
             substituteNote?: string;
         };
+        AdminRecipeIngredient: {
+            amount?: number;
+            amountLabel?: string;
+            countsForStock: boolean;
+            /** Format: int64 */
+            ingredientId: number;
+            ingredientSlug?: string;
+            isApproved: boolean;
+            isOptional: boolean;
+            nameKo?: string;
+            /** Format: int32 */
+            position: number;
+            role?: string;
+            /** Format: int64 */
+            substituteIngredientId?: number;
+            substituteNote?: string;
+            unit?: string;
+        };
+        AdminRecipeResponse: {
+            abvCalculated?: number;
+            /** Format: int64 */
+            cocktailId: number;
+            exists: boolean;
+            ingredients: components["schemas"]["AdminRecipeIngredient"][];
+            note?: string;
+            /** Format: int32 */
+            servingCount: number;
+            steps: components["schemas"]["AdminRecipeStep"][];
+        };
+        AdminRecipeStep: {
+            /** Format: int32 */
+            stepNo: number;
+            techniqueRef?: string;
+            text: string;
+        };
         AuditLogItem: {
             action: string;
             actor?: components["schemas"]["ActorRef"];
@@ -1039,6 +1102,23 @@ export interface components {
             slug: string;
             substituteNote?: string;
         };
+        RecipeIngredientInput: {
+            amount?: number;
+            amountLabel?: string;
+            countsForStock?: boolean;
+            /** Format: int64 */
+            ingredientId: number;
+            isOptional: boolean;
+            role?: string;
+            /** Format: int64 */
+            substituteIngredientId?: number;
+            substituteNote?: string;
+            unit?: string;
+        };
+        RecipeStepInput: {
+            techniqueRef?: string;
+            text: string;
+        };
         RecipeVersion: {
             ingredients: components["schemas"]["IngredientLine"][];
             isDefault: boolean;
@@ -1065,6 +1145,13 @@ export interface components {
             dismiss: boolean;
             /** @description dismiss=true 면 필수. 왜 고치지 않고 넘기는지. */
             reason?: string;
+        };
+        SaveRecipeRequest: {
+            ingredients: components["schemas"]["RecipeIngredientInput"][];
+            note?: string;
+            /** Format: int32 */
+            servingCount: number;
+            steps: components["schemas"]["RecipeStepInput"][];
         };
         SearchGroup: {
             /** Format: int32 */
@@ -1374,6 +1461,54 @@ export interface operations {
             };
         };
     };
+    find_3: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdminRecipeResponse"];
+                };
+            };
+        };
+    };
+    save: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveRecipeRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdminRecipeResponse"];
+                };
+            };
+        };
+    };
     unpublish: {
         parameters: {
             query?: never;
@@ -1392,6 +1527,30 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PublishResponse"];
+                };
+            };
+        };
+    };
+    search_1: {
+        parameters: {
+            query?: {
+                /** @description 이름 · 영문명 · 슬러그의 일부 */
+                q?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdminIngredientResponse"][];
                 };
             };
         };
