@@ -71,3 +71,45 @@ test("RED11 - 사유 없이 넘길 수 없다", () => {
     /disabled=\{busy \|\| reason\.trim\(\) === ""\}/,
   );
 });
+
+// ── 감사 로그 (FR-ADMIN-005 · SPEC-08 §2.2) ──────────────────────────────
+
+없는화면이다("/admin/audit");
+
+/**
+ * RED 14·15·21 — 감사 로그는 `admin` 만이다.
+ *
+ * 메뉴에서 숨기는 것과 주소로 막는 것이 **둘 다** 있어야 한다. 숨김만 있으면 주소를
+ * 치면 들어오고, 막기만 있으면 눌러서 404 를 보게 된다.
+ */
+test("RED14,15,21 - 감사 로그는 메뉴에서 숨고 주소로도 막힌다", () => {
+  const nav = read("components/admin/admin-nav.tsx");
+  expect(nav, "감사 로그 메뉴에 역할 조건이 없다").toMatch(
+    /href: "\/admin\/audit"[^}]*adminOnly: true/,
+  );
+  expect(nav, "역할로 거르지 않는다").toMatch(/adminOnly \|\| role === "admin"/);
+
+  expect(read("app/admin/audit/page.tsx"), "감사 화면이 역할을 확인하지 않는다").toMatch(
+    /requireAdminRole\(\)/,
+  );
+  expect(read("lib/admin-session.ts"), "admin 이 아니면 404 가 아니다").toMatch(
+    /role !== "admin"\) notFound\(\)/,
+  );
+});
+
+/**
+ * RED 19 — 감사 로그에는 **고치는 길이 없다** (`PRIN-T08`).
+ *
+ * API 에 경로가 없고 DB 권한도 없지만, 화면에 버튼이 생기면 누군가 그 경로를 만든다.
+ * 쓰기 호출이 아예 없는지를 본다.
+ */
+test("RED19 - 감사 로그에 수정·삭제가 없다", () => {
+  const page = read("app/admin/audit/page.tsx");
+
+  expect(page, "감사 화면에서 쓰기를 부른다").not.toMatch(/method:\s*"(POST|PATCH|PUT|DELETE)"/);
+  for (const word of ["수정", "삭제", "지우기"]) {
+    expect(page, `감사 화면에 "${word}" 조작이 있다`).not.toMatch(
+      new RegExp(`<button[^>]*>[^<]*${word}`),
+    );
+  }
+});

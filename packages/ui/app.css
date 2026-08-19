@@ -1617,3 +1617,26 @@ figcaption {
   padding-top: 0;
   border-top: none;
 }
+
+/* ── 어드민 감사 로그 (ISSUE-048) ──────────────────────────────────────────
+   무엇이 바뀌었는지만 줄로 남긴다 — 전체 값을 늘어놓지 않는다 */
+.admin-diff {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-top: var(--space-2);
+}
+.admin-diff th,
+.admin-diff td {
+  padding: 6px 8px;
+  border: 1px solid var(--color-divider);
+  text-align: left;
+  vertical-align: top;
+  word-break: break-word;
+}
+.admin-diff thead th {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-neutral-700);
+}

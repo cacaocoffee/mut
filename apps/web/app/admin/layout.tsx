@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AdminNav } from "@/components/admin/admin-nav";
+import { adminAccess } from "@/lib/admin-session";
 
 /**
  * 어드민 셸 (ISSUE-045 · `FR-ADMIN-001` · SPEC-05 §1·§4).
@@ -29,6 +30,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   // **판정은 페이지가 한다** (`requireAdmin`). 레이아웃에서 `notFound()` 를 부르면 응답이
   // `200` 인 채 본문만 not-found 로 그려진다 — 크롤러와 스크립트는 본문이 아니라 상태를 본다.
   // 레이아웃은 껍데기만 그리고, 안쪽은 페이지가 막히면 애초에 안 온다.
+  //
+  // 메뉴는 역할에 따라 달라진다 (SPEC-08 §2, ISSUE-048). 페이지와 같은 판정을 쓴다 —
+  // `adminAccess` 는 요청 안에서 한 번만 두드린다.
+  const access = await adminAccess();
+  const role = access.kind === "allowed" ? access.role : "editor";
+
   return (
     <main className="shell admin">
       <header className="admin__head">
@@ -40,7 +47,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       </header>
 
       <div className="admin__body">
-        <AdminNav />
+        <AdminNav role={role} />
         <section className="admin__content">{children}</section>
       </div>
     </main>

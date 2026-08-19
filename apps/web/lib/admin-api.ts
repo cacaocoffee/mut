@@ -90,3 +90,36 @@ export async function verificationTasks(filter: {
   const body = await get<{ items: VerificationTask[] }>(`/tasks?${query}`);
   return body?.items ?? [];
 }
+
+// ── 감사 로그 (ISSUE-048 · `FR-ADMIN-005`) ────────────────────────────────
+
+export type AuditLogEntry = components["schemas"]["AuditLogItem"];
+
+export type AuditFilter = {
+  entityType?: string;
+  action?: string;
+  actorUserId?: string;
+  from?: string;
+  to?: string;
+};
+
+/**
+ * 감사 로그. **`admin` 만 부를 수 있다** (SPEC-08 §2.2).
+ *
+ * 필터는 AND 로 묶이고 정렬은 최신순으로 서버가 고정한다. 전체 건수를 함께 돌려주는
+ * 이유는 필터가 걸린 화면에서 "몇 건 중 몇 건" 이 안 보이면 거른 것인지 없는 것인지
+ * 알 수 없어서다.
+ */
+export async function auditLogs(
+  filter: AuditFilter,
+): Promise<{ items: AuditLogEntry[]; total: number }> {
+  const query = new URLSearchParams({ size: "50" });
+  for (const [key, value] of Object.entries(filter)) {
+    if (value) query.set(key, value);
+  }
+
+  const body = await get<{ items: AuditLogEntry[]; page: { totalElements: number } }>(
+    `/audit-logs?${query}`,
+  );
+  return { items: body?.items ?? [], total: body?.page.totalElements ?? 0 };
+}
