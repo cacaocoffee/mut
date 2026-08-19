@@ -123,3 +123,17 @@ export async function auditLogs(
   );
   return { items: body?.items ?? [], total: body?.page.totalElements ?? 0 };
 }
+
+// ── 표준 레시피 (ISSUE-051 · `NFR-O-01`) ─────────────────────────────────
+
+export type AdminRecipe = components["schemas"]["AdminRecipeResponse"];
+export type AdminRecipeIngredient = components["schemas"]["AdminRecipeIngredient"];
+
+/**
+ * 표준 레시피. **아직 안 쓴 것은 `exists: false`** 로 온다 (404 가 아니다).
+ *
+ * 없는 칵테일만 404 다 — 편집 화면이 둘을 구분하지 못하면 새로 쓰기를 시작할 수 없다.
+ */
+export async function adminRecipe(cocktailId: string | number): Promise<AdminRecipe | null> {
+  return get<AdminRecipe>(`/cocktails/${encodeURIComponent(String(cocktailId))}/recipe`);
+}
