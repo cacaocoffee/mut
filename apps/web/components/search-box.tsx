@@ -106,7 +106,7 @@ export function SearchBox({
   return (
     <div className="search-box">
       <label className="filter-label" htmlFor={`${listId}-input`}>
-        검색 SEARCH
+        검색
       </label>
       <input
         id={`${listId}-input`}

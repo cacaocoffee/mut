@@ -83,10 +83,10 @@ export function DetailActions({
   return (
     <div className="detail-actions">
       <button type="button" className="btn btn-secondary" onClick={save} disabled={saved}>
-        {saved ? "저장됨 SAVED" : "저장 SAVE"}
+        {saved ? "저장됨" : "저장"}
       </button>
       <button type="button" className="btn btn-secondary" onClick={share}>
-        공유 SHARE
+        공유
       </button>
       {message && (
         <p className="detail-actions__note" role="status">

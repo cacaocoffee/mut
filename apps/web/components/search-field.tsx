@@ -41,7 +41,7 @@ export function SearchField({
   return (
     <div className="search-field">
       <label className="search-field__label" htmlFor="cocktail-q">
-        검색 SEARCH
+        검색
       </label>
 
       <div className="search-field__box">
@@ -63,7 +63,7 @@ export function SearchField({
             aria-label="검색어 지우기"
             onClick={() => onChange("")}
           >
-            지움 CLEAR
+            지움
           </button>
         )}
       </div>
