@@ -23,6 +23,9 @@ const PUBLIC_PAGES = [
   { path: "/cocktails/base/gin", label: "카테고리" },
   { path: "/finder", label: "파인더" },
   { path: "/search", label: "통합 검색" },
+  { path: "/my-bar", label: "내 술장" },
+  { path: "/ingredients", label: "재료 사전" },
+  { path: "/ingredients/campari", label: "재료 상세" },
   { path: "/privacy", label: "개인정보" },
   { path: "/terms", label: "약관" },
 ];

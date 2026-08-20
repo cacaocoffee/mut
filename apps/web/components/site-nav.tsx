@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Wordmark } from "@/components/wordmark";
-import { FINDER_PATH, SEARCH_PATH } from "@/lib/routes";
+import { FINDER_PATH, MY_BAR_PATH, SEARCH_PATH } from "@/lib/routes";
 
 export function SiteNav() {
   const pathname = usePathname();
@@ -25,6 +25,7 @@ export function SiteNav() {
   const tabs = [
     { href: SEARCH_PATH, ko: "01 탐색", en: "SEARCH", match: (p: string) => p === SEARCH_PATH },
     { href: FINDER_PATH, ko: "02 파인더", en: "FINDER", match: (p: string) => p === FINDER_PATH },
+    { href: MY_BAR_PATH, ko: "03 내 술장", en: "MY BAR", match: (p: string) => p === MY_BAR_PATH },
   ];
 
   return (

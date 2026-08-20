@@ -113,6 +113,10 @@ test("RED8 - 사이트맵의 모든 경로가 단일 축이다", async ({ reques
     /^\/terms$/,
     /^\/cocktails\/[a-z0-9-]+$/,
     /^\/cocktails\/(base|style|method)\/[a-z0-9-]+$/,
+    // 재료 사전은 색인한다 — 사람마다 달라지지 않고 "이 재료로 뭘 만드나" 는 실제 질의다.
+    // 내 술장(`/my-bar`)은 담은 것에 따라 내용이 달라져 사이트맵에 넣지 않는다.
+    /^\/ingredients$/,
+    /^\/ingredients\/[a-z0-9-]+$/,
   ];
   const unexpected = paths.filter((p) => !patterns.some((re) => re.test(p)));
   expect(unexpected, "색인할 경로 모양이 늘었다 — sitemap.ts 의 ALLOWED_PATTERNS 를 함께 본다").toEqual([]);

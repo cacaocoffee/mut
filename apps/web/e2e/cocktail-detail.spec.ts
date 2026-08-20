@@ -219,7 +219,10 @@ test("RED32,34,35 - 저장·공유가 있고 술장 대조는 없다", async ({ 
 
   await expect(page.getByRole("button", { name: /저장/ })).toBeVisible();
   await expect(page.getByRole("button", { name: /공유/ })).toBeVisible();
-  await expect(page.getByText(/내 술장|재료 대조/)).toHaveCount(0);
+
+  // 내비의 `03 내 술장` 탭은 화면 이동이지 이 화면의 액션이 아니다. 본문만 본다 —
+  // 여기서 막는 것은 **상세에 붙는 대조 버튼**이다.
+  await expect(page.locator("main").getByText(/내 술장|재료 대조/)).toHaveCount(0);
 });
 
 /** RED 33 — 비로그인 저장은 막지 않고 **유도한다** (`R-F2.2-4` 의 정신). */
