@@ -50,7 +50,7 @@ docs/                     문서 23개 — 아래 참조
 | 시스템 스펙 | [`docs/spec/`](docs/spec/) — SPEC-00~08 · 10 |
 | 화면 명세 | [`docs/screens/`](docs/screens/) |
 | 디자인 | [`docs/design/README.md`](docs/design/README.md) |
-| 결정 기록 | [`docs/decisions/`](docs/decisions/) — ADR 7건 |
+| 결정 기록 | [`docs/decisions/`](docs/decisions/) — ADR 8건 |
 | 배포 전 사람 확인 | [`docs/RELEASE-CHECKLIST.md`](docs/RELEASE-CHECKLIST.md) |
 | 추적 · 게이트 | [`docs/TRACE-00_추적매트릭스.md`](docs/TRACE-00_추적매트릭스.md) |
 | 아직 안 정해진 것 | [`docs/prd/GAPS.md`](docs/prd/GAPS.md) |

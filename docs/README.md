@@ -71,6 +71,7 @@
 | [ADR-0005](./decisions/ADR-0005-ui-package-scope.md) | `app.css` 는 우리 것, `styles.css` 는 시안 것 — 정본 개정 절차 |
 | [ADR-0006](./decisions/ADR-0006-btn-primary-contrast.md) | 흰 글자를 얹는 면은 `accent-700` — `.btn-primary` 대비 (G-16) |
 | [ADR-0007](./decisions/ADR-0007-hosting.md) | 호스팅은 Vercel · Neon · R2. 웹부터 혼자 $0 으로 올린다 (G-07 하단) |
+| [ADR-0008](./decisions/ADR-0008-color-photos.md) | 콘텐츠 사진은 컬러 — 시안의 `.grayscale` 규칙을 뗀다 (G-46) |
 
 ## 미결
 
