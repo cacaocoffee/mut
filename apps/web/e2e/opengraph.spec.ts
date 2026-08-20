@@ -178,18 +178,19 @@ test("RED20 - 상세가 아닌 화면도 기본 카드를 갖는다", async ({ r
   expect(res.headers()["content-type"]).toContain("image/png");
 });
 
-/** 카드 색이 시안에서 왔는지 — Satori 가 CSS 변수를 못 읽어 값을 적어 둔 자리다. */
-test("카드 색이 시안 원본과 같다", () => {
+/** 카드 색이 팔레트 정본에서 왔는지 — Satori 가 CSS 변수를 못 읽어 값을 적어 둔 자리다. */
+test("카드 색이 팔레트 정본과 같다", () => {
   const baseline = readFileSync(join(process.cwd(), "../../scripts/color-parity.mjs"), "utf8");
   const card = readFileSync(join(process.cwd(), "lib/og-card.tsx"), "utf8");
 
+  // 매거진판 (ADR-0007). 팔레트를 바꾸면 BASELINE · og-card 와 함께 이 표를 고친다.
   for (const [token, hex] of [
-    ["--color-bg", "#f3f2f2"],
-    ["--color-text", "#201e1d"],
-    ["--color-accent", "#ec3013"],
-    ["--color-neutral-700", "#605d5d"],
+    ["--color-bg", "#f6f3eb"],
+    ["--color-text", "#241e18"],
+    ["--color-accent", "#93293b"],
+    ["--color-neutral-700", "#605e58"],
   ]) {
-    expect(baseline, `${token} 이 시안 표에서 바뀌었다`).toContain(`"${token}": "${hex}"`);
+    expect(baseline, `${token} 이 팔레트 정본에서 바뀌었다`).toContain(`"${token}": "${hex}"`);
     expect(card, `카드가 ${token} 값을 안 쓴다`).toContain(hex);
   }
 });

@@ -75,7 +75,7 @@ const NUMERIC = [".results-count", ".spec-strip", ".cocktail-card__abv", ".profi
  * 앱이 주입하는 것으로 알려진 토큰 — `packages/ui` 가 정의하지 않아도 된다 (게이트 9).
  * next/font 가 런타임에 넣는다. 이 목록 밖의 미정의 토큰은 실패로 본다.
  */
-const APP_PROVIDED = ["--font-archivo", "--font-noto-sans", "--font-noto-serif"];
+const APP_PROVIDED = ["--font-fraunces", "--font-plex", "--font-noto-serif"];
 
 /**
  * 한글을 담는 칸 — 12px 바닥 (게이트 13).

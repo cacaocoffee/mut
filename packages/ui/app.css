@@ -1,6 +1,6 @@
 /* ══════════════════════════════════════════════════════════════════════════
    MUT — 화면 레이아웃 층.
-   styles.css(Modernist 토큰·컴포넌트) 위에 얹는다. 색·간격·라운드는 전부
+   styles.css(매거진판 토큰·컴포넌트) 위에 얹는다. 색·간격·라운드는 전부
    토큰에서 가져오고, 여기서는 배치와 반응형만 다룬다.
 
    시안은 데스크톱 그리드 기준이라 그 배치를 ≥1024px 케이스로 두고,
@@ -31,14 +31,11 @@
   padding: 0 var(--space-8) 64px;
 }
 /* ┌─ 마스트헤드 ────────────────────────────────────────────────────────────┐
-   시안(MUT.dc.html:23-30)은 브랜드 좌측 + 번호 탭 우측을 그렸다.
-   이 블록이 그 형태를 덮는다. **근거는 취향이다** — ADR-0005 결정 3 이 그렇게 적었고,
-   되돌리는 조건은 `cross_nav` 계측(SPEC-10)이다.
+   매거진판(ADR-0007)은 잡지 제호처럼 짠다 — 워드마크 중앙, 탭이 그 아래 얇은 선
+   사이에 선다. 중앙 정렬은 이 시스템에서 제호 한 곳만 허용된다 (docs/design/README).
 
-   되돌리려면 이 블록만 지우면 된다. `styles.css` 의 `.nav`·`.nav-brand` 는 안 건드렸다.
-
-   번호(01·02·03)는 유지한다 — 시안이 세 화면의 순서를 드러내려 붙인 것이고
-   그 이유는 취소되지 않았다. 바뀌는 것은 배치뿐이다.
+   번호(01·02·03)는 유지한다 — 세 화면의 순서를 드러내려 붙인 것이고
+   그 이유는 취소되지 않았다.
    └────────────────────────────────────────────────────────────────────────┘ */
 .site-nav {
   position: sticky;
@@ -62,6 +59,8 @@
 .site-nav .nav-brand {
   display: flex;
   align-items: flex-end;
+  /* 제호는 중앙이다 — 이 시스템에서 유일하게 허용되는 중앙 정렬 (ADR-0007) */
+  justify-content: center;
   gap: 12px;
   /* .nav-brand 의 margin-right: auto 는 가로 배치용이었다 — 세로에서는 무의미하다 */
   margin-right: 0;
@@ -85,6 +84,8 @@
   padding: var(--space-2) 0;
   flex-wrap: wrap;
   row-gap: var(--space-1);
+  /* 제호 아래 탭도 지면의 중앙 배열을 따른다 */
+  justify-content: center;
 }
 .site-nav .nav-brand small {
   font-size: 10px;
@@ -118,7 +119,10 @@
   padding: var(--space-3) var(--space-3);
   /* 터치 타깃 — WCAG 2.5.8. 모바일 트래픽 80% 가정(PRD 12장)이면 특히 */
   min-height: 44px;
-  font-size: 13px;
+  /* 탭은 잡지 목차다 — 제목 서체(세리프)를 쓰고, 선택만 굵어진다 (ADR-0007) */
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: 14px;
   /* 클릭 대상은 한 줄짜리 물건이다 (ISSUE-051). 두 줄로 접히면 줄바꿈이 의도인지
      알 수 없고 버튼 높이만 자라 형제와 리듬이 깨진다. */
   white-space: nowrap;
@@ -147,7 +151,8 @@
   align-items: end;
   gap: var(--space-6);
   padding: 36px 0 20px;
-  border-bottom: 2px solid var(--color-divider);
+  /* 지면의 강한 경계 — 잉크색 3px (ADR-0007). 조직 구분(2px divider)보다 한 단 세다 */
+  border-bottom: 3px solid var(--color-text);
 }
 .page-head h1 {
   font-size: 56px;
@@ -200,38 +205,42 @@
 
 /* ─────────────────────────  01 탐색  ───────────────────────── */
 
+/* ┌─ 필터 — 사이드바가 아니라 가로 색인 띠다 (ADR-0007) ────────────────────┐
+   잡지 색인처럼 축 이름이 왼쪽 좁은 단에 서고 값이 옆으로 흐른다. 필터가
+   결과 **위**에 전폭으로 걸려야 "아래 전체에 걸린다"가 형태로 읽힌다 —
+   검색 칸을 전폭으로 올린 것과 같은 논리다.
+   └────────────────────────────────────────────────────────────────────────┘ */
 .search-layout {
   display: grid;
-  grid-template-columns: 296px 1fr;
-  gap: 40px;
-  padding-top: 28px;
+  grid-template-columns: 1fr;
+  gap: 0;
+  padding-top: 16px;
   align-items: start;
 }
 .filter-panel {
-  position: sticky;
-  top: 78px;
   display: flex;
   flex-direction: column;
-  border-right: 2px solid var(--color-divider);
-  padding-right: var(--space-6);
+  border-bottom: 2px solid var(--color-text);
+  margin-bottom: 28px;
 }
 .filter-group {
-  padding: 18px 0;
+  display: grid;
+  grid-template-columns: 128px minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: baseline;
+  padding: 10px 0;
   border-bottom: 1px solid var(--color-divider);
 }
 .filter-label {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-2);
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-neutral-700);
-  margin-bottom: var(--space-2);
+  margin-bottom: 0;
 }
 .filter-label .hint {
-  /* float 이었다 — 부모를 flex 로 바꿔 정렬을 배치에 맡긴다 */
-  margin-left: auto;
+  display: block;
+  margin-top: 2px;
   font-size: 10px;
   letter-spacing: 0;
   text-transform: none;
@@ -241,20 +250,32 @@
   flex-wrap: wrap;
   gap: 6px;
 }
-/* 기주 칩 — 결과 개수를 병기하고 0건은 비활성 (PRD R-F2.1-2) */
+/* ┌─ 필터 칩 — 뱃지다 ─────────────────────────────────────────────────────┐
+   기본 = 테두리 상자 · 호버 = 테두리가 진해지고 옅게 채워진다 · 선택 = 와인 채움.
+   흰 글자를 얹는 면은 accent-700 이다 (G-16 · ADR-0006, 6.29:1).
+   결과 개수를 병기하고 0건은 비활성 (PRD R-F2.1-2).
+   └────────────────────────────────────────────────────────────────────────┘ */
 .chip {
   flex: none;
   white-space: nowrap;
-  font-size: 12px;
-  padding: 6px 11px;
+  font-size: 13px;
+  /* `.btn` 이 700 을 깔지만 비선택 값은 보통 굵기다 — 선택만 굵어진다 */
+  font-weight: 400;
+  padding: 5px 11px;
   border: 1px solid var(--color-divider);
+  background: transparent;
+  color: var(--color-neutral-800);
+}
+.chip:not(:disabled):hover {
+  background: color-mix(in srgb, var(--color-text) 6%, transparent);
+  color: var(--color-text);
+  border-color: var(--color-neutral-500);
 }
 .chip[aria-pressed="true"] {
-  /* 흰 글자를 얹는 면은 accent-700 이다 (G-16 · ADR-0006). accent 는 3.76:1 이라 12px
-     글자에 못 쓴다 — 아래 `.btn-primary` 와 같은 이유이고 같은 값이다. */
-  border-color: var(--color-accent-700);
   background: var(--color-accent-700);
+  border-color: var(--color-accent-700);
   color: var(--color-bg);
+  font-weight: 700;
 }
 /* 개수는 부모 글자색을 그대로 물려받는다. `opacity` 로 흐리면 실효 대비가 4.5:1 아래로
    떨어진다 — axe 가 `.count` 를 22곳에서 잡았다 (ISSUE-046). 작게 쓰는 것으로 충분하다. */
@@ -274,6 +295,7 @@
    성립하지만 한글은 x-height 가 커서 그 크기에서 획이 뭉갠다. 시안이 라틴 목업으로
    짜였고 한글을 검증하지 않았다 — G-16 이 대비에서 겪은 것과 같은 원인이다 (ISSUE-054).
    커진 만큼 세로 패딩을 줄여 칩 높이를 유지한다. */
+/* 맛·향 칩 — 같은 뱃지 문법, 한 치수 작다 */
 .chip-tag {
   flex: none;
   white-space: nowrap;
@@ -285,6 +307,11 @@
   background: transparent;
   color: var(--color-neutral-800);
 }
+.chip-tag:not(:disabled):hover {
+  background: color-mix(in srgb, var(--color-text) 6%, transparent);
+  color: var(--color-text);
+  border-color: var(--color-neutral-500);
+}
 /* 맛·향에도 개수를 병기한다 — `R-F2.1-2` 는 **모든** 필터 값을 말한다 (ISSUE-040) */
 .chip-tag .count {
   font-weight: 400;
@@ -292,29 +319,42 @@
   margin-left: 5px;
 }
 .chip-tag[aria-pressed="true"] {
-  border-color: var(--color-accent);
-  background: var(--color-accent-100);
-  color: var(--color-accent-800);
+  border-color: var(--color-accent-700);
+  background: var(--color-accent-700);
+  color: var(--color-bg); /* 6.29:1 */
+  font-weight: 700;
 }
 .chip-tag:disabled {
   opacity: 0.32;
   cursor: not-allowed;
 }
-/* 당도 세그먼트 — 세로 스택 */
+/* 당도 세그먼트 — 색인 띠 안에서는 값이 옆으로 흐르고, 칸 하나하나가 뱃지다 (ADR-0007).
+   선택 채움(accent-700)은 아래 ADR-0006 블록이 전역으로 맡는다. */
 .seg-stack {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
   width: 100%;
+  border: 0;
 }
 .seg-stack .seg-opt {
-  padding: var(--space-2) 10px;
-  border-left: 0;
+  padding: 5px 11px;
+  border: 1px solid var(--color-divider);
   justify-content: flex-start;
-  gap: 10px;
+  gap: 8px;
 }
 .seg-stack .seg-opt + .seg-opt {
-  border-left: 0;
+  border-left: 1px solid var(--color-divider);
   border-top: 1px solid var(--color-divider);
+}
+.seg-stack .seg-opt:not(:has(input:checked)):hover {
+  background: color-mix(in srgb, var(--color-text) 6%, transparent);
+  color: var(--color-text);
+  border-color: var(--color-neutral-500);
+}
+/* 채움과 테두리가 같은 색이어야 뱃지로 읽힌다 */
+.seg-stack .seg-opt:has(input:checked) {
+  border-color: var(--color-accent-700);
 }
 .seg-stack .seg-opt .ko {
   display: block;
@@ -350,8 +390,9 @@
   font-variant-numeric: tabular-nums;
 }
 .results-count b {
-  font-size: 22px;
-  font-weight: 800;
+  font-family: var(--font-heading);
+  font-size: 26px;
+  font-weight: var(--font-heading-weight);
 }
 .results-count span {
   font-size: 11px;
@@ -364,34 +405,49 @@
 .card-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-6);
+  gap: 0 var(--space-8);
 }
 
-/* 칵테일 카드 */
+/* ┌─ 칵테일 카드 — 상자가 아니라 지면의 목록 항목이다 (ADR-0007) ───────────┐
+   surface 채움과 테두리를 걷고 헤어라인 하나가 항목을 가른다. 잡지 색인처럼
+   읽히고, 상태(호버)는 제목 색으로 말한다.
+   └────────────────────────────────────────────────────────────────────────┘ */
 .cocktail-card {
   display: flex;
   flex-direction: column;
-  background: var(--color-surface);
-  border: 1px solid var(--color-divider);
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--color-divider);
+  padding: 14px 0 30px;
   color: inherit;
   text-decoration: none;
   text-align: left;
 }
-/* 이 페이지에서 유일한 트랜지션이다. ADR-0001 이 부록 A 에서 살린 값이
-   --dur·--ease 인데 정작 아무도 안 쓰고 있었다 — 쓰거나 지워야 했고, 쓰는 쪽을 골랐다.
-   시안 README 가 "떠 있는 것도 장식된 것도 없다"고 했으므로 **하나를 넘기지 않는다.**
-   레이아웃 속성이 아니라 색만 움직여서 리플로가 없다. */
-.cocktail-card:hover {
-  border-color: var(--color-accent);
+/* 첫 항목은 잡지의 머리기사다 — 넓은 화면에서 두 단을 쓴다 */
+@media (min-width: 1081px) {
+  .card-grid > .cocktail-card:first-child {
+    grid-column: span 2;
+  }
+  .card-grid > .cocktail-card:first-child .cocktail-card__ko {
+    font-size: 30px;
+  }
+  /* 두 단 폭에서 4:5 를 그대로 두면 사진이 화면 하나를 다 먹는다 — 머리기사는 와이드 크롭 */
+  .card-grid > .cocktail-card:first-child .photo-slot--4x5 {
+    aspect-ratio: 16 / 9;
+  }
 }
-.cocktail-card {
-  transition: border-color var(--dur) var(--ease);
+/* 이 페이지에서 유일한 트랜지션이다. 색만 움직여서 리플로가 없다. */
+.cocktail-card:hover .cocktail-card__ko {
+  color: var(--color-accent-700);
+}
+.cocktail-card .cocktail-card__ko {
+  transition: color var(--dur) var(--ease);
 }
 @media (prefers-reduced-motion: reduce) {
-  .cocktail-card { transition: none; }
+  .cocktail-card .cocktail-card__ko { transition: none; }
 }
 .cocktail-card__body {
-  padding: 12px 12px 14px;
+  padding: 12px 0 0;
   display: flex;
   flex-direction: column;
   gap: 9px;
@@ -404,9 +460,10 @@
   gap: var(--space-2);
 }
 .cocktail-card__ko {
-  font-size: 19px;
-  font-weight: 800;
-  line-height: 1.15;
+  font-family: var(--font-heading);
+  font-size: 21px;
+  font-weight: var(--font-heading-weight);
+  line-height: 1.2;
 }
 .cocktail-card__en {
   font-size: 11px;
@@ -420,8 +477,9 @@
 }
 .cocktail-card__abv b {
   display: block;
+  font-family: var(--font-heading);
   font-size: 20px;
-  font-weight: 800;
+  font-weight: var(--font-heading-weight);
   line-height: 1;
 }
 .cocktail-card__abv span {
@@ -435,13 +493,18 @@
   flex-wrap: wrap;
   gap: var(--space-1);
 }
+/* 향 태그도 상자가 아니라 글줄이다 — 가운뎃점으로 잇는다 (ADR-0007) */
 .cocktail-card__flavors span {
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.04em;
-  padding: 2px 6px;
-  border: 1px solid var(--color-divider);
-  color: var(--color-neutral-800);
+  padding: 0;
+  border: 0;
+  color: var(--color-accent-700);
   white-space: nowrap;
+}
+.cocktail-card__flavors span + span::before {
+  content: "· ";
+  color: var(--color-neutral-700);
 }
 /* 12px 바닥 — `{기법} · {잔}` 이 한글이다. 위 .chip-tag 와 같은 이유. */
 .cocktail-card__foot {
@@ -555,7 +618,8 @@
 .spec-strip {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  border-top: 2px solid var(--color-divider);
+  /* 스펙은 지면의 표다 — 위는 강한 잉크선, 아래는 조직 구분선 (ADR-0007) */
+  border-top: 3px solid var(--color-text);
   border-bottom: 2px solid var(--color-divider);
   margin-top: 20px;
   /* ABV·당도 단계가 숫자다 — 항목 간 세로 정렬이 맞아야 표로 읽힌다 */
@@ -577,8 +641,9 @@
 }
 .spec-strip dd {
   margin: 0;
+  font-family: var(--font-heading);
   font-size: 19px;
-  font-weight: 800;
+  font-weight: var(--font-heading-weight);
   line-height: 1.1;
 }
 .spec-strip .sub {
@@ -677,8 +742,9 @@
   border-bottom: 1px solid var(--color-divider);
 }
 .step .n {
+  font-family: var(--font-heading);
   font-size: 26px;
-  font-weight: 800;
+  font-weight: var(--font-heading-weight);
   line-height: 1;
   color: var(--color-accent);
 }
@@ -742,6 +808,16 @@
   line-height: 1.85;
   color: var(--color-neutral-900);
   max-width: 46ch;
+}
+/* 잡지 기사의 첫 글자 — 스토리 첫 문단만 머리글자를 키운다 (ADR-0007) */
+.editorial p:first-of-type::first-letter {
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  font-size: 3em;
+  float: left;
+  line-height: 0.85;
+  padding-right: 0.12em;
+  color: var(--color-accent-700);
 }
 .related-link {
   justify-content: space-between;
@@ -1204,13 +1280,8 @@
   .page-head h1 .sub { font-size: 18px; margin-left: 10px; }
   .page-head .lede { max-width: none; }
 
-  .search-layout { grid-template-columns: 1fr; gap: var(--space-6); }
-  .filter-panel {
-    position: static;
-    border-right: 0;
-    border-bottom: 2px solid var(--color-divider);
-    padding-right: 0;
-  }
+  /* 색인 띠 — 좁은 폭에서는 축 이름이 값 위로 올라간다 */
+  .filter-group { grid-template-columns: 1fr; gap: 4px; }
 
   .detail-hero { grid-template-columns: 1fr; gap: var(--space-6); }
   .detail-hero .photo-slot { min-height: 0; }
@@ -1245,6 +1316,8 @@
   /* 탭 레이블을 줄인다 — 접는 것보다 짧게 쓰는 쪽이 먼저다.
      국문만 남겨도 `01`·`02`·`03` 이 화면 순서를 그대로 드러낸다. */
   .tab .en { display: none; }
+  /* 세리프 14px × 탭 3개가 320px 한 줄에 서려면 좌우 패딩을 한 단 줄인다 */
+  .tab { padding-left: var(--space-2); padding-right: var(--space-2); }
   .site-nav .nav-brand small { display: none; }
   /* 태그라인이 빠지면 마크만 남는다. 좁은 화면에서 마스트헤드가 본문을 밀지 않게
      줄이되, `ㅅ` 획이 읽히는 선(48px) 밑으로는 내리지 않는다. */

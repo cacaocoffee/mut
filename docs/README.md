@@ -7,7 +7,7 @@
 | **왜 · 무엇** | 제품 요구사항 | [`prd/`](./prd/) |
 | **어떻게** | 시스템 스펙 | [`spec/`](./spec/) |
 | **화면** | 프론트 화면 명세 | [`screens/`](./screens/) |
-| **디자인** | Modernist 토큰 · 규칙 | [`design/`](./design/) |
+| **디자인** | 매거진판 토큰 · 규칙 | [`design/`](./design/) |
 | **왜 그렇게 정했나** | ADR | [`decisions/`](./decisions/) |
 
 ## 읽기 순서
@@ -70,6 +70,7 @@
 | [ADR-0004](./decisions/ADR-0004-age-gate.md) | 전면 성인 인증 게이트를 두지 않는다 (법률 검토 대기 조건부) |
 | [ADR-0005](./decisions/ADR-0005-ui-package-scope.md) | `app.css` 는 우리 것, `styles.css` 는 시안 것 — 정본 개정 절차 |
 | [ADR-0006](./decisions/ADR-0006-btn-primary-contrast.md) | 흰 글자를 얹는 면은 `accent-700` — `.btn-primary` 대비 (G-16) |
+| [ADR-0007](./decisions/ADR-0007-design-magazine.md) | 디자인 시스템을 **매거진판**으로 교체 — 아이보리 + 와인 + 세리프 제목 (ADR-0001 대체) |
 
 ## 미결
 

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Archivo, Noto_Sans_KR, Noto_Serif_KR } from "next/font/google";
+import { Fraunces, IBM_Plex_Sans_KR, Noto_Serif_KR } from "next/font/google";
 import { SiteNav } from "@/components/site-nav";
 import { PathRecorder } from "@/components/analytics/path-recorder";
 import { LegalNotice } from "@/components/legal/legal-notice";
@@ -7,14 +7,14 @@ import { SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 import "@/components/legal/legal.css";
 
-const archivo = Archivo({
-  variable: "--font-archivo",
+/* 가변 폰트라 weight 를 안 적는다 — wght 축 전체가 한 파일로 온다 (ADR-0007) */
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
-  weight: ["400", "600", "800"],
 });
 
-const notoSans = Noto_Sans_KR({
-  variable: "--font-noto-sans",
+const plex = IBM_Plex_Sans_KR({
+  variable: "--font-plex",
   subsets: ["latin"],
   weight: ["400", "500", "700"],
 });
@@ -67,7 +67,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="ko"
-      className={`${archivo.variable} ${notoSans.variable} ${notoSerif.variable}`}
+      className={`${fraunces.variable} ${plex.variable} ${notoSerif.variable}`}
     >
       <body>
         <div className="page">

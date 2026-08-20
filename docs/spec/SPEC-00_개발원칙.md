@@ -85,7 +85,7 @@
 | DB | **PostgreSQL 16** |
 | 프론트엔드 | **Next.js 16 (App Router) + TypeScript** |
 | 어드민 | Next.js 앱 내부 (`/admin`) — API를 소비하는 별도 라우트 그룹 |
-| 디자인 시스템 | Modernist (`packages/ui`) — [ADR-0001](../decisions/ADR-0001-design-system.md) |
+| 디자인 시스템 | 매거진판 (`packages/ui`) — [ADR-0007](../decisions/ADR-0007-design-magazine.md) |
 
 임의로 다른 스택을 들이지 않는다. 필요하면 이 표를 먼저 고친다.
 

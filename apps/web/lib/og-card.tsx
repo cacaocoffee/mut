@@ -22,12 +22,12 @@ import { ImageResponse } from "next/og";
  */
 export const OG_SIZE = { width: 1200, height: 630 };
 
-/** 시안 토큰의 hex. `--color-bg` · `--color-text` · `--color-accent` · `--color-neutral-700`. */
+/** 매거진판 토큰의 hex. `--color-bg` · `--color-text` · `--color-accent` · `--color-neutral-700`. */
 export const OG_PALETTE = {
-  bg: "#f3f2f2",
-  text: "#201e1d",
-  accent: "#ec3013",
-  muted: "#605d5d",
+  bg: "#f6f3eb",
+  text: "#241e18",
+  accent: "#93293b",
+  muted: "#605e58",
 };
 
 /** 바깥을 기다리는 한도. 넘으면 라틴 글꼴로 그린다 — 안 나오는 것보다 낫다. */
