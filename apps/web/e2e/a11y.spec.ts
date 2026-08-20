@@ -72,9 +72,15 @@ for (const { path, label } of PUBLIC_PAGES) {
  *
  * 토큰 표(`scripts/contrast-check.mjs`)는 "이 조합이 AA 인가" 를 계산하지만, 그 조합이
  * 실제로 그 자리에 쓰였는지는 모른다. axe 의 `color-contrast` 가 그리는 쪽을 본다.
+ *
+ * **페이지마다 테스트를 하나씩 만든다.** 예전에는 10개를 한 테스트에서 돌았는데,
+ * 매거진판이 글꼴 셋(Fraunces · Noto Serif KR · IBM Plex Sans KR)을 싣게 되면서
+ * 혼자 돌 때 이미 16초가 됐다. 예산 30초에 여유가 1.8배뿐이라 CI(2코어)에서 넘어간다.
+ * 나누면 각자 30초를 갖고, 실패했을 때 **어느 화면인지가 테스트 이름에 나온다.**
+ * 위의 axe 전수 검사가 이미 쓰는 모양이다.
  */
-test("RED16~20 - 그려진 글자의 대비가 AA 다", async ({ page }) => {
-  for (const { path, label } of PUBLIC_PAGES) {
+for (const { path, label } of PUBLIC_PAGES) {
+  test(`RED16~20 - ${label} 의 그려진 글자가 AA 다`, async ({ page }) => {
     await page.goto(path);
     const { violations } = await axe(page).withRules(["color-contrast"]).analyze();
 
@@ -84,8 +90,8 @@ test("RED16~20 - 그려진 글자의 대비가 AA 다", async ({ page }) => {
       ),
     );
     expect(failures, failures.join(" / ")).toEqual([]);
-  }
-});
+  });
+}
 
 /**
  * RED 23·24 — 포커스가 보인다 (`NFR-A-05`).

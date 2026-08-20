@@ -90,11 +90,11 @@ async function enabledChip(chips: Locator, from = 0): Promise<Locator> {
 }
 
 const AXES: { label: string; param: string }[] = [
-  { label: "기주 BASE SPIRIT", param: "base" },
-  { label: "스타일 STYLE", param: "style" },
-  { label: "메이킹 METHOD", param: "method" },
-  { label: "도수 ABV", param: "abv" },
-  { label: "맛 / 향 FLAVOR PROFILE", param: "flavor" },
+  { label: "기주", param: "base" },
+  { label: "스타일", param: "style" },
+  { label: "메이킹", param: "method" },
+  { label: "도수", param: "abv" },
+  { label: "맛 · 향", param: "flavor" },
 ];
 
 // ── RED 1~7 : 6축 필터 (FR-SEARCH-001) ───────────────────────────────────
@@ -156,7 +156,7 @@ test("RED7 - 보유 재료 축이 없다", async ({ page }) => {
  */
 test("RED8 - 기주 복수 선택이 OR 다", async ({ page }) => {
   await page.goto(SEARCH);
-  const chips = axisChips(page, "기주 BASE SPIRIT");
+  const chips = axisChips(page, "기주");
   const [a, b] = [chips.nth(0), chips.nth(1)];
   const [na, nb] = [await countOf(a), await countOf(b)];
 
@@ -174,7 +174,7 @@ test("RED8 - 기주 복수 선택이 OR 다", async ({ page }) => {
  */
 test("RED9,16 - 향·맛 복수 선택이 AND 다", async ({ page }) => {
   await page.goto(SEARCH);
-  const flavors = axisChips(page, "맛 / 향 FLAVOR PROFILE");
+  const flavors = axisChips(page, "맛 · 향");
 
   await flavors.nth(0).click();
   const alone = await resultCount(page);
@@ -191,11 +191,11 @@ test("RED9,16 - 향·맛 복수 선택이 AND 다", async ({ page }) => {
 test("RED10 - 다른 축 간에는 AND 다", async ({ page }) => {
   await page.goto(SEARCH);
 
-  const base = axisChips(page, "기주 BASE SPIRIT").first();
+  const base = axisChips(page, "기주").first();
   const baseOnly = await countOf(base);
   await base.click();
 
-  const style = await enabledChip(axisChips(page, "스타일 STYLE"));
+  const style = await enabledChip(axisChips(page, "스타일"));
   await style.click();
 
   await expect.poll(async () => resultCount(page)).toBeLessThanOrEqual(baseOnly);
@@ -233,7 +233,7 @@ test("RED12 - 모든 필터 값 옆에 개수가 표시된다", async ({ page })
  */
 test("RED13,17 - 0 건인 값이 비활성 처리된다", async ({ page }) => {
   await page.goto(SEARCH);
-  const flavors = axisChips(page, "맛 / 향 FLAVOR PROFILE");
+  const flavors = axisChips(page, "맛 · 향");
 
   await flavors.nth(0).click();
   await (await enabledChip(flavors, 1)).click();
@@ -256,10 +256,10 @@ test("RED13,17 - 0 건인 값이 비활성 처리된다", async ({ page }) => {
 /** RED 14 — 다른 축을 고르면 개수가 즉시 갱신된다. */
 test("RED14 - 개수가 실시간으로 갱신된다", async ({ page }) => {
   await page.goto(SEARCH);
-  const style = axisChips(page, "스타일 STYLE").first();
+  const style = axisChips(page, "스타일").first();
   const before = await countOf(style);
 
-  await axisChips(page, "기주 BASE SPIRIT").first().click();
+  await axisChips(page, "기주").first().click();
 
   await expect
     .poll(async () => countOf(style), { message: "다른 축을 골랐는데 개수가 그대로다" })
@@ -274,7 +274,7 @@ test("RED14 - 개수가 실시간으로 갱신된다", async ({ page }) => {
  */
 test("RED15 - 같은 축 선택은 그 축 카운트에 영향을 주지 않는다", async ({ page }) => {
   await page.goto(SEARCH);
-  const bases = axisChips(page, "기주 BASE SPIRIT");
+  const bases = axisChips(page, "기주");
 
   const before: number[] = [];
   for (let i = 0; i < (await bases.count()); i++) before.push(await countOf(bases.nth(i)));
@@ -311,10 +311,10 @@ test("RED21,22 - 도수가 4개 칩이고 연속 슬라이더가 없다", async 
   await page.goto(SEARCH);
 
   // 코퍼스에 없는 구간은 칩이 없으므로 4개 이하다. 지금은 논알콜까지 있어 4개다.
-  expect(await axisChips(page, "도수 ABV").count()).toBeLessThanOrEqual(4);
+  expect(await axisChips(page, "도수").count()).toBeLessThanOrEqual(4);
   await expect(page.locator('input[type="range"]')).toHaveCount(0);
   // `abvMin`·`abvMax` 를 받는 자리를 만들지 않는다 (이슈 018 RED 21)
-  await axisChips(page, "도수 ABV").first().click();
+  await axisChips(page, "도수").first().click();
   expect(page.url()).not.toMatch(/abvM(in|ax)/);
 });
 
@@ -332,7 +332,7 @@ test("RED23,24 - 파인더와 같은 구간 정의를 쓴다", async ({ page }) 
   );
 
   await page.goto(SEARCH);
-  const chips = await axisChips(page, "도수 ABV").count();
+  const chips = await axisChips(page, "도수").count();
 
   await page.goto("/finder");
   const options = await page.getByRole("button", { name: /무알콜|가볍게|적당히|독하게/ }).count();
@@ -353,9 +353,9 @@ test("RED23,24 - 파인더와 같은 구간 정의를 쓴다", async ({ page }) 
 test("RED25,27 - 쿼리스트링 형식이 서버 API 와 같다", async ({ page }) => {
   await page.goto(SEARCH);
 
-  await axisChips(page, "기주 BASE SPIRIT").nth(0).click();
-  await axisChips(page, "기주 BASE SPIRIT").nth(1).click();
-  await (await enabledChip(axisChips(page, "스타일 STYLE"))).click();
+  await axisChips(page, "기주").nth(0).click();
+  await axisChips(page, "기주").nth(1).click();
+  await (await enabledChip(axisChips(page, "스타일"))).click();
   await (await enabledSweet(page)).click();
 
   // 화면은 클릭 즉시 바뀌고 주소는 한 박자 뒤에 따라온다 (`router.replace`).
@@ -371,7 +371,7 @@ test("RED25,27 - 쿼리스트링 형식이 서버 API 와 같다", async ({ page
 
 test("RED26,28 - URL 을 공유하면 같은 결과가 나오고 뒤로가기가 동작한다", async ({ page }) => {
   await page.goto(SEARCH);
-  await axisChips(page, "기주 BASE SPIRIT").first().click();
+  await axisChips(page, "기주").first().click();
   await expect(page, "주소가 아직 따라오지 않았다").toHaveURL(/base=/);
 
   const shared = page.url();
@@ -383,7 +383,7 @@ test("RED26,28 - URL 을 공유하면 같은 결과가 나오고 뒤로가기가
   // 클라이언트 필터). 그래서 값이 들어오기를 기다린다. 서버 렌더로 바꾸면 첫 그림부터
   // 맞지만 칩을 누를 때마다 서버를 왕복하게 된다 (RED 36·37).
   await expect(page.locator(".results-count b")).toHaveText(String(expected));
-  await expect(axisChips(page, "기주 BASE SPIRIT").first()).toHaveAttribute(
+  await expect(axisChips(page, "기주").first()).toHaveAttribute(
     "aria-pressed",
     "true",
   );
@@ -402,8 +402,8 @@ test("RED28 - 필터를 여러 번 만져도 뒤로가기 한 번이면 벗어�
   await page.getByRole("link", { name: /탐색으로/ }).click();
   await expect(page).toHaveURL(new RegExp(`${SEARCH}$`));
 
-  await axisChips(page, "기주 BASE SPIRIT").first().click();
-  await (await enabledChip(axisChips(page, "스타일 STYLE"))).click();
+  await axisChips(page, "기주").first().click();
+  await (await enabledChip(axisChips(page, "스타일"))).click();
   await expect(page).toHaveURL(/style=/); // 주소가 따라온 뒤에 뒤로 간다
 
   await page.goBack();
@@ -444,7 +444,7 @@ test("RED29 - 사이트맵에 탐색 경로가 없다", async ({ request }) => {
 
 test("RED30,31,32 - 비활성 칩이 개수와 함께 읽힌다", async ({ page }) => {
   await page.goto(SEARCH);
-  const flavors = axisChips(page, "맛 / 향 FLAVOR PROFILE");
+  const flavors = axisChips(page, "맛 · 향");
   await flavors.nth(0).click();
   await (await enabledChip(flavors, 1)).click();
 
@@ -461,7 +461,7 @@ test("RED30,31,32 - 비활성 칩이 개수와 함께 읽힌다", async ({ page 
 test("RED33,34 - 키보드로 모든 칩에 도달하고 아웃라인이 보인다", async ({ page }) => {
   await page.goto(SEARCH);
 
-  const chips = axisChips(page, "기주 BASE SPIRIT");
+  const chips = axisChips(page, "기주");
   const first = chips.first();
 
   // 하이드레이션이 끝나기 전에 준 포커스는 리액트가 붙으면서 풀린다.
@@ -499,9 +499,9 @@ test("RED37 - 필터를 만져도 목록을 다시 받지 않는다", async ({ p
   });
 
   await page.goto(SEARCH);
-  await axisChips(page, "기주 BASE SPIRIT").first().click();
-  await axisChips(page, "스타일 STYLE").first().click();
-  await axisChips(page, "맛 / 향 FLAVOR PROFILE").first().click();
+  await axisChips(page, "기주").first().click();
+  await axisChips(page, "스타일").first().click();
+  await axisChips(page, "맛 · 향").first().click();
 
   expect(calls, "필터마다 목록을 다시 받고 있다").toEqual([]);
 });
@@ -541,7 +541,7 @@ test("RED36 - 필터 조작이 즉시 반영된다", async ({ page }) => {
   const before = await resultCount(page);
 
   const started = Date.now();
-  await axisChips(page, "기주 BASE SPIRIT").first().click();
+  await axisChips(page, "기주").first().click();
   await expect.poll(async () => resultCount(page)).not.toBe(before);
   const elapsed = Date.now() - started;
 
@@ -602,7 +602,7 @@ test("검색어와 필터가 함께 걸린다", async ({ page }) => {
   await expectResults(page, 3);
 
   // 기주를 럼으로 좁히면 킹스톤 네그로니만 남는다 — 검색어가 살아 있다는 뜻이다
-  await axisChips(page, "기주 BASE SPIRIT").filter({ hasText: "럼" }).first().click();
+  await axisChips(page, "기주").filter({ hasText: "럼" }).first().click();
   await expectResults(page, 1);
   await expect(page.locator(".cocktail-card").first()).toContainText("킹스톤");
 });

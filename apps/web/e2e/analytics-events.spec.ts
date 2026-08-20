@@ -91,7 +91,7 @@ test("RED1,3,4 - 필터를 걸면 축·값·결과 수가 실려 나간다", asy
   const batches = await collect(page);
   await ready(page, SEARCH);
 
-  const gin = chips(page, "기주 BASE SPIRIT").first();
+  const gin = chips(page, "기주").first();
   const expected = Number(((await gin.getAttribute("aria-label")) ?? "").match(/(\d+)개/)![1]);
   await gin.click();
 
@@ -115,11 +115,11 @@ test("RED2 - 여섯 축과 키워드가 각자의 이름으로 나간다", async
   // 축마다 새로 연다. 하나를 걸면 다른 축의 값이 0건이 되어 잠기는데(그것이 패싯의 일이다),
   // 잠긴 것을 누르면 이벤트가 안 나가 "축이 빠졌다" 로 읽힌다.
   const byChip: [string, string][] = [
-    ["기주 BASE SPIRIT", "base"],
-    ["스타일 STYLE", "style"],
-    ["메이킹 METHOD", "method"],
-    ["도수 ABV", "abv"],
-    ["맛 / 향 FLAVOR PROFILE", "flavor"],
+    ["기주", "base"],
+    ["스타일", "style"],
+    ["메이킹", "method"],
+    ["도수", "abv"],
+    ["맛 · 향", "flavor"],
   ];
 
   let sent = 0;
@@ -150,11 +150,11 @@ test("RED5 - activeAxisCount 가 그때 걸린 축 수다", async ({ page }) => 
   const batches = await collect(page);
   await ready(page, SEARCH);
 
-  await chips(page, "기주 BASE SPIRIT").first().click();
+  await chips(page, "기주").first().click();
   let events = await flushed(page, batches, "filter_apply", 1);
   expect(events.at(-1)!.payload).toMatchObject({ activeAxisCount: 1 });
 
-  await chips(page, "스타일 STYLE").first().click();
+  await chips(page, "스타일").first().click();
   events = await flushed(page, batches, "filter_apply", 2);
   expect(events.at(-1)!.payload, "두 축을 걸었는데 하나로 셌다").toMatchObject({
     activeAxisCount: 2,
@@ -171,7 +171,7 @@ test("RED6 - 연속 조작이 디바운스된다", async ({ page }) => {
   const batches = await collect(page);
   await ready(page, SEARCH);
 
-  const bases = chips(page, "기주 BASE SPIRIT");
+  const bases = chips(page, "기주");
   for (let i = 0; i < 3; i++) {
     await bases.nth(i).click();
     await page.waitForTimeout(80); // 400ms 창 안에 세 번
@@ -364,7 +364,7 @@ test("RED21 - 전송 로직을 다시 만들지 않았다", () => {
 test("RED22 - 공통 필드가 035 와 같다", async ({ page }) => {
   const batches = await collect(page);
   await ready(page, SEARCH);
-  await chips(page, "기주 BASE SPIRIT").first().click();
+  await chips(page, "기주").first().click();
 
   const [event] = await flushed(page, batches, "filter_apply");
   expect(event.sessionId).toMatch(/^[0-9a-f-]{36}$/i);
@@ -379,7 +379,7 @@ test("RED23 - 전송이 막혀도 화면이 그대로 돈다", async ({ page }) 
   await page.route("**/api/events", (route) => route.abort("blockedbyclient"));
 
   await ready(page, SEARCH);
-  await chips(page, "기주 BASE SPIRIT").first().click();
+  await chips(page, "기주").first().click();
   await expect(page.locator(".results-count b")).toBeVisible();
 
   await page.goto(FINDER);
