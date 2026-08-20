@@ -13,10 +13,17 @@ const fraunces = Fraunces({
   subsets: ["latin"],
 });
 
+/*
+ * `preload: false` — 이 폰트는 한글이라 유니코드 구간별 조각 282개로 쪼개져 오는데,
+ * preload 를 켜 두면 next/font 가 그중 187개를 첫 페이지에 전부 미리 싣는다.
+ * 그 다운로드가 대역폭을 채워 본문 텍스트의 LCP 가 2.0s 기준(`NFR-P-01`)을 넘겼다.
+ * 끄면 화면에 실제로 쓰인 구간의 조각만 CSS unicode-range 로 내려받는다.
+ */
 const plex = IBM_Plex_Sans_KR({
   variable: "--font-plex",
   subsets: ["latin"],
   weight: ["400", "500", "700"],
+  preload: false,
 });
 
 const notoSerif = Noto_Serif_KR({
