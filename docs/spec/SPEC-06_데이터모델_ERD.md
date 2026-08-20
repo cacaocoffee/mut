@@ -358,7 +358,7 @@ CONSTRAINT ck_menu_source CHECK (
 다형 참조라 FK를 걸 수 없다. **타입별 테이블로 쪼개지 않는 이유**는 컬렉션이
 세 종류를 섞어 담아야 하기 때문이다(`R-F5-2`). 참조 무결성은 앱이 책임진다.
 
-#### `user_stock` (Phase 2)
+#### `user_stock` (폐기 · [ADR-0010](../decisions/ADR-0010-articles-over-my-bar.md))
 
 `user_id`, `ingredient_id`, `added_at`. PK (`user_id`, `ingredient_id`).
 

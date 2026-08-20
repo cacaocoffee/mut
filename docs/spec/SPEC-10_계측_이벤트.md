@@ -158,7 +158,7 @@ PRD 2.2의 성공 지표 8개가 어떤 이벤트로 계산되나.
 | MAU | 30,000 | `DISTINCT sessionId` 월별 | 1a |
 | **유기 검색 유입 비중** | 50%+ | `referrerType='organic'` / 전체 | **1a** |
 | **칵테일↔바 크로스 이동률** | 세션 20% | `cross_nav` 있는 세션 / 전체 세션 | **1b** |
-| 내 술장 3개+ 등록 유저 | 가입자 25% | `user_stock` 카운트 | Phase 2 |
+| ~~내 술장 3개+ 등록 유저~~ — 폐기, 대체 지표는 [G-50](../prd/GAPS.md) | ~~가입자 25%~~ | — | — |
 | 유료 제휴사 수 | 30 | `partner_contract.tier >= partner` | 1b |
 | 제휴사 외부 액션 CTR | 12% | `partner_action` / `bar_view` | 1b |
 

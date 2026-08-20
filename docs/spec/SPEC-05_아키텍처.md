@@ -87,11 +87,17 @@ ADMIN ──governs──▶ 전부 (발행 상태 · 감사)
 | `/finder` · `/finder?base=…&step=…` | 셸 정적 + 클라이언트 진행 | — | ✅ **canonical `/finder`** |
 | `/bars/[slug]` | **SSG + ISR** | 발행 시 on-demand | ✅ |
 | `/bars?…` 목록·지도 | 클라이언트 | — | ❌ `noindex` |
-| `/stories/[slug]` | SSG + ISR | 발행 시 | ✅ |
+| `/articles` 목록 | SSG + ISR | 발행 시 | ✅ |
+| `/articles/[slug]` | SSG + ISR | 발행 시 | ✅ |
 | `/curations/[slug]` | SSG + ISR | 발행 시 | ✅ |
 | `/my/*` | CSR (인증) | — | ❌ |
 | `/partner/*` | CSR (인증) | — | ❌ |
 | `/admin/*` | CSR (인증) | — | ❌ |
+
+> 스토리 경로는 원래 `/stories/[slug]` 로 적혀 있었는데, SPEC-07 의 `GET /articles` ·
+> SPEC-06 의 `article` 테이블과 이름이 어긋나 `/articles` 로 통일했다
+> ([ADR-0010](../decisions/ADR-0010-articles-over-my-bar.md)). 아티클 앞당김(2026-08-20)
+> 동안 재생성은 배포 시점뿐이다 — 어드민 발행이 없어서 on-demand 훅이 부를 일이 없다.
 
 **on-demand 재생성** — 어드민에서 발행하면 API가 프론트의 revalidate 훅을 호출한다.
 에디터가 발행하고 나서 반영을 기다리지 않아야 한다 (PRD 12장 — 개발자 없이 발행).

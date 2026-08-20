@@ -222,9 +222,7 @@ SSG 빌드가 같은 엔드포인트를 반복 호출하므로 실효가 크다.
 
 | 경로 | 설명 |
 |---|---|
-| `GET` `PUT` `/me/stock` | 내 술장 재료 |
-| `GET` `/me/stock/makeable` | 지금 만들 수 있는 것 (`R-F2.2-1`) |
-| `GET` `/me/stock/one-away` | **재료 1개만 더 있으면** (`R-F2.2-2`) |
+| ~~`GET` `PUT` `/me/stock`~~ | 내 술장 — 폐기 ([ADR-0010](../decisions/ADR-0010-articles-over-my-bar.md)) |
 | `GET` `/articles` `/articles/{slug}` | 스토리 |
 | `GET` `/curations` `/curations/{slug}` | 큐레이션 리스트 |
 
