@@ -2,7 +2,7 @@
 @import "@mut/ui/styles.css";
 @import "@mut/ui/app.css";
 
-/* 매거진판의 폰트 지정 (ADR-0007) — 제목은 Fraunces(라틴) + Noto Serif KR(한글) 세리프,
+/* 매거진판의 폰트 지정 (ADR-0009) — 제목은 Fraunces(라틴) + Noto Serif KR(한글) 세리프,
    본문은 IBM Plex Sans KR. 실제 파일은 next/font가 주입하는
    --font-fraunces / --font-plex / --font-noto-serif. */
 :root {

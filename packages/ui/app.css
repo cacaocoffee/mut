@@ -31,7 +31,7 @@
   padding: 0 var(--space-8) 64px;
 }
 /* ┌─ 마스트헤드 ────────────────────────────────────────────────────────────┐
-   매거진판(ADR-0007)은 잡지 제호처럼 짠다 — 워드마크 중앙, 탭이 그 아래 얇은 선
+   매거진판(ADR-0009)은 잡지 제호처럼 짠다 — 워드마크 중앙, 탭이 그 아래 얇은 선
    사이에 선다. 중앙 정렬은 이 시스템에서 제호 한 곳만 허용된다 (docs/design/README).
 
    번호(01·02·03)는 유지한다 — 세 화면의 순서를 드러내려 붙인 것이고
@@ -59,7 +59,7 @@
 .site-nav .nav-brand {
   display: flex;
   align-items: flex-end;
-  /* 제호는 중앙이다 — 이 시스템에서 유일하게 허용되는 중앙 정렬 (ADR-0007) */
+  /* 제호는 중앙이다 — 이 시스템에서 유일하게 허용되는 중앙 정렬 (ADR-0009) */
   justify-content: center;
   gap: 12px;
   /* .nav-brand 의 margin-right: auto 는 가로 배치용이었다 — 세로에서는 무의미하다 */
@@ -119,7 +119,7 @@
   padding: var(--space-3) var(--space-3);
   /* 터치 타깃 — WCAG 2.5.8. 모바일 트래픽 80% 가정(PRD 12장)이면 특히 */
   min-height: 44px;
-  /* 탭은 잡지 목차다 — 제목 서체(세리프)를 쓰고, 선택만 굵어진다 (ADR-0007) */
+  /* 탭은 잡지 목차다 — 제목 서체(세리프)를 쓰고, 선택만 굵어진다 (ADR-0009) */
   font-family: var(--font-heading);
   font-weight: 400;
   font-size: 14px;
@@ -151,7 +151,7 @@
   align-items: end;
   gap: var(--space-6);
   padding: 36px 0 20px;
-  /* 지면의 강한 경계 — 잉크색 3px (ADR-0007). 조직 구분(2px divider)보다 한 단 세다 */
+  /* 지면의 강한 경계 — 잉크색 3px (ADR-0009). 조직 구분(2px divider)보다 한 단 세다 */
   border-bottom: 3px solid var(--color-text);
 }
 .page-head h1 {
@@ -205,7 +205,7 @@
 
 /* ─────────────────────────  01 탐색  ───────────────────────── */
 
-/* ┌─ 필터 — 사이드바가 아니라 가로 색인 띠다 (ADR-0007) ────────────────────┐
+/* ┌─ 필터 — 사이드바가 아니라 가로 색인 띠다 (ADR-0009) ────────────────────┐
    잡지 색인처럼 축 이름이 왼쪽 좁은 단에 서고 값이 옆으로 흐른다. 필터가
    결과 **위**에 전폭으로 걸려야 "아래 전체에 걸린다"가 형태로 읽힌다 —
    검색 칸을 전폭으로 올린 것과 같은 논리다.
@@ -328,7 +328,7 @@
   opacity: 0.32;
   cursor: not-allowed;
 }
-/* 당도 세그먼트 — 색인 띠 안에서는 값이 옆으로 흐르고, 칸 하나하나가 뱃지다 (ADR-0007).
+/* 당도 세그먼트 — 색인 띠 안에서는 값이 옆으로 흐르고, 칸 하나하나가 뱃지다 (ADR-0009).
    선택 채움(accent-700)은 아래 ADR-0006 블록이 전역으로 맡는다. */
 .seg-stack {
   display: flex;
@@ -408,7 +408,7 @@
   gap: 0 var(--space-8);
 }
 
-/* ┌─ 칵테일 카드 — 상자가 아니라 지면의 목록 항목이다 (ADR-0007) ───────────┐
+/* ┌─ 칵테일 카드 — 상자가 아니라 지면의 목록 항목이다 (ADR-0009) ───────────┐
    surface 채움과 테두리를 걷고 헤어라인 하나가 항목을 가른다. 잡지 색인처럼
    읽히고, 상태(호버)는 제목 색으로 말한다.
    └────────────────────────────────────────────────────────────────────────┘ */
@@ -493,7 +493,7 @@
   flex-wrap: wrap;
   gap: var(--space-1);
 }
-/* 향 태그도 상자가 아니라 글줄이다 — 가운뎃점으로 잇는다 (ADR-0007) */
+/* 향 태그도 상자가 아니라 글줄이다 — 가운뎃점으로 잇는다 (ADR-0009) */
 .cocktail-card__flavors span {
   font-size: 11px;
   letter-spacing: 0.04em;
@@ -618,7 +618,7 @@
 .spec-strip {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  /* 스펙은 지면의 표다 — 위는 강한 잉크선, 아래는 조직 구분선 (ADR-0007) */
+  /* 스펙은 지면의 표다 — 위는 강한 잉크선, 아래는 조직 구분선 (ADR-0009) */
   border-top: 3px solid var(--color-text);
   border-bottom: 2px solid var(--color-divider);
   margin-top: 20px;
@@ -809,7 +809,7 @@
   color: var(--color-neutral-900);
   max-width: 46ch;
 }
-/* 잡지 기사의 첫 글자 — 스토리 첫 문단만 머리글자를 키운다 (ADR-0007) */
+/* 잡지 기사의 첫 글자 — 스토리 첫 문단만 머리글자를 키운다 (ADR-0009) */
 .editorial p:first-of-type::first-letter {
   font-family: var(--font-heading);
   font-weight: var(--font-heading-weight);

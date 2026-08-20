@@ -8,7 +8,7 @@ import { FINDER_PATH, MY_BAR_PATH, SEARCH_PATH } from "@/lib/routes";
 export function SiteNav() {
   const pathname = usePathname();
 
-  // 레이블은 한국어 한 벌이다 — 영어 병기는 매거진판에서 걷어냈다 (ADR-0007 결과 항목).
+  // 레이블은 한국어 한 벌이다 — 영어 병기는 매거진판에서 걷어냈다 (ADR-0009 결과 항목).
   // 레이블을 두 줄로 접는 대신 짧게 쓴다 (ISSUE-051 #69). `01`·`02`·`03` 이 화면 순서를 드러낸다.
   //
   // **상세는 여기 없다.** 시안이 단일 페이지라 탭이 화면 전환기였고, 거기서는

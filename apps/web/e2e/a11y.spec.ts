@@ -125,7 +125,7 @@ test("RED23,24 - 포커스 링이 2px accent 다", async ({ page }) => {
     return Array.from(ctx.getImageData(0, 0, 1, 1).data).slice(0, 3);
   }, style!.color);
 
-  // 매거진판 accent — #93293b (ADR-0007). 팔레트를 바꾸면 이 기대값도 함께 바꾼다.
+  // 매거진판 accent — #93293b (ADR-0009). 팔레트를 바꾸면 이 기대값도 함께 바꾼다.
   const [r, g, b] = rgb;
   expect(
     Math.abs(r - 147) < 12 && Math.abs(g - 41) < 12 && Math.abs(b - 59) < 12,

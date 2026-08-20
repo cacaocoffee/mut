@@ -183,7 +183,7 @@ test("카드 색이 팔레트 정본과 같다", () => {
   const baseline = readFileSync(join(process.cwd(), "../../scripts/color-parity.mjs"), "utf8");
   const card = readFileSync(join(process.cwd(), "lib/og-card.tsx"), "utf8");
 
-  // 매거진판 (ADR-0007). 팔레트를 바꾸면 BASELINE · og-card 와 함께 이 표를 고친다.
+  // 매거진판 (ADR-0009). 팔레트를 바꾸면 BASELINE · og-card 와 함께 이 표를 고친다.
   for (const [token, hex] of [
     ["--color-bg", "#f6f3eb"],
     ["--color-text", "#241e18"],

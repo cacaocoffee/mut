@@ -7,7 +7,7 @@ import { SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 import "@/components/legal/legal.css";
 
-/* 가변 폰트라 weight 를 안 적는다 — wght 축 전체가 한 파일로 온다 (ADR-0007) */
+/* 가변 폰트라 weight 를 안 적는다 — wght 축 전체가 한 파일로 온다 (ADR-0009) */
 const fraunces = Fraunces({
   variable: "--font-fraunces",
   subsets: ["latin"],

@@ -115,7 +115,7 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
     { label: "도수", value: c.abv != null ? `${c.abv}%` : "—", sub: "표준 배합 기준" },
     { label: "스타일", value: c.stylePrimary.labelKo, sub: "대표 스타일" },
     { label: "글라스", value: c.glassType, sub: "권장 잔" },
-    // 라벨도 값도 한국어 한 벌이다 — 영어 병기는 매거진판에서 걷어냈다 (ADR-0007 결과 항목).
+    // 라벨도 값도 한국어 한 벌이다 — 영어 병기는 매거진판에서 걷어냈다 (ADR-0009 결과 항목).
     // 예전에는 메이킹만 슬러그(`stir`)를, 당도만 영문(`Dry`)을 보여 줘서 언어가 제각각이었다.
     { label: "메이킹", value: c.method.labelKo, sub: "도구 기준" },
     { label: "당도", value: c.sweetness.ko, sub: "4단계 기준" },
@@ -129,7 +129,8 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
       />
 
       <div className="detail-hero">
-        <div className="grayscale photo-slot photo-slot--4x5">
+        {/* 히어로는 `PhotoSlot` 과 달리 라벨 문구가 달라 직접 쓴다. 컬러 — ADR-0008 */}
+        <div className="photo-slot photo-slot--4x5">
           <div className="photo-slot__label">HERO IMAGE 4:5 — PLACEHOLDER</div>
           <div className="photo-slot__caption">{c.nameEn}</div>
         </div>
@@ -286,7 +287,7 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
             <figure>
               <PhotoSlot ratio="3x2" label="EDITORIAL IMAGE 3:2 — PLACEHOLDER" />
               <figcaption>
-                에디토리얼 이미지 자리. 사진은 흑백(grayscale)으로 출력됩니다.
+                에디토리얼 이미지 자리입니다.
               </figcaption>
             </figure>
 

@@ -1,9 +1,9 @@
 /* 매거진판 — design-system tokens and component classes. This file is the source
-   of truth for the system's look (ADR-0007); the hex baseline lives in
+   of truth for the system's look (ADR-0009); the hex baseline lives in
    scripts/color-parity.mjs and must round-trip with the oklch() notation here. */
 /* 폰트 파일은 앱이 next/font 로 자체 서빙한다 (app/layout.tsx → globals.css 변수).
    Modernist 시절 남아 있던 Google Fonts @import 는 같은 폰트를 이중으로 받아
-   networkidle 을 늘리던 잔재라 매거진판에서 걷어냈다 (ADR-0007). */
+   networkidle 을 늘리던 잔재라 매거진판에서 걷어냈다 (ADR-0009). */
 
 :root {
   --color-bg: oklch(96.43% 0.0111 89.72);
@@ -14,7 +14,7 @@
   --color-divider: color-mix(in srgb, var(--color-text) 40%, transparent);
 
   /* Tonal ramps — generated in OKLCH on the same shared lightness scale as
-     Modernist (ADR-0007 결정 1), so the same step of any role matches the
+     Modernist (ADR-0009 결정 1), so the same step of any role matches the
      others in visual value and contrast-check pairs keep holding. */
   --color-neutral-100: oklch(97.05% 0.0098 87.47);
   --color-neutral-200: oklch(93.11% 0.0112 89.73);

@@ -341,8 +341,10 @@ for (const rel of USAGE_ALSO.concat(["apps/web/components/recipe-panel.tsx"])) {
 // 11. no_decorative_eyebrow — 서수가 아닌 <h6> 커커는 장식이다.
 //     전부 챕터면 아무것도 챕터가 아니다. 폼·목록 레이블은 기능이 있으므로 남긴다.
 const EYEBROW_ALLOWED = [
-  { file: "apps/web/components/search-screen.tsx", text: "필터 FILTERS", why: "필터 패널의 폼 레이블" },
-  { file: "apps/web/app/cocktails/[slug]/page.tsx", text: "같은 기주 RELATED", why: "목록 레이블" },
+  // 문구는 매거진판에서 한국어 한 벌로 줄었다 (ADR-0009). 허용하는 근거는 그대로다 —
+  // 영문 병기를 걷어낸 것이지 이 <h6> 들이 하는 일이 바뀐 것은 아니다.
+  { file: "apps/web/components/search-screen.tsx", text: "필터", why: "필터 패널의 폼 레이블" },
+  { file: "apps/web/app/cocktails/[slug]/page.tsx", text: "같은 기주", why: "목록 레이블" },
 ];
 for (const rel of USAGE_ALSO) {
   let text;
