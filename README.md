@@ -9,7 +9,8 @@
 **현재 상태 — Phase 1a 구현 완료.**
 Kotlin/Spring API · Postgres 시드 41종 · 어드민(편집 · 레시피 · 재료 승인 · 검증 태스크 ·
 감사 로그) · 공개 화면 5종이 동작한다. e2e 237건이 CI 에서 돈다.
-남은 것은 호스팅 · 이미지 저장소 같은 **사업 결정**이다 ([G-07](docs/prd/GAPS.md)).
+호스팅은 [ADR-0007](docs/decisions/ADR-0007-hosting.md)로 정했다 — **웹은 지금 바로 $0으로
+올릴 수 있다** (아래 [배포](#배포)). 남은 것은 사진 자산 같은 **사업 결정**이다.
 
 ```bash
 npm install
@@ -49,7 +50,7 @@ docs/                     문서 23개 — 아래 참조
 | 시스템 스펙 | [`docs/spec/`](docs/spec/) — SPEC-00~08 · 10 |
 | 화면 명세 | [`docs/screens/`](docs/screens/) |
 | 디자인 | [`docs/design/README.md`](docs/design/README.md) |
-| 결정 기록 | [`docs/decisions/`](docs/decisions/) — ADR 6건 |
+| 결정 기록 | [`docs/decisions/`](docs/decisions/) — ADR 7건 |
 | 배포 전 사람 확인 | [`docs/RELEASE-CHECKLIST.md`](docs/RELEASE-CHECKLIST.md) |
 | 추적 · 게이트 | [`docs/TRACE-00_추적매트릭스.md`](docs/TRACE-00_추적매트릭스.md) |
 | 아직 안 정해진 것 | [`docs/prd/GAPS.md`](docs/prd/GAPS.md) |
@@ -79,6 +80,57 @@ Phase 1을 둘로 나눴다 ([SPEC-01 §4](docs/spec/SPEC-01_시스템개요_범
 
 이미지는 전부 시안의 자리표시자다. 실제 사진 자산이 없다.
 
+## 배포
+
+호스팅은 [ADR-0007](docs/decisions/ADR-0007-hosting.md)이 정했다 — 웹은 Vercel, DB는 Neon,
+이미지는 Cloudflare R2, API는 Fly 또는 Cloud Run. **세 단계로 나눠** 올리고, 지금 할 수
+있는 것은 1단계다.
+
+| 단계 | 무엇 | 값 | 막는 것 |
+|---|---|---|---|
+| **1** | 웹만 Vercel | **$0** | 없음 |
+| 2 | API + DB(Neon) | **$0~3** | [G-45](docs/prd/GAPS.md#g-45) 판정 |
+| 3 | 이미지 R2 | ~$0 | 붙일 사진이 없다 |
+
+2단계 값이 벌어지는 이유는 둘이다 — 도메인을 사야 하는지([G-45](docs/prd/GAPS.md#g-45))와
+API를 Cloud Run 무료 한도에 넣을 수 있는지(GraalVM 네이티브가 필요하다). 둘 다
+**1단계를 막지 않으므로 지금 정하지 않는다.**
+
+### 1단계 — 웹만 올린다
+
+[`apps/web/lib/api.ts`](apps/web/lib/api.ts)가 `MUT_API_URL` 이 비면 API를 부르지 않고
+`packages/domain` 의 배열로 빌드한다. 그래서 **백엔드 없이 사이트가 뜬다.**
+
+Vercel 대시보드에서 이 저장소를 가져오고:
+
+| 설정 | 값 |
+|---|---|
+| Root Directory | **`apps/web`** — 루트 락파일을 보고 npm 워크스페이스를 알아서 설치한다 |
+| Framework | Next.js (자동으로 잡힌다) |
+| 환경변수 | `MUT_SITE_URL` **하나만** 넣는다 |
+
+`MUT_SITE_URL` 을 빠뜨리면 [`apps/web/lib/site.ts`](apps/web/lib/site.ts)가
+`http://localhost:3000` 을 쓴다. 그러면 OG · 사이트맵 · 구조화 데이터가 전부 로컬을 가리켜
+**카카오톡 카드가 뜨지 않는다**. 화면은 멀쩡해 보이므로 눈으로는 못 잡는다.
+
+`MUT_API_URL` 은 **넣지 않는다.** 넣는 순간 API 만 쓰는데 2단계 전에는 그게 없다.
+
+변수 목록과 각각을 빠뜨렸을 때 무슨 일이 생기는지는 [`apps/web/.env.example`](apps/web/.env.example)에 있다.
+
+**1단계에서 무엇이 도는가.** 서버를 부르는 것만 못 쓴다.
+
+| | 1단계에서 |
+|---|---|
+| 탐색 · 파인더 · 내 술장 · 재료 사전 · 상세 | **전부 돈다** |
+| 탐색 화면의 검색창 | **돈다.** 색인이 503을 주면 이름 부분일치로 물러난다 — 초성과 별칭만 빠진다 ([`use-name-index.ts`](apps/web/lib/use-name-index.ts)) |
+| 자동완성 드롭다운 | 제안이 **안 뜬다** (빈 목록). 치는 것 자체는 막히지 않는다 |
+| `/search` 통합 검색 | **빈 화면.** 셸만 있고 질의를 전부 API에 맡긴다. 내비에 없고 `noindex`라 주소를 직접 쳐야 닿는다 |
+| 로그인 · 어드민 | 못 쓴다 |
+
+세 줄 모두 조용히 물러난다 — 오류 화면이 뜨지 않는다.
+
+올린 뒤에는 아래 **공유 카드 확인**을 한 번 돌린다 — 그게 1단계의 마지막 관문이다.
+
 ## 공유 카드 확인 (배포 전)
 
 `NFR-S-06` 은 **카카오톡 카드 미리보기**를 사람이 확인하라고 한다 — 자동화할 수 없는 항목이라
@@ -98,7 +150,8 @@ Phase 1을 둘로 나눴다 ([SPEC-01 §4](docs/spec/SPEC-01_시스템개요_범
 
 | | 성격 |
 |---|---|
-| 호스팅 · 이미지 저장소 결정 | **사업/인프라** — 스펙으로 풀리지 않는다 ([G-07](docs/prd/GAPS.md)) |
+| 도메인을 사야 하는가 | **2단계 값을 가른다.** 프록시가 `Set-Cookie` 를 그대로 전달하면 안 사도 될 수 있다 ([G-45](docs/prd/GAPS.md#g-45)) |
+| 히어로 사진 | 3단계를 막는다. 저장소는 R2로 정해졌고 붙일 사진이 없다 ([G-07](docs/prd/GAPS.md)) |
 | 법률 검토 1회 | **외부** — [ADR-0004](docs/decisions/ADR-0004-age-gate.md)의 전제 확인 포함 |
 | 시드 데이터 다듬기 | 에디터 판단 — 계량 표기 · oz 반올림 ([DECISIONS](docs/issues/DECISIONS.md) D-3~D-5) |
 | Phase 1b 바 · 제휴 | 스펙 완료, 착수 보류 |

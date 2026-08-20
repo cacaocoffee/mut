@@ -32,6 +32,9 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# 예시는 값이 없고 무엇을 넣는지만 적혀 있다. 이게 빠지면 배포하는 사람이
+# 변수 이름을 코드에서 찾아내야 한다 (ADR-0007).
+!.env.example
 
 # vercel
 .vercel
