@@ -130,7 +130,8 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
       />
 
       <div className="detail-hero">
-        <div className="grayscale photo-slot photo-slot--4x5">
+        {/* 히어로는 `PhotoSlot` 과 달리 라벨 문구가 달라 직접 쓴다. 컬러 — ADR-0008 */}
+        <div className="photo-slot photo-slot--4x5">
           <div className="photo-slot__label">HERO IMAGE 4:5 — PLACEHOLDER</div>
           <div className="photo-slot__caption">{c.nameEn}</div>
         </div>
@@ -289,7 +290,7 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
             <figure>
               <PhotoSlot ratio="3x2" label="EDITORIAL IMAGE 3:2 — PLACEHOLDER" />
               <figcaption>
-                에디토리얼 이미지 자리. 사진은 흑백(grayscale)으로 출력됩니다.
+                에디토리얼 이미지 자리입니다.
               </figcaption>
             </figure>
 

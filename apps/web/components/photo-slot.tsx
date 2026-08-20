@@ -1,6 +1,10 @@
 /**
- * 사진 자리. 시안이 사선 해칭 플레이스홀더로 잡아둔 블록이며,
- * 실제 이미지가 들어와도 `.grayscale` 래퍼는 유지한다 — 콘텐츠 사진은 흑백 출력이 원칙.
+ * 사진 자리. 시안이 사선 해칭 플레이스홀더로 잡아둔 블록이다.
+ *
+ * **컬러로 낸다** ([ADR-0008](../../../docs/decisions/ADR-0008-color-photos.md)).
+ * 시안은 `.grayscale` 래퍼를 씌웠는데, 칵테일에서 색은 장식이 아니라 **식별 정보다** —
+ * 흑백이면 네그로니와 맨해튼이 거의 같은 사진이 되고 49종 그리드가 서로 구별되지 않는다.
+ * 클래스는 `styles.css` 에 남아 있다. 되돌리려면 아래 래퍼에 다시 넣는다.
  */
 export function PhotoSlot({
   ratio,
@@ -12,7 +16,7 @@ export function PhotoSlot({
   label?: string;
 }) {
   return (
-    <div className={`grayscale photo-slot photo-slot--${ratio}`}>
+    <div className={`photo-slot photo-slot--${ratio}`}>
       {label ? <div className="photo-slot__label">{label}</div> : null}
       {caption ? <div className="photo-slot__caption">{caption}</div> : null}
     </div>
