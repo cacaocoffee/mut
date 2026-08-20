@@ -28,7 +28,7 @@ apps/
       common/            공통 · 어댑터 · 감사
 packages/
   domain/             TS — 프론트 필터·파인더 로직 + 생성 타입
-  ui/                 Modernist 디자인 시스템
+  ui/                 매거진판 디자인 시스템 (ADR-0009)
 docs/
 ```
 

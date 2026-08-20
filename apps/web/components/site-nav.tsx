@@ -8,8 +8,8 @@ import { FINDER_PATH, MY_BAR_PATH, SEARCH_PATH } from "@/lib/routes";
 export function SiteNav() {
   const pathname = usePathname();
 
-  // 국문과 영문을 나눠 둔다 — 560px 아래에서 영문만 감춘다 (ISSUE-051 #69).
-  // 레이블을 두 줄로 접는 대신 짧게 쓴다. `01`·`02` 가 화면 순서를 계속 드러낸다.
+  // 레이블은 한국어 한 벌이다 — 영어 병기는 매거진판에서 걷어냈다 (ADR-0009 결과 항목).
+  // 레이블을 두 줄로 접는 대신 짧게 쓴다 (ISSUE-051 #69). `01`·`02`·`03` 이 화면 순서를 드러낸다.
   //
   // **상세는 여기 없다.** 시안이 단일 페이지라 탭이 화면 전환기였고, 거기서는
   // "상세 = 지금 고른 것" 이 성립했다. 실제 주소로 옮긴 뒤에도 그 칸이 남아
@@ -23,9 +23,9 @@ export function SiteNav() {
   // (`R-F5-1`) 칵테일 그리드가 담을 수 없고, 그 화면에 걸린 요구사항이 따로 있다
   // (`FR-SEARCH-006`·`007`·`008`). 갈 곳이 생기면 다시 내건다.
   const tabs = [
-    { href: SEARCH_PATH, ko: "01 탐색", en: "SEARCH", match: (p: string) => p === SEARCH_PATH },
-    { href: FINDER_PATH, ko: "02 파인더", en: "FINDER", match: (p: string) => p === FINDER_PATH },
-    { href: MY_BAR_PATH, ko: "03 내 술장", en: "MY BAR", match: (p: string) => p === MY_BAR_PATH },
+    { href: SEARCH_PATH, ko: "01 탐색", match: (p: string) => p === SEARCH_PATH },
+    { href: FINDER_PATH, ko: "02 파인더", match: (p: string) => p === FINDER_PATH },
+    { href: MY_BAR_PATH, ko: "03 내 술장", match: (p: string) => p === MY_BAR_PATH },
   ];
 
   return (
@@ -45,7 +45,7 @@ export function SiteNav() {
             className="btn tab"
             aria-current={t.match(pathname) ? "page" : undefined}
           >
-            {t.ko} <span className="en">{t.en}</span>
+            {t.ko}
           </Link>
         ))}
       </div>

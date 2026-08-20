@@ -85,7 +85,7 @@ test("RED2,3 - 구간 정의가 탐색 필터와 동일하다", async ({ page })
 
   const chips = page
     .locator(".filter-group")
-    .filter({ hasText: "도수 ABV" })
+    .filter({ hasText: "도수" })
     .locator("button[aria-pressed]");
 
   const searchBands: string[] = [];

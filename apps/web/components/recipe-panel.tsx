@@ -61,7 +61,7 @@ export function RecipePanel({ slug, ingredients }: { slug: string; ingredients: 
   return (
     <>
       <div className="rule-head">
-        <h4 style={{ margin: 0 }}>재료 INGREDIENTS</h4>
+        <h4 style={{ margin: 0 }}>재료</h4>
         <div className="recipe-controls">
           <div className="stepper">
             <button

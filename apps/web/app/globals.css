@@ -1,12 +1,13 @@
-/* Modernist 토큰·컴포넌트가 먼저, 화면 레이아웃 층이 그 위. 순서를 바꾸지 말 것. */
+/* 매거진판 토큰·컴포넌트가 먼저, 화면 레이아웃 층이 그 위. 순서를 바꾸지 말 것. */
 @import "@mut/ui/styles.css";
 @import "@mut/ui/app.css";
 
-/* 시안의 폰트 지정 — Archivo(라틴) + Noto Sans KR(한글) 병기, 에디토리얼 본문은 Noto Serif KR.
-   실제 파일은 next/font가 주입하는 --font-archivo / --font-noto-sans / --font-noto-serif. */
+/* 매거진판의 폰트 지정 (ADR-0009) — 제목은 Fraunces(라틴) + Noto Serif KR(한글) 세리프,
+   본문은 IBM Plex Sans KR. 실제 파일은 next/font가 주입하는
+   --font-fraunces / --font-plex / --font-noto-serif. */
 :root {
-  --font-heading: var(--font-archivo), var(--font-noto-sans), system-ui, sans-serif;
-  --font-body: var(--font-archivo), var(--font-noto-sans), system-ui, sans-serif;
+  --font-heading: var(--font-fraunces), var(--font-noto-serif), "Noto Serif KR", serif;
+  --font-body: var(--font-plex), "IBM Plex Sans KR", system-ui, sans-serif;
   --font-serif: var(--font-noto-serif), "Noto Serif KR", serif;
 }
 

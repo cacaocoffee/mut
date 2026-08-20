@@ -7,7 +7,7 @@
 | **왜 · 무엇** | 제품 요구사항 | [`prd/`](./prd/) |
 | **어떻게** | 시스템 스펙 | [`spec/`](./spec/) |
 | **화면** | 프론트 화면 명세 | [`screens/`](./screens/) |
-| **디자인** | Modernist 토큰 · 규칙 | [`design/`](./design/) |
+| **디자인** | 매거진판 토큰 · 규칙 | [`design/`](./design/) |
 | **왜 그렇게 정했나** | ADR | [`decisions/`](./decisions/) |
 
 ## 읽기 순서
@@ -72,6 +72,7 @@
 | [ADR-0006](./decisions/ADR-0006-btn-primary-contrast.md) | 흰 글자를 얹는 면은 `accent-700` — `.btn-primary` 대비 (G-16) |
 | [ADR-0007](./decisions/ADR-0007-hosting.md) | 호스팅은 Vercel · Neon · R2. 웹부터 혼자 $0 으로 올린다 (G-07 하단) |
 | [ADR-0008](./decisions/ADR-0008-color-photos.md) | 콘텐츠 사진은 컬러 — 시안의 `.grayscale` 규칙을 뗀다 (G-46) |
+| [ADR-0009](./decisions/ADR-0009-design-magazine.md) | 디자인 시스템을 **매거진판**으로 교체 — 아이보리 + 와인 + 세리프 제목 (ADR-0001 대체) |
 
 ## 미결
 

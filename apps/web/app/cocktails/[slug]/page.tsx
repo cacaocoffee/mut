@@ -112,14 +112,13 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
   const related = await loadRelated(slug);
 
   const specs = [
-    { label: "ABV", value: c.abv != null ? `${c.abv}%` : "—", sub: "표준 배합 기준" },
-    { label: "STYLE", value: c.stylePrimary.labelKo, sub: "대표 스타일" },
-    { label: "GLASSWARE", value: c.glassType, sub: "권장 잔" },
-    // 값은 한국어로 통일한다 — 라벨(위)이 이미 영문이라 값까지 영문이면 한 줄에서 두 번
-    // 영어를 읽는다. 예전에는 메이킹만 슬러그(`stir`)를, 당도만 영문(`Dry`)을 보여 줘서
-    // 다섯 칸의 언어가 제각각이었다.
-    { label: "TECHNIQUE", value: c.method.labelKo, sub: "메이킹 방법" },
-    { label: "SWEETNESS", value: c.sweetness.ko, sub: `${c.sweetness.en} · 4단계` },
+    { label: "도수", value: c.abv != null ? `${c.abv}%` : "—", sub: "표준 배합 기준" },
+    { label: "스타일", value: c.stylePrimary.labelKo, sub: "대표 스타일" },
+    { label: "글라스", value: c.glassType, sub: "권장 잔" },
+    // 라벨도 값도 한국어 한 벌이다 — 영어 병기는 매거진판에서 걷어냈다 (ADR-0009 결과 항목).
+    // 예전에는 메이킹만 슬러그(`stir`)를, 당도만 영문(`Dry`)을 보여 줘서 언어가 제각각이었다.
+    { label: "메이킹", value: c.method.labelKo, sub: "도구 기준" },
+    { label: "당도", value: c.sweetness.ko, sub: "4단계 기준" },
   ];
 
   return (
@@ -141,7 +140,7 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
             className="btn btn-ghost"
             style={{ fontSize: 11, paddingLeft: 0, marginBottom: 14 }}
           >
-            ← 탐색으로 BACK TO SEARCH
+            ← 탐색으로
           </Link>
           <h1>{c.nameKo}</h1>
           <div className="en">{c.nameEn}</div>
@@ -192,7 +191,7 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
               브라우저에서 한 번 보낸다 (이슈 035). */}
           <TrackCocktailView slug={c.slug} />
 
-          <h4 className="section-head">제조 순서 METHOD</h4>
+          <h4 className="section-head">제조 순서</h4>
           <ol style={{ listStyle: "none", margin: 0, padding: 0 }}>
             {c.steps.map((text, i) => (
               <li className="step" key={text}>
@@ -207,7 +206,7 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
           {/* `GATE-COCKTAIL-01` 이 발행 필수로 만든 블록이다 — `PRIN-P03` 의 핵심. */}
           {c.tastingNote && (
             <>
-              <h4 className="section-head section-head--flush">향과 맛 TASTING</h4>
+              <h4 className="section-head section-head--flush">향과 맛</h4>
               <p className="summary">{c.tastingNote}</p>
               <div className="tag-row">
                 {c.aromaTags.map((tag) => (
@@ -221,14 +220,12 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
 
           {c.profile && (
             <>
-              <h4 className="section-head">맛 프로필 FLAVOR PROFILE</h4>
+              <h4 className="section-head">맛 프로필</h4>
               <FlavorRadar profile={c.profile as [number, number, number, number, number]} title={c.nameKo} />
               <div style={{ borderTop: "2px solid var(--color-divider)" }}>
                 {c.profile.map((v, i) => (
                   <div className="profile-row" key={AXES[i]}>
-                    <span className="label">
-                      {AXES_KO[i]} {AXES[i]}
-                    </span>
+                    <span className="label">{AXES_KO[i]}</span>
                     <span className="meter">
                       <span style={{ width: `${(v / 5) * 100}%` }} />
                     </span>
@@ -241,7 +238,7 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
 
           {c.origin && (
             <>
-              <h4 className="section-head">기록 ORIGIN</h4>
+              <h4 className="section-head">기록</h4>
               <table className="table">
                 <tbody>
                   {[
@@ -300,7 +297,7 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
               <div
                 style={{ marginTop: 24, borderTop: "2px solid var(--color-divider)", paddingTop: 16 }}
               >
-                <h6 style={{ margin: "0 0 10px" }}>같은 기주 RELATED</h6>
+                <h6 style={{ margin: "0 0 10px" }}>같은 기주</h6>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   {related.map((r) => (
                     <Link key={r.slug} href={`/cocktails/${r.slug}`} className="btn related-link">

@@ -5,8 +5,9 @@
  * ADR-0005 결정 3 이 램프 표기 변경을 **"표기 변경이지 값 변경이 아니다"**로 규정했다.
  * 그 주장을 사람이 지키는 대신 이 스크립트가 지킨다 — 표기를 바꾸다 값이 밀리면 여기서 걸린다.
  *
- * BASELINE 은 시안 원본(`docs/design/source/MUT.dc.html`)에서 온 값이고
- * **손으로 고치지 않는다.** 색을 정말 바꿔야 한다면 ADR 을 먼저 쓴다 (SPEC-00 §4).
+ * BASELINE 은 매거진판 팔레트(ADR-0007)의 hex 정본이고 **손으로 고치지 않는다.**
+ * 색을 정말 바꿔야 한다면 ADR 을 먼저 쓴다 (SPEC-00 §4). Modernist 시절에는
+ * 시안 원본(`docs/design/source/MUT.dc.html`)이 이 자리를 맡았다.
  *
  *   node scripts/color-parity.mjs             대조 (npm run check 가 부른다)
  *   node scripts/color-parity.mjs --generate  BASELINE 을 oklch() 로 출력 (이관용)
@@ -19,25 +20,25 @@ import { dirname, join } from "node:path";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const TARGET = "packages/ui/styles.css";
 
-/** 시안이 정한 색. 이 표가 정본이다. */
+/** 매거진판이 정한 색 (ADR-0007). 이 표가 hex 정본이다. */
 const BASELINE = {
-  "--color-bg": "#f3f2f2",
-  "--color-surface": "#eae9e9",
-  "--color-text": "#201e1d",
-  "--color-accent": "#ec3013",
-  "--color-accent-2": "#e15b47",
+  "--color-bg": "#f6f3eb",
+  "--color-surface": "#ece8df",
+  "--color-text": "#241e18",
+  "--color-accent": "#93293b",
+  "--color-accent-2": "#9f5c54",
 
-  "--color-neutral-100": "#f8f4f4", "--color-neutral-200": "#eae7e7", "--color-neutral-300": "#d7d3d3",
-  "--color-neutral-400": "#bab6b6", "--color-neutral-500": "#9b9797", "--color-neutral-600": "#7d7979",
-  "--color-neutral-700": "#605d5d", "--color-neutral-800": "#444141", "--color-neutral-900": "#2d2b2b",
+  "--color-neutral-100": "#f8f5ee", "--color-neutral-200": "#ebe8e0", "--color-neutral-300": "#d8d4cc",
+  "--color-neutral-400": "#bbb7af", "--color-neutral-500": "#9b9891", "--color-neutral-600": "#7d7a74",
+  "--color-neutral-700": "#605e58", "--color-neutral-800": "#44423d", "--color-neutral-900": "#2d2b27",
 
-  "--color-accent-100": "#fff2ef", "--color-accent-200": "#ffe0d9", "--color-accent-300": "#ffc4b8",
-  "--color-accent-400": "#ff9783", "--color-accent-500": "#ff563c", "--color-accent-600": "#dd2b0f",
-  "--color-accent-700": "#ae1800", "--color-accent-800": "#7c1405", "--color-accent-900": "#4d170e",
+  "--color-accent-100": "#fff1f1", "--color-accent-200": "#ffdcde", "--color-accent-300": "#ffc1c4",
+  "--color-accent-400": "#f39ba2", "--color-accent-500": "#da767f", "--color-accent-600": "#bc5460",
+  "--color-accent-700": "#993846", "--color-accent-800": "#6f252f", "--color-accent-900": "#481b20",
 
-  "--color-accent-2-100": "#fff2ef", "--color-accent-2-200": "#ffe0da", "--color-accent-2-300": "#ffc4b9",
-  "--color-accent-2-400": "#ff9784", "--color-accent-2-500": "#ef6853", "--color-accent-2-600": "#c94b39",
-  "--color-accent-2-700": "#9e3526", "--color-accent-2-800": "#71261b", "--color-accent-2-900": "#471d16",
+  "--color-accent-2-100": "#fef2f0", "--color-accent-2-200": "#fde0dc", "--color-accent-2-300": "#f6c8c1",
+  "--color-accent-2-400": "#e4a59c", "--color-accent-2-500": "#ca8379", "--color-accent-2-600": "#ac6359",
+  "--color-accent-2-700": "#8b473f", "--color-accent-2-800": "#64312b", "--color-accent-2-900": "#41211d",
 };
 
 // ── 색 변환 (Björn Ottosson, Oklab) ──────────────────────────────────────────

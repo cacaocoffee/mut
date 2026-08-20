@@ -75,7 +75,7 @@ const NUMERIC = [".results-count", ".spec-strip", ".cocktail-card__abv", ".profi
  * 앱이 주입하는 것으로 알려진 토큰 — `packages/ui` 가 정의하지 않아도 된다 (게이트 9).
  * next/font 가 런타임에 넣는다. 이 목록 밖의 미정의 토큰은 실패로 본다.
  */
-const APP_PROVIDED = ["--font-archivo", "--font-noto-sans", "--font-noto-serif"];
+const APP_PROVIDED = ["--font-fraunces", "--font-plex", "--font-noto-serif"];
 
 /**
  * 한글을 담는 칸 — 12px 바닥 (게이트 13).
@@ -341,8 +341,10 @@ for (const rel of USAGE_ALSO.concat(["apps/web/components/recipe-panel.tsx"])) {
 // 11. no_decorative_eyebrow — 서수가 아닌 <h6> 커커는 장식이다.
 //     전부 챕터면 아무것도 챕터가 아니다. 폼·목록 레이블은 기능이 있으므로 남긴다.
 const EYEBROW_ALLOWED = [
-  { file: "apps/web/components/search-screen.tsx", text: "필터 FILTERS", why: "필터 패널의 폼 레이블" },
-  { file: "apps/web/app/cocktails/[slug]/page.tsx", text: "같은 기주 RELATED", why: "목록 레이블" },
+  // 문구는 매거진판에서 한국어 한 벌로 줄었다 (ADR-0009). 허용하는 근거는 그대로다 —
+  // 영문 병기를 걷어낸 것이지 이 <h6> 들이 하는 일이 바뀐 것은 아니다.
+  { file: "apps/web/components/search-screen.tsx", text: "필터", why: "필터 패널의 폼 레이블" },
+  { file: "apps/web/app/cocktails/[slug]/page.tsx", text: "같은 기주", why: "목록 레이블" },
 ];
 for (const rel of USAGE_ALSO) {
   let text;

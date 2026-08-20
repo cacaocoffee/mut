@@ -240,7 +240,7 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
           <h1>
             칵테일 탐색
             <span className="sub">
-              Browse {results.length} of {corpus.length} entries
+              전체 {corpus.length}잔 중 {results.length}잔
             </span>
           </h1>
         </div>
@@ -258,20 +258,20 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
       <div className="search-layout">
         <aside className="filter-panel">
           <div className="rule-head">
-            <h6 style={{ margin: 0 }}>필터 FILTERS</h6>
+            <h6 style={{ margin: 0 }}>필터</h6>
             <button
               type="button"
               className="btn btn-ghost"
               style={{ fontSize: 11 }}
               onClick={() => apply(DEFAULT_FILTERS)}
             >
-              초기화 RESET
+              초기화
             </button>
           </div>
 
           {/* 당도만 단일값이다 (DECISIONS §1.11) — 라디오로 그 사실을 드러낸다 */}
           <div className="filter-group">
-            <div className="filter-label">당도 SWEETNESS</div>
+            <div className="filter-label">당도</div>
             <div className="seg seg-stack">
               <label className="seg-opt">
                 <input
@@ -281,7 +281,7 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
                   onChange={() => apply({ sweet: null }, { axis: "sweet", value: "" })}
                 />
                 <span className="ko">전체</span>
-                <span className="en">All · {sweetAll}</span>
+                <span className="en">{sweetAll}</span>
               </label>
               {SWEET_LEVELS.filter((level) => level in counts.sweet).map((level) => {
                 const [ko, en] = SWEETNESS[level];
@@ -297,9 +297,7 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
                       onChange={() => apply({ sweet: level }, { axis: "sweet", value: level })}
                     />
                     <span className="ko">{ko}</span>
-                    <span className="en">
-                      {en} · {n}
-                    </span>
+                    <span className="en">{n}</span>
                   </label>
                 );
               })}
@@ -307,7 +305,7 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
           </div>
 
           <FacetChips
-            label="기주 BASE SPIRIT"
+            label="기주"
             counts={counts.base}
             selected={filters.bases}
             labelOf={(slug) => BASE_SPIRIT_LABELS[slug as BaseSpirit]}
@@ -315,7 +313,7 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
           />
 
           <FacetChips
-            label="스타일 STYLE"
+            label="스타일"
             counts={counts.style}
             selected={filters.styles}
             labelOf={(slug) => STYLE_LABELS[slug as StyleKey]}
@@ -323,7 +321,7 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
           />
 
           <FacetChips
-            label="메이킹 METHOD"
+            label="메이킹"
             counts={counts.method}
             selected={filters.methods}
             labelOf={(slug) => TECHNIQUE_LABELS[slug as Technique]}
@@ -331,7 +329,7 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
           />
 
           <FacetChips
-            label="도수 ABV"
+            label="도수"
             counts={counts.abv}
             selected={filters.abvBands}
             labelOf={(slug) => ABV_LABELS[slug as AbvBand]}
@@ -341,7 +339,7 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
           {/* 여섯 축 중 여기만 AND 다 — 고를수록 결과가 줄고, 불가능한 조합은 즉시 0 이다
               (`FR-SEARCH-009`). 힌트 문구가 그 차이를 적어 준다. */}
           <FacetChips
-            label="맛 / 향 FLAVOR PROFILE"
+            label="맛 · 향"
             hint="전부 만족"
             variant="chip-tag"
             counts={counts.flavor}

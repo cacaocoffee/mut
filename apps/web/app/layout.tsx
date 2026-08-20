@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Archivo, Noto_Sans_KR, Noto_Serif_KR } from "next/font/google";
+import { Fraunces, IBM_Plex_Sans_KR, Noto_Serif_KR } from "next/font/google";
 import { SiteNav } from "@/components/site-nav";
 import { PathRecorder } from "@/components/analytics/path-recorder";
 import { LegalNotice } from "@/components/legal/legal-notice";
@@ -7,16 +7,23 @@ import { SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 import "@/components/legal/legal.css";
 
-const archivo = Archivo({
-  variable: "--font-archivo",
+/* 가변 폰트라 weight 를 안 적는다 — wght 축 전체가 한 파일로 온다 (ADR-0009) */
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
-  weight: ["400", "600", "800"],
 });
 
-const notoSans = Noto_Sans_KR({
-  variable: "--font-noto-sans",
+/*
+ * `preload: false` — 이 폰트는 한글이라 유니코드 구간별 조각 282개로 쪼개져 오는데,
+ * preload 를 켜 두면 next/font 가 그중 187개를 첫 페이지에 전부 미리 싣는다.
+ * 그 다운로드가 대역폭을 채워 본문 텍스트의 LCP 가 2.0s 기준(`NFR-P-01`)을 넘겼다.
+ * 끄면 화면에 실제로 쓰인 구간의 조각만 CSS unicode-range 로 내려받는다.
+ */
+const plex = IBM_Plex_Sans_KR({
+  variable: "--font-plex",
   subsets: ["latin"],
   weight: ["400", "500", "700"],
+  preload: false,
 });
 
 const notoSerif = Noto_Serif_KR({
@@ -67,7 +74,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="ko"
-      className={`${archivo.variable} ${notoSans.variable} ${notoSerif.variable}`}
+      className={`${fraunces.variable} ${plex.variable} ${notoSerif.variable}`}
     >
       <body>
         <div className="page">

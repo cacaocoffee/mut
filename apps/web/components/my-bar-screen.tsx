@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { Fragment, useMemo } from "react";
 import {
   CATEGORY_LABELS,
   CATEGORY_ORDER,
@@ -163,8 +163,14 @@ export function MyBarScreen({ corpus }: { corpus: SearchItem[] }) {
                         <span className="en">{item.nameEn}</span>
                       </a>
                       <span className="one-away__need">
-                        {/* 택일이면 둘 중 아무거나다 — `버번 또는 라이` 가 그 줄이다 */}
-                        {missing.map((s) => getIngredient(s)?.nameKo ?? s).join(" 또는 ")}
+                        {/* 택일이면 둘 중 아무거나다 — `버번 또는 라이` 가 그 줄이다.
+                            눌러서 그 자리에서 담는다 — 위 선반으로 올라가 찾게 하지 않는다 */}
+                        {missing.map((s, i) => (
+                          <Fragment key={s}>
+                            {i > 0 && "또는"}
+                            <AddMissing slug={s} onAdd={toggle} />
+                          </Fragment>
+                        ))}
                       </span>
                     </li>
                   ))}
@@ -184,7 +190,7 @@ export function MyBarScreen({ corpus }: { corpus: SearchItem[] }) {
                     <ul className="buy-hint__list">
                       {buys.map((b) => (
                         <li key={b.slug}>
-                          <b>{getIngredient(b.slug)?.nameKo ?? b.slug}</b>
+                          <AddMissing slug={b.slug} onAdd={toggle} />
                           <span>
                             {b.unlocks > 0 ? `바로 ${b.unlocks}잔` : `${b.blocks}잔이 기다림`}
                           </span>
@@ -202,9 +208,17 @@ export function MyBarScreen({ corpus }: { corpus: SearchItem[] }) {
                         <span className="en">{item.nameEn}</span>
                       </a>
                       <span className="one-away__need">
-                        {missing
-                          .map((req) => req.map((s) => getIngredient(s)?.nameKo ?? s).join(" 또는 "))
-                          .join(" · ")}
+                        {missing.map((req, gi) => (
+                          <Fragment key={req.join("|")}>
+                            {gi > 0 && "·"}
+                            {req.map((s, i) => (
+                              <Fragment key={s}>
+                                {i > 0 && "또는"}
+                                <AddMissing slug={s} onAdd={toggle} />
+                              </Fragment>
+                            ))}
+                          </Fragment>
+                        ))}
                       </span>
                     </li>
                   ))}
@@ -266,5 +280,26 @@ function Empty({ onPick }: { onPick: (slug: string) => void }) {
         ))}
       </div>
     </div>
+  );
+}
+
+/**
+ * 빠진 재료를 그 자리에서 담는 버튼.
+ *
+ * 「하나만 더」·「다음에 살 것」이 재료 이름을 글자로만 적으면, 담으러 위 선반으로
+ * 올라가 같은 이름을 다시 찾아야 한다 (`R-F2.2-2` 가 말한 동인을 화면이 스스로 끊는다).
+ * 이름이 곧 담기 버튼이면 그 왕복이 없다.
+ */
+function AddMissing({ slug, onAdd }: { slug: string; onAdd: (slug: string) => void }) {
+  const name = getIngredient(slug)?.nameKo ?? slug;
+  return (
+    <button
+      type="button"
+      className="one-away__add"
+      aria-label={`${name} 담기`}
+      onClick={() => onAdd(slug)}
+    >
+      {name}
+    </button>
   );
 }

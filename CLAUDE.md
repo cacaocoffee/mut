@@ -60,7 +60,7 @@ PRD 전문(841줄)을 통째로 읽지 말 것. `docs/prd/README.md`의 표가 �
 ```
 apps/web/          Next.js 16 App Router — 화면
 packages/domain/   타입 · 데이터 · 검색/파인더 로직 (프레임워크 비의존)
-packages/ui/       Modernist 토큰 + 화면 레이아웃 CSS
+packages/ui/       매거진판 토큰 + 화면 레이아웃 CSS
 docs/              prd · design · decisions
 ```
 
