@@ -89,6 +89,27 @@ test("RED3 - 하나만 더 있으면 목록에 빠진 재료가 적힌다", asyn
   await expect(row.locator(".one-away__need")).toHaveText("스위트 베르무트");
 });
 
+/**
+ * 빠진 재료는 그 자리에서 담는다.
+ *
+ * 이름만 적혀 있으면 위 선반으로 올라가 같은 이름을 다시 찾아야 한다 — 「하나만 더」가
+ * 만든 동기를 화면이 스스로 끊는 왕복이다. 이름이 곧 담기 버튼이다.
+ */
+test("하나만 더의 빠진 재료를 누르면 바로 담긴다", async ({ page }) => {
+  await page.goto(MY_BAR);
+  await ready(page);
+
+  await pick(page, "진", "캄파리");
+
+  const shelf = page.locator(".stock-shelf", { hasText: "재료 하나만 더 있으면" });
+  const row = shelf.locator(".one-away__row").filter({ hasText: /^네그로니/ });
+  await row.getByRole("button", { name: "스위트 베르무트 담기" }).click();
+
+  // 담기는 순간 네그로니가 「만들 수 있는 것」으로 올라간다
+  await expect(shelfCount(page, "지금 만들 수 있는 것")).toHaveText("1");
+  await expect(page.locator(".card-grid .cocktail-card")).toContainText("네그로니");
+});
+
 /** RED 4 — 택일로 적힌 줄은 **둘 중 아무거나** 로 읽힌다 (`버번 또는 라이`). */
 test("RED4 - 택일 재료는 어느 쪽이든 채워진다", async ({ page }) => {
   await page.goto(MY_BAR);
