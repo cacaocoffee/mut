@@ -6,8 +6,10 @@ import {
   CATEGORY_ORDER,
   STOCKABLE,
   getIngredient,
+  bestBuys,
   makeable,
   oneAway,
+  usingAny,
   type IngredientCategory,
   type SearchItem,
 } from "@mut/domain";
@@ -48,6 +50,18 @@ export function MyBarScreen({ corpus }: { corpus: SearchItem[] }) {
         .filter((x): x is { item: SearchItem; missing: string[] } => Boolean(x.item)),
     [have, bySlug]
   );
+
+  /** 아직 먼 것까지 펼친다 — 빠진 재료가 겹치는 것이 곧 살 것이다. */
+  const partial = useMemo(
+    () =>
+      usingAny(have)
+        .map((x) => ({ item: bySlug.get(x.slug), missing: x.missing }))
+        .filter((x): x is { item: SearchItem; missing: string[][] } => Boolean(x.item)),
+    [have, bySlug]
+  );
+
+  /** 그 겹침을 사람이 세지 않게 한다. */
+  const buys = useMemo(() => bestBuys(have), [have]);
 
   const grouped = useMemo(() => {
     const map = new Map<IngredientCategory, typeof STOCKABLE>();
@@ -146,6 +160,46 @@ export function MyBarScreen({ corpus }: { corpus: SearchItem[] }) {
                       <span className="one-away__need">
                         {/* 택일이면 둘 중 아무거나다 — `버번 또는 라이` 가 그 줄이다 */}
                         {missing.map((s) => getIngredient(s)?.nameKo ?? s).join(" 또는 ")}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </Shelf>
+
+              <Shelf
+                title="가진 재료가 들어가는 것"
+                en="WHAT ELSE USES THESE"
+                count={partial.length}
+                empty="담은 재료가 들어가는 다른 칵테일이 없습니다."
+              >
+                {/* 목록을 눈으로 세지 않게, 겹치는 재료를 먼저 말한다 */}
+                {buys.length > 0 && (
+                  <div className="buy-hint">
+                    <span className="buy-hint__label">다음에 살 것</span>
+                    <ul className="buy-hint__list">
+                      {buys.map((b) => (
+                        <li key={b.slug}>
+                          <b>{getIngredient(b.slug)?.nameKo ?? b.slug}</b>
+                          <span>
+                            {b.unlocks > 0 ? `바로 ${b.unlocks}잔` : `${b.blocks}잔이 기다림`}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <ul className="one-away">
+                  {partial.map(({ item, missing }) => (
+                    <li key={item.slug} className="one-away__row">
+                      <a className="one-away__name" href={`/cocktails/${item.slug}`}>
+                        <b>{item.nameKo}</b>
+                        <span className="en">{item.nameEn}</span>
+                      </a>
+                      <span className="one-away__need">
+                        {missing
+                          .map((req) => req.map((s) => getIngredient(s)?.nameKo ?? s).join(" 또는 "))
+                          .join(" · ")}
                       </span>
                     </li>
                   ))}

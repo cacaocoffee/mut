@@ -81,7 +81,10 @@ test("RED3 - 하나만 더 있으면 목록에 빠진 재료가 적힌다", asyn
 
   await expect(shelfCount(page, "지금 만들 수 있는 것")).toHaveText("0");
 
-  const row = page.locator(".one-away__row", { hasText: "네그로니" });
+  // 「가진 재료가 들어가는 것」에도 같은 줄 모양이 쓰이고 거기에 화이트·킹스톤 네그로니가
+  // 있다. 묶음 안으로 좁혀야 이름이 겹치지 않는다.
+  const shelf = page.locator(".stock-shelf", { hasText: "재료 하나만 더 있으면" });
+  const row = shelf.locator(".one-away__row").filter({ hasText: /^네그로니/ });
   await expect(row).toBeVisible();
   await expect(row.locator(".one-away__need")).toHaveText("스위트 베르무트");
 });
@@ -155,6 +158,52 @@ test("RED8 - 빈 술장에서는 하나만 더가 나오지 않는다", async ({
 test("RED9 - 내 술장은 noindex 다", async ({ page }) => {
   await page.goto(MY_BAR);
   await expect(page.locator('head meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+});
+
+/**
+ * RED 13 — **가진 재료가 들어가는 것**과 **다음에 살 것**.
+ *
+ * 캄파리 · 진 · 카시스만 있는 사람에게는 「만들 수 있는 것」도 「하나만 더」도 거의 비어
+ * 있다. 그러면 뭘 사야 하는지 알 방법이 없다. 두 칸 이상 빈 것까지 펼치고, **빠진 재료가
+ * 겹치는 것을 코드가 세어** 위에 적는다 — 스무 줄을 눈으로 세게 하지 않는다.
+ */
+test("RED13 - 멀리 있는 것과 다음에 살 것이 나온다", async ({ page }) => {
+  await page.goto(MY_BAR);
+  await ready(page);
+
+  await pick(page, "캄파리", "진", "크렘 드 카시스");
+
+  const shelf = page.locator(".stock-shelf", { hasText: "가진 재료가 들어가는 것" });
+  await expect(shelf.locator(".one-away__row").first()).toBeVisible();
+
+  // 스위트 베르무트가 네그로니(하나만 더) · 불바디에 · 킹스톤 네그로니 · 비어 아메리카노를
+  // 막고 있다. 그것이 첫 줄이어야 한다 — 이 화면이 답하려는 물음이 "뭘 사야 하나" 다.
+  await expect(shelf.locator(".buy-hint__list li").first()).toContainText("스위트 베르무트");
+});
+
+/** RED 14 — 세 묶음이 서로 겹치지 않는다. 같은 잔을 세 번 보여 주면 새로 아는 것이 없다. */
+test("RED14 - 세 묶음에 같은 칵테일이 두 번 나오지 않는다", async ({ page }) => {
+  await page.goto(MY_BAR);
+  await ready(page);
+
+  await pick(page, "진", "캄파리", "스위트 베르무트");
+
+  const names = [
+    ...(await page.locator(".card-grid .cocktail-card h3, .card-grid .cocktail-card").allInnerTexts()),
+  ]
+    .concat(await page.locator(".one-away__name b").allInnerTexts())
+    .map((t) => t.split("\n")[0].trim())
+    .filter(Boolean);
+
+  const dupes = names.filter((n, i) => names.indexOf(n) !== i);
+  expect(dupes, `두 번 나온 것: ${dupes.join(", ")}`).toEqual([]);
+});
+
+/** RED 15 — 빈 술장에서는 「다음에 살 것」이 없다. 담은 것이 없으면 추천할 근거도 없다. */
+test("RED15 - 빈 술장에는 다음에 살 것이 없다", async ({ page }) => {
+  await page.goto(MY_BAR);
+  await ready(page);
+  await expect(page.locator(".buy-hint")).toHaveCount(0);
 });
 
 // ── 재료 사전 ─────────────────────────────────────────────────────────────
