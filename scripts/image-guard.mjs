@@ -8,14 +8,15 @@
  * | 히어로 밖은 `loading="lazy"` | `NFR-P-06` (차단) |
  * | 반응형 `sizes` 를 준다 | `NFR-P-06` (차단) |
  *
- * ## 사진은 아직 없고 로고만 있다
+ * ## 사진 목록 ↔ 디렉터리 대조 (ISSUE-060 #139)
  *
- * 콘텐츠 사진은 전부 자리표시자다 (`PhotoSlot` — 해칭 무늬와 캡션). 실제 사진 자산이
- * 없어서이고(G-07 이미지 저장소 미정), **그래서 이 게이트를 지금 세운다** —
- * 첫 사진이 들어오는 날 규칙을 기억하는 사람이 없어도 여기서 걸린다.
+ * 사진은 `apps/web/public/cocktails/{slug}.webp` 에 있고(#87 · D-6), 화면은
+ * `apps/web/lib/cocktail-photos.ts` 의 슬러그 목록을 보고 사진과 자리표시자를 가른다.
+ * 둘이 어긋나면 — 목록에만 있으면 깨진 이미지가 나가고, 파일만 있으면 화면에 안 나온다.
+ * 그래서 양방향으로 대조한다.
  *
- * 지금 걸리는 것은 헤더의 워드마크 하나다. 몇 개를 봤는지 함께 찍는다 — "통과" 만
- * 나오면 검사기가 아무것도 안 보고 있는 상태와 구분되지 않는다.
+ * 몇 개를 봤는지 함께 찍는다 — "통과" 만 나오면 검사기가 아무것도 안 보고 있는
+ * 상태와 구분되지 않는다.
  *
  *   node scripts/image-guard.mjs        (npm run check 가 부른다)
  */
@@ -74,6 +75,34 @@ function inspect(abs) {
 
 for (const dir of SCAN) walk(join(ROOT, dir));
 
+// ── 사진 목록 ↔ 디렉터리 양방향 대조 (ISSUE-060 #139) ─────────────────────
+const PHOTO_DIR = join(ROOT, "apps/web/public/cocktails");
+const MANIFEST = join(ROOT, "apps/web/lib/cocktail-photos.ts");
+
+const photoFiles = new Set(
+  readdirSync(PHOTO_DIR)
+    .filter((n) => n.endsWith(".webp"))
+    .map((n) => n.replace(/\.webp$/, "")),
+);
+const listedSlugs = new Set(
+  [...readFileSync(MANIFEST, "utf8").matchAll(/^\s*"([a-z0-9]+)",$/gm)].map((m) => m[1]),
+);
+
+for (const slug of listedSlugs) {
+  if (!photoFiles.has(slug)) {
+    findings.push(
+      `apps/web/lib/cocktail-photos.ts — "${slug}" 가 목록에 있는데 public/cocktails/${slug}.webp 가 없다 (깨진 이미지가 나간다)`,
+    );
+  }
+}
+for (const slug of photoFiles) {
+  if (!listedSlugs.has(slug)) {
+    findings.push(
+      `apps/web/public/cocktails/${slug}.webp — 파일은 있는데 cocktail-photos.ts 목록에 없다 (화면에 안 나온다)`,
+    );
+  }
+}
+
 if (findings.length > 0) {
   console.error(`image-guard: ${findings.length}건\n`);
   findings.forEach((f) => console.error(`  ${f}`));
@@ -82,7 +111,5 @@ if (findings.length > 0) {
 }
 
 console.log(
-  checked === 0
-    ? "image-guard: 통과 — 검사 대상 이미지 없음 (전부 자리표시자, G-07)"
-    : `image-guard: ${checked}개 통과`,
+  `image-guard: <img> ${checked}개 · 사진 목록 ${listedSlugs.size}건 ↔ 파일 ${photoFiles.size}장 대조 통과`,
 );
