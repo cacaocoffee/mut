@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Wordmark } from "@/components/wordmark";
-import { FINDER_PATH, MY_BAR_PATH, SEARCH_PATH } from "@/lib/routes";
+import { ARTICLES_PATH, FINDER_PATH, SEARCH_PATH } from "@/lib/routes";
 
 export function SiteNav() {
   const pathname = usePathname();
@@ -25,7 +25,9 @@ export function SiteNav() {
   const tabs = [
     { href: SEARCH_PATH, ko: "01 탐색", match: (p: string) => p === SEARCH_PATH },
     { href: FINDER_PATH, ko: "02 파인더", match: (p: string) => p === FINDER_PATH },
-    { href: MY_BAR_PATH, ko: "03 내 술장", match: (p: string) => p === MY_BAR_PATH },
+    // 상세(`/articles/[slug]`)에서도 이 탭이 현재지다 — 목록의 잎사귀라서다. 칵테일 상세가
+    // `01 탐색`에 불이 안 들어오는 것과 다른 이유: 저쪽은 카테고리·검색 여러 길로 들어온다.
+    { href: ARTICLES_PATH, ko: "03 아티클", match: (p: string) => p.startsWith(ARTICLES_PATH) },
   ];
 
   return (

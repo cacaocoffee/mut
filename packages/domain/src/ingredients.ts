@@ -1,10 +1,10 @@
 /**
- * 재료 마스터 (`FR-INGREDIENT-001`·`006` · `R-F2.2-*`).
+ * 재료 마스터 (`FR-INGREDIENT-001`·`006`).
  *
  * ## 왜 있어야 하나
  *
  * [SPEC-00 §7](../../../docs/spec/SPEC-00_개발원칙.md) 이 못박았다 — **"재료를 문자열로
- * 저장하면 역검색(내 술장)과 바 연결이 전부 불가능해진다."** `data.ts` 의 레시피 줄이
+ * 저장하면 재료 사전의 "이 재료로 만드는 것" 목록과 바 연결이 전부 불가능해진다."** `data.ts` 의 레시피 줄이
  * 정확히 그 상태다 (`{ ko: "진", en: "Dry Gin", ml: 30 }` — 슬러그도 ID 도 없다).
  * 여기가 그 이름들이 모이는 한 자리다.
  *
@@ -17,7 +17,7 @@
  * ## 카테고리는 계약이 정한 7종이다
  *
  * `apps/api/.../IngredientCategory.kt` 와 같은 값·같은 기본값을 쓴다 (`PRIN-T02`).
- * **`garnish` 만 `countsForStock` 이 `false` 다** — `R-F2.2-5` 의 요체이고, 빼지 않으면
+ * **`garnish` 만 `countsForStock` 이 `false` 다** — 가니시는 필수 재료가 아니라는 구분이고, 빼지 않으면
  * 민트 잎 하나 없다고 모히토가 안 나온다.
  *
  * 7종 안에 술을 담을 칸이 `spirit` 하나뿐이라 베르무트 · 셰리 · 릴레 · 막걸리 · 맥주도
@@ -48,7 +48,7 @@ export const CATEGORY_LABELS: Record<IngredientCategory, string> = {
 
 export const CATEGORY_ORDER = Object.keys(CATEGORY_LABELS) as IngredientCategory[];
 
-/** 역검색 판정에서 빼는 카테고리 (`R-F2.2-5`). 계약의 `defaultCountsForStock` 과 같다. */
+/** 필수 재료로 세지 않는 카테고리. 계약의 `defaultCountsForStock` 과 같다. */
 const NOT_COUNTED: ReadonlySet<IngredientCategory> = new Set<IngredientCategory>(["garnish"]);
 
 export interface Ingredient {
@@ -172,7 +172,7 @@ export const INGREDIENTS: Ingredient[] = [
     category: "mixer",
   },
 
-  // ── 가니시 ── 여기부터는 역검색에서 세지 않는다 (`R-F2.2-5`) ─────────────
+  // ── 가니시 ── 여기부터는 필수 재료로 세지 않는다 ─────────────
   { slug: "lemon-peel", nameKo: "레몬 필", nameEn: "Lemon Peel", category: "garnish" },
   { slug: "orange-peel", nameKo: "오렌지 필", nameEn: "Orange Peel", category: "garnish" },
   { slug: "lemon-wheel", nameKo: "레몬 휠", nameEn: "Lemon Wheel", category: "garnish" },
@@ -228,7 +228,7 @@ export function resolveIngredient(nameKo: string): Requirement | null {
   return BY_NAME.get(nameKo) ?? null;
 }
 
-/** 역검색에서 세는 재료인가 (`R-F2.2-5`). 마스터에 없으면 세지 않는다. */
+/** 필수 재료로 세는가. 마스터에 없으면 세지 않는다. */
 export function countsForStock(slug: string): boolean {
   const ing = BY_SLUG.get(slug);
   return ing ? !NOT_COUNTED.has(ing.category) : false;

@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 /**
- * 재료 마스터 불변식 (`FR-INGREDIENT-006` · `R-F2.2-5`).
+ * 재료 마스터 불변식 (`FR-INGREDIENT-006`).
  *
  * | 규칙 | 왜 |
  * |---|---|
- * | 레시피 줄이 전부 마스터로 읽힌다 | 미아 하나가 그 칵테일을 역검색에서 통째로 틀리게 한다 |
+ * | 레시피 줄이 전부 마스터로 읽힌다 | 미아 하나가 재료 사전의 "이 재료로 만드는 것" 을 통째로 틀리게 한다 |
  * | 마스터에 죽은 항목이 없다 | 안 쓰이는 이름은 오타이거나 지운 재료의 잔해다 |
  * | 슬러그 · 이름 · 별칭이 겹치지 않는다 | 겹치면 어느 쪽으로 읽힐지 순서가 정한다 |
- * | `garnish` 는 판정에서 빠진다 | `R-F2.2-5` — 안 빼면 매칭이 거의 안 된다 |
+ * | `garnish` 는 필수 재료로 안 센다 | 재료 사전이 "없어도 만들 수 있다" 를 이 구분으로 표시한다 |
  * | 요구 재료가 빈 칵테일이 없다 | 아무것도 없이 만들 수 있는 것이 되어 버린다 |
  *
  * `npm run check` 가 부른다. 재료 이름은 `data.ts` 에 자유 텍스트로 적히므로
@@ -27,8 +27,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
  */
 const probe = `
 import { COCKTAILS } from "./packages/domain/src/data";
-import { INGREDIENTS, resolveIngredient, countsForStock, getIngredient } from "./packages/domain/src/ingredients";
-import { STOCK_INDEX } from "./packages/domain/src/stock";
+import { INGREDIENTS, resolveIngredient, countsForStock } from "./packages/domain/src/ingredients";
 
 const orphans = [];
 const used = new Set();
@@ -56,9 +55,8 @@ console.log(JSON.stringify({
   unused: INGREDIENTS.filter((i) => !used.has(i.slug)).map((i) => i.slug),
   countedGarnish: INGREDIENTS.filter((i) => i.category === "garnish" && countsForStock(i.slug)).map((i) => i.slug),
   uncountedNonGarnish: INGREDIENTS.filter((i) => i.category !== "garnish" && !countsForStock(i.slug)).map((i) => i.slug),
-  empty: STOCK_INDEX.filter((e) => e.needs.length === 0).map((e) => e.slug),
+  empty: COCKTAILS.filter((c) => c.ingredients.length === 0).map((c) => c.id),
   stockable: INGREDIENTS.filter((i) => countsForStock(i.slug)).length,
-  unknownInIndex: STOCK_INDEX.flatMap((e) => e.needs.flat()).filter((s) => !getIngredient(s)),
 }));
 `;
 
@@ -81,22 +79,19 @@ for (const s of r.unused) {
   findings.push(`${s} 는 어느 레시피에도 안 쓰인다 — 오타이거나 지운 재료의 잔해다`);
 }
 for (const s of r.countedGarnish) {
-  findings.push(`${s} 는 garnish 인데 판정에 들어간다 (R-F2.2-5)`);
+  findings.push(`${s} 는 garnish 인데 필수 재료로 센다 (countsForStock 불일치)`);
 }
 for (const s of r.uncountedNonGarnish) {
   findings.push(`${s} 는 garnish 가 아닌데 판정에서 빠진다 (FR-INGREDIENT-006)`);
 }
 for (const s of r.empty) {
-  findings.push(`${s} 는 요구 재료가 없다 — 아무것도 없이 만들 수 있는 것이 된다`);
-}
-for (const s of r.unknownInIndex) {
-  findings.push(`역검색 색인에 마스터에 없는 슬러그가 있다: ${s}`);
+  findings.push(`${s} 는 재료가 없다 — 레시피 없이 발행되는 셈이다`);
 }
 
 if (findings.length > 0) {
   console.error(`ingredient-guard: ${findings.length}건\n`);
   findings.forEach((f) => console.error(`  ${f}`));
-  console.error("\n근거: SPEC-00 §7 — 재료를 문자열로 두면 역검색이 조용히 틀린다.");
+  console.error("\n근거: SPEC-00 §7 — 재료를 문자열로 두면 재료 사전이 조용히 틀린다.");
   process.exit(1);
 }
 

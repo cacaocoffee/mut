@@ -220,7 +220,7 @@ test("RED32,34,35 - 저장·공유가 있고 술장 대조는 없다", async ({ 
   await expect(page.getByRole("button", { name: /저장/ })).toBeVisible();
   await expect(page.getByRole("button", { name: /공유/ })).toBeVisible();
 
-  // 내비의 `03 내 술장` 탭은 화면 이동이지 이 화면의 액션이 아니다. 본문만 본다 —
+  // 내 술장은 폐기됐지만(ADR-0010) 이 확인은 남긴다 — 본문에 대조 액션이 되살아나면 잡는다.
   // 여기서 막는 것은 **상세에 붙는 대조 버튼**이다.
   await expect(page.locator("main").getByText(/내 술장|재료 대조/)).toHaveCount(0);
 });
@@ -260,7 +260,9 @@ function pageSource(): string {
  * 하나로 못박으면 업그레이드 때 **조용히** 통과해 버린다.
  */
 function builtHtml(name: string): string | null {
-  const roots = [join(process.cwd(), ".next/server/app"), join(process.cwd(), ".next/server/pages")];
+  // `app` 전체가 아니라 `app/cocktails` 다 — 아티클에도 `negroni.html` 이 생겨서
+  // (ADR-0010) 이름만으로 찾으면 그쪽이 먼저 잡힌다.
+  const roots = [join(process.cwd(), ".next/server/app/cocktails"), join(process.cwd(), ".next/server/pages")];
 
   for (const root of roots) {
     const found = find(root, name);

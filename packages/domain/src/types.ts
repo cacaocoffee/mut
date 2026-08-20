@@ -61,6 +61,49 @@ export type SweetLevel = components["schemas"]["SweetLevel"];
  */
 export type AbvBand = "na" | "low" | "mid" | "high";
 
+/**
+ * 아티클의 주제 축 (ADR-0010).
+ *
+ * **계약에 없다.** SPEC-02 §6 의 `Article.type` 은 발행 형식 축
+ * (`interview`·`guide`·`trend`·`photo_essay`)이고, 이 축은 지금 있는 글의 묶음이다.
+ * 두 축의 관계는 `GET /articles` 계약을 만들 때 정한다 (GAPS G-49).
+ */
+export type ArticleCategory = "cocktail" | "bar" | "whisky";
+
+/**
+ * 아티클 본문 한 덩이. 문단 · 소제목 · 인용 · 사진 네 가지뿐이다 —
+ * 블로그(SmartEditor)에서 이관하며 실제로 나온 종류가 이 넷이다.
+ */
+export type ArticleBlock =
+  | { kind: "paragraph"; text: string }
+  | { kind: "heading"; text: string }
+  | { kind: "quote"; text: string }
+  /** width·height 는 원본 픽셀 크기 — 화면이 자리를 미리 잡아 로딩 때 밀리지 않는다 (NFR-P-03) */
+  | { kind: "figure"; src: string; width: number; height: number; caption?: string };
+
+/**
+ * 아티클 (`FR-CONTENT-001` 앞당김 · ADR-0010).
+ *
+ * **계약에 없다.** `article` 테이블(SPEC-06 §3.6)과 `GET /articles` 는 Phase 2 다.
+ * 그때까지 본문은 `articles/` 아래 정적 데이터로 있고, 이 타입이 그 모양이다.
+ */
+export interface Article {
+  slug: string;
+  category: ArticleCategory;
+  title: string;
+  /** 카드와 메타 설명에 쓰는 한두 문장 요약 */
+  dek: string;
+  /** YYYY-MM-DD — 블로그 원문의 발행일 */
+  publishedAt: string;
+  /** 대표 사진. `/articles/{slug}/…` 아래 정적 파일 */
+  hero: string;
+  /** 블로그 원문 주소. 상세 하단에 출처로 표기한다 (ADR-0010 이관 규칙) */
+  sourceUrl: string;
+  /** 본문이 다루는 칵테일의 코퍼스 id — 상세의 "관련 칵테일" 링크가 된다 */
+  relatedCocktailSlugs: string[];
+  blocks: ArticleBlock[];
+}
+
 /* ─────────────────  레코드  ───────────────── */
 
 /**

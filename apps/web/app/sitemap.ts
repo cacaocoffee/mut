@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { COCKTAILS, INGREDIENTS } from "@mut/domain";
+import { ARTICLES, COCKTAILS, INGREDIENTS } from "@mut/domain";
 import { CATEGORY_AXES, publishedSlugs, usingApi } from "@/lib/api";
 import { categorySlugs } from "@/lib/category-page";
 import { SITE_URL } from "@/lib/site";
@@ -37,6 +37,8 @@ export const ALLOWED_PATTERNS = [
   /^\/cocktails\/(base|style|method)\/[a-z0-9-]+$/,
   /^\/ingredients$/,
   /^\/ingredients\/[a-z0-9-]+$/,
+  /^\/articles$/,
+  /^\/articles\/[a-z0-9-]+$/,
 ] as const;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -56,8 +58,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // 재료 사전은 색인한다 — 사람마다 달라지지 않고 "이 재료로 뭘 만드나" 는 실제로
-  // 들어오는 질의다. 내 술장(`/my-bar`)은 담은 것에 따라 내용이 달라져 넣지 않는다.
+  // 들어오는 질의다.
   paths.push(...INGREDIENTS.map((i) => `/ingredients/${i.slug}`));
+
+  // 아티클 — 콘텐츠 유입이 존재 이유라 목록·상세 다 색인한다 (ADR-0010 · SPEC-05 §4).
+  paths.push("/articles", ...ARTICLES.map((a) => `/articles/${a.slug}`));
 
   return paths.map((path) => ({
     url: `${base}${path}`,

@@ -7,14 +7,14 @@ import {
   cocktailsUsing,
   type IngredientCategory,
 } from "@mut/domain";
-import { INGREDIENTS_PATH, MY_BAR_PATH } from "@/lib/routes";
+import { INGREDIENTS_PATH } from "@/lib/routes";
 
 /**
  * 재료 사전 목록 (SCREENS-01 01-D · `FR-INGREDIENT-002`).
  *
  * ## 색인한다
  *
- * 탐색·내 술장과 달리 내용이 사람마다 달라지지 않는다. "이 재료를 쓰는 칵테일" 을 찾는
+ * 탐색과 달리 내용이 사람마다 달라지지 않는다. "이 재료를 쓰는 칵테일" 을 찾는
  * 검색은 실제로 들어오는 질의라 상세·카테고리와 같은 취급으로 둔다 (SPEC-05 §4).
  *
  * ## 지금은 이름과 쓰임새까지다
@@ -46,10 +46,7 @@ export default function IngredientsPage() {
             <span className="sub">{INGREDIENTS.length} ingredients</span>
           </h1>
         </div>
-        <p className="lede">
-          가진 것을 담아 두면 만들 수 있는 칵테일을 되짚어 줍니다 —{" "}
-          <Link href={MY_BAR_PATH}>내 술장</Link>
-        </p>
+        <p className="lede">재료마다 그 재료로 만드는 칵테일을 함께 적었습니다.</p>
       </header>
 
       {grouped.map(([category, list]) => (
