@@ -18,6 +18,7 @@ import {
 } from "@mut/domain";
 import { FINDER_PATH } from "@/lib/routes";
 import { finderStep } from "@/lib/analytics/events";
+import { cocktailPhotoSrc } from "@/lib/cocktail-photos";
 import { PhotoSlot } from "./photo-slot";
 import { SweetTag } from "./sweet-tag";
 
@@ -254,7 +255,12 @@ export function FinderScreen({ corpus }: { corpus: SearchItem[] }) {
                       <span>%</span>
                     </span>
                   </div>
-                  <PhotoSlot ratio="4x3" caption={cocktail.nameEn} />
+                  <PhotoSlot
+                    ratio="4x3"
+                    caption={cocktail.nameEn}
+                    src={cocktailPhotoSrc(cocktail.slug)}
+                    alt={`${cocktail.nameKo} 칵테일 사진`}
+                  />
                   <div className="result-card__body">
                     <h3>{cocktail.nameKo}</h3>
                     <div className="cocktail-card__en" style={{ marginBottom: 10 }}>

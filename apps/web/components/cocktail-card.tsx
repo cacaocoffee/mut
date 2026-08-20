@@ -5,6 +5,7 @@ import {
   TECHNIQUE_LABELS,
   type SearchItem,
 } from "@mut/domain";
+import { cocktailPhotoSrc } from "@/lib/cocktail-photos";
 import { PhotoSlot } from "./photo-slot";
 import { SweetTag } from "./sweet-tag";
 
@@ -20,7 +21,13 @@ import { SweetTag } from "./sweet-tag";
 export function CocktailCard({ cocktail }: { cocktail: SearchItem }) {
   return (
     <Link href={`/cocktails/${cocktail.slug}`} className="cocktail-card">
-      <PhotoSlot ratio="4x5" caption={cocktail.nameEn} label="IMAGE 4:5" />
+      <PhotoSlot
+        ratio="4x5"
+        caption={cocktail.nameEn}
+        label="IMAGE 4:5"
+        src={cocktailPhotoSrc(cocktail.slug)}
+        alt={`${cocktail.nameKo} 칵테일 사진`}
+      />
       <div className="cocktail-card__body">
         <div className="cocktail-card__title">
           <div>

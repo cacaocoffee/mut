@@ -13,6 +13,7 @@ import { FlavorRadar } from "@/components/flavor-radar";
 import { RecipePanel } from "@/components/recipe-panel";
 import { TrackCocktailView } from "@/components/analytics/cocktail-view";
 import { PhotoSlot } from "@/components/photo-slot";
+import { cocktailPhotoSrc } from "@/lib/cocktail-photos";
 import { cocktailDetail, publishedSlugs, relatedCocktails, usingApi, type RelatedItem } from "@/lib/api";
 import { fromApi, fromPrototype, prototypeSlugs, type CocktailView } from "@/lib/cocktail-view";
 import { SEARCH_PATH } from "@/lib/routes";
@@ -130,11 +131,25 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
       />
 
       <div className="detail-hero">
-        {/* 히어로는 `PhotoSlot` 과 달리 라벨 문구가 달라 직접 쓴다. 컬러 — ADR-0008 */}
-        <div className="photo-slot photo-slot--4x5">
-          <div className="photo-slot__label">HERO IMAGE 4:5 — PLACEHOLDER</div>
-          <div className="photo-slot__caption">{c.nameEn}</div>
-        </div>
+        {/* 히어로는 `PhotoSlot` 과 달리 라벨 문구가 달라 직접 쓴다. 컬러 — ADR-0008.
+            사진은 첫 화면(LCP)이라 lazy 를 붙이지 않는다 — `__img--hero` 가
+            image-guard 의 EAGER_ALLOWED 표식이다 (ISSUE-060 #139) */}
+        {cocktailPhotoSrc(c.slug) ? (
+          <div className="photo-slot photo-slot--4x5 photo-slot--photo">
+            <img
+              className="photo-slot__img photo-slot__img--hero"
+              src={cocktailPhotoSrc(c.slug)!}
+              alt={`${c.nameKo} 칵테일 사진`}
+              width={800}
+              height={800}
+            />
+          </div>
+        ) : (
+          <div className="photo-slot photo-slot--4x5">
+            <div className="photo-slot__label">HERO IMAGE 4:5 — PLACEHOLDER</div>
+            <div className="photo-slot__caption">{c.nameEn}</div>
+          </div>
+        )}
         <div>
           <Link
             href={SEARCH_PATH}
