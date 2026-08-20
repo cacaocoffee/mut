@@ -15,6 +15,7 @@ import {
 } from "@mut/domain";
 import { useStock } from "@/lib/use-stock";
 import { CocktailCard } from "./cocktail-card";
+import { IngredientPicker } from "./ingredient-picker";
 
 /** 처음 온 사람에게 권하는 것. 이 여섯이면 코퍼스에서 실제로 몇 잔이 열린다. */
 const STARTERS = ["gin", "sweet-vermouth", "campari", "lemon-juice", "lime-juice", "simple-syrup"];
@@ -100,6 +101,10 @@ export function MyBarScreen({ corpus }: { corpus: SearchItem[] }) {
               비움 CLEAR
             </button>
           </div>
+
+          {/* 59종을 훑는 대신 이름으로 찾는다. 아래 카테고리 목록은 그대로 둔다 —
+              이름을 모르면 훑어야 하고, 훑다 보면 있는 줄도 몰랐던 것이 눈에 든다 */}
+          <IngredientPicker have={have} onToggle={toggle} />
 
           {/* 가니시가 없는 이유를 적어 둔다 — 없으면 "왜 레몬 필이 없냐" 가 된다 */}
           <p className="stock-note">

@@ -206,6 +206,92 @@ test("RED15 - 빈 술장에는 다음에 살 것이 없다", async ({ page }) =>
   await expect(page.locator(".buy-hint")).toHaveCount(0);
 });
 
+// ── 재료 찾기 ─────────────────────────────────────────────────────────────
+
+/** 담을 재료를 이름으로 찾는 칸. 59종을 훑는 대신 치는 길이다. */
+function picker(page: Page) {
+  return page.getByLabel("담을 재료를 이름으로 찾습니다");
+}
+
+/** RED 16 — 이름 일부로 찾으면 해당하는 것만 나온다. */
+test("RED16 - 이름으로 재료를 찾는다", async ({ page }) => {
+  await page.goto(MY_BAR);
+  await ready(page);
+
+  await picker(page).fill("베르무트");
+  const options = page.locator(".search-box__option");
+  await expect(options).toHaveCount(2);
+  await expect(options.first()).toContainText("스위트 베르무트");
+});
+
+/**
+ * RED 17 — **별칭으로도 찾힌다.**
+ *
+ * `data.ts` 가 같은 것을 `쿠앵트로` · `코앵트로` 두 표기로 적었고 마스터가 그것을 흡수했다
+ * (`ingredients.ts` 의 `aliases`). 찾기가 그 목록을 다시 만들지 않는다는 뜻이다.
+ */
+test("RED17 - 별칭으로도 찾힌다", async ({ page }) => {
+  await page.goto(MY_BAR);
+  await ready(page);
+
+  await picker(page).fill("코앵트로");
+  await expect(page.locator(".search-box__option").first()).toContainText("쿠앵트로");
+});
+
+/** RED 18 — 치고 Enter 면 담긴다. 고른 것이 없으면 첫 줄이다 — 가장 흔한 손놀림이다. */
+test("RED18 - Enter 로 담고 입력이 비워진다", async ({ page }) => {
+  await page.goto(MY_BAR);
+  await ready(page);
+
+  await picker(page).fill("캄파리");
+  await picker(page).press("Enter");
+
+  await expect(page.locator('.filter-panel .chip[aria-pressed="true"]')).toHaveCount(1);
+  // 비워야 다음 재료를 바로 칠 수 있다
+  await expect(picker(page)).toHaveValue("");
+});
+
+/** RED 19 — 연달아 담긴다. 한 호흡에 세 개를 넣는 것이 이 칸을 둔 이유다. */
+test("RED19 - 연달아 담을 수 있다", async ({ page }) => {
+  await page.goto(MY_BAR);
+  await ready(page);
+
+  for (const name of ["진", "캄파리", "스위트 베르"]) {
+    await picker(page).fill(name);
+    await picker(page).press("Enter");
+  }
+
+  await expect(page.locator('.filter-panel .chip[aria-pressed="true"]')).toHaveCount(3);
+  await expect(shelfCount(page, "지금 만들 수 있는 것")).toHaveText("1");
+});
+
+/** RED 20 — 없는 이름이면 그렇다고 말한다. 목록이 그냥 사라지면 "찾는 중" 과 구분이 안 된다. */
+test("RED20 - 없는 이름에 안내가 나온다", async ({ page }) => {
+  await page.goto(MY_BAR);
+  await ready(page);
+
+  await picker(page).fill("없는재료");
+  await expect(page.locator(".search-box__option--empty")).toBeVisible();
+});
+
+/** RED 21 — 화살표와 `aria-activedescendant` 로 키보드만으로 고를 수 있다 (`NFR-A-04`). */
+test("RED21 - 키보드로 고를 수 있다", async ({ page }) => {
+  await page.goto(MY_BAR);
+  await ready(page);
+
+  const box = picker(page);
+  await box.fill("베르무트");
+  await box.press("ArrowDown");
+  await box.press("ArrowDown");
+  await expect(box).toHaveAttribute("aria-activedescendant", /.+/);
+
+  await box.press("Enter");
+  // 둘째 줄이 드라이 베르무트다
+  await expect(
+    page.locator('.filter-panel .chip[aria-pressed="true"]', { hasText: "드라이 베르무트" })
+  ).toBeVisible();
+});
+
 // ── 재료 사전 ─────────────────────────────────────────────────────────────
 
 /** RED 10 — 재료 상세가 **이 재료를 쓰는 칵테일**을 보여 준다 (`FR-INGREDIENT-002`). */
