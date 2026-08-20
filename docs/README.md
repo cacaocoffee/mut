@@ -70,10 +70,13 @@
 | [ADR-0004](./decisions/ADR-0004-age-gate.md) | 전면 성인 인증 게이트를 두지 않는다 (법률 검토 대기 조건부) |
 | [ADR-0005](./decisions/ADR-0005-ui-package-scope.md) | `app.css` 는 우리 것, `styles.css` 는 시안 것 — 정본 개정 절차 |
 | [ADR-0006](./decisions/ADR-0006-btn-primary-contrast.md) | 흰 글자를 얹는 면은 `accent-700` — `.btn-primary` 대비 (G-16) |
+| [ADR-0007](./decisions/ADR-0007-hosting.md) | 호스팅은 Vercel + Fly + Neon + R2. 웹부터 혼자 올린다 (G-07 하단) |
 
 ## 미결
 
 [`prd/GAPS.md`](./prd/GAPS.md) — 17건 중 **15건 해결, 2건 남음.**
 
-남은 둘은 **문서로 풀 수 없는 것**이다 — 호스팅·이미지 저장소(G-07 하단)와 사업 결정(G-17).
+남은 둘 중 호스팅은 [ADR-0007](./decisions/ADR-0007-hosting.md)이 정했고, **이미지 저장소를
+실제로 붙이는 것과 사업 결정(G-17)이 남는다.** 이미지는 결정이 없어서가 아니라
+붙일 사진이 아직 없어서 남아 있다.
 **호스팅 · 이미지 저장소**만 사업/인프라 결정이라 스펙으로 해소되지 않는다.
