@@ -9,7 +9,8 @@
 **현재 상태 — Phase 1a 구현 완료.**
 Kotlin/Spring API · Postgres 시드 41종 · 어드민(편집 · 레시피 · 재료 승인 · 검증 태스크 ·
 감사 로그) · 공개 화면 5종이 동작한다. e2e 237건이 CI 에서 돈다.
-남은 것은 호스팅 · 이미지 저장소 같은 **사업 결정**이다 ([G-07](docs/prd/GAPS.md)).
+호스팅은 [ADR-0007](docs/decisions/ADR-0007-hosting.md)로 정했다 — **웹은 지금 바로 $0으로
+올릴 수 있다** (아래 [배포](#배포)). 남은 것은 사진 자산 같은 **사업 결정**이다.
 
 ```bash
 npm install
@@ -49,7 +50,7 @@ docs/                     문서 23개 — 아래 참조
 | 시스템 스펙 | [`docs/spec/`](docs/spec/) — SPEC-00~08 · 10 |
 | 화면 명세 | [`docs/screens/`](docs/screens/) |
 | 디자인 | [`docs/design/README.md`](docs/design/README.md) |
-| 결정 기록 | [`docs/decisions/`](docs/decisions/) — ADR 6건 |
+| 결정 기록 | [`docs/decisions/`](docs/decisions/) — ADR 7건 |
 | 배포 전 사람 확인 | [`docs/RELEASE-CHECKLIST.md`](docs/RELEASE-CHECKLIST.md) |
 | 추적 · 게이트 | [`docs/TRACE-00_추적매트릭스.md`](docs/TRACE-00_추적매트릭스.md) |
 | 아직 안 정해진 것 | [`docs/prd/GAPS.md`](docs/prd/GAPS.md) |
@@ -81,14 +82,19 @@ Phase 1을 둘로 나눴다 ([SPEC-01 §4](docs/spec/SPEC-01_시스템개요_범
 
 ## 배포
 
-호스팅은 [ADR-0007](docs/decisions/ADR-0007-hosting.md)이 정했다 — Vercel + Fly + Neon + R2 를
-**세 단계로 나눠** 올린다. 지금 할 수 있는 것은 1단계다.
+호스팅은 [ADR-0007](docs/decisions/ADR-0007-hosting.md)이 정했다 — 웹은 Vercel, DB는 Neon,
+이미지는 Cloudflare R2, API는 Fly 또는 Cloud Run. **세 단계로 나눠** 올리고, 지금 할 수
+있는 것은 1단계다.
 
 | 단계 | 무엇 | 값 | 막는 것 |
 |---|---|---|---|
 | **1** | 웹만 Vercel | **$0** | 없음 |
-| 2 | 도메인 + API(Fly) + DB(Neon) | ~$3 + 도메인 값 | **도메인** |
+| 2 | API + DB(Neon) | **$0~3** | [G-45](docs/prd/GAPS.md#g-45) 판정 |
 | 3 | 이미지 R2 | ~$0 | 붙일 사진이 없다 |
+
+2단계 값이 벌어지는 이유는 둘이다 — 도메인을 사야 하는지([G-45](docs/prd/GAPS.md#g-45))와
+API를 Cloud Run 무료 한도에 넣을 수 있는지(GraalVM 네이티브가 필요하다). 둘 다
+**1단계를 막지 않으므로 지금 정하지 않는다.**
 
 ### 1단계 — 웹만 올린다
 
@@ -144,7 +150,7 @@ Vercel 대시보드에서 이 저장소를 가져오고:
 
 | | 성격 |
 |---|---|
-| 도메인 | **2단계를 막는다.** 쿠키 세션이라 프론트와 API가 같은 상위 도메인이어야 한다 ([ADR-0007](docs/decisions/ADR-0007-hosting.md)) |
+| 도메인을 사야 하는가 | **2단계 값을 가른다.** 프록시가 `Set-Cookie` 를 그대로 전달하면 안 사도 될 수 있다 ([G-45](docs/prd/GAPS.md#g-45)) |
 | 히어로 사진 | 3단계를 막는다. 저장소는 R2로 정해졌고 붙일 사진이 없다 ([G-07](docs/prd/GAPS.md)) |
 | 법률 검토 1회 | **외부** — [ADR-0004](docs/decisions/ADR-0004-age-gate.md)의 전제 확인 포함 |
 | 시드 데이터 다듬기 | 에디터 판단 — 계량 표기 · oz 반올림 ([DECISIONS](docs/issues/DECISIONS.md) D-3~D-5) |
