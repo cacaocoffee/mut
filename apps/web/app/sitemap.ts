@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { COCKTAILS } from "@mut/domain";
+import { COCKTAILS, INGREDIENTS } from "@mut/domain";
 import { CATEGORY_AXES, publishedSlugs, usingApi } from "@/lib/api";
 import { categorySlugs } from "@/lib/category-page";
 import { SITE_URL } from "@/lib/site";
@@ -35,6 +35,8 @@ export const ALLOWED_PATTERNS = [
   /^\/terms$/,
   /^\/cocktails\/[a-z0-9-]+$/,
   /^\/cocktails\/(base|style|method)\/[a-z0-9-]+$/,
+  /^\/ingredients$/,
+  /^\/ingredients\/[a-z0-9-]+$/,
 ] as const;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -42,7 +44,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = SITE_URL;
   const now = new Date();
 
-  const paths: string[] = ["/", "/finder", "/privacy", "/terms"];
+  const paths: string[] = ["/", "/finder", "/privacy", "/terms", "/ingredients"];
 
   // 발행분만. `draft` 는 공개 API 가 주지 않는다 (RED 26).
   const cocktails = usingApi ? await publishedSlugs() : COCKTAILS.map((c) => c.id);
@@ -52,6 +54,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const slugs = await categorySlugs(axis);
     paths.push(...slugs.map((slug) => `/cocktails/${axis}/${slug}`));
   }
+
+  // 재료 사전은 색인한다 — 사람마다 달라지지 않고 "이 재료로 뭘 만드나" 는 실제로
+  // 들어오는 질의다. 내 술장(`/my-bar`)은 담은 것에 따라 내용이 달라져 넣지 않는다.
+  paths.push(...INGREDIENTS.map((i) => `/ingredients/${i.slug}`));
 
   return paths.map((path) => ({
     url: `${base}${path}`,

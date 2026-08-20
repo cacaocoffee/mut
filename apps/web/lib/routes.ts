@@ -19,3 +19,14 @@ export const FINDER_PATH = "/finder";
  * 칵테일과 재료를 한 번에 찾는다. 둘 다 색인하지 않는다 (`PRIN-P06`).
  */
 export const UNIFIED_SEARCH_PATH = "/search";
+
+/**
+ * 내 술장 — 가진 재료로 만들 수 있는 것을 되짚는다 (`R-F2.2-*`).
+ *
+ * 체크 상태에 따라 내용이 달라지는 화면이라 색인하지 않는다 (`PRIN-P06` · 탐색 필터와
+ * 같은 성격). 로그인 없이 로컬 저장으로 쓴다 (`R-F2.2-4`) — `/me/*` 아래가 아닌 이유다.
+ */
+export const MY_BAR_PATH = "/my-bar";
+
+/** 재료 사전 (`FR-INGREDIENT-002` · SCREENS-01 01-D). 이쪽은 색인한다. */
+export const INGREDIENTS_PATH = "/ingredients";

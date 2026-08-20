@@ -42,7 +42,7 @@
 | [SCREENS-00 인덱스·공통규칙](./screens/SCREENS-00_인덱스_공통규칙.md) | 상태 5종 · 반응형 · 접근성 · 카피 · 법적 표기 | ✅ |
 | [SCREENS-01 칵테일](./screens/SCREENS-01_칵테일.md) | 탐색 · 상세 · 카테고리 · 재료 사전 | ✅ |
 | SCREENS-02 바 탐색·상세 | | ⬜ |
-| SCREENS-03 파인더·내 술장 | | ⬜ |
+| [SCREENS-03 파인더·내 술장](./screens/SCREENS-03_파인더.md) | 4문항 추천 · 보유 재료 역검색 | ✅ |
 | SCREENS-04 마이·저장 | | ⬜ |
 | SCREENS-05 파트너 대시보드 | | ⬜ |
 | [SCREENS-06 어드민](./screens/SCREENS-06_어드민.md) | 할 일 · 편집 · 재료 마스터 · 감사 로그 | ✅ |

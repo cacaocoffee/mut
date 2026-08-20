@@ -182,6 +182,9 @@ test("RED9 - 단계마다 주소가 바뀌고 공유하면 그 자리가 열린�
  */
 test("RED11 - 후보가 0이면 안내가 나온다", async ({ page }) => {
   await page.goto(`${FINDER}?abv=na&base=whisky&step=2`);
+  // 답은 주소에 있고 화면은 **붙은 뒤에** 그것을 읽는다. 기다리지 않으면 답이 안 걸린
+  // 상태의 수(전체)를 재게 된다 — CI 에서 49 를 받아 실패했다.
+  await ready(page);
 
   expect(await candidateCount(page)).toBe(0);
   await expect(page.locator(".quiz-dead-end")).toBeVisible();

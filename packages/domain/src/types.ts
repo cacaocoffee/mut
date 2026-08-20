@@ -63,7 +63,13 @@ export type AbvBand = "na" | "low" | "mid" | "high";
 
 /* ─────────────────  레코드  ───────────────── */
 
-export interface Ingredient {
+/**
+ * 레시피 한 줄. **재료 마스터가 아니다** — 그쪽은 `ingredients.ts` 의 [Ingredient] 다.
+ *
+ * 계약도 둘을 나눠 부른다 (`IngredientLine` · `IngredientItem`). 예전에는 이 타입 이름이
+ * `Ingredient` 였는데, 마스터가 생기면서 같은 이름이 두 뜻을 갖게 됐다.
+ */
+export interface RecipeLine {
   ko: string;
   en: string;
   /** 1인분 기준 용량(ml). 계량하지 않는 재료는 생략하고 `amount`를 쓴다. */
@@ -121,7 +127,7 @@ export interface Cocktail {
    */
   tastingNote?: string;
 
-  ingredients: Ingredient[];
+  ingredients: RecipeLine[];
   steps: string[];
   origin: Origin;
   story: Story;

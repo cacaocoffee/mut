@@ -24,8 +24,11 @@ import {
   type Technique,
 } from "@mut/domain";
 import { SEARCH_PATH } from "@/lib/routes";
+import { useNameIndex } from "@/lib/use-name-index";
 import { filterApply, type FilterAxis } from "@/lib/analytics/events";
 import { CocktailCard } from "./cocktail-card";
+import { SearchField } from "./search-field";
+import { Pager, PAGE_SIZE } from "./pager";
 
 const ABV_LABELS = Object.fromEntries(ABV_BANDS.map((b) => [b.key, b.ko])) as Record<
   AbvBand,
@@ -129,12 +132,71 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
     [corpus, router, setQuery]
   );
 
-  const results = useMemo(() => filterCocktails(corpus, filters), [corpus, filters]);
-  const counts = useMemo(() => facetCounts(corpus, filters), [corpus, filters]);
+  /**
+   * 검색어는 색인이 맞히고, 나머지 여섯 축은 여기서 건다 — 둘은 **AND** 다.
+   *
+   * 색인이 답을 주면 그 슬러그만 남긴 코퍼스를 만들고 `query` 를 비워 넘긴다.
+   * 아래 계산(결과 · 패싯 카운트 · 당도 전체)이 전부 그 코퍼스를 보므로, 칩 옆 숫자가
+   * "검색어까지 걸었을 때의 개수" 가 된다 — 눌러 보고 0 을 만나는 일이 없다.
+   *
+   * 색인을 못 쓰면 `slugs` 가 `null` 이고 코퍼스도 필터도 그대로다. 그러면
+   * `filterCocktails` 안의 이름 부분일치가 예전처럼 동작한다.
+   */
+  const { slugs, pending: searchPending } = useNameIndex(filters.query);
+  const scope = useMemo(
+    () => (slugs ? corpus.filter((c) => slugs.has(c.slug)) : corpus),
+    [corpus, slugs]
+  );
+  const axes = useMemo(() => (slugs ? { ...filters, query: "" } : filters), [filters, slugs]);
+
+  const results = useMemo(() => filterCocktails(scope, axes), [scope, axes]);
+
+  /**
+   * 몇 쪽을 보고 있나.
+   *
+   * ## 도메인 `Filters` 에 넣지 않는다
+   *
+   * 쪽 번호는 **거르는 축이 아니다.** `toFilterQuery` 는 여섯 축만으로 주소를 새로 만들고,
+   * 그래서 필터를 하나라도 건드리면 `page` 가 저절로 떨어져 1쪽으로 돌아간다 — 3쪽을 보다가
+   * 기주를 바꿨는데 결과가 5개뿐인 3쪽에 남아 있는 일이 없다. 초기화를 따로 안 적어도 된다.
+   *
+   * ## 주소에 남긴다
+   *
+   * 필터와 같은 이유다 (`FR-SEARCH-005`) — 보낸 링크가 보던 쪽을 열어야 한다.
+   *
+   * 결과가 줄어 지금 쪽이 사라졌으면 마지막 쪽으로 당긴다. 주소를 손으로 고쳐 `page=99`
+   * 로 와도 빈 화면을 보지 않는다.
+   */
+  const pageCount = Math.max(1, Math.ceil(results.length / PAGE_SIZE));
+  const page = Math.min(
+    pageCount,
+    Math.max(1, Number(new URLSearchParams(query).get("page")) || 1)
+  );
+  const shown = useMemo(
+    () => results.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+    [results, page]
+  );
+
+  /** 쪽만 바꾼다 — 걸린 필터는 그대로 두고 `page` 만 갈아 끼운다. */
+  const goPage = useCallback(
+    (next: number) => {
+      const params = new URLSearchParams(queryRef.current);
+      if (next <= 1) params.delete("page");
+      else params.set("page", String(next));
+
+      const q = params.toString();
+      setQuery(q);
+      router.replace(q ? `${SEARCH_PATH}?${q}` : SEARCH_PATH, { scroll: false });
+      // 쪽을 넘기면 목록 맨 위로 — 넘겼는데 화면이 그대로면 바뀐 줄 모른다.
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    },
+    [router, setQuery]
+  );
+  const counts = useMemo(() => facetCounts(scope, axes), [scope, axes]);
   // 당도 "전체" 칸의 개수. 축의 선택만 뺀 결과라 다른 축은 그대로 반영된다.
   const sweetAll = useMemo(
-    () => filterCocktails(corpus, { ...filters, sweet: null }).length,
-    [corpus, filters]
+    () => filterCocktails(scope, { ...axes, sweet: null }).length,
+    [scope, axes]
   );
 
   /**
@@ -182,11 +244,16 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
             </span>
           </h1>
         </div>
-        <p className="lede">
-          기주 · 스타일 · 메이킹 · 당도 · 도수 · 맛/향 6개 축으로 교차 검색합니다. 모든 수치는
-          표준 레시피 기준 실측값입니다.
-        </p>
       </header>
+
+      {/* 검색이 필터보다 먼저 온다. 예전에는 필터 패널 **맨 아래** 한 칸이었는데,
+          가장 자주 손이 가는 것이 가장 눈에 안 띄는 자리에 있었다. 두 컬럼 위에
+          전폭으로 두어 이것이 아래 전체에 걸린다는 것을 형태로 드러낸다. */}
+      <SearchField
+        value={filters.query}
+        pending={searchPending}
+        onChange={(v) => apply({ query: v }, { axis: "query", value: v })}
+      />
 
       <div className="search-layout">
         <aside className="filter-panel">
@@ -283,17 +350,6 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
             onToggle={(slug) => toggle("flavors", "flavor", slug as FlavorKey)}
           />
 
-          <div className="filter-group" style={{ borderBottom: 0 }}>
-            <div className="filter-label">검색 KEYWORD</div>
-            <input
-              className="input"
-              type="search"
-              placeholder="네그로니 / Negroni"
-              value={filters.query}
-              aria-label="칵테일 이름 검색"
-              onChange={(e) => apply({ query: e.target.value }, { axis: "query", value: e.target.value })}
-            />
-          </div>
         </aside>
 
         <section>
@@ -308,11 +364,16 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
           </div>
 
           {results.length > 0 ? (
-            <div className="card-grid">
-              {results.map((c) => (
-                <CocktailCard key={c.slug} cocktail={c} />
-              ))}
-            </div>
+            <>
+              <div className="card-grid">
+                {/* 세는 것은 전체, 그리는 것은 이 쪽뿐이다. 칩 옆 숫자와 위의 결과 수는
+                    걸러진 전부를 말하고(그래야 맞다), DOM 에는 한 쪽만 올린다. */}
+                {shown.map((c) => (
+                  <CocktailCard key={c.slug} cocktail={c} />
+                ))}
+              </div>
+              <Pager page={page} pageCount={pageCount} total={results.length} onGo={goPage} />
+            </>
           ) : (
             <div className="empty-state">
               <h3>조건에 맞는 항목이 없습니다</h3>
