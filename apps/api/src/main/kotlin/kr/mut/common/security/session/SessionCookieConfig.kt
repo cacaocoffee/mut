@@ -16,11 +16,13 @@ import org.springframework.session.web.http.DefaultCookieSerializer
  * | `Secure` | 환경별 | 로컬 `http://localhost` 에서는 꺼야 로그인이 된다 |
  * | `SameSite` | `Lax` | 크로스 사이트 POST 를 막되 일반 링크 이동은 살린다 |
  *
- * ## ⚠️ 호스팅 제약 (G-07)
+ * ## 호스팅 제약은 풀렸다 (G-45 판정 · 2026-08-21)
  *
- * 쿠키를 공유하려면 **프론트와 API 가 같은 상위 도메인**이어야 한다
- * (`www.example.kr` / `api.example.kr`). SPEC-07 §1.2 가 인증 방식으로 호스팅에 제약을 걸었다 —
- * 호스팅을 정할 때 이 조건을 먼저 본다. 도메인을 환경변수로 뺀 이유다.
+ * 브라우저는 API 를 직접 부르지 않고 웹 오리진의 프록시만 부른다. 그래서 쿠키는
+ * 웹 오리진에만 있으면 되고, 프론트와 API 의 상위 도메인이 같을 필요가 없다.
+ * **조건이 하나 있다 — `mut.session.cookie-domain` 을 비워 둔다.** 비우면 `Domain`
+ * 속성이 안 붙고, 브라우저가 자기가 요청한 오리진(= 웹)에 쿠키를 귀속시킨다.
+ * 값을 넣는 순간 상류 도메인이 적혀 나가서 브라우저가 쿠키를 버린다.
  */
 @Configuration
 class SessionCookieConfig(
