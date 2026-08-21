@@ -66,7 +66,7 @@ object SchemaLint {
     val PROTECTED_TABLES = listOf("cocktail", "bar", "article", "curation_list")
 
     /** 앱이 붙는 역할. 권한 검사의 주체다. */
-    private const val APP_ROLE = "kcocktail_app"
+    private const val APP_ROLE = "mut_app"
 
     // ── 규칙 ────────────────────────────────────────────────────────────────
 

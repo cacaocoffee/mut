@@ -279,13 +279,13 @@ class CocktailSchemaTest {
     @Test
     fun `RED30 - 앱 역할에 cocktail DELETE 권한이 없다`() {
         assertThat(
-            one("SELECT has_table_privilege('kcocktail_app', 'cocktail', 'DELETE')::text"),
+            one("SELECT has_table_privilege('mut_app', 'cocktail', 'DELETE')::text"),
         ).isEqualTo("false")
 
         // 읽기·쓰기는 된다 — 삭제만 막혔다.
-        assertThat(one("SELECT has_table_privilege('kcocktail_app', 'cocktail', 'SELECT')::text"))
+        assertThat(one("SELECT has_table_privilege('mut_app', 'cocktail', 'SELECT')::text"))
             .isEqualTo("true")
-        assertThat(one("SELECT has_table_privilege('kcocktail_app', 'cocktail', 'UPDATE')::text"))
+        assertThat(one("SELECT has_table_privilege('mut_app', 'cocktail', 'UPDATE')::text"))
             .isEqualTo("true")
     }
 

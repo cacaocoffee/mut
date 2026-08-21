@@ -92,8 +92,8 @@ object LintFixtures {
         );
 
         -- 앱 역할에 런타임과 같은 권한을 준 뒤, 보호 테이블에서만 DELETE 를 회수한다.
-        GRANT USAGE ON SCHEMA $SCHEMA TO kcocktail_app;
-        GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA $SCHEMA TO kcocktail_app;
-        REVOKE DELETE ON $SCHEMA.protected_row FROM kcocktail_app;
+        GRANT USAGE ON SCHEMA $SCHEMA TO mut_app;
+        GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA $SCHEMA TO mut_app;
+        REVOKE DELETE ON $SCHEMA.protected_row FROM mut_app;
     """.trimIndent()
 }
