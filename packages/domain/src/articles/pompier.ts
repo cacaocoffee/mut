@@ -1,0 +1,33 @@
+import type { Article } from "../types";
+
+export const ARTICLE: Article = {
+  slug: "pompier",
+  category: "cocktail",
+  title: "폼피에 — 카시스 소다를 업그레이드해보자!",
+  dek: "폼피에는 프랑스어로 '소방관'을 의미하며, 이 칵테일이 어떻게 생겨났는지, 왜 이런 이름이 붙었는지는 전혀 알려진 바가 없습니다.",
+  publishedAt: "2024-10-10",
+  hero: "/articles/pompier/00.webp",
+  sourceUrl: "https://blog.naver.com/shakinglikebartender/223613692833",
+  relatedCocktailSlugs: ["pompier"],
+  blocks: [
+    { kind: "figure", src: "/articles/pompier/00.webp", width: 966, height: 966 },
+    { kind: "paragraph", text: "폼피에는 프랑스어로 '소방관'을 의미하며, 이 칵테일이 어떻게 생겨났는지, 왜 이런 이름이 붙었는지는 전혀 알려진 바가 없습니다." },
+    { kind: "paragraph", text: "우리나라에서는 인지도가 없다시피 한 칵테일이며, 일본이나 서양에서나 조금 알려져 있는 것 같습니다. 저는 만화 '바텐더 a tokyo'에서 처음 확인했습니다." },
+    { kind: "paragraph", text: "들어가는 재료는 아주 심플한데, 드라이 버무스와 크렘 드 카시스에 탄산이 들어가는 것으로, 어딘가 스프리츠 칵테일류를 생각나게 하는 조합입니다." },
+    { kind: "paragraph", text: "기주는 특이하게 드라이 버무스로, 버무스의 사용에 애를 먹는 홈텐더 분들에게 특히 추천할 만한 칵테일입니다." },
+    { kind: "figure", src: "/articles/pompier/01.webp", width: 966, height: 966 },
+    { kind: "heading", text: "Ingredients" },
+    { kind: "paragraph", text: "45ml 드라이 버무스 (Dry Vermouth)" },
+    { kind: "paragraph", text: "15-20ml 크렘 드 카시스 (Creme de Cassis)" },
+    { kind: "paragraph", text: "100-120ml 탄산수 (Soda Water)" },
+    { kind: "figure", src: "/articles/pompier/02.webp", width: 966, height: 966 },
+    { kind: "heading", text: "How to Mix" },
+    { kind: "paragraph", text: "1. 긴 잔에 얼음을 채워줍니다." },
+    { kind: "paragraph", text: "2. 카시스와 버무스를 넣고 잘 섞이게 스터해줍니다." },
+    { kind: "paragraph", text: "3. 탄산수를 넣어주고, 얼음을 살짝 위아래로 움직여줍니다." },
+    { kind: "paragraph", text: "칵테일 자체는 덜 달지만 허브감과 와인스러움이 살짝 추가된 약간은 복잡한 카시스 소다 같은 느낌입니다. 그렇다고 복합미가 있는 칵테일은 아니고 맛 자체는 단순한 편입니다." },
+    { kind: "paragraph", text: "칵테일의 이름이 프랑스어인 만큼 재료를 모두 프랑스 재료로 사용하는 것도 센스 있는 선택이며, 이탈리안 버무스가 프렌치 버무스보다는 깔끔한 편이라 그냥 달고 밋밋한 술이 될 수 있으니 프랑스의 버무스를 추천하는 편입니다." },
+    { kind: "paragraph", text: "크렘 드 카시스는 제품마다 퀄리티 차이가 너무 극명하니 반드시 프랑스의 좋은 퀄리티의 제품을 사용하시는 걸 권장 드리는 편입니다." },
+    { kind: "paragraph", text: "저도수 칵테일인데다가 약간은 허브감이 있는 칵테일이라 식전주로도 꽤나 좋을 것 같네요." },
+  ],
+};

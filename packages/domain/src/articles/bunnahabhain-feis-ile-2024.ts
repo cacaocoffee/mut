@@ -2,7 +2,7 @@ import type { Article } from "../types";
 
 export const ARTICLE: Article = {
   slug: "bunnahabhain-feis-ile-2024",
-  category: "whisky",
+  category: "spirits",
   title: "부나하벤 페스 아일 2024 — 루비 포트 피니시",
   dek: "아일라까지 가서 못 만난 축제 보틀을 싱가포르 창이 공항에서 만났다. 브리딩 후에 완전히 다른 위스키가 되는 14년 숙성.",
   publishedAt: "2024-11-23",

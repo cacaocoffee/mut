@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { ARTICLES, ARTICLE_CATEGORY_KO } from "@mut/domain";
+import { ARTICLES } from "@mut/domain";
+import { ArticleList } from "@/components/article-list";
 import { ARTICLES_PATH } from "@/lib/routes";
 import { openGraph } from "@/lib/site";
 
@@ -11,18 +11,19 @@ import { openGraph } from "@/lib/site";
  *
  * 내용이 사람마다 달라지지 않고, 콘텐츠 유입이 이 화면의 존재 이유다 (SPEC-05 §4).
  *
- * ## 카테고리 필터가 없다
+ * ## 필터는 클라이언트, 목록은 서버
  *
- * 9편에 필터를 달면 누를 이유보다 누를 것이 많아진다. 카드의 카테고리 라벨이
- * 지금은 그 역할을 다 한다 — 글이 쌓여 한 화면을 넘기면 그때 단다.
+ * 9편일 때는 필터를 안 달았고 "글이 쌓여 한 화면을 넘기면 그때 단다"고 적어 뒀다.
+ * 142편이 되며 그때가 왔다 — 카드 데이터만 추려 `ArticleList` 로 넘긴다.
+ * 본문(`blocks`)은 상세만 쓰므로 클라이언트에 싣지 않는다.
  */
 export const metadata: Metadata = {
   title: "아티클",
-  description: "칵테일, 바, 위스키 — 마시는 것 너머의 이야기를 담습니다.",
+  description: "칵테일, 바, 스피릿 — 마시는 것 너머의 이야기를 담습니다.",
   alternates: { canonical: ARTICLES_PATH },
   openGraph: openGraph({
     title: "아티클",
-    description: "칵테일, 바, 위스키 — 마시는 것 너머의 이야기를 담습니다.",
+    description: "칵테일, 바, 스피릿 — 마시는 것 너머의 이야기를 담습니다.",
     url: ARTICLES_PATH,
   }),
 };
@@ -37,6 +38,15 @@ function formatDate(iso: string): string {
 }
 
 export default function ArticlesPage() {
+  const cards = ARTICLES.map((a) => ({
+    slug: a.slug,
+    title: a.title,
+    dek: a.dek,
+    category: a.category,
+    dateLabel: formatDate(a.publishedAt),
+    hero: a.hero,
+  }));
+
   return (
     <main className="shell">
       <header className="page-head">
@@ -46,31 +56,10 @@ export default function ArticlesPage() {
             <span className="sub">{ARTICLES.length} articles</span>
           </h1>
         </div>
-        <p className="lede">칵테일, 바, 위스키 — 마시는 것 너머의 이야기를 담습니다.</p>
+        <p className="lede">칵테일, 바, 스피릿 — 마시는 것 너머의 이야기를 담습니다.</p>
       </header>
 
-      <div className="card-grid">
-        {ARTICLES.map((a) => (
-          <Link key={a.slug} href={`${ARTICLES_PATH}/${a.slug}`} className="article-card">
-            {/* 카드 사진은 4:3 고정 크롭이다 — 목록의 줄맞춤이 원본 비율보다 중요하다.
-                본문(상세)에서는 원본 비율로 그린다. 컬러 — ADR-0008 */}
-            <div className="photo-slot photo-slot--4x3 photo-slot--photo">
-              <img
-                className="photo-slot__img"
-                src={a.hero}
-                alt={`${a.title} 대표 사진`}
-                loading="lazy"
-                width={800}
-                height={600}
-              />
-            </div>
-            <span className="article-card__kicker">{ARTICLE_CATEGORY_KO[a.category]}</span>
-            <h3 className="article-card__title">{a.title}</h3>
-            <p className="article-card__dek">{a.dek}</p>
-            <span className="article-card__date">{formatDate(a.publishedAt)}</span>
-          </Link>
-        ))}
-      </div>
+      <ArticleList articles={cards} />
     </main>
   );
 }

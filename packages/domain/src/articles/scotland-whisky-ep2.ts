@@ -1,0 +1,30 @@
+import type { Article } from "../types";
+
+export const ARTICLE: Article = {
+  slug: "scotland-whisky-ep2",
+  category: "spirits",
+  title: "스코틀랜드 위스키 여행 ep2 — 드디어 꿈에 그리던 아일라로",
+  dek: "글래스고에서 아일라로 가는 방법은 크게 두 가지가 있다.",
+  publishedAt: "2024-08-16",
+  hero: "/articles/scotland-whisky-ep2/00.webp",
+  sourceUrl: "https://blog.naver.com/shakinglikebartender/223549995582",
+  relatedCocktailSlugs: [],
+  blocks: [
+    { kind: "figure", src: "/articles/scotland-whisky-ep2/00.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/scotland-whisky-ep2/01.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/scotland-whisky-ep2/02.webp", width: 966, height: 1288 },
+    { kind: "paragraph", text: "글래스고에서 아일라로 가는 방법은 크게 두 가지가 있다." },
+    { kind: "paragraph", text: "1. 글래스고 공항에서 경비행기 타기" },
+    { kind: "paragraph", text: "2. 버스나 렌터카를 통해 케나크레이그로 이동 후 페리 타기." },
+    { kind: "paragraph", text: "**좀 더 자세한 내용은 ep0 참고!!!" },
+    { kind: "paragraph", text: "이번에는 2박 3일이라는 짧은 기간에서 되도록 시간을 잘 쓰기 위해 경비행기를 타고 아침 일찍 아일라로 이동했다. 참고로 글래스고 시내에서 공항까지는 500 Airport Express 버스로 이동이 편하고, 구글 맵에서도 쉽게 찾아볼 수 있다." },
+    { kind: "figure", src: "/articles/scotland-whisky-ep2/03.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/scotland-whisky-ep2/04.webp", width: 966, height: 1288, caption: "멀리서 보이는 포트 엘런과 아일라 공항" },
+    { kind: "paragraph", text: "경비행기 자체는 내부가 엄청 시끄럽기는 했지만 비행시간 자체가 짧아서 강력하게 추천한다. 다만, 날씨라는 변수에 따라 결항될 확률도 있긴 하다. 아일라 공항에서는 와이파이나 데이터가 잘 안 터지는데 전화는 또 잘 된다." },
+    { kind: "paragraph", text: "택시를 타고 예약한 호텔로 향하던 중에 논두렁에 차가 한 대 빠져있는 걸 보고선 택시 운전수가 \"아일라에 온 걸 환영해, 저렇게까지 마시진 말라구.\"라고 농담하는 걸 듣고 친구와 빵 터졌고, 아일라에 왔다는 걸 새삼 실감하게 되었다." },
+    { kind: "paragraph", text: "보모어에 도착해서 호텔에 짐을 맡기고, 버스를 타고 브룩라디 증류소로 향했다." },
+    { kind: "figure", src: "/articles/scotland-whisky-ep2/05.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/scotland-whisky-ep2/06.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/scotland-whisky-ep2/07.webp", width: 966, height: 1289 },
+  ],
+};

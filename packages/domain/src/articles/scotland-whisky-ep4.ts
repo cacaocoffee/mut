@@ -1,0 +1,32 @@
+import type { Article } from "../types";
+
+export const ARTICLE: Article = {
+  slug: "scotland-whisky-ep4",
+  category: "spirits",
+  title: "스코틀랜드 위스키 여행 ep4 — 짧은 시간이었지만 아름다웠던 보모어 증류소",
+  dek: "아일라 첫째 날 마지막을 장식한 증류소는 보모어 증류소(Bowmore Distillery)였다.",
+  publishedAt: "2024-08-17",
+  hero: "/articles/scotland-whisky-ep4/00.webp",
+  sourceUrl: "https://blog.naver.com/shakinglikebartender/223550901536",
+  relatedCocktailSlugs: [],
+  blocks: [
+    { kind: "figure", src: "/articles/scotland-whisky-ep4/00.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/scotland-whisky-ep4/01.webp", width: 966, height: 1288 },
+    { kind: "paragraph", text: "아일라 첫째 날 마지막을 장식한 증류소는 보모어 증류소(Bowmore Distillery)였다. 그날 투어가 있기는 했지만 스케줄이 브룩라디 웨어하우스 투어와 같은 날에 하는 건 물리적으로 불가능해 비지터 센터에서 위스키만 마시게 됐다." },
+    { kind: "paragraph", text: "보모어 증류소는 아일라 섬의 주도인 보모어에 위치해 있는데, 호텔이 마침 근처에 있어서 비지터 센터가 닫기 직전까지 내부 바에서 위스키를 마실 수 있었다." },
+    { kind: "figure", src: "/articles/scotland-whisky-ep4/02.webp", width: 966, height: 725 },
+    { kind: "figure", src: "/articles/scotland-whisky-ep4/03.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/scotland-whisky-ep4/04.webp", width: 966, height: 1288 },
+    { kind: "paragraph", text: "지금 와서 생각해보자면 보모어 증류소는 다른 곳들보다 비지터 센터가 볼 거리도 많고, 잘돼있다는 느낌이 있다. 위스키를 마시느라 사진으로 찍는 걸 깜빡했는데, 바다 뷰로 경치도 끝내준다." },
+    { kind: "paragraph", text: "덤으로 여러 전설적인 바틀과 보모어 관련 굿즈들도 볼 수 있는데, 이 정도면 작은 박물관이라 해도 되겠다. 물론 마실 수는 없지만." },
+    { kind: "figure", src: "/articles/scotland-whisky-ep4/05.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/scotland-whisky-ep4/06.webp", width: 966, height: 1263 },
+    { kind: "paragraph", text: "보모어에서는 작년과 올해의 페스 아일 바틀들, 애스턴 마틴 3번째 릴리즈, 2013년에 릴리스된 보모어 23년, 27년 숙성의 보모어 핸드필 1996, 타임리스 시리즈의 27년을 마셨었다." },
+    { kind: "paragraph", text: "맛이 정확히 기억은 안나는데, 대부분 보모어의 향기롭고 우아한 약피트가 매력적으로 다가왔던 것은 기억에 남는다." },
+    { kind: "paragraph", text: "브룩라디에서 만났던 인도인 형님(?)을 다시 만났는데, 본인이 마시던 타임리스 시리즈의 31년을 건네줘서 살짝 마셔보기도 했고." },
+    { kind: "paragraph", text: "보모어 타임리스 시리즈를 시키면 저 작은 모래시계가 다 떨어지고 나서 마시라고 하는데, 바틀을 처음 땄더니 저 모래시계를 선물로 챙겨줬다. 모래시계는 용케 유럽여행 중에 깨지지 않고 집까지 무사히 도착했다." },
+    { kind: "paragraph", text: "하나 아쉬웠던 점운 브룩라디 증류소에서 옥토모어를 마시고 온 후에 보모어를 갔다는 점이다. 이미 너무 자극적인 걸 마시기도 했고, 브룩라디 증류소에서 시음도 많이 해서 혀와 코가 많이 무뎌졌었다." },
+    { kind: "paragraph", text: "짧은 시간 내에 많이 즐겨야하니 어쩔 수 없었지만....." },
+    { kind: "figure", src: "/articles/scotland-whisky-ep4/07.webp", width: 966, height: 1288 },
+  ],
+};

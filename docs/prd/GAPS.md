@@ -1325,7 +1325,8 @@ CI 에서 상세 3,028ms · 탐색 3,590ms 가 나와 예산 2,500ms 를 넘겼�
 
 ### G-49
 **아티클 주제 축과 발행 형식 축의 관계 미결** (2026-08-20 · [ADR-0010](../decisions/ADR-0010-articles-over-my-bar.md)).
-화면은 주제 축 `cocktail`(칵테일) · `bar`(바) · `whisky`(위스키)로 아티클을 묶는데,
+화면은 주제 축 `cocktail`(칵테일) · `bar`(바) · `spirits`(스피릿)의 세 갈래로 아티클을 나누는데
+(처음엔 `whisky` 위스키였다가 진·꼬냑·소주 리뷰가 들어오며 2026-08-21 스피릿으로 넓혔다),
 SPEC-02 §6 의 `Article.type` 은 발행 형식 축(`interview`·`guide`·`trend`·`photo_essay`)이다.
 두 축을 다 둘지, 하나로 합칠지, 매핑할지는 `GET /articles` 계약을 만들 때 정한다.
 그때까지 주제 축은 `packages/domain/src/articles/` 안의 화면 전용 값이다.

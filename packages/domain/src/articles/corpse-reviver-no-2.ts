@@ -1,0 +1,32 @@
+import type { Article } from "../types";
+
+export const ARTICLE: Article = {
+  slug: "corpse-reviver-no-2",
+  category: "cocktail",
+  title: "콥스 리바이버 넘버 2 — 죽은 자를 깨우는 칵테일",
+  dek: "「콥스 리바이버」라는 이름은 이미 19세기부터 존재하였는데, 가장 오래된 기록은 1861년 런던에서 출판된 잡지 '펀치(Punch)'에서 슬링(Sling), 스톤 월(Stone Wall)이라는 칵테일과 함께 언급되는 것입니다.",
+  publishedAt: "2025-10-08",
+  hero: "/articles/corpse-reviver-no-2/00.webp",
+  sourceUrl: "https://blog.naver.com/shakinglikebartender/224034950340",
+  relatedCocktailSlugs: ["corpsereviver2"],
+  blocks: [
+    { kind: "figure", src: "/articles/corpse-reviver-no-2/00.webp", width: 966, height: 966 },
+    { kind: "paragraph", text: "「콥스 리바이버」라는 이름은 이미 19세기부터 존재하였는데, 가장 오래된 기록은 1861년 런던에서 출판된 잡지 '펀치(Punch)'에서 슬링(Sling), 스톤 월(Stone Wall)이라는 칵테일과 함께 언급되는 것입니다." },
+    { kind: "paragraph", text: "이 시기에는 숙취를 더 강한 술로 달래는 해장술이 유행했다고 하는데, 이 당시에는 콥스 리바이버가 특정 칵테일 또는 레시피로서의 의미가 아니라 이름 그대로 \"해장을 위한 술\"이라는 의미로 쓰였을 것이라는 주장이 주를 이룹니다." },
+    { kind: "paragraph", text: "가장 오래된 레시피는 1871년에 출판된 책인 The Gentlemen's Table Guide에서 처음 언급되는데, 브랜디와 마라스키노 리큐르가 동량으로 들어가고, 보커스 비터가 들어가는 등 현재의 유명한 레시피들과는 전혀 다릅니다." },
+    { kind: "figure", src: "/articles/corpse-reviver-no-2/01.webp", width: 462, height: 196, caption: "The Savoy Cocktail Book(1930)" },
+    { kind: "paragraph", text: "콥스 리바이버는 정말 많은 종류가 있지만, 현재 가장 유명한 콥스 리바이버는 넘버 2로, 넘버 1과 함께 1930년 해리 크래독의 저서인 The Savoy Cocktail Book에서 처음 소개되었습니다." },
+    { kind: "paragraph", text: "레시피 밑을 보면 \"4잔을 연속으로 빠르게 마시면 되살아난 시체도 다시 죽을 것\"이라는 내용이 적혀있는데, 칵테일 이름의 뜻인 \"죽은 자도 부활시키는 것\"을 바탕으로 너무 빠르게 많이 마시지 말라는 위트 있는 경고라 할 수 있죠." },
+    { kind: "figure", src: "/articles/corpse-reviver-no-2/02.webp", width: 966, height: 966 },
+    { kind: "paragraph", text: "원래 콥스 리바이버 넘버 2의 레시피는 들어가는 재료들이 동량으로 되어 있지만, 그렇게 밸런스가 좋다고 느껴지지는 않습니다." },
+    { kind: "paragraph", text: "콥스 리바이버 넘버 2도 처음 기록으로 등장한 지 거의 100년이 되어가는 술이기 때문에 다양한 비율의 레시피가 있으니 그걸 비교해 보면서 본인에게 맞는 비율을 찾아가는 것도 좋을 것 같습니다." },
+    { kind: "figure", src: "/articles/corpse-reviver-no-2/03.webp", width: 966, height: 966 },
+    { kind: "paragraph", text: "1. 압생트 외의 모든 재료를 셰이커에 넣는다." },
+    { kind: "paragraph", text: "2. 차게 해둔 잔 안에 압생트를 뿌려 린싱해준다." },
+    { kind: "paragraph", text: "3. 셰이커에 얼음을 채우고, 셰이킹한다." },
+    { kind: "paragraph", text: "4. 잔에 따라준다." },
+    { kind: "paragraph", text: "압생트의 경우는 스프레이가 없다면 1바스푼 정도를 잔에 넣고, 잔 안에 전체적으로 묻을 수 있도록 잔을 돌려준 후,  남은 압생트를 버려주면 됩니다." },
+    { kind: "paragraph", text: "콥스 리바이버 넘버 2는 시트러스의 새콤달콤함, 릴레의 약간의 와인 같은 캐릭터, 중심을 잡아주는 진의 보타니컬함 살짝에 미묘하게 느껴지는 압생트의 풍미가 함께 느껴지는 재미있는 칵테일입니다." },
+    { kind: "paragraph", text: "개인적으로는 사실 맛 자체가 해장술보다는 지쳐 있을 때에 마시면 기운이 날 것 같은 칵테일이라고 생각됩니다." },
+  ],
+};

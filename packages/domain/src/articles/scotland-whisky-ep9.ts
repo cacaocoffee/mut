@@ -1,0 +1,31 @@
+import type { Article } from "../types";
+
+export const ARTICLE: Article = {
+  slug: "scotland-whisky-ep9",
+  category: "spirits",
+  title: "스코틀랜드 위스키 여행 ep9 — 아름다운 자연과 어우러진 라프로익 증류소",
+  dek: "라프로익 증류소는 다른 킬달튼 형제(아드벡, 라가불린)들과는 다르게 가로수길(?)을 거친 후에야 나타나는데, 우리는 날씨가 정말 좋았을 때 갔어서 이 가로수길이 아주 아름다웠다.",
+  publishedAt: "2024-08-23",
+  hero: "/articles/scotland-whisky-ep9/00.webp",
+  sourceUrl: "https://blog.naver.com/shakinglikebartender/223558193281",
+  relatedCocktailSlugs: [],
+  blocks: [
+    { kind: "figure", src: "/articles/scotland-whisky-ep9/00.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/scotland-whisky-ep9/01.webp", width: 966, height: 1288 },
+    { kind: "paragraph", text: "라프로익 증류소는 다른 킬달튼 형제(아드벡, 라가불린)들과는 다르게 가로수길(?)을 거친 후에야 나타나는데, 우리는 날씨가 정말 좋았을 때 갔어서 이 가로수길이 아주 아름다웠다." },
+    { kind: "paragraph", text: "라프로익 증류소에는 단순히 몇몇 라프로익 위스키를 찍먹해보려고 갔던지라 친구와 곧바로 비지터 센터 너머의 바로 직행했다." },
+    { kind: "figure", src: "/articles/scotland-whisky-ep9/02.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/scotland-whisky-ep9/03.webp", width: 966, height: 1288 },
+    { kind: "paragraph", text: "라프로익 비지터 센터의 바에 가면 우선 주문하기도 전에 위스키를 한 잔 준다. 받은 건 올해 페스 아일 바틀인 카디어스(Cairdeas)였는데, 솔직히 올해 축제 바틀을 웰컴 위스키로 내줄 줄은 몰랐다." },
+    { kind: "paragraph", text: "라프로익 카디어스는 2008년부터 페스 아일을 위해 릴리즈된 시리즈로, 카디어스(Cairdeas)는 게일어로 우정(Friendship)을 의미한다." },
+    { kind: "paragraph", text: "아마 여기에 착안한 것인지, 아니면 그 반대인지 라프로익이 운영하는 멤버십의 이름은 라프로익의 친구들(Friends of Laphroaig)이기도 하다." },
+    { kind: "figure", src: "/articles/scotland-whisky-ep9/04.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/scotland-whisky-ep9/05.webp", width: 966, height: 1288 },
+    { kind: "paragraph", text: "비지터 바에서는 올드 & 레어와 캐스크 스트렝스 10 테이스팅 플라이트를 마시게 되었는데, 가격면에서 지금까지 방문했던 증류소 중에서 제일 저렴했던 것 같다." },
+    { kind: "paragraph", text: "문제는 맛인데....나도 친구도 라프로익을 그다지 좋아하는 편은 아니여서 그렇게 큰 감상은 없었다. 더 큰 문제는 마신 것들 중에 비매품인 핸드필 제품이 있었는데, 이게 정말 별로였다." },
+    { kind: "paragraph", text: "위스키에서 처음 맛보는 이상한 맛이 났는데, 나만 그랬으면 내 혀가 이상하구나 하고 끝냈겠지만, 친구도 맛이 이상하다고 한 거 보니 뭔가 바틀이 오염됐거나, 잘못 보관된 건가 싶다." },
+    { kind: "paragraph", text: "비지터 내부 바에서 마시다보면 자연스럽게 창문으로 눈길이 가는데, 그 너머로 보이는 광경은 아직도 잊히지 않을 정도로 아름다웠다." },
+    { kind: "figure", src: "/articles/scotland-whisky-ep9/06.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/scotland-whisky-ep9/07.webp", width: 966, height: 1288 },
+  ],
+};

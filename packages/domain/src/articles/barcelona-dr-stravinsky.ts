@@ -1,0 +1,33 @@
+import type { Article } from "../types";
+
+export const ARTICLE: Article = {
+  slug: "barcelona-dr-stravinsky",
+  category: "bar",
+  title: "닥터 스트라빈스키",
+  dek: "\"닥터 스트라빈스키(Dr Stravinsky)\"는 바르셀로나 대성당 근처에 위치한 바로, 2019년 The World's Best Bars 50(월드 베스트 바)에서 25위에 이름을 올리기도 했습니다.",
+  publishedAt: "2024-07-07",
+  hero: "/articles/barcelona-dr-stravinsky/00.webp",
+  sourceUrl: "https://blog.naver.com/shakinglikebartender/223504224649",
+  relatedCocktailSlugs: [],
+  blocks: [
+    { kind: "figure", src: "/articles/barcelona-dr-stravinsky/00.webp", width: 966, height: 1289 },
+    { kind: "figure", src: "/articles/barcelona-dr-stravinsky/01.webp", width: 966, height: 1288 },
+    { kind: "paragraph", text: "\"닥터 스트라빈스키(Dr Stravinsky)\"는 바르셀로나 대성당 근처에 위치한 바로, 2019년 The World's Best Bars 50(월드 베스트 바)에서 25위에 이름을 올리기도 했습니다." },
+    { kind: "paragraph", text: "닥터 스트라빈스키에서는 '재증류, 발효, 팻  워싱(Fat Washing), 인퓨징(Infusing), 수비드 등등' 다양한 기술을 바탕으로 칵테일을 만들어내며, 역시나 믹솔로지적인 성격이 강한 바입니다." },
+    { kind: "figure", src: "/articles/barcelona-dr-stravinsky/02.webp", width: 966, height: 543 },
+    { kind: "figure", src: "/articles/barcelona-dr-stravinsky/03.webp", width: 966, height: 1717 },
+    { kind: "paragraph", text: "바 내부 벽면과 백바를 보면 인퓨징 중인 주류들과 재증류, 발효, 워싱을 거친 주류들이 주로 진열되어 있으며, 미니 증류기까지 바 카운터에 두는 등 바의 아이덴티티를 쉽게 파악할 수 있도록 배치한 것이 인상적입니다." },
+    { kind: "figure", src: "/articles/barcelona-dr-stravinsky/04.webp", width: 966, height: 966 },
+    { kind: "figure", src: "/articles/barcelona-dr-stravinsky/05.webp", width: 966, height: 966, caption: "Tuber Negroni / Cheese Knees" },
+    { kind: "paragraph", text: "\"투베르 네그로니(Tuber Negroni)\"에서 '투베르'는 트러플을 의미하는데, 메뉴의 재료 표기에서 'black truffle mezcal'을 확인하실 수 있습니다." },
+    { kind: "paragraph", text: "생 트러플은 가격이 있는 편이며, 인퓨징을 한다고 하더라도 일주일도 안되는 사이에 향과 맛이 거의 빠지게 되어 바텐더분에게 물어보니 메즈칼에 트러플 오일을 워싱하는 식으로 트러플의 캐릭터를 준다고 합니다." },
+    { kind: "paragraph", text: "네그로니는 본래 그 재료들인 진(Gin), 버무스(Vermouth), 캄파리(Campari) 때문에 약초, 한약재스러운 맛과 향이 나는데, 거기에 트러플이 더해지니 꽤 잘 어울렸고, 쿰쿰한 향의 치즈 가니시까지 더하니 꽤 일체감 있는 향과 맛이 났습니다. 치즈를 버섯처럼 보이게 만들어 가니시한 것도 아주 마음에 드네요." },
+    { kind: "paragraph", text: "\"치즈 니즈(Cheese Knees)\"는 \"비즈 니스(Bee's Knees)\"라는 클래식 칵테일의 변형으로, 기존의 '비즈 니스'에 스모키함과 치즈를 더한 칵테일입니다. 친구가 주문해서 저는 한 두입만 마셔봐서 정확히 기억이 나지는 않는데, 꽤 괜찮은 칵테일이었습니다." },
+    { kind: "figure", src: "/articles/barcelona-dr-stravinsky/06.webp", width: 966, height: 966 },
+    { kind: "figure", src: "/articles/barcelona-dr-stravinsky/07.webp", width: 966, height: 966, caption: "Camp Nou / ?" },
+    { kind: "paragraph", text: "\"캄프 누(Camp Nou)\"는 진, 피노 쉐리, 허브 시럽, 라임 등이 들어가는 일종의 \"김렛(Gimlet)\"이라는 클래식 칵테일의 변형으로 볼 수 있으며, 신맛과 허브를 좋아하시는 분들은 아주 좋아하실 맛입니다." },
+    { kind: "paragraph", text: "'캄프 누'는 축구팀인 FC 바르셀로나의 홈구장으로, FC 바르셀로나의 팬인 저로서는 안시키고는 베길 수 없는 한 잔이었습니다. 솔직히 네이밍이 칵테일에 어울리는지는 차치하고, FC 바르셀로나 팬이라 밝히고 칵테일을 주문하니 바텐더분이 정말 좋아하시는 게 재밌었습니다." },
+    { kind: "paragraph", text: "바르셀로나에는 십스(Sips), 파라디소(Paradiso) 등과 같이 유명한 바들이 많습니다만, 저는 개인적으로 닥터 스트라빈스키를 방문할 것 같습니다." },
+    { kind: "paragraph", text: "맛과 가니시가 필요 이상으로 너무 복잡하지 않고 직관적인 편이며, 너무 사람이 붐비지도 않는 편이고, 일단 가격대가 다른 곳들보다는 낮은 편입니다." },
+  ],
+};

@@ -1,0 +1,32 @@
+import type { Article } from "../types";
+
+export const ARTICLE: Article = {
+  slug: "last-word",
+  category: "cocktail",
+  title: "금주법 시대의 칵테일, 라스트 워드",
+  dek: "라스트 워드는 금주법 이전 시대에 만들어진 칵테일로, Detroit Athletic Club의 잡지 1916년 7-8월호에 첨부된 칵테일 메뉴판에 단순히 레시피 없이 그 이름만 기록된 것이 가장 최초의 기록이라고 합니다.",
+  publishedAt: "2021-09-26",
+  hero: "/articles/last-word/00.webp",
+  sourceUrl: "https://blog.naver.com/shakinglikebartender/222517500244",
+  relatedCocktailSlugs: [],
+  blocks: [
+    { kind: "paragraph", text: "About the Drink" },
+    { kind: "paragraph", text: "라스트 워드는 금주법 이전 시대에 만들어진 칵테일로, Detroit Athletic Club의 잡지 1916년 7-8월호에 첨부된 칵테일 메뉴판에 단순히 레시피 없이 그 이름만 기록된 것이 가장 최초의 기록이라고 합니다." },
+    { kind: "paragraph", text: "이후 1951년 Ted Saucier의 칵테일 저서인 'Bottoms Up!'에서 그 레시피와 Detroit Athletic Club에 얽힌 간단한 역사에 대해 기록되었습니다." },
+    { kind: "paragraph", text: "처음 알려진 레시피는 모든 재료가 동일한 비율로 들어간 것이었지만 시간이 지나면서 다른 비율의 레시피도 나오게됐으며, 다양한 배리에이션(변형)들이 등장하게 되었습니다." },
+    { kind: "paragraph", text: "Ingredients?" },
+    { kind: "figure", src: "/articles/last-word/00.webp", width: 966, height: 966 },
+    { kind: "paragraph", text: "라스트 워드에 들어가는 재료는 마라스키노 리큐르, 그린 샤트르뢰즈, 진, 라임즙이며 모든 재료를 동일한 비율로 넣어줍니다." },
+    { kind: "paragraph", text: "룩사르도 마라스키노는 체리 리큐르로 아주 드라이하며, 샤르트뢰즈는 '리큐르의 여왕'이라는 별명을 가진 허브 리큐르입니다. 진은 여러분이 선호하는 진을 사용해주세요." },
+    { kind: "paragraph", text: "How to Mix?" },
+    { kind: "paragraph", text: "1. 모든 재료를 22.5ml씩 셰이커 안에 넣어줍니다." },
+    { kind: "paragraph", text: "2. 셰이커에 얼음을 채우고 셰이킹을 해줍니다." },
+    { kind: "paragraph", text: "3. 칵테일 글라스에 셰이킹한 칵테일을 따라줍니다." },
+    { kind: "paragraph", text: "4. 마라스키노 체리를 넣어서 가니시를 해줍니다." },
+    { kind: "figure", src: "/articles/last-word/01.webp", width: 966, height: 966, caption: "완성된 라스트 워드 (Last Word)" },
+    { kind: "paragraph", text: "만들어진 라스트 워드는 그린 샤르트뢰즈와 라임즙으로 인해 녹색을 띄게 됩니다." },
+    { kind: "paragraph", text: "라스트 워드에 대해서 얘기할 때 빠지지 않는 것이 '밸런스'입니다. 샤르트뢰즈의 허브감, 마라스키노의 드라이함, 라임의 시트러시함, 진의 복잡함이 모두 일체감 있게 잘 느껴집니다." },
+    { kind: "paragraph", text: "재미있는 점은 이 칵테일에 들어가는 세 가지 술이 모두 자기주장이 아주 강하고, 시럽이 들어가지 않는데도 불구하고 꽤나 완벽한 밸런스를 이룬다는 점입니다." },
+    { kind: "paragraph", text: "더 많은 칵테일에 관한 정보는" },
+  ],
+};

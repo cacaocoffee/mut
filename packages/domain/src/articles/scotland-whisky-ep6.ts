@@ -1,0 +1,32 @@
+import type { Article } from "../types";
+
+export const ARTICLE: Article = {
+  slug: "scotland-whisky-ep6",
+  category: "spirits",
+  title: "스코틀랜드 위스키 여행 ep6 — 보모어 호텔의 루치스 위스키 바의 엄청난 아일라 위스키 컬렉션 / Lucci's Whisky Bar",
+  dek: "우리가 숙박한 보모어 호텔의 내부에는 루치스 바가 있었는데, 여기가 또 아일라 여행객들에게는 성지 중 하나로 통한다.",
+  publishedAt: "2024-08-20",
+  hero: "/articles/scotland-whisky-ep6/00.webp",
+  sourceUrl: "https://blog.naver.com/shakinglikebartender/223554418634",
+  relatedCocktailSlugs: [],
+  blocks: [
+    { kind: "figure", src: "/articles/scotland-whisky-ep6/00.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/scotland-whisky-ep6/01.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/scotland-whisky-ep6/02.webp", width: 966, height: 1717 },
+    { kind: "figure", src: "/articles/scotland-whisky-ep6/03.webp", width: 966, height: 1288 },
+    { kind: "paragraph", text: "우리가 숙박한 보모어 호텔의 내부에는 루치스 바가 있었는데, 여기가 또 아일라 여행객들에게는 성지 중 하나로 통한다." },
+    { kind: "paragraph", text: "바 내부에만 위스키가 있는 게 아니라, 호텔 내부 곳곳에 위스키가 있는데, 킬호만의 경우는 우리가 머문 방 바로 옆에 위치해 있어서 매일 아침저녁으로 바틀을 구경하기도 했다." },
+    { kind: "paragraph", text: "루치스 바의 컬렉션은 정말 입을 떡 벌어지게 할만한데, 직접 보고 있어도 현실감이 떨어진다. 그건 말도 안 되게 높은 가격 때문...." },
+    { kind: "paragraph", text: "아마 대부분이 마실 수 있는 바틀들 중에서도 아주 희귀한 바틀이 있음에도 불구하고 텐션이 그렇게 오르지 않았던 건 가격 때문이었다. 아무리 위스키를 좋아하고, 돈을 쓸 각오를 하고 와도 가격이 익숙해지질 않는다." },
+    { kind: "figure", src: "/articles/scotland-whisky-ep6/04.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/scotland-whisky-ep6/05.webp", width: 966, height: 1288 },
+    { kind: "paragraph", text: "루치스 바의 메뉴를 친구가 몇 쪽 찍어왔는데, 엄청난 컬렉션에 한 번 놀라고, 가격에 두 번 놀라게 된다. 저 사진이 진짜 일부에 불과하다." },
+    { kind: "paragraph", text: "브룩라디 웨어하우스 투어를 안내해 준 스태프가 자신이 마신 위스키 중 최고였다고 극찬한 옥토모어 이벤트 호라이즌을 마셔보고 싶었는데, 100파운드라 고민 끝에 포기해버렸다." },
+    { kind: "paragraph", text: "어디선가 얼핏 본 바로는 보모어에서 멀리 떨어지지 않은 곳에 \"더 아일라 위스키 볼트(The Islay Whisky Vault)\"라는 곳이 여기보다 더 합리적인 가격으로 위스키를 맛볼 수 있다고 하니, 보모어 호텔에 숙박하는 거 아니면 거기로 하자." },
+    { kind: "figure", src: "/articles/scotland-whisky-ep6/06.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/scotland-whisky-ep6/07.webp", width: 966, height: 1288, caption: "브룩라디 블랙아트(Bruichladdich Black Art 03.1) / 라가불린 12년 CS (Lagavulin 12yo CS, 2016)" },
+    { kind: "paragraph", text: "그렇게 나는 브룩라디 블랙아트 03.1을 마셨는데, 이게 얼마 남아있지 않은 상태에서 오래 보관돼서 그런지 솔직히 힘이 너~무 빠져있었다. 향이나 맛이나 힘이 너무 빠진...." },
+    { kind: "paragraph", text: "그나마 합리적인 가격 찾다가 주문했지만 이것도 비싼 걸로 기억하는데, 적잖이 실망했다." },
+    { kind: "paragraph", text: "개인적으로 물론 희귀한 바틀도 있지만, 굳이 여기서보다는 증류소에서 이것저것 더 합리적인 가격에 마셔보거나, 더 비싼 증류소 투어를 하는 게 더 나을 것 같다는 생각이 들었다." },
+  ],
+};

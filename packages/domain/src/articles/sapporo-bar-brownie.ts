@@ -1,0 +1,33 @@
+import type { Article } from "../types";
+
+export const ARTICLE: Article = {
+  slug: "sapporo-bar-brownie",
+  category: "bar",
+  title: "브라우니 — 스스키노역 근처 지하에 숨어 있는 깔끔한 매력의 몰트바",
+  dek: "'바 브라우니'는 홋카이도의 오비히로에 본점을 둔 바로, 이곳 삿포로 스스키노역 근처에 있는 브라우니는 분점에 해당합니다.",
+  publishedAt: "2024-12-28",
+  hero: "/articles/sapporo-bar-brownie/00.webp",
+  sourceUrl: "https://blog.naver.com/shakinglikebartender/223707726678",
+  relatedCocktailSlugs: [],
+  blocks: [
+    { kind: "figure", src: "/articles/sapporo-bar-brownie/00.webp", width: 966, height: 966 },
+    { kind: "paragraph", text: "'바 브라우니'는 홋카이도의 오비히로에 본점을 둔 바로, 이곳 삿포로 스스키노역 근처에 있는 브라우니는 분점에 해당합니다. 제가 10월에 갔을 때는 오픈한 지 며칠 되지 않았다고 하며, 실제로 구글 맵에도 표시되지 않았던 걸로 기억합니다." },
+    { kind: "paragraph", text: "그런 곳을 어떻게 방문했냐하면, 근처의 샷 바 베키오(Shot Bar Vecchio)에서 추천을 받아서 방문했습니다." },
+    { kind: "paragraph", text: "사실 이번 삿포로 바 투어는 일단 찾아놓은 바를 갔다가 거기서 추천을 받고 즉흥적으로 갔던 곳이 꽤 있었는데, 브라우니는 그중 하나였습니다." },
+    { kind: "figure", src: "/articles/sapporo-bar-brownie/01.webp", width: 966, height: 1717 },
+    { kind: "figure", src: "/articles/sapporo-bar-brownie/02.webp", width: 966, height: 1717 },
+    { kind: "figure", src: "/articles/sapporo-bar-brownie/03.webp", width: 966, height: 1717 },
+    { kind: "paragraph", text: "브라우니의 특징은 우리가 흔하게 생각할 만한 아주 깔끔한 일본의 몰트바의 전형이라 할 수 있는데, 개인적으로 제가 일본에서 가 본 바들 중에서 가장 단정하고 깔끔한 인상을 받았습니다." },
+    { kind: "figure", src: "/articles/sapporo-bar-brownie/04.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/sapporo-bar-brownie/05.webp", width: 966, height: 1288 },
+    { kind: "paragraph", text: "일단 첫 잔으로 아묻따 하이볼." },
+    { kind: "paragraph", text: "개인적으로 하이볼은 와인류의 캐스크를 사용한 건 그렇게 좋아하지 않아서 버번 캐스크를 사용한 하이볼을 요청드렸는데, 글렌 알라키 버번캐스크로 만들어주셨습니다. 개인적으로 팥 같은 캐스크의 캐릭터가 좀 강해서 불호..." },
+    { kind: "figure", src: "/articles/sapporo-bar-brownie/06.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/sapporo-bar-brownie/07.webp", width: 966, height: 1288 },
+    { kind: "paragraph", text: "그리고 끝나지 않는 나 홀로 아드벡 데이." },
+    { kind: "paragraph", text: "이날 더 위스키 테이스팅 룸에서 아일라 스폰지를 못 사서 화풀이 마냥 세 곳의 바에서 아드벡을 엄청나게 마셨는데, 브라우니에서 마셨던 아드벡은 모두 맛있었습니다." },
+    { kind: "paragraph", text: "독립병입이었던 몰트만(Maltman)의 킬달튼 10년은 셰리캐스크였는데, 이거 가격도 괜찮고 모닥불같이 타는 듯한 피트감과 베리류, 크리미함, 베이컨과 같은 캐릭터로 맛도 아주 좋았어서 아드벡을 좋아하시는 분이라면 꼭 추천하고 싶습니다." },
+    { kind: "paragraph", text: "아드벡 싱글캐스크 같은 경우는 바테이블에 놓여있길래 '싱글캐스크 + 세컨 필 꼬뜨 로띠 와인 캐스크'에 혹해 궁금해서 한 번 마셔봤는데, 정확한 맛까지는 기억이 안 나지만 우아한 캐릭터의 아드벡으로 한참 향을 맡았던 기억이 있습니다." },
+    { kind: "paragraph", text: "제가 갔던 날에는 점장님(?)의 아는 분들이 오셨는지 그렇게 얘기를 많이 나누지는 못했는데, 그래도 기본적으로 응대가 꽤 나이스했고, 위스키 라인업도 상당히 좋아서 일본에서 몰트바를 찾는 분들에게 특히 추천드립니다." },
+  ],
+};

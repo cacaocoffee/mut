@@ -1,0 +1,31 @@
+import type { Article } from "../types";
+
+export const ARTICLE: Article = {
+  slug: "bar-cherokee",
+  category: "bar",
+  title: "체로키 — 올드바틀과 빈티지의 천국",
+  dek: "\"체로키(Cherokee)\"는 후쿠오카 나카스의 한 빌딩에 위치한 바로, 올드바틀의 천국이라 할 수 있는 바입니다.",
+  publishedAt: "2024-07-14",
+  hero: "/articles/bar-cherokee/00.webp",
+  sourceUrl: "https://blog.naver.com/shakinglikebartender/223512114600",
+  relatedCocktailSlugs: [],
+  blocks: [
+    { kind: "figure", src: "/articles/bar-cherokee/00.webp", width: 810, height: 1440 },
+    { kind: "figure", src: "/articles/bar-cherokee/01.webp", width: 810, height: 1440 },
+    { kind: "paragraph", text: "\"체로키(Cherokee)\"는 후쿠오카 나카스의 한 빌딩에 위치한 바로, 올드바틀의 천국이라 할 수 있는 바입니다. 오래된 올드바틀의 위스키 뿐만 아니라, 올드바틀의 다른 증류주나 리큐르까지 정말 다양한 라인이 준비되어 있고, 이 재료들로 칵테일을 만들어내기도 합니다." },
+    { kind: "figure", src: "/articles/bar-cherokee/02.webp", width: 595, height: 793 },
+    { kind: "figure", src: "/articles/bar-cherokee/03.webp", width: 810, height: 1080 },
+    { kind: "figure", src: "/articles/bar-cherokee/04.webp", width: 810, height: 1080, caption: "네그로니(Negroni) / 캄파리(50s, 80s, current) /스푸모니(Spumoni)" },
+    { kind: "paragraph", text: "저는 워낙에 네그로니(Negroni)라는 칵테일과 그 재료로 들어가는 캄파리(Campari)를 매우 좋아해서 50년대, 80년대의 캄파리와 현행으로 나오는 캄파리를 비교해서 마셔보았습니다." },
+    { kind: "paragraph", text: "제 감상으로는 현행과 과거의 캄파리는 단맛과 쓴맛의 포인트가 다르다였습니다. 현행보다 80년대의 캄파리는 단맛과 쓴맛이 좀 더 차분하고, 용담이나 칡뿌리 같은 뿌리의 쓴맛 캐릭터를 좀 더 느낄 수 있고, 자몽과 망고의 캐릭터가 인상적인 캄파리였습니다. 50년대의 캄파리는 한방 약재들의 캐릭터가 지배적이며 좀 더 묵직한 느낌으로, 아마로 같은 인상을 강하게 받았습니다." },
+    { kind: "paragraph", text: "올드바틀로 만든 네그로니는 80년대의 탱커레이, 80년대의 캄파리, 90년대의 친자노 버무스로 만들어졌습니다. 맛 자체의 무게감이 현재의 네그로니와는 확연하게 차이가 나고, 단맛의 쓴맛의 캐릭터 자체가 다릅니다. 이 한 잔은 '체로키'에 가신다면 꼭 추천드리고 싶네요." },
+    { kind: "paragraph", text: "그 외에도 80년대 캄파리로 만든 스푸모니를 마시면서 오너와 스푸모니의 기원에 대해서 시시콜콜한 농담을 하며 재미있게 마셨습니다. 이것도 상당히 맛있었구요." },
+    { kind: "figure", src: "/articles/bar-cherokee/05.webp", width: 810, height: 1440 },
+    { kind: "figure", src: "/articles/bar-cherokee/06.webp", width: 810, height: 1440 },
+    { kind: "figure", src: "/articles/bar-cherokee/07.webp", width: 810, height: 1440, caption: "마르 드 샴페인(Marc de Champagne)" },
+    { kind: "paragraph", text: "그 외에도 최근 마르(Marc)와 핀(Fine)에 관심이 많아 마르가 있는지 여쭤봤는데, '마르 드 샴페인'이 있다고 해서 바로 주문했습니다. 이것도 올드바틀이라 하셨는데, 다른 마르 드 샴페인과 비교해보라고 한 잔을 더 주셨습니다." },
+    { kind: "paragraph", text: "하나는 맛이 세로로 느껴지고, 하나는 가로로 느껴진다는데, 표현은 이상하지만 그 말 그대로 맛이 느껴지는 게 정말 신기했습니다." },
+    { kind: "paragraph", text: "이렇게 '체로키'에는 올드바틀 리큐르, 그걸 이용한 칵테일이 있을 뿐만 아니라, 올드바틀 위스키나 다른 종류의 증류주까지 정말 많은 올드바틀이 놓여져 있으며, 합리적인 가격에 경험을 할 수 있습니다. 물론 일반적인 칵테일이나, 직접 증류한 술을 활용한 칵테일 등도 다양하게 준비가 되어 있습니다." },
+    { kind: "paragraph", text: "올드바틀에 관심이 있으시거나, 칵테일과 리큐르에 관심이 있는 분들에게 특히 추천을 드리며, 오너에게 관련된 질문을 하면 정말 잘 설명해주시니 궁금한 것도 주저 없이 물어봐주세요." },
+  ],
+};
