@@ -52,7 +52,7 @@ Railway의 `Free` 플랜(월 $1)은 **RAM 0.5GB** 라 이 API가 들어가지 �
 | 층 | 어디 | 왜 | 값 |
 |---|---|---|---|
 | 웹 | **Vercel** | Next.js를 만든 곳이라 ISR과 `ImageResponse` 가 손대지 않고 돈다 | Hobby $0 |
-| API | **Fly.io** 또는 **Cloud Run** | 둘 다 컨테이너 하나면 된다. 아래 「$0 으로 끝낼 수 있는가」에서 고른다 | $0 ~ $3.19 |
+| API | **Fly.io** (2026-08-21 확정) | 컨테이너 하나. 리전은 **sin** — 요청 하나가 쿼리를 여러 번 치므로 사용자(서울)보다 DB(Neon 싱가포르) 옆이 전체 지연이 짧다. `min_machines_running=0` 으로 시작 — 잠들면 $0, 첫 요청이 JVM 기동 ~20초를 기다린다. 트래픽이 생기면 1 로 올린다 | $0 ~ $3.19 |
 | DB | **Neon** | PostgreSQL 16 · 안 쓰면 자동으로 멈춘다 | 무료 0.5GB |
 | 이미지 | **Cloudflare R2** | **S3 호환**이라 `media_asset.storage_key` 가 그대로 맞는다 | 10GB 무료 |
 

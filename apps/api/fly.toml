@@ -1,0 +1,34 @@
+# Fly.io 설정 (ADR-0007 2단계).
+#
+# 리전이 sin(싱가포르)인 이유 — DB(Neon)가 ap-southeast-1 이다. 요청 하나가
+# 쿼리를 여러 번 치므로 API 는 사용자보다 DB 옆에 두는 쪽이 전체 지연이 짧다.
+#
+# min_machines_running = 0 — 요청이 없으면 기계를 멈춘다. 값이 $0 에 수렴하는 대신
+# 잠든 뒤 첫 요청이 JVM 기동(~20초)을 기다린다. 트래픽이 생기면 1 로 올린다.
+
+app = "mut-api"
+primary_region = "sin"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8080"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [[http_service.checks]]
+    path = "/actuator/health"
+    interval = "30s"
+    timeout = "5s"
+    # Flyway 가 기동 때 돈다 — JVM + 마이그레이션 확인 시간을 준다
+    grace_period = "60s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "1gb"
