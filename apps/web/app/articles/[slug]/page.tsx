@@ -50,7 +50,7 @@ export async function generateMetadata({
   };
 }
 
-function Block({ b }: { b: ArticleBlock }) {
+function Block({ b, dropcap }: { b: ArticleBlock; dropcap?: boolean }) {
   switch (b.kind) {
     case "heading":
       return <h2>{b.text}</h2>;
@@ -64,7 +64,7 @@ function Block({ b }: { b: ArticleBlock }) {
         </figure>
       );
     default:
-      return <p>{b.text}</p>;
+      return <p className={dropcap ? "dropcap" : undefined}>{b.text}</p>;
   }
 }
 
@@ -77,6 +77,10 @@ export default async function ArticleDetailPage({ params }: PageProps<"/articles
   const first = a.blocks[0];
   const blocks = first?.kind === "figure" && first.src === a.hero ? a.blocks.slice(1) : a.blocks;
   const heroDims = first?.kind === "figure" && first.src === a.hero ? first : null;
+
+  // 드롭캡은 글자로 시작하는 첫 문단에만 — 따옴표·인용으로 여는 글에서 부호가 커지는 것을 막는다
+  const firstParagraph = blocks.find((b) => b.kind === "paragraph");
+  const dropcapOk = firstParagraph != null && /^[가-힣A-Za-z]/.test(firstParagraph.text);
 
   const related = a.relatedCocktailSlugs
     .map((s) => getCocktail(s))
@@ -122,7 +126,7 @@ export default async function ArticleDetailPage({ params }: PageProps<"/articles
         </figure>
 
         {blocks.map((b, i) => (
-          <Block key={i} b={b} />
+          <Block key={i} b={b} dropcap={dropcapOk && b === firstParagraph} />
         ))}
 
         <p className="article-source">

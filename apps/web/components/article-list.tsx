@@ -22,26 +22,57 @@ export interface ArticleCardData {
 
 const CATEGORIES: ArticleCategory[] = ["cocktail", "bar", "spirits"];
 
+/** 한 페이지 분량 — 머리기사(2칸)+측면 1 이 첫 줄, 나머지 12장이 3장씩 네 줄. */
+const PAGE_SIZE = 14;
+
 /**
- * 아티클 카드 그리드 + 카테고리 필터 (`FR-CONTENT-001` 앞당김 · ADR-0010).
+ * 아티클 카드 그리드 + 카테고리 색인 + 페이지네이션
+ * (`FR-CONTENT-001` 앞당김 · ADR-0010).
  *
- * 9편일 때는 필터가 없었다 — "글이 쌓여 한 화면을 넘기면 그때 단다"고 적어 뒀고,
- * 142편이 되며 그때가 왔다. 탐색 화면의 `.chip` 필터와 같은 패턴을 쓴다
- * (`aria-pressed` · `.count`). 전체 카드는 초기 HTML 에 그대로 있으므로
- * 크롤러는 필터와 무관하게 모든 글로 가는 링크를 본다.
+ * 143편을 한 페이지에 다 이어 붙이면 끝이 없어서 페이지로 나눈다. 페이지마다
+ * 첫 글이 머리기사(2칸)다. 상세 URL 143개가 발행일과 함께 사이트맵에 다
+ * 포함되어 있으므로, 목록이 첫 페이지만 그려도 크롤러 색인에는 문제가 없다.
+ *
+ * 필터는 칩이 아니라 잡지 색인 띠다 — 고른 항목에 밑줄이 남는다.
  */
 export function ArticleList({ articles }: { articles: ArticleCardData[] }) {
   const [cat, setCat] = useState<ArticleCategory | "all">("all");
-  const shown = cat === "all" ? articles : articles.filter((a) => a.category === cat);
+  const [page, setPage] = useState(1);
+
+  const filtered = cat === "all" ? articles : articles.filter((a) => a.category === cat);
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const current = Math.min(page, pageCount);
+  const shown = filtered.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
+
+  function selectCategory(next: ArticleCategory | "all") {
+    setCat(next);
+    setPage(1);
+  }
+
+  function goTo(next: number) {
+    setPage(next);
+    window.scrollTo({ top: 0 });
+  }
 
   return (
     <>
-      <div className="chip-row" role="group" aria-label="아티클 카테고리">
-        <button type="button" className="chip" aria-pressed={cat === "all"} onClick={() => setCat("all")}>
+      <div className="article-index" role="group" aria-label="아티클 카테고리">
+        <button
+          type="button"
+          className="article-index__btn"
+          aria-pressed={cat === "all"}
+          onClick={() => selectCategory("all")}
+        >
           전체 <span className="count">{articles.length}</span>
         </button>
         {CATEGORIES.map((c) => (
-          <button key={c} type="button" className="chip" aria-pressed={cat === c} onClick={() => setCat(c)}>
+          <button
+            key={c}
+            type="button"
+            className="article-index__btn"
+            aria-pressed={cat === c}
+            onClick={() => selectCategory(c)}
+          >
             {ARTICLE_CATEGORY_KO[c]}{" "}
             <span className="count">{articles.filter((a) => a.category === c).length}</span>
           </button>
@@ -49,9 +80,13 @@ export function ArticleList({ articles }: { articles: ArticleCardData[] }) {
       </div>
 
       <div className="card-grid">
-        {shown.map((a) => (
-          <Link key={a.slug} href={`${ARTICLES_PATH}/${a.slug}`} className="article-card">
-            {/* 카드 사진은 4:3 고정 크롭이다 — 목록의 줄맞춤이 원본 비율보다 중요하다.
+        {shown.map((a, i) => (
+          <Link
+            key={a.slug}
+            href={`${ARTICLES_PATH}/${a.slug}`}
+            className={i === 0 ? "article-card article-card--lead" : "article-card"}
+          >
+            {/* 카드 사진은 고정 크롭이다 — 목록의 줄맞춤이 원본 비율보다 중요하다.
                 본문(상세)에서는 원본 비율로 그린다. 컬러 — ADR-0008 */}
             <div className="photo-slot photo-slot--4x3 photo-slot--photo">
               <img
@@ -74,6 +109,38 @@ export function ArticleList({ articles }: { articles: ArticleCardData[] }) {
           </Link>
         ))}
       </div>
+
+      {pageCount > 1 && (
+        <nav className="article-pagenav" aria-label="아티클 페이지">
+          <button
+            type="button"
+            className="article-pagenav__btn"
+            disabled={current === 1}
+            onClick={() => goTo(current - 1)}
+          >
+            ← 이전
+          </button>
+          {Array.from({ length: pageCount }, (_, i) => i + 1).map((n) => (
+            <button
+              key={n}
+              type="button"
+              className="article-pagenav__btn article-pagenav__btn--num"
+              aria-current={n === current ? "page" : undefined}
+              onClick={() => goTo(n)}
+            >
+              {n}
+            </button>
+          ))}
+          <button
+            type="button"
+            className="article-pagenav__btn"
+            disabled={current === pageCount}
+            onClick={() => goTo(current + 1)}
+          >
+            다음 →
+          </button>
+        </nav>
+      )}
     </>
   );
 }

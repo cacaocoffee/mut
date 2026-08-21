@@ -50,6 +50,8 @@ export default function ArticlesPage() {
 
   return (
     <main className="shell">
+      {/* lede 를 두지 않는다 — 오른쪽 구석에 뜬 한 줄이 색인 띠와 자리를 다퉜다.
+          이 화면이 무엇인지는 색인 띠와 카드가 이미 말한다. */}
       <header className="page-head">
         <div>
           <h1>
@@ -57,7 +59,6 @@ export default function ArticlesPage() {
             <span className="sub">{ARTICLES.length} articles</span>
           </h1>
         </div>
-        <p className="lede">칵테일, 바, 스피릿 — 마시는 것 너머의 이야기를 담습니다.</p>
       </header>
 
       <ArticleList articles={cards} />
