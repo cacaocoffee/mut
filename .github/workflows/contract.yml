@@ -103,7 +103,7 @@ jobs:
         env:
           # 데이터베이스 이름은 옛 이름 그대로다 — 롤이 V001 안에 있고 마이그레이션은
           # 불변이라 짝을 맞춘다 (G-40). 아래 DB_URL 과 같은 값이어야 한다
-          POSTGRES_DB: kcocktail
+          POSTGRES_DB: mut
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
         ports: ["5432:5432"]
@@ -139,7 +139,7 @@ jobs:
       - name: 서버 기동
         working-directory: apps/api
         env:
-          DB_URL: jdbc:postgresql://localhost:5432/kcocktail
+          DB_URL: jdbc:postgresql://localhost:5432/mut
           DB_USER: postgres
           DB_PASSWORD: postgres
           MUT_RATE_LIMIT_ENABLED: "false" # 대조가 수십 번 부른다. 429 를 대조 실패로 읽지 않는다

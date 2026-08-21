@@ -20,9 +20,9 @@ import java.sql.DriverManager
  * | 커넥션 | 계정 | 쓰임 |
  * |---|---|---|
  * | [migrateConnection] | 컨테이너 슈퍼유저 | Flyway · 픽스처 DDL |
- * | [appConnection] | `app_test` (`kcocktail_app` 멤버) | 런타임이 실제로 갖는 권한 |
+ * | [appConnection] | `app_test` (`mut_app` 멤버) | 런타임이 실제로 갖는 권한 |
  *
- * `kcocktail_app` 은 `NOLOGIN` 이라 직접 붙지 못한다 — 운영과 같은 모양으로,
+ * `mut_app` 은 `NOLOGIN` 이라 직접 붙지 못한다 — 운영과 같은 모양으로,
  * 로그인 계정을 그 역할의 멤버로 넣어 권한을 상속받게 한다.
  */
 object PostgresSupport {
@@ -73,7 +73,7 @@ object PostgresSupport {
         DriverManager.getConnection(container.jdbcUrl, APP_USER, APP_PASSWORD)
 
     /**
-     * `kcocktail_app` 에 붙을 로그인 계정을 만든다.
+     * `mut_app` 에 붙을 로그인 계정을 만든다.
      *
      * 마이그레이션이 하지 않는다 — 계정과 비밀번호는 환경마다 다르고,
      * 자격증명을 DDL 이력에 남기지 않는다.
@@ -92,7 +92,7 @@ object PostgresSupport {
                     ${'$'}${'$'};
                     """.trimIndent(),
                 )
-                st.execute("GRANT kcocktail_app TO $APP_USER")
+                st.execute("GRANT mut_app TO $APP_USER")
             }
         }
     }

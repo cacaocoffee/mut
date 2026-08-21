@@ -48,10 +48,10 @@ class SchemaLintTest {
             assertThat(conn.one("SELECT proname FROM pg_proc WHERE proname = 'set_updated_at'"))
                 .`as`("updated_at 트리거 함수가 만들어졌는가")
                 .isEqualTo("set_updated_at")
-            // 롤 이름만 옛 이름이다 — `V001` 안에 있고 적용된 마이그레이션은 고치지 않는다
-            // (G-40). 이름을 바꾸는 것은 호스팅이 정해져 DB 를 새로 만드는 날이다.
-            assertThat(conn.rows("SELECT rolname FROM pg_roles WHERE rolname LIKE 'kcocktail%'"))
-                .containsExactlyInAnyOrder("kcocktail_app", "kcocktail_migrate")
+            // V027 이 롤을 mut_* 로 바꿨다 (G-40 해소). V001 의 옛 이름은 불변 규칙 때문에
+            // 그대로고, 최종 상태를 검사한다. LIKE 의 \_ 는 밑줄 리터럴이다.
+            assertThat(conn.rows("SELECT rolname FROM pg_roles WHERE rolname LIKE 'mut\\_%'"))
+                .containsExactlyInAnyOrder("mut_app", "mut_migrate")
         }
     }
 
@@ -197,8 +197,8 @@ class SchemaLintTest {
                 .`as`("public 스키마 테이블에 대한 기본 권한 항목이 있다")
                 .isNotEmpty()
             assertThat(acl.joinToString(" "))
-                .`as`("kcocktail_app 에 SELECT·INSERT·UPDATE·DELETE (arwd)")
-                .contains("kcocktail_app=arwd")
+                .`as`("mut_app 에 SELECT·INSERT·UPDATE·DELETE (arwd)")
+                .contains("mut_app=arwd")
         }
     }
 

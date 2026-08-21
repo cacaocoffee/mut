@@ -52,8 +52,8 @@ docker run -d --name mut-db -p 5432:5432 \
 
 | 역할 | 권한 |
 |---|---|
-| `kcocktail_migrate` | DDL. Flyway 가 붙는 계정을 이 역할의 멤버로 둔다 |
-| `kcocktail_app` | DML 만. **보호 테이블에는 `DELETE` 도 없다** |
+| `mut_migrate` | DDL. Flyway 가 붙는 계정을 이 역할의 멤버로 둔다 |
+| `mut_app` | DML 만. **보호 테이블에는 `DELETE` 도 없다** |
 
 나누지 않으면 "물리 삭제 금지"(`INV-BAR-03`)를 DB 가 강제할 수 없다 — 앱이 `DROP` 도 되는
 권한으로 붙기 때문이다. `PRIN-T05` 가 불변식을 서버가 강제하라고 한 것이 이 얘기다.
@@ -62,8 +62,8 @@ docker run -d --name mut-db -p 5432:5432 \
 자격증명을 마이그레이션에 넣지 않기 위해서다.
 
 ```sql
-CREATE ROLE kcocktail_web LOGIN PASSWORD '…';
-GRANT kcocktail_app TO kcocktail_web;
+CREATE ROLE mut_web LOGIN PASSWORD '…';
+GRANT mut_app TO mut_web;
 ```
 
 > ⚠️ **Flyway 는 항상 같은 계정으로 붙어야 한다.** `V001` 의 `ALTER DEFAULT PRIVILEGES` 가
@@ -75,7 +75,7 @@ GRANT kcocktail_app TO kcocktail_web;
 **각 테이블을 만드는 마이그레이션이 같은 파일 안에서** 회수한다.
 
 ```sql
-REVOKE DELETE ON cocktail FROM kcocktail_app;
+REVOKE DELETE ON cocktail FROM mut_app;
 ```
 
 빠뜨리면 `SchemaLintTest` 가 잡는다. 목록의 정본은 그 테스트의 `SchemaLint.PROTECTED_TABLES` 다.
@@ -231,7 +231,7 @@ CREATE TABLE cocktail (
 );
 CREATE TRIGGER cocktail_set_updated_at BEFORE UPDATE ON cocktail
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
-REVOKE DELETE ON cocktail FROM kcocktail_app;   -- 보호 테이블만
+REVOKE DELETE ON cocktail FROM mut_app;   -- 보호 테이블만
 ```
 
 빠뜨리면 `SchemaLintTest` 가 잡는다 — 명명 규약(`snake_case` 단수형 · `is_`/`has_` · `_at`/`_on`),
