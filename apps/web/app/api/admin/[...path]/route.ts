@@ -32,10 +32,14 @@ async function proxy(request: Request, path: string[]): Promise<Response> {
     const res = await fetch(target, { method: request.method, headers: forward, body, cache: "no-store" });
 
     // 422(게이트 실패)·409(이미 발행)를 그대로 넘긴다 — 화면이 그 코드로 분기한다.
-    return new Response(await res.text(), {
-      status: res.status,
-      headers: { "Content-Type": res.headers.get("content-type") ?? "application/json" },
-    });
+    const out = new Headers({ "Content-Type": res.headers.get("content-type") ?? "application/json" });
+    // 세션 연장·재발급 쿠키와 CSRF 토큰도 옮긴다 (G-45 판정) — 떨어뜨리면
+    // 쿠키가 브라우저까지 오지 못해 로그인이 웹 오리진에서 성립하지 않는다.
+    const csrf = res.headers.get("x-csrf-token");
+    if (csrf) out.set("X-CSRF-Token", csrf);
+    for (const cookie of res.headers.getSetCookie()) out.append("Set-Cookie", cookie);
+
+    return new Response(await res.text(), { status: res.status, headers: out });
   } catch (e) {
     console.warn(`[admin-proxy] 상류 호출 실패: ${e instanceof Error ? e.message : String(e)}`);
     return Response.json({ error: "API 를 부르지 못했다" }, { status: 502 });
