@@ -3,6 +3,7 @@ package kr.mut.common.security.csrf
 import kr.mut.common.security.ratelimit.RateLimitFilter
 import kr.mut.common.security.ratelimit.RateLimitProperties
 import kr.mut.common.security.ratelimit.RateLimiter
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
@@ -28,6 +29,10 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher
  * 인가 규칙은 각 도메인 이슈가 `PermissionMatrix`(ISSUE-006)로 판정한다.
  */
 @Configuration
+// CLI 실행(reindexSearch·verifyInvariants)은 웹 서버 없이 부팅된다(web-application-type=none).
+// HttpSecurity 는 웹에서만 만들어지는 빈이라 이 설정도 웹일 때만 만든다 —
+// 조건이 없으면 CLI 부팅이 "HttpSecurity could not be found" 로 죽는다.
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @EnableConfigurationProperties(RateLimitProperties::class)
 class SecurityConfig {
 

@@ -1,6 +1,7 @@
 package kr.mut.common.security.ratelimit
 
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.stereotype.Component
 import java.time.Clock
 import java.time.Instant
@@ -20,6 +21,9 @@ import java.util.concurrent.ConcurrentHashMap
  * 경계에서 최대 2배까지 통과할 수 있다 (59초에 300개 + 61초에 300개). 알고 쓰는 것이다 —
  * 여기 한도는 남용 방지지 정밀 과금이 아니고, 슬라이딩은 요청마다 타임스탬프를 들고 있어야 한다.
  */
+// 레이트 리밋은 HTTP 필터에서만 쓰인다 — CLI 부팅(웹 없음)에는 SecurityConfig 가 빠지면서
+// RateLimitProperties 도 없으므로, 이 빈도 웹일 때만 만든다.
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @Component
 class RateLimiter(
     private val properties: RateLimitProperties,
