@@ -2,7 +2,7 @@ import type { Article } from "../types";
 
 export const ARTICLE: Article = {
   slug: "springbank-distillery-tour",
-  category: "whisky",
+  category: "spirits",
   title: "스프링뱅크 증류소 투어 — 술 기행의 종착점",
   dek: "회사를 그만두고 친구를 끌고 아일라를 거쳐 캠벨타운까지. 스코틀랜드 위스키 여행의 마지막 목적지에서 남긴 기록.",
   publishedAt: "2024-12-15",

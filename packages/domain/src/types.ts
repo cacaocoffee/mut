@@ -68,7 +68,7 @@ export type AbvBand = "na" | "low" | "mid" | "high";
  * (`interview`·`guide`·`trend`·`photo_essay`)이고, 이 축은 지금 있는 글의 묶음이다.
  * 두 축의 관계는 `GET /articles` 계약을 만들 때 정한다 (GAPS G-49).
  */
-export type ArticleCategory = "cocktail" | "bar" | "whisky";
+export type ArticleCategory = "cocktail" | "bar" | "spirits";
 
 /**
  * 아티클 본문 한 덩이. 문단 · 소제목 · 인용 · 사진 네 가지뿐이다 —

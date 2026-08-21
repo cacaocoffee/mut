@@ -1,0 +1,32 @@
+import type { Article } from "../types";
+
+export const ARTICLE: Article = {
+  slug: "aviation",
+  category: "cocktail",
+  title: "에비에이션, 크렘 드 바이올렛의 진면목",
+  dek: "에비에이션은 1916년 뉴욕 Wallick 호텔의 헤드바텐더였던 Hugo Ensslin의 저서인 \"Recipes for Mixed Drinks\"에서 처음 등장했다고 합니다.",
+  publishedAt: "2022-06-25",
+  hero: "/articles/aviation/00.webp",
+  sourceUrl: "https://blog.naver.com/shakinglikebartender/222788482366",
+  relatedCocktailSlugs: [],
+  blocks: [
+    { kind: "figure", src: "/articles/aviation/00.webp", width: 966, height: 966, caption: "인스타그램 @shakinglikebartender" },
+    { kind: "paragraph", text: "About the Drink" },
+    { kind: "paragraph", text: "에비에이션은 1916년 뉴욕 Wallick 호텔의 헤드바텐더였던 Hugo Ensslin의 저서인 \"Recipes for Mixed Drinks\"에서 처음 등장했다고 합니다." },
+    { kind: "paragraph", text: "에비에이션은 100년이 넘는 시간 동안 역사에서 잊혀지기도 했던, 참 다사다난한 칵테일인데 바로 그 주재료인 크렘 드 바이올렛(Creme de Violet / Violette)때문입니다." },
+    { kind: "paragraph", text: "이 바이올렛 리큐르는 이름에서도 알 수 있듯이 제비꽃이 주재로인 리큐르로, 애초에 생산량이 많지도 않았는데 급기야 1960년대에는 거의 자취를 감추다시피 했습니다. 다행히도 이후 클래식, 크래프트 칵테일 바람이 불어 다양한 브랜드에서 생산하게 되었으나, 여전히 우리나라에서는 거의 구할 수 없는 리큐르 중 하나입니다." },
+    { kind: "heading", text: "Ingredients" },
+    { kind: "figure", src: "/articles/aviation/01.webp", width: 966, height: 966 },
+    { kind: "paragraph", text: "에비에이션은 진(60ml)이 베이스가 되는 칵테일로, 크렘 드 바이올렛(7.5ml), 마라스키노 리큐르(6ml), 레몬즙(22.5ml) 그리고 심플 시럽(5ml)이 들어갑니다. 참고로 개인적으로 마라스키노 리큐를를 별로 안좋아해서 비율을 좀 줄였습니다." },
+    { kind: "paragraph", text: "How to Mix?" },
+    { kind: "paragraph", text: "1. 모든 재료를 쉐이커 안에 넣어줍니다." },
+    { kind: "paragraph", text: "2. 쉐이커에 얼음을 채우고, 쉐이킹 해줍니다." },
+    { kind: "paragraph", text: "3. 칵테일 글라스에 쉐이킹한 칵테일을 따라줍니다." },
+    { kind: "paragraph", text: "4. 잔에 체리를 하나 퐁당 떨어트려줍니다(옵션)." },
+    { kind: "figure", src: "/articles/aviation/02.webp", width: 966, height: 966 },
+    { kind: "paragraph", text: "비쥬얼만 봐도 바로 이름과 연관을 지을 수 있는 게, 칵테일 색 자체가 하늘색이고, 쉐이킹으로 인해 생긴 약간의 거품층이 구름 같아보입니다." },
+    { kind: "paragraph", text: "비터트루스의 바이올렛 리큐르 자체가 꽃향이 과하지 않아 사실 그렇게 많이 느껴지지는 않지만, 다른 재료들의 맛을 헤치지 않는 선에서 달달하게 느껴진 것 같습니다. 또한 산뜻하고, 약간 시트러시한 게 요즘 같이 더운 날씨에 마시면 리프레싱할 수 있을 것 같습니다." },
+    { kind: "paragraph", text: "에비에이션이 맛없다고 하는 글을 꽤 많이 봤는데, 저는 꽤 맛있게 마셨습니다." },
+    { kind: "paragraph", text: "좀 더 많은 칵테일 정보는" },
+  ],
+};

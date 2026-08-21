@@ -1,0 +1,32 @@
+import type { Article } from "../types";
+
+export const ARTICLE: Article = {
+  slug: "bordeaux-point-rouge",
+  category: "bar",
+  title: "포인트 루즈",
+  dek: "\"포인트 루즈(Point Rouge)\"는 보르도(Bordeaux)의 '생장(Saint-Jean)역' 근처에 있는 바입니다.",
+  publishedAt: "2024-07-07",
+  hero: "/articles/bordeaux-point-rouge/00.webp",
+  sourceUrl: "https://blog.naver.com/shakinglikebartender/223504265636",
+  relatedCocktailSlugs: [],
+  blocks: [
+    { kind: "paragraph", text: "\"포인트 루즈(Point Rouge)\"는 보르도(Bordeaux)의 '생장(Saint-Jean)역' 근처에 있는 바입니다." },
+    { kind: "paragraph", text: "보르도에서 와인이 아니고 무슨 바를 가냐고 하실 수 있으나, 이 바는 엄청나게 많은 위스키 라인업, 특히 고숙성과 국내에서 보기 어려운 위스키를 저렴한 가격에 마실 수 있는 엄청난 바입니다." },
+    { kind: "figure", src: "/articles/bordeaux-point-rouge/00.webp", width: 966, height: 1717 },
+    { kind: "figure", src: "/articles/bordeaux-point-rouge/01.webp", width: 966, height: 1717 },
+    { kind: "figure", src: "/articles/bordeaux-point-rouge/02.webp", width: 966, height: 1717 },
+    { kind: "figure", src: "/articles/bordeaux-point-rouge/03.webp", width: 966, height: 1717 },
+    { kind: "figure", src: "/articles/bordeaux-point-rouge/04.webp", width: 966, height: 1288 },
+    { kind: "paragraph", text: "메뉴 중 일부인데, 단종된 맥캘란 10년이 14유로, 맥캘란 엘레강시아 1991 16유로, 맥켈란 레플리카 1876이 42유로 밖에 하지 않는 미친 가격대를 보여줍니다. 재밌는 건 라가불린 16년은 또 18유로로 비쌉니다." },
+    { kind: "paragraph", text: "가격이 당시 매입가로 책정된 건지, 어떻게 책정된 건지는 잘 모르겠지만 국내에서 볼 수 없거나 비싼 위스키를 아주 저렴하게 마셔볼 수 있습니다." },
+    { kind: "paragraph", text: "전 바로 맥캘란 10년과 엘레강시아를 주문했는데, 10년은 없다고 하더군요.....ㅠㅠ" },
+    { kind: "figure", src: "/articles/bordeaux-point-rouge/05.webp", width: 966, height: 1717 },
+    { kind: "figure", src: "/articles/bordeaux-point-rouge/06.webp", width: 966, height: 1717 },
+    { kind: "figure", src: "/articles/bordeaux-point-rouge/07.webp", width: 966, height: 1717, caption: "Macallan / Martell / George T.Stagg" },
+    { kind: "paragraph", text: "제가 마셔본 건 맥캘란 엘레강시아 1991(Macallan Elegancia), 마르텔 리저브 드 샹텔루 70년대 바틀(Martell Reserve de Chanteloup, Borderies), 조지 티스택(George T.Stagg 2015)이었습니다." },
+    { kind: "paragraph", text: "맥캘란 엘레강시아 1991는 현행의 맥캘란보다 훨씬 자연스럽고, 튀지 않는 느낌의 쉐리감인 맥캘란이었습니다만, 제가 맥캘란을 그렇게까지 선호하지는 않아 그 이상의 감상은 없었습니다." },
+    { kind: "paragraph", text: "마르텔 리저브 드 샹텔루 같은 경우에는 보더리 원액 단독으로 만들어진 것 같은데, 그렇게 크게 인상적이지 않았습니다." },
+    { kind: "paragraph", text: "BTAC의 조지 티스택은 이번에 처음 마셔봤는데, 기대감을 져버리지 않았습니다. 강력한 도수감에서 오는 타격감에 카라멜, 눅진한 체리, 바닐라, 건과일, 시나몬 등 저에게 극호인 캐릭터가 강렬하게 남았습니다." },
+    { kind: "paragraph", text: "\"포인트 루즈\"는 시그니처 뿐만 아니라 클래식 칵테일도 물론 판매하지만 굳이 칵테일을 마시는 것보다는 다양한 위스키, 꼬냑, 럼 등을 저렴한 가격에 맛 볼 수 있기 때문에 위스키, 꼬냑, 럼 등을 마시는 걸 추천드립니다." },
+  ],
+};

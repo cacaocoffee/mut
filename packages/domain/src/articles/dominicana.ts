@@ -1,0 +1,32 @@
+import type { Article } from "../types";
+
+export const ARTICLE: Article = {
+  slug: "dominicana",
+  category: "cocktail",
+  title: "완벽한 디저트 칵테일, 도미니카나",
+  dek: "도미니카나는 전설적인 바텐더 사샤 페트라스케(Sasha Petraske)가 자신의 바 Milk & Honey에서 2011년 처음 만든 시그니처 칵테일입니다.",
+  publishedAt: "2021-09-30",
+  hero: "/articles/dominicana/00.webp",
+  sourceUrl: "https://blog.naver.com/shakinglikebartender/222522307570",
+  relatedCocktailSlugs: [],
+  blocks: [
+    { kind: "paragraph", text: "About the Drink" },
+    { kind: "paragraph", text: "도미니카나는 전설적인 바텐더 사샤 페트라스케(Sasha Petraske)가 자신의 바 Milk & Honey에서 2011년 처음 만든 시그니처 칵테일입니다. 얼핏보면 화이트 러시안(White Russian)의 변형처럼 보이기도 하는 이 칵테일은 화이트 러시안보다 훨씬 풍부한 맛을 내며, 럼과 커피의 조화를 잘 엿볼 수 있습니다." },
+    { kind: "paragraph", text: "원래는 도미니카 럼을 사용하지만 국내에서 고숙성의 퀄리티가 좋은 도미니카 럼을 구하기가 어려워 개인 취향에 맞는 에이지드 럼을 사용해주시면 될 것 같습니다." },
+    { kind: "paragraph", text: "Ingredients?" },
+    { kind: "figure", src: "/articles/dominicana/00.webp", width: 966, height: 966 },
+    { kind: "paragraph", text: "도미니카나에는 에이지드 럼과 커피 리큐어 그리고 생크림이 들어갑니다." },
+    { kind: "paragraph", text: "에이지드 럼과 커피 리큐어는 본인의 취향에 맞춰 사용하시면 됩니다. 개인적으로 커피 리큐어는 미스터 블랙을 가장 좋아하는데, 디플로마티코 리제르바 익스클루시바의 초콜렛과 설탕의 깊은 풍미가 미스터 블랙과 잘 어울릴 것 같아 이 조합을 사용하였습니다." },
+    { kind: "paragraph", text: "How to Mix?" },
+    { kind: "paragraph", text: "1. 에이지드 럼과 커피 리큐르를 45ml씩 믹싱글라스에 넣습니다." },
+    { kind: "paragraph", text: "2. 믹싱글라스를 얼음으로 채워주고 스터해줍니다." },
+    { kind: "paragraph", text: "3. 차갑게 해놓은 칵테일 글라스에 스터한 것을 따라줍니다." },
+    { kind: "paragraph", text: "4. 생크림을 살짝 흔들어 줍니다." },
+    { kind: "paragraph", text: "5.흔든 생크림을 조심스럽게 플로팅해줍니다." },
+    { kind: "figure", src: "/articles/dominicana/01.webp", width: 966, height: 966 },
+    { kind: "paragraph", text: "술과 플로팅된 술은 완벽하게 나뉘어져 있어야 하는데, 플로팅 전에 생크림을 살짝 흔들어주는 것이 팁입니다." },
+    { kind: "paragraph", text: "입에 대자마자 부들부들한 생크림의 감촉이 느껴지고, 생크림과 함께 럼과 커피 리큐르를 섞는 것이 입 안으로 들어오는데 깊은 풍미와 달달한 맛이 나는 크리미한 커피를 마시는 것 같습니다." },
+    { kind: "paragraph", text: "완벽한 디저트 칵테일로 달달한 칵테일을 찾으시는 분들에게 추천드립니다." },
+    { kind: "paragraph", text: "더 많은 칵테일 정보는" },
+  ],
+};

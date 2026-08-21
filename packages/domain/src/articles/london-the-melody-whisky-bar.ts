@@ -1,0 +1,32 @@
+import type { Article } from "../types";
+
+export const ARTICLE: Article = {
+  slug: "london-the-melody-whisky-bar",
+  category: "bar",
+  title: "멜로디 위스키 바",
+  dek: "\"The Melody Whisky Bar\"는 런던 해머스미스에 위치한 바로, 칵테일도 제공하지만 이름 그대로 위스키를 주력으로 하는 바입니다.",
+  publishedAt: "2024-06-28",
+  hero: "/articles/london-the-melody-whisky-bar/00.webp",
+  sourceUrl: "https://blog.naver.com/shakinglikebartender/223494430126",
+  relatedCocktailSlugs: [],
+  blocks: [
+    { kind: "paragraph", text: "\"The Melody Whisky Bar\"는 런던 해머스미스에 위치한 바로, 칵테일도 제공하지만 이름 그대로 위스키를 주력으로 하는 바입니다. 런던으로 향하기 전에 캠벨타운에 위치한 카덴헤드(Cadenhead)의 테이스팅 샵 직원과 얘기하던 중에 위스키 라인업이 좋다고 추천을 받았았고, 저는 패피 반 윙클을 마시기 위해서 방문했습니다." },
+    { kind: "figure", src: "/articles/london-the-melody-whisky-bar/00.webp", width: 966, height: 1717 },
+    { kind: "figure", src: "/articles/london-the-melody-whisky-bar/01.webp", width: 966, height: 1717 },
+    { kind: "figure", src: "/articles/london-the-melody-whisky-bar/02.webp", width: 966, height: 1717 },
+    { kind: "figure", src: "/articles/london-the-melody-whisky-bar/03.webp", width: 966, height: 1717 },
+    { kind: "figure", src: "/articles/london-the-melody-whisky-bar/04.webp", width: 966, height: 1717, caption: "엄청난 콜렉션" },
+    { kind: "paragraph", text: "예 뭐....런던에 한해서는 위스키의 종류와 희귀 바틀들이 가장 많은 바가 아닐까 싶습니다. 패피 반 윙클(Pappy Van Winkle) 뿐만 아니라 BTAC, 페쇠 증류소(로즈뱅크, 포트엘렌 등), 치치부, 가루이자와, 다양한 고숙성, 다수의 독립병입자, 증류소 핸드필 등 군침 흘릴만한 위스키들이 즐비해있습니다." },
+    { kind: "paragraph", text: "Winkle Flight" },
+    { kind: "figure", src: "/articles/london-the-melody-whisky-bar/05.webp", width: 966, height: 543 },
+    { kind: "paragraph", text: "- Old Rip Van Winkle 10 Year old -" },
+    { kind: "paragraph", text: "- Van Winkle Special Reserve 12 Year old -" },
+    { kind: "paragraph", text: "- Van Winkle Family Reserve Rye 13 Year old -" },
+    { kind: "paragraph", text: "- Pappy Van Winkle 15 Year old -" },
+    { kind: "paragraph", text: "- Pappy Van Winkle 20 Year old -" },
+    { kind: "paragraph", text: "윙클 플라이트 메뉴는 위의 총 5가지의 위스키가 10ml씩 제공됩니다. 10ml를 누구 코에 붙이냐 싶지만, 패피는 국내에서 마셔보기도 힘들고, 마셔도 엄청나게 비싼 가격이라 5종을 마셔볼 수 있는 기회만으로도 아주아주 감사합니다. 참고로 가격은 86파운드(서비스 차지 별도)로 약 15만원입니다. 서비스 차지까지 붙어서 저는 아마 17만원 정도 나온 것 같습니다." },
+    { kind: "paragraph", text: "패피 반 윙클에 대한 제 인상은 실망 그 자체였습니다. 먼저 올드 립 반 윙클 10년과 반 윙클 12년은 불쾌할 정도의 상한 유제품(특히 우유) 냄새가 났고, 라이는 크게 기억에 남지 않았으며, 15년과 20년은 숙성 년수가 주는 기대감을 전혀 채워주지 못했습니다. 복합성도 크게 느껴지지도 않고.....초반에 상한 유제품 냄새에서 흠칫해서 그런지 이후 마실 때에도 그다지 인상적인 느낌은 아니었습니다." },
+    { kind: "paragraph", text: "제일 기대한 20년은 캐릭터들이 밸런스 좋게 이루어지긴 했습니다만....복합적이라는 생각이 들지는 않았던데다가 캐릭터를 캐치하기가 애매했습니다. 오히려 15년이 좀 더 맛이 강하고 복합적으로 느껴졌는데, 아마도 도수가 53.5%로 다른 40도대인 라인들에 비해 높아서 그런 것 같습니다." },
+    { kind: "paragraph", text: "제 입맛에는 이래저래 전체적으로 실망스러웠으나, 버번의 끝판왕을 아주 좋은 가격으로 마셔볼 수 있었다는 점에 의의를 두었습니다. 바의 직원들이 아주 친절했고, 좋은 가격에 좋은 위스키 라인업을 가지고 있으니 런던 여행 시에 한 번쯤은 방문해보시는 걸 추천드립니다." },
+  ],
+};

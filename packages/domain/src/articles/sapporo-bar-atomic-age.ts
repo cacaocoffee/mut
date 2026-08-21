@@ -1,0 +1,33 @@
+import type { Article } from "../types";
+
+export const ARTICLE: Article = {
+  slug: "sapporo-bar-atomic-age",
+  category: "bar",
+  title: "아토믹 에이지 — 올드 보틀 위스키의 향연",
+  dek: "「바 아토믹 에이지」는 삿포로 스스키노역과 호스이스스키노역 근처에 위치한 바로, 유심히 찾아보지 않으면 입구를 놓치기 쉬운 특이한 구조의 바입니다. 저도 한참을 찾아 헤매다가 들어갔습니다.",
+  publishedAt: "2025-02-02",
+  hero: "/articles/sapporo-bar-atomic-age/00.webp",
+  sourceUrl: "https://blog.naver.com/shakinglikebartender/223745150093",
+  relatedCocktailSlugs: [],
+  blocks: [
+    { kind: "figure", src: "/articles/sapporo-bar-atomic-age/00.webp", width: 966, height: 1717 },
+    { kind: "figure", src: "/articles/sapporo-bar-atomic-age/01.webp", width: 966, height: 543 },
+    { kind: "paragraph", text: "「바 아토믹 에이지」는 삿포로 스스키노역과 호스이스스키노역 근처에 위치한 바로, 유심히 찾아보지 않으면 입구를 놓치기 쉬운 특이한 구조의 바입니다. 저도 한참을 찾아 헤매다가 들어갔습니다." },
+    { kind: "figure", src: "/articles/sapporo-bar-atomic-age/02.webp", width: 966, height: 543 },
+    { kind: "paragraph", text: "아토믹 에이지는 백바에 올드 보틀이 줄지어 있는데, 위스키뿐만 아니라 럼·진·리큐르 등의 올드 보틀도 아주 많이 구비되어 있는 바입니다. 오히려 현행을 찾기가 힘든 느낌." },
+    { kind: "figure", src: "/articles/sapporo-bar-atomic-age/03.webp", width: 966, height: 1287 },
+    { kind: "figure", src: "/articles/sapporo-bar-atomic-age/04.webp", width: 966, height: 1288 },
+    { kind: "paragraph", text: "먼저 스카치의 올드 보틀을 마셨는데, 첫 잔은 추천을 부탁드렸는데 「80년대 링크우드 12년」을 추천해 주셨습니다. 아마도 무난하고 호불호가 안 갈릴 것 같은 캐릭터라 추천해 주신 듯. 맛도 모난 곳 없이 부드럽고 달큰했습니다." },
+    { kind: "paragraph", text: "다음으로 「모리슨 보모어 12년 덤피보틀」이 보이길래 가격을 여쭤보고 생각보다 싸서 주문을 했습니다. 개인적으로 현행 보모어와 비슷한 캐릭터가 많이 느껴진다고 하니 사장님도 현재의 모리슨이 이 시절의 맛을 따라가려 하고 있다고 맞장구를 치셨습니다." },
+    { kind: "paragraph", text: "마시면서 위스키 얘기를 하다가 로즈뱅크 이야기가 나오게 됐는데, 블렌디드 스카치인 「70년대의 하이랜드 넥타(Highland Nectar)」가 로즈뱅크와 탈리스커가 키몰트라고 하면서 추천해주시길래 바로 시켰습니다. 맛은 부드럽고 무난한 느낌." },
+    { kind: "figure", src: "/articles/sapporo-bar-atomic-age/05.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/sapporo-bar-atomic-age/06.webp", width: 966, height: 1288 },
+    { kind: "paragraph", text: "스카치를 마시는 중간에 사장님이 올드 버번이 그렇게 맛있다고 하시길래 하나 추천을 받았습니다. 「올드 크로우(Old Crow)」라는 버번인데 저는 처음 보는 버번이네요." },
+    { kind: "paragraph", text: "이 80년대의 올드 크로우는 힘이 많이 빠진 건지 원래 그런 맛인지는 모르겠지만 개인적으로 너무 맛이 비어있다고 생각되는 한 잔이었습니다. 이전에 80~90년대의 캐나디안 위스키를 마셨을 때 느꼈던 비는 맛..." },
+    { kind: "paragraph", text: "이것만 그런 건가 싶어서 도수가 높은 「올드 그랜드 대드 114」도 마셔봤는데, 현행과 꽤 비슷하지만 이것도 뭔가 힘이 빠졌달까 맛이 비었달까하는 굳이 싶은 맛이었습니다." },
+    { kind: "figure", src: "/articles/sapporo-bar-atomic-age/07.webp", width: 966, height: 1288 },
+    { kind: "paragraph", text: "위스키를 마시면서 백바를 보다가 적어도 80년대 이전에 유통된 「볼스(Bols)의 오렌지 큐라소」를 봐서 가격을 여쭤봤더니 조금 서비스를 주셔서 맛을 볼 기회가 있었습니다." },
+    { kind: "paragraph", text: "이 오렌지 큐라소가 현재의 오렌지 큐라소와는 전~혀 다른 느낌입니다. 훨씬 자연스러운 오렌지의 캐릭터에 더 당도가 있는 듯한 맛. 개인적으로 이건 니트로 마셔도 될 것 같은 맛이었습니다." },
+    { kind: "paragraph", text: "아토믹 에이지는 대부분의 보틀이 올드 보틀로, 올드 보틀을 좋아하시는 분이라면 꼭 한 번쯤은 삿포로에 가신다면 방문하는 걸 추천드릴만 한 바입니다." },
+  ],
+};

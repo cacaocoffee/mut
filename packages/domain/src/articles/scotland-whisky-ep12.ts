@@ -1,0 +1,30 @@
+import type { Article } from "../types";
+
+export const ARTICLE: Article = {
+  slug: "scotland-whisky-ep12",
+  category: "spirits",
+  title: "스코틀랜드 위스키 여행 ep12 — 아일라에서 캠벨타운으로",
+  dek: "아일라섬에서 페리를 타고 나오면 케나크레이그(Kennacraig) 페리 터미널에 도착을 하게 된다. 캠벨타운이나 그 반대편인 글래스고로 가는 버스는 여기서 타면 된다.",
+  publishedAt: "2024-09-10",
+  hero: "/articles/scotland-whisky-ep12/00.webp",
+  sourceUrl: "https://blog.naver.com/shakinglikebartender/223579235249",
+  relatedCocktailSlugs: [],
+  blocks: [
+    { kind: "figure", src: "/articles/scotland-whisky-ep12/00.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/scotland-whisky-ep12/01.webp", width: 966, height: 1288 },
+    { kind: "paragraph", text: "아일라섬에서 페리를 타고 나오면 케나크레이그(Kennacraig) 페리 터미널에 도착을 하게 된다. 캠벨타운이나 그 반대편인 글래스고로 가는 버스는 여기서 타면 된다." },
+    { kind: "paragraph", text: "사실 페리 도착 시간과 버스 도착 시간이 진짜 이상하다. 몇 분 차로 버스가 먼저 도착해서 출발하는 시간대 거나, 약 20분 차이로 페리가 먼저 도착하는 빡빡한 시간대 거나. 그렇지 않으면 몇 시간이나 차이가 나버린다." },
+    { kind: "paragraph", text: "그렇기 때문에 시간 계산을 잘해서 예약을 하자. 우린 한 20분 페리가 먼저 도착하는 걸 예약했는데 페리가 생각보다 늦게 도착하는 바람에 버스 시간이 지나서 내리게 되었다." },
+    { kind: "paragraph", text: "내리자마자 달려서 버스를 찾는데, 터미널 직원에게 물어보니 아직 안 왔다고 하더라.... 페리 도착이 늦고, 버스 도착도 덩달아 늦어서 시간이 맞아버리는 이상한 상황." },
+    { kind: "paragraph", text: "결국 버스 잘 탔고, 몇 시간을 걸려서 캠벨타운에 도착했다. 일요일은 스프링뱅크 증류소나 카덴헤드 샵이 오픈을 안 해서 밖에서만 둘러보고 다음날을 기약했다." },
+    { kind: "figure", src: "/articles/scotland-whisky-ep12/02.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/scotland-whisky-ep12/03.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/scotland-whisky-ep12/04.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/scotland-whisky-ep12/05.webp", width: 966, height: 1288 },
+    { kind: "paragraph", text: "캠벨타운에서 오래 있지는 않았지만, 음식을 추천하자면 \"홈 웍(Home Wok)\"이라는 포장 전문 중국집을 강력하게 추천한다." },
+    { kind: "figure", src: "/articles/scotland-whisky-ep12/06.webp", width: 966, height: 966 },
+    { kind: "paragraph", text: "구글 평점을 기준으로 4.6점으로 다른 캠벨타운 음식점들보다 높은 편인데다가, 일단 가격이 싸면서도 양이 정말 많다. 가게 주인이 아시아인인데 우릴 보고 같은 아시아인이라 반가워 해줬어서 양을 더 많이 준 걸지도 모르겠다." },
+    { kind: "paragraph", text: "맛도 한국인 입맛에 맞는 데다가 정말 맛있었다. 딱 서양 스타일의 중국 음식 같은 느낌." },
+    { kind: "paragraph", text: "웬만해서는 식당 추천은 안 하는 편인데, 맛있고 가성비 좋은 음식점이 없는 캠벨타운 여행자들을 위해서 꼭 추천하고 싶은 식당이다." },
+  ],
+};

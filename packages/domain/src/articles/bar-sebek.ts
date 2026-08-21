@@ -1,0 +1,32 @@
+import type { Article } from "../types";
+
+export const ARTICLE: Article = {
+  slug: "bar-sebek",
+  category: "bar",
+  title: "세벡 — 나카스 골목에 핀 작은 꽃",
+  dek: "\"세벡(Sebek)\"은 후쿠오카 나카스의 한 골목길에 위치한 작은 바입니다.",
+  publishedAt: "2024-07-13",
+  hero: "/articles/bar-sebek/00.webp",
+  sourceUrl: "https://blog.naver.com/shakinglikebartender/223511381638",
+  relatedCocktailSlugs: [],
+  blocks: [
+    { kind: "figure", src: "/articles/bar-sebek/00.webp", width: 966, height: 1717 },
+    { kind: "figure", src: "/articles/bar-sebek/01.webp", width: 966, height: 1717 },
+    { kind: "paragraph", text: "\"세벡(Sebek)\"은 후쿠오카 나카스의 한 골목길에 위치한 작은 바입니다. '헤네시 X.O 칵테일 컴페티션 2017'과 '산토리 칵테일 어워드 2021'에서 우승을 한 '오오츠 마키코' 오너가 혼자 운영을 하고 있으며, 현재에도 두 대회에서 우승한 칵테일들을 맛 볼 수 있습니다." },
+    { kind: "paragraph", text: "'Sebek'이란 고대 이집트의 악어 머리를 하고 있는 신으로, 바의 간판과 바 내부에서도 악어와 관련된 장식물을 흔하게 찾아볼 수 있습니다. 다른 손님들과 하는 얘기를 들었는데, 오너 본인이 들인 것보다도 손님들의 선물이 많다고 하네요." },
+    { kind: "paragraph", text: "여담으로 \"세벡\"은 \"만화 바텐더\"와도 연관이 있습니다. 바텐더의 작가가 방문하여 취재하기도 하였고, '바텐더 a tokyo'의 '바의 문'이라는 에피소드에 등장하는 \"라흐므(Larme)\"라는 칵테일의 레세피를 제공하기도 하였다고 합니다." },
+    { kind: "figure", src: "/articles/bar-sebek/02.webp", width: 966, height: 1288 },
+    { kind: "paragraph", text: "'뚜르비옹'은  '헤네시 X.O 칵테일 컴페티션 2017' 우승 칵테일로, 헤네시 X.O, 아프리콧 홍차, 바나나 리큐르, 로제 시럽 등을 디켄터에 넣고 스월링한 후 서브하고, 얼음 위에 유자 가루를 가니시해주는 특이한 칵테일입니다. 맛 자체도 정말 신기한 게 헤네시 X.O라는 꼬냑에 다른 맛을 추가하여 스펙트럼을 넓힌 것 같은 맛입니다." },
+    { kind: "paragraph", text: "'즈이카'는 '산토리 칵테일 어워드 2021' 우승 칵테일로, 일본의 로쿠 진(Roku Gin), 말차 리큐르, 생강 시럽, 오오츠님이 직접 양봉한 꿀 등이 들어가는 칵테일입니다. 시트러스가 들어가지 않지만 밸런스가 좋고, 이 칵테일도 이전까지는 마셔본 적 없는 특이한 느낌의, 말차가 주가 되는 칵테일이었습니다." },
+    { kind: "figure", src: "/articles/bar-sebek/03.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/bar-sebek/04.webp", width: 966, height: 1288 },
+    { kind: "paragraph", text: "그 외에 다양한 칵테일이 있는데, 이렇게 더운 날에는 모히또나 진토닉을 첫 잔으로 꼭 추천하고 싶습니다. 모히또는 아마 마지막에 압생트를 살짝 뿌려주시는 것 같은데, 이게 또 모히또의 민트 캐릭터와 잘 어울립니다." },
+    { kind: "paragraph", text: "에스프레소 마티니는 카카오 리큐르나 카카오 닙을 칵테일에 넣으시는 거 같은데, 가니시로 올려준 카카오닙처럼 쌉쌀한 카카오 같은 맛으로, 굳이 따지자면 커피 보다는 카카오 닙 맛이 나는 에스프레소 마티니라는 인상을 받았습니다." },
+    { kind: "figure", src: "/articles/bar-sebek/05.webp", width: 966, height: 1717 },
+    { kind: "figure", src: "/articles/bar-sebek/06.webp", width: 966, height: 1717 },
+    { kind: "figure", src: "/articles/bar-sebek/07.webp", width: 966, height: 1717, caption: "애플잭(Apple Jack) / 라뇨 사보란 VSOP" },
+    { kind: "paragraph", text: "칵테일 외에도 다양한 위스키, 브랜디, 진 등이 있으며, 맥캘란, 하이랜드 파크, 헤네시 등의 올드바틀도 있습니다. 다만 올드바틀은 아직 판매하지 않고 있으며, 아직 판매할 시기를 정하지 못했다고 하네요." },
+    { kind: "paragraph", text: "다만, \"세벡\"은 칵테일을 주로 하는 바이며, 오너가 다양한 수상 경력도 가지고 있는 만큼, 칵테일을 강력하게 추천드립니다." },
+    { kind: "paragraph", text: "\"세벡\"은 꽤나 아기자기한 바로, 바테이블에 6자리, 4인용 테이블 하나가 끝이니, 되도록이면 붐비지 않는 시간인 오픈 직후에 방문하는 걸 추천드리며, 흡연이 가능한 바이니 저처럼 흡연을 하지 않는 분들은 특히 사람이 적은 오픈 직후가 좋겠네요." },
+  ],
+};

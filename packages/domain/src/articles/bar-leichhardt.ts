@@ -1,0 +1,32 @@
+import type { Article } from "../types";
+
+export const ARTICLE: Article = {
+  slug: "bar-leichhardt",
+  category: "bar",
+  title: "라이카도 — 멋진 위스키 콜렉션",
+  dek: "\"라이카도(Bar Leichhardt)\"는 후쿠오카의 야쿠인역과 와타나베도리역 사이에 위치한 바로, 후쿠오카 내에서도 \"히구치(Bar Higuchi)\"와 더불어 멋진 위스키 라인업을 자랑하는 바입니다.",
+  publishedAt: "2024-07-21",
+  hero: "/articles/bar-leichhardt/00.webp",
+  sourceUrl: "https://blog.naver.com/shakinglikebartender/223520281386",
+  relatedCocktailSlugs: [],
+  blocks: [
+    { kind: "figure", src: "/articles/bar-leichhardt/00.webp", width: 966, height: 543 },
+    { kind: "figure", src: "/articles/bar-leichhardt/01.webp", width: 966, height: 1288 },
+    { kind: "paragraph", text: "\"라이카도(Bar Leichhardt)\"는 후쿠오카의 야쿠인역과 와타나베도리역 사이에 위치한 바로, 후쿠오카 내에서도 \"히구치(Bar Higuchi)\"와 더불어 멋진 위스키 라인업을 자랑하는 바입니다." },
+    { kind: "paragraph", text: "히구치에 비해서는 아직 국내에서 많이 알려지지 않은 탓인지 한국인 손냄이 간간히 있긴 하지만 많지는 않은 것 같습니다." },
+    { kind: "figure", src: "/articles/bar-leichhardt/02.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/bar-leichhardt/03.webp", width: 966, height: 1288, caption: "보모어 12년 추가 숙성 / 글렌터렛 하이볼" },
+    { kind: "paragraph", text: "\"라이카도\"에서는 실제 보모어의 오크를 가져와 작게 만든 오크통에 보모어 12년을 계속해서 채워서 추가 숙성하는 위스키가 있습니다." },
+    { kind: "paragraph", text: "하프로 마셔봤는데, 일반 12년보다 당연히 숙성감은 있었는데 그 말로만 정리하기가 어렵고, 옛날 보모어의 편린이 보이는 느낌이었습니다. 향은 약간 아쉬웠네요." },
+    { kind: "paragraph", text: "하이볼은 '약간의 피트감이 있는 싱글 몰트'로 주문했는데, 윌슨 앤 모건(Wilson & Morgan)의 쿨일라와 글렌터렛을 추천해줘서 글렌터렛(Glenturret)으로 마셨습니다." },
+    { kind: "paragraph", text: "사실 그렇게 기대는 안됐는데, 달달하고 약간의 피트가 있는 게, 마치 '롱로우를 고소하게 해서 하이볼로 하면 이런 느낌이 아닐까?' 하는 느낌이었네요. 아주 맛있었습니다." },
+    { kind: "figure", src: "/articles/bar-leichhardt/04.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/bar-leichhardt/05.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/bar-leichhardt/06.webp", width: 966, height: 1288, caption: "Ardbeg Blaaack / Springbank 12yo 80s(?) Ceramic / Kilchoman Cognac Cask" },
+    { kind: "paragraph", text: "아드벡 블랙(Ardbeg Blaaack)은 제가 알기로 바틀에 양 그림이 없는 버전(46%)과 양 그림이 있는 버전(50.7%)이 있는 걸로 아는데, 전 전자를 마셨습니다." },
+    { kind: "paragraph", text: "뉴질랜드의 피노누아 캐스크를 썼다고 하는데....와인 캐스크의 캐릭터는 솔직히 그닥 느끼지 못했고, 아드벡의 피트감이 좀 강하게 느껴졌습니다. 다른 버전을 마셔보고 싶네요." },
+    { kind: "paragraph", text: "특급 시대의 스프링뱅크 도자기 바틀은 이전에도 마셔본 적이 있습니다만, 도자기병은 휘발이 용이해서 내용물이 줄어드는 경우가 많습니다." },
+    { kind: "paragraph", text: "이런 점 때문에 바틀의 보존 상태에 따라서 맛이 달라지는데, 이번에 마신 건 보존 상태가 안좋았는지 약간의 올드몰트 향 빼고는 힘이 상당히 빠진 느낌을 많이 받았습니다." },
+    { kind: "paragraph", text: "\"라이카도\"는 위스키의 종류가 정말 다양하며, 평일 기준으로 손님이 그렇게 많지 않고 차분한 느낌을 받았으며, 직원들이 아주아주 친절합니다. 위스키 추천도 맡길만하니 마음 놓고 추천 받아보는 것도 좋습니다." },
+  ],
+};

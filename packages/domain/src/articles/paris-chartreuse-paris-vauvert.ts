@@ -1,0 +1,33 @@
+import type { Article } from "../types";
+
+export const ARTICLE: Article = {
+  slug: "paris-chartreuse-paris-vauvert",
+  category: "bar",
+  title: "샤르트뢰즈 파리-보베르",
+  dek: "샤르트뢰즈는 컬트적인 인기를 끌고 있는 프랑스의 허브 리큐르로, 그 기원이 아주 오래된 리큐르입니다.",
+  publishedAt: "2024-07-01",
+  hero: "/articles/paris-chartreuse-paris-vauvert/00.webp",
+  sourceUrl: "https://blog.naver.com/shakinglikebartender/223497553700",
+  relatedCocktailSlugs: [],
+  blocks: [
+    { kind: "paragraph", text: "샤르트뢰즈는 컬트적인 인기를 끌고 있는 프랑스의 허브 리큐르로, 그 기원이 아주 오래된 리큐르입니다." },
+    { kind: "paragraph", text: "샤르트뢰즈의 전설은 프랑스의 앙리 4세 때인 1605년 프랑스의 카르투시오회 수도자들이 후에 프랑스의 원수가 된 프랑수아-안니발 데스트레(François-Annibal d'Estrées)에게서 출처를 정확히 알 수 없는 장수의 비약으로 알려진 레시피를 받은 것에서 시작되었다고 합니다." },
+    { kind: "figure", src: "/articles/paris-chartreuse-paris-vauvert/00.webp", width: 266, height: 400, caption: "https://www.chartreuse.fr/en/produit/vegetable-elixir/" },
+    { kind: "paragraph", text: "이 문서는 1737년에 그랑 샤르트뢰즈 수도원(Grande Chartreuse)로 옮겨졌고, 수도사들에 의해서, 특히 제롬 모벡(Jérôme Maubec)의 큰 도움을 통해 1764년 샤르트뢰즈 그린의 원형인 \"엘릭시르 베제탈 드 라 그랑 샤르트뢰즈(ELIXIR VÉGÉTAL DE LA GRANDE-CHARTREUSE)\"를 만들어냅니다." },
+    { kind: "paragraph", text: "이후 레시피는 한 번도 바뀌지 않았다고 하며, 이 제품은 국내에서는 볼 수 없지만 일본에서는 비교적 쉽게 찾아볼 수 있습니다." },
+    { kind: "paragraph", text: "이후 1840년에 국내에는 샤르트뢰즈 그린(Chartreuse Green)과 샤르트뢰즈 옐로우(Chartreuse Yellow)로 알려진 샤르트뢰즈 베르테(Chartreuse Verte)와 샤르트뢰즈 존(Chartreuse Jaune)이 \"엘릭시르 베제탈 드 라 그랑 샤르트뢰즈\"를 바탕으로 만들어졌고, 그 인기로 인해 \"술의 여왕/리큐르의 여왕(Reine des Liqueurs)\"이라 불리기도 했습니다." },
+    { kind: "figure", src: "/articles/paris-chartreuse-paris-vauvert/01.webp", width: 966, height: 1482 },
+    { kind: "paragraph", text: "\"샤르트뢰즈 파리-보베르\"는 파리 오데옹(Odeon)역 바로 앞에 위치한 샤르트뢰즈 전용샵입니다. 런던에서 우연히 주류샵인 아마투스(Amathus)를 찾은 것처럼, 이 곳도 점심에 식당 웨이팅을 위해 시간을 보내다가 우연히 찾게 된 곳입니다." },
+    { kind: "figure", src: "/articles/paris-chartreuse-paris-vauvert/02.webp", width: 966, height: 404 },
+    { kind: "figure", src: "/articles/paris-chartreuse-paris-vauvert/03.webp", width: 966, height: 1708 },
+    { kind: "paragraph", text: "말이 리쿼샵이지, 샤르트뢰즈에 관한 역사나 옛날 바틀들 또한 구경할 수 있을 정도로 거의 샤르트뢰즈 박물관이라 할 수 있습니다." },
+    { kind: "paragraph", text: "샤르트뢰즈는 옛날 바틀들이 엄청난 가치를 가지고 있기 때문에 보기가 정말 어려운데, 이 곳에서는 다양한 옛날 바틀들을 구경할 수 있습니다." },
+    { kind: "figure", src: "/articles/paris-chartreuse-paris-vauvert/04.webp", width: 966, height: 1717 },
+    { kind: "figure", src: "/articles/paris-chartreuse-paris-vauvert/05.webp", width: 966, height: 1717 },
+    { kind: "figure", src: "/articles/paris-chartreuse-paris-vauvert/06.webp", width: 966, height: 1717 },
+    { kind: "paragraph", text: "샤르트뢰즈 그린과 옐로우는 기본이며, 그 외의 라인들을 모두 취급하고 있습니다. 저는 작은 도자기 바틀에 들어있는 엘릭시르 베제탈과 1084년 성 브루노가 카르투지오 수도회를 창립한 지 900주년을 기념하기 위해 카르투지오회 신부들이 1984년에 처음 만들어졌다고 하는 \"LIQUEUR DU 9e CENTENAIRE\"를 구매하고 싶었지만, 이미 위스키를 구매해서 참을 수 밖에 없었습니다...." },
+    { kind: "figure", src: "/articles/paris-chartreuse-paris-vauvert/07.webp", width: 966, height: 752 },
+    { kind: "paragraph", text: "진열된 상품을 지나쳐서 들어가면, 샤르트뢰즈 내부의 자체 바가 있습니다. 여기서 제품을 시음하거나 칵테일을 주문할 수 있는 것 같은데, 제가 방문한 날에는 하필 바가 쉬어서 아쉽게도 이용하지는 못했네요...." },
+    { kind: "paragraph", text: "파리 시내에서 샤르트뢰즈를 시음(아마 저렴하게 유료로)할 수 있으며, 샤르트뢰즈의 팬이라면 한 번쯤 방문해서 사진을 남기거나, 기념품을 살만한 곳입니다." },
+  ],
+};

@@ -1,0 +1,33 @@
+import type { Article } from "../types";
+
+export const ARTICLE: Article = {
+  slug: "regarding-cocktails",
+  category: "cocktail",
+  title: "칵테일에 관하여 — 사샤 페트라스케를 기리며",
+  dek: "\"Regarding Cocktails\"는 현대 칵테일과 바 트렌드에 많은 영향을 미친 바인 밀크 앤 허니(Milk&Honey)를 오픈한 \"사샤 페트라스케(Sasha Petraske)\"와 관련된 칵테일 북입니다.",
+  publishedAt: "2024-08-17",
+  hero: "/articles/regarding-cocktails/00.webp",
+  sourceUrl: "https://blog.naver.com/shakinglikebartender/223550948729",
+  relatedCocktailSlugs: [],
+  blocks: [
+    { kind: "figure", src: "/articles/regarding-cocktails/00.webp", width: 500, height: 500 },
+    { kind: "paragraph", text: "\"Regarding Cocktails\"는 현대 칵테일과 바 트렌드에 많은 영향을 미친 바인 밀크 앤 허니(Milk&Honey)를 오픈한 \"사샤 페트라스케(Sasha Petraske)\"와 관련된 칵테일 북입니다." },
+    { kind: "paragraph", text: "그의 저서가 아닌 '관련된'이라 표현했는데, 이 칵테일 북은 사샤 페트라스케의 유작으로 알려져 있지만 사실 그의 아내(Georgette Moger-Petraske)가 남편의 글을 모아 정리하고, 동업자인 바텐더들의 도움을 받아 집필한 책이기 때문입니다." },
+    { kind: "figure", src: "/articles/regarding-cocktails/01.webp", width: 966, height: 557, caption: "사진: Daniel Krieger / 출처: Punch Drink" },
+    { kind: "paragraph", text: "사샤 페트라스케는 1999년 밀크 앤 허니를 오픈하면서 스피크이지(Speakeasy) 스타일의 바를 유행시켰고, 크래프트 칵테일 운동(Craft Cocktail Movement, AKA 칵테일 르네상스)에 큰 영향을 미친 사람 중 한 명입니다." },
+    { kind: "paragraph", text: "당시 칵테일은 저급의 술과 재료 및 너무 단 기성품 시럽 등으로 만들어졌으며, 달고 외견만 화려한 칵테일이 주가 되었던 시대였습니다." },
+    { kind: "paragraph", text: "사샤 페트라스케를 포함한 몇몇 바텐더 및 음료 관계자들은 크래프트 칵테일 운동을 통해서 전통으로의 회귀, 좋은 퀄리티와 신선한 재료, 잊힌 주류의 재발견, 크래프트 재료의 사용 등으로 당시의 ‘칵테일은 저질의 것을 그나마 맛있게 만드는 것’이라는 인식을 타파하려 노력했습니다." },
+    { kind: "paragraph", text: "그 결과 클래식 칵테일들이 다시금 주목 받게 되었고, 잊혔던 칵테일과 주류들이 다시 발굴되었으며, 신선하고 좋은 재료와 수제 재료를 사용하여 칵테일의 맛을 높이게 되었습니다." },
+    { kind: "paragraph", text: "클래식 칵테일이 계속해서 인기를 누리며, 많은 변형이 나오는 것도 크래프트 칵테일 운동이 없었다면 불가능했겠죠." },
+    { kind: "paragraph", text: "2015년 8월 21일 사샤 페트라스케는 안타깝게도 42세의 이른 나이로 사망하게 됩니다. 밀크 앤 허니의 첫 번째 매장 위치(한 번 이사함)에는 현재 그의 제자 샘 로스(Sam Ross)의 바인 아타보이(Attaboy)가 자리 잡게 되었습니다." },
+    { kind: "paragraph", text: "2020년 9월 26일 밀크 앤 허니는 런던 소호에 위치한 지점이 문을 닫게 되면서 그 역사의 끝을 맞이하게 됩니다." },
+    { kind: "figure", src: "/articles/regarding-cocktails/02.webp", width: 720, height: 540 },
+    { kind: "paragraph", text: "다시 책 이야기로 돌아와서 Regarding Cocktails라는 책은 바텐더들보다는 홈바, 홈텐더들에게 초점이 맞춰져 있는 책입니다." },
+    { kind: "paragraph", text: "홈바에 필요한 바웨어, 글라스웨어에 대한 정보는 기본이고, 밀크 앤 허니에서 쓰던 시럽이나 홈 칵테일 파티를 위한 유의점 등과 같은 정보가 실려 있는 걸 보면 더욱 홈바에 적절한 책이죠." },
+    { kind: "figure", src: "/articles/regarding-cocktails/03.webp", width: 606, height: 454 },
+    { kind: "figure", src: "/articles/regarding-cocktails/04.webp", width: 897, height: 673 },
+    { kind: "paragraph", text: "칵테일 레시피 소개 같은 경우에는 재료를 아주 센스 있게 표현했고, 메이킹 과정에 더해 사샤 페트라스케와 관련 있는 사람들의 소회가 주로 적혀 있습니다. 여기서는 메이킹보다는 관련인들의 소회가 좀 더 주가 되는 느낌을 받았습니다." },
+    { kind: "paragraph", text: "화려하지 않고, 디테일한 메이킹 정보 등이 실려있지는 않지만 필요한 내용을 알차고 담담하게 소개하고 있다는 인상이 마치 사샤 페트라스케 그 자체를 간접적으로 보여주는 것 같네요." },
+    { kind: "paragraph", text: "여기에 더해 밀크 앤 허니의 칵테일 레시피도 실려있으니 홈바에 반드시 한 권쯤 두는 걸 강력하게 추천드립니다." },
+  ],
+};

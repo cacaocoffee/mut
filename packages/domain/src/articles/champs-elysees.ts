@@ -1,0 +1,32 @@
+import type { Article } from "../types";
+
+export const ARTICLE: Article = {
+  slug: "champs-elysees",
+  category: "cocktail",
+  title: "눈이 번쩍 떠질만큼 자극적인 샹젤리제 칵테일",
+  dek: "프랑스 파리의 거리와 동명의 이름을 가진 칵테일, 샹젤리제는 1925년 Nina Toye와 Arthur H.",
+  publishedAt: "2021-10-09",
+  hero: "/articles/champs-elysees/00.webp",
+  sourceUrl: "https://blog.naver.com/shakinglikebartender/222532101445",
+  relatedCocktailSlugs: [],
+  blocks: [
+    { kind: "paragraph", text: "About the Drink" },
+    { kind: "paragraph", text: "프랑스 파리의 거리와 동명의 이름을 가진 칵테일, 샹젤리제는 1925년 Nina Toye와 Arthur H. Adair의 저서 \"Drinks-Long and Short\"에서 처음 등장했습니다." },
+    { kind: "paragraph", text: "이 칵테일은 사이드카(Sidecar)의 변형으로, 오렌지 큐라소(Orange Curaçau) 또는 그랑 마르니에(Grand Marnier)대신 그린 샤르트뢰즈(Green Chartreuse)를 사용한 것입니다. 예상치 못한 조합이기는 하지만 처음 맛을 보시는 순간 눈이 확 떠질만큼 자극적이고 재미있는 경험을 하실 수 있습니다." },
+    { kind: "paragraph", text: "개인적으로는 샹젤리제 칵테일의 원형격인 사이드카보다 자극적이고 다채롭다고 생각하는데 국내에서는 거의 알려져 있지 않은 것에 놀랐습니다." },
+    { kind: "paragraph", text: "Ingredients?" },
+    { kind: "figure", src: "/articles/champs-elysees/00.webp", width: 966, height: 966 },
+    { kind: "paragraph", text: "샹젤리제에 들어가는 술은 코냑(60ml)과 허브리큐르인 '리큐르의 여왕' 그린 샤르트뢰즈(15ml)이며, 그 외에 레몬 즙(15ml)과 심플 시럽(7.5ml)이 들어갑니다." },
+    { kind: "paragraph", text: "제가 사용한 피에르 페랑(Pierre Ferrand)는 도수도 45도로 높고, 꽤 화사한 코냑으로 칵테일 용으로 주로 사용하고 있습니다." },
+    { kind: "paragraph", text: "How to Mix?" },
+    { kind: "paragraph", text: "1. 모든 재료를 셰이커 안에 넣어줍니다." },
+    { kind: "paragraph", text: "2. 셰이커에 얼음을 채우고 셰이킹을 해줍니다." },
+    { kind: "paragraph", text: "3. 칵테일 글라스에 셰이킹한 칵테일을 따라줍니다." },
+    { kind: "paragraph", text: "4. 레몬 필로 가니시를 해줍니다." },
+    { kind: "figure", src: "/articles/champs-elysees/01.webp", width: 966, height: 966 },
+    { kind: "paragraph", text: "한 모금을 마시자마자 엄청나게 강렬하고 자극적인 맛으로 인해 '이런 칵테일이 있다고?' 하며 눈이 번쩍 떠집니다." },
+    { kind: "paragraph", text: "이 칵테일에 샤르트뢰즈는 15ml만 들어갔는데도 불구하고 60ml 들어간 코냑보다 더욱 빛이 납니다. 샤르트뢰즈의 허브감과 더불어 레몬의 신맛이 눈에 띄는데, 약간의 시럽으로 신맛이 지나치지 않게 밸런스를 잘 이뤄줍니다." },
+    { kind: "paragraph", text: "코냑, 샤르트뢰즈와 레몬이 만나 민티함이 느껴지는 것 같은 착각이 날 정도로 아주 상쾌한 맛이 납니다. 리프레시가 필요할 때 가장 먼저 찾을 것 같은 칵테일입니다." },
+    { kind: "paragraph", text: "더 많은 칵테일 정보는" },
+  ],
+};

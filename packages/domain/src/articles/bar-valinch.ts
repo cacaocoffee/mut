@@ -1,0 +1,33 @@
+import type { Article } from "../types";
+
+export const ARTICLE: Article = {
+  slug: "bar-valinch",
+  category: "bar",
+  title: "발린치 — 숨어있는 은근한 위스키 강자",
+  dek: "\"발린치(Valinch)\"는 후쿠오카의 텐진미나미역과 와타나베도리역 중간에 있는 바로, 꽤나 차분한 분위기의 바입니다.",
+  publishedAt: "2024-07-14",
+  hero: "/articles/bar-valinch/00.webp",
+  sourceUrl: "https://blog.naver.com/shakinglikebartender/223512163042",
+  relatedCocktailSlugs: [],
+  blocks: [
+    { kind: "figure", src: "/articles/bar-valinch/00.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/bar-valinch/01.webp", width: 966, height: 1288 },
+    { kind: "paragraph", text: "\"발린치(Valinch)\"는 후쿠오카의 텐진미나미역과 와타나베도리역 중간에 있는 바로, 꽤나 차분한 분위기의 바입니다." },
+    { kind: "paragraph", text: "이 바의 가장 큰 특징이라 한다면, 출시된 위스키를 바 안의 오크통에서 추가 숙성하여 판매한다는 점입니다. 오너에 의하면 현재 라가불린, 보모어, 글렌기어리가 딱 마시기 좋게 숙성되었다고 합니다." },
+    { kind: "figure", src: "/articles/bar-valinch/02.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/bar-valinch/03.webp", width: 966, height: 1288, caption: "글렌모렌지 10년 미즈나라 캐스크에서 추가 숙성 /                     카노스케 럼캐스크 숙성" },
+    { kind: "paragraph", text: "그 외에도 다양한 추가 숙성되고 있는 위스키들이 있는데, 저는 먼저 글렌모렌지 10년을 미즈나라 캐스크(Mizunara Cask)에서 추가 숙성한 걸 마셔봤습니다." },
+    { kind: "paragraph", text: "오너가 비교해보라고 글렌모렌지 10년을 같이 주셨는데 확실히 다르긴합니다. 다만, 미즈나라 캐스크의 캐릭터가 정확히 뭐다!라고 제가 표현을 잘 못하겠네요...." },
+    { kind: "paragraph", text: "오너와 이런저런 얘기를 하다가 일본에서 카노스케(Kanosuke)는 어떤 포지션인지를 물어봤습니다. 일본에서도 카노스케는 꽤 잘 만들고 있는 루키라는 인상이 있다고 하네요." },
+    { kind: "paragraph", text: "그러다가 카노스케 럼캐스크 숙성된 걸 5미리 남았다고 주셨는데, 개인적으로 캐스크를 정말 잘 쓴다는 인상을 받았습니다. 럼의 달달한 캐릭터를 확실히 위스키에 부여했다는 게 아주아주 맛있었습니다." },
+    { kind: "figure", src: "/articles/bar-valinch/04.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/bar-valinch/05.webp", width: 966, height: 1288 },
+    { kind: "figure", src: "/articles/bar-valinch/06.webp", width: 966, height: 1288, caption: "Hazelburn 15 year Oloroso matured /                    The Art Collection Mannochmore / Octomore 08.3" },
+    { kind: "paragraph", text: "개인적으로 스프링뱅크의 제품을 좋아하는데, 헤이즐번 15년 올로로소 캐스크는 이전에 마셔본 적 있지만 국내에선 보기 어려운 헤이즐번의 제품이니 한 번 더 마셔봤습니다. 역시 스프링뱅크 증류소에서 나오는 제품이니 맛은 보장되어 있네요." },
+    { kind: "paragraph", text: "다음은 오너의 추천으로 마셨는데, The Art Collection이라는 독립병입자의 밀라노 위스키 페스티벌 & 럼 쇼 2023(Milano Whisky Festival & Rum Show 2023)을 위해 출시된 마녹모어로, 버번 혹스헤드 숙성 후 아몬티야도 캐스크에서 16개월 피니시를 거친 제품입니다. 부들부들하고, 요구르트 같은 단향이 인상적이었습니다." },
+    { kind: "paragraph", text: "얘기를 더 하다가 옥토모어에 대한 얘기가 나왔는데, ppm이 300 이상 되는 바틀이 있다고 하셔서 바로 주문해봤습니다. 옥토모어 08.3은 ppm이 309.1이라는 세계에서 가장 ppm이 높은 바틀로 유명한데, 맛은.... 솔직히 강렬한 피트에 곡물감이 달달하게 나지만 그렇게 복합적이지 않은, 굳이....싶은 바틀이긴 했습니다." },
+    { kind: "figure", src: "/articles/bar-valinch/07.webp", width: 966, height: 543 },
+    { kind: "paragraph", text: "그외에 발린치에는 스프링뱅크 몇 종류, 옥토모어 몇 종류가 있고, 독립병입자도 꽤 많이 갖춰져있습니다. 오너가 글렌모렌지를 좋아하시는지 글렌모렌지가 많이 보였고, 일본 위스키는 그렇게 많이 보이지는 않았네요." },
+    { kind: "paragraph", text: "오너 혼자서 운영하는 것 같고, 오너가 살짝은 거리감 있지만 사근사근하게 응대를 해주십니다. 새벽 4시까지 운영을 하니 느즈막하게 방문해서 한 잔 마시는 것도 좋을 것 같네요." },
+  ],
+};

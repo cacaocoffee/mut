@@ -2,7 +2,7 @@ import type { Article } from "../types";
 
 export const ARTICLE: Article = {
   slug: "kilkerran-8cs-batch10",
-  category: "whisky",
+  category: "spirits",
   title: "킬커란 8cs 배치 10 — 캐스크 스트렝스 시음기",
   dek: "형제의 분쟁에서 태어나 두 번 죽고 되살아난 글렌가일 증류소. 올로로소 캐스크 8년, 57.4%의 배치 10을 마셔봤다.",
   publishedAt: "2024-10-14",

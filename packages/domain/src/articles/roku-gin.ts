@@ -1,0 +1,33 @@
+import type { Article } from "../types";
+
+export const ARTICLE: Article = {
+  slug: "roku-gin",
+  category: "spirits",
+  title: "로쿠 진 — 일본스러운, 특히 사쿠라·유자·차가 돋보이는 재패니즈 진",
+  dek: "'로쿠 진'은 일본의 산토리에서 생산하는 재패니즈 진으로, 일본의 4계절의 캐릭터를 낼 수 있는 6가지의 재료를 제철에 수확하여 증류·침지하여 만들어내며, 이 때 6가지의 일본의 재료를 바탕으로 로쿠(일본어로 6)라는 이름을 붙인 진입니다.",
+  publishedAt: "2024-10-05",
+  hero: "/articles/roku-gin/00.webp",
+  sourceUrl: "https://blog.naver.com/shakinglikebartender/223607891549",
+  relatedCocktailSlugs: [],
+  blocks: [
+    { kind: "figure", src: "/articles/roku-gin/00.webp", width: 966, height: 966 },
+    { kind: "paragraph", text: "About The Gin" },
+    { kind: "paragraph", text: "'로쿠 진'은 일본의 산토리에서 생산하는 재패니즈 진으로, 일본의 4계절의 캐릭터를 낼 수 있는 6가지의 재료를 제철에 수확하여 증류·침지하여 만들어내며, 이 때 6가지의 일본의 재료를 바탕으로 로쿠(일본어로 6)라는 이름을 붙인 진입니다." },
+    { kind: "paragraph", text: "이 6가지 재료는 '벚꽃, 벚꽃잎, 센차, 옥로, 산초, 유자'이며, 그 외에도 진을 생산하는 데에 전통적으로 사용되는 재료들(주니퍼베리, 안젤리카, 카다멈 등) 8가지를 더해 총 14가지의 보태니컬로 진을 만들어내고 있습니다." },
+    { kind: "paragraph", text: "아쉽게도 아직까지 국내에는 수입되지 않고 있으며, 일본에서는 흔하게 볼 수 있습니다." },
+    { kind: "figure", src: "/articles/roku-gin/01.webp", width: 966, height: 966 },
+    { kind: "heading", text: "Nose" },
+    { kind: "paragraph", text: "- 압도적인 벚꽃, 유자, 차의 캐릭터" },
+    { kind: "paragraph", text: "- 은은한 주니퍼베리, 향신료" },
+    { kind: "paragraph", text: "- 향은 오일리한 느낌" },
+    { kind: "heading", text: "Palate" },
+    { kind: "paragraph", text: "- 깔끔한 벚꽃, 시트러스 캐릭터" },
+    { kind: "paragraph", text: "- 약간은 후추 같은 맛이 있음" },
+    { kind: "paragraph", text: "- 차를 마시는 느낌이 들기도 함" },
+    { kind: "figure", src: "/articles/roku-gin/02.webp", width: 966, height: 966 },
+    { kind: "paragraph", text: "진을 시음하려면 역시 진 토닉 또는 진 소다를 마셔봐야한다는 것이 제 지론이라 바로 만들어봤습니다." },
+    { kind: "paragraph", text: "잔을 입으로 가져가면서는 코에 차를 넣는 일본 진 특유의 향이 기분 좋게 올라옵니다. 맛은 살짝 달짝지근한 벚꽃, 유자에 깔끔한 차 같은 캐릭터가 있는 진토닉이 만들어졌습니다." },
+    { kind: "paragraph", text: "아주 깔끔하고 일본스러운 풍미가 가득한 느낌이네요." },
+    { kind: "paragraph", text: "개인적으로 로쿠 진이 국내에 수입이 되면 좋겠습니다만....가격적인 면에서 메리트가 있을지는 미지수입니다." },
+  ],
+};
