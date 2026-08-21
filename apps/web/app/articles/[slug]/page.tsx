@@ -98,7 +98,11 @@ export default async function ArticleDetailPage({ params }: PageProps<"/articles
           >
             ← 아티클
           </Link>
-          <span className="article-card__kicker">{ARTICLE_CATEGORY_KO[a.category]}</span>
+          {/* 협찬 글 표기는 데이터 플래그로만 켜진다 — 끌 수 없다 (`NFR-L-02` · 배포 차단) */}
+          <span className="article-card__kicker">
+            {ARTICLE_CATEGORY_KO[a.category]}
+            {a.isSponsored && " · 제휴 콘텐츠"}
+          </span>
           <h1>{a.title}</h1>
         </div>
         <p className="lede">{a.dek}</p>

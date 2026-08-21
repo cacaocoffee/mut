@@ -99,6 +99,11 @@ export interface Article {
   hero: string;
   /** 블로그 원문 주소. 상세 하단에 출처로 표기한다 (ADR-0010 이관 규칙) */
   sourceUrl: string;
+  /**
+   * 협찬 글이면 true. 목록 카드와 상세 머리에 「제휴 콘텐츠」 라벨이 붙는다 —
+   * 공정위 의무 표기라 끌 수 없다 (`NFR-L-02` · 배포 차단).
+   */
+  isSponsored?: boolean;
   /** 본문이 다루는 칵테일의 코퍼스 id — 상세의 "관련 칵테일" 링크가 된다 */
   relatedCocktailSlugs: string[];
   blocks: ArticleBlock[];

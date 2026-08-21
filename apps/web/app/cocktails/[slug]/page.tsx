@@ -5,6 +5,7 @@ import {
   AXES,
   AXES_KO,
   COCKTAILS,
+  articlesForCocktail,
   relatedCocktails as prototypeRelated,
   getCocktail,
 } from "@mut/domain";
@@ -111,6 +112,7 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
   if (!c) notFound();
 
   const related = await loadRelated(slug);
+  const stories = articlesForCocktail(slug);
 
   const specs = [
     { label: "도수", value: c.abv != null ? `${c.abv}%` : "—", sub: "표준 배합 기준" },
@@ -328,6 +330,22 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
             )}
           </div>
         </div>
+      )}
+
+      {/* 이 칵테일을 다루는 아티클 (ADR-0010). 아티클 → 칵테일 링크의 역방향이다 —
+          한쪽만 이어져 있으면 읽던 사람이 되돌아올 길이 없다. */}
+      {stories.length > 0 && (
+        <section>
+          <h4 className="section-head">이 칵테일의 아티클</h4>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {stories.map((a) => (
+              <Link key={a.slug} href={`/articles/${a.slug}`} className="btn related-link">
+                <span className="name">{a.title}</span>
+                <span className="meta">아티클 읽기</span>
+              </Link>
+            ))}
+          </div>
+        </section>
       )}
     </main>
   );

@@ -17,6 +17,7 @@ export interface ArticleCardData {
   category: ArticleCategory;
   dateLabel: string;
   hero: string;
+  isSponsored?: boolean;
 }
 
 const CATEGORIES: ArticleCategory[] = ["cocktail", "bar", "spirits"];
@@ -62,7 +63,11 @@ export function ArticleList({ articles }: { articles: ArticleCardData[] }) {
                 height={600}
               />
             </div>
-            <span className="article-card__kicker">{ARTICLE_CATEGORY_KO[a.category]}</span>
+            {/* 협찬 글 표기는 데이터 플래그로만 켜진다 — 끌 수 없다 (`NFR-L-02` · 배포 차단) */}
+            <span className="article-card__kicker">
+              {ARTICLE_CATEGORY_KO[a.category]}
+              {a.isSponsored && " · 제휴 콘텐츠"}
+            </span>
             <h3 className="article-card__title">{a.title}</h3>
             <p className="article-card__dek">{a.dek}</p>
             <span className="article-card__date">{a.dateLabel}</span>

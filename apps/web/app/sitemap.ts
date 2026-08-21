@@ -62,12 +62,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   paths.push(...INGREDIENTS.map((i) => `/ingredients/${i.slug}`));
 
   // 아티클 — 콘텐츠 유입이 존재 이유라 목록·상세 다 색인한다 (ADR-0010 · SPEC-05 §4).
-  paths.push("/articles", ...ARTICLES.map((a) => `/articles/${a.slug}`));
+  paths.push("/articles");
 
-  return paths.map((path) => ({
+  const entries: MetadataRoute.Sitemap = paths.map((path) => ({
     url: `${base}${path}`,
     lastModified: now,
     // 상세가 콘텐츠의 중심이라 조금 높인다. 카테고리는 그것으로 가는 길이다.
     priority: path.startsWith("/cocktails/") && path.split("/").length === 3 ? 0.8 : 0.6,
   }));
+
+  // 아티클 상세는 발행일을 그대로 적는다 — 전부 `now` 로 적으면 크롤러가
+  // 142편이 매시간 바뀐다고 읽고, 정말 바뀐 글을 가려낼 수 없다.
+  entries.push(
+    ...ARTICLES.map((a) => ({
+      url: `${base}/articles/${a.slug}`,
+      lastModified: new Date(a.publishedAt),
+      priority: 0.6,
+    })),
+  );
+
+  return entries;
 }

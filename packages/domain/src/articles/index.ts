@@ -49,6 +49,7 @@ import { ARTICLE as espressoMartini2021 } from "./espresso-martini-2021";
 import { ARTICLE as espressoMartiniMrBlack } from "./espresso-martini-mr-black";
 import { ARTICLE as garibaldi } from "./garibaldi";
 import { ARTICLE as ginFizz } from "./gin-fizz";
+import { ARTICLE as giffardHomeCocktails } from "./giffard-home-cocktails";
 import { ARTICLE as ginGinMule } from "./gin-gin-mule";
 import { ARTICLE as ginRickey } from "./gin-rickey";
 import { ARTICLE as glenScotiaExclusiveCaskForKorea2024TawnyPort } from "./glen-scotia-exclusive-cask-for-korea-2024-tawny-port";
@@ -207,6 +208,7 @@ export const ARTICLES: Article[] = [
   espressoMartiniMrBlack,
   garibaldi,
   ginFizz,
+  giffardHomeCocktails,
   ginGinMule,
   ginRickey,
   glenScotiaExclusiveCaskForKorea2024TawnyPort,
@@ -314,4 +316,12 @@ export function articleBySlug(slug: string): Article | undefined {
 
 export function articlesByCategory(category: ArticleCategory): Article[] {
   return ARTICLES.filter((a) => a.category === category);
+}
+
+/**
+ * 이 칵테일을 다루는 아티클 — 상세 화면의 역링크가 쓴다.
+ * `relatedCocktailSlugs` 는 아티클 → 칵테일 방향으로 적혀 있으므로 여기서 뒤집는다.
+ */
+export function articlesForCocktail(cocktailId: string): Article[] {
+  return ARTICLES.filter((a) => a.relatedCocktailSlugs.includes(cocktailId));
 }
