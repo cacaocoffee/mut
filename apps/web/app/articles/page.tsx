@@ -45,6 +45,7 @@ export default function ArticlesPage() {
     category: a.category,
     dateLabel: formatDate(a.publishedAt),
     hero: a.hero,
+    isSponsored: a.isSponsored,
   }));
 
   return (
