@@ -908,11 +908,7 @@
   font-variant-numeric: tabular-nums;
   color: var(--color-neutral-700);
 }
-/* ┌─ 목록 리듬 — 머리기사 · 표준 · 목록 행이 교차한다 ─────────────────────┐
-   143편을 같은 카드로 이어 붙이면 상품 목록이 된다. 아홉 편 주기로
-   [머리기사(2칸)+측면 1] → [표준 3] → [목록 행 4] 를 반복해 지면의 밀도를 바꾼다.
-   주기는 `article-list.tsx` 가 렌더 순서로 정하고, 여기는 모양만 맡는다.
-   └────────────────────────────────────────────────────────────────────────┘ */
+/* 페이지의 첫 글은 머리기사다 — 2칸을 쓰고 사진이 넓어진다 (ADR-0009) */
 @media (min-width: 1081px) {
   .article-card--lead {
     grid-column: span 2;
@@ -923,34 +919,6 @@
   }
   .article-card--lead .photo-slot--4x3 {
     aspect-ratio: 16 / 9;
-  }
-}
-/* 목록 행 — 사진 없이 한 줄. 밀도가 높아 큰 카드 사이에서 숨을 고른다 */
-.article-card--row {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: 72px 1fr auto;
-  gap: 16px;
-  align-items: baseline;
-  padding: 13px 0;
-}
-.article-card--row .article-card__kicker {
-  margin: 0;
-}
-.article-card--row .article-card__title {
-  margin: 0;
-  font-size: 17px;
-  line-height: 1.45;
-}
-.article-card--row .article-card__date {
-  margin: 0;
-}
-@media (max-width: 720px) {
-  .article-card--row {
-    grid-template-columns: 1fr auto;
-  }
-  .article-card--row .article-card__kicker {
-    display: none;
   }
 }
 
@@ -987,78 +955,39 @@
   margin-left: 4px;
 }
 
-/* ┌─ 상세 머리 — 매거진 표제 (ADR-0009 마스트헤드와 같은 중앙 정렬) ────────┐ */
-.article-head {
-  max-width: 780px;
-  margin: 4px auto 0;
-  text-align: center;
+/* 페이지 나누기 — 색인 띠와 같은 말투. 지금 페이지에 밑줄이 남는다 */
+.article-pagenav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: 4px 14px;
+  margin-top: 36px;
+  padding-top: 14px;
+  border-top: 2px solid var(--color-divider);
 }
-.article-head__dek {
-  max-width: 560px;
-  margin: 14px auto 0;
-  font-size: 15px;
-  line-height: 1.75;
-  color: var(--color-neutral-700);
-}
-.article-head__byline {
-  margin: 18px 0 0;
-  font-size: 12px;
-  letter-spacing: 0.05em;
+.article-pagenav__btn {
+  background: none;
+  border: 0;
+  padding: 2px 2px 4px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--color-neutral-700);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
 }
-.article-head__rule {
-  width: 44px;
-  height: 2px;
-  margin: 22px auto 0;
-  border: 0;
-  background: var(--color-accent-700);
+.article-pagenav__btn:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
-
-/* 대표 사진 — 본문(640px)보다 넓게 낸다. 표제 다음의 첫 화면이다 */
-.article-hero {
-  max-width: 920px;
-  margin: 36px auto 0;
+.article-pagenav__btn:not(:disabled):not([aria-current="page"]):hover {
+  color: var(--color-text);
 }
-.article-hero img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-/* 이전 · 다음 글 — 글 끝이 막다른 길이 되지 않게 한다 */
-.article-pager {
-  max-width: 920px;
-  margin: 44px auto 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0 24px;
-  border-top: 2px solid var(--color-divider);
-  padding-top: 18px;
-}
-.article-pager a {
-  color: inherit;
-  text-decoration: none;
-}
-.article-pager__dir {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  color: var(--color-neutral-700);
-}
-.article-pager__title {
-  font-family: var(--font-serif);
-  font-weight: 600;
-  font-size: 17px;
-  line-height: 1.45;
-}
-.article-pager a:hover .article-pager__title {
+.article-pagenav__btn[aria-current="page"] {
   color: var(--color-accent-700);
-}
-.article-pager__next {
-  text-align: right;
+  border-bottom-color: var(--color-accent-700);
 }
 
 /* 본문 한 단 — 세리프 자수는 `.editorial` 과 같은 눈금을 쓴다 */
@@ -1103,12 +1032,6 @@
 }
 .article-body figure {
   margin: 36px 0;
-}
-/* 본문 사진은 큰 화면에서 글보다 한 뼘 넓게 당겨 낸다 — 잡지의 지면 문법 */
-@media (min-width: 1000px) {
-  .article-body figure {
-    margin: 40px calc((100% - 880px) / 2);
-  }
 }
 .article-body img {
   display: block;
