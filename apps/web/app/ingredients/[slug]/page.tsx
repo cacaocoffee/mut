@@ -74,7 +74,7 @@ export default async function IngredientPage({ params }: PageProps<"/ingredients
         </div>
         <p className="lede">
           {CATEGORY_LABELS[ing.category]}
-          {/* 가니시는 없어도 만들 수 있다. 내 술장에서 안 보이는 이유를 여기서 말해 준다 */}
+          {/* 가니시는 필수 재료가 아니다 — 마스터의 countsForStock 구분을 그대로 보여 준다 */}
           {!countsForStock(ing.slug) && " · 없어도 만들 수 있는 가니시입니다"}
         </p>
       </header>

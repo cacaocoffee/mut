@@ -1,5 +1,5 @@
 import type { CocktailView } from "./cocktail-view";
-import { formatQuantity } from "@mut/domain";
+import { formatQuantity, type Article } from "@mut/domain";
 import { SITE_URL } from "./site";
 
 /**
@@ -42,6 +42,27 @@ export function recipeJsonLd(c: CocktailView) {
       position: i + 1,
       text,
     })),
+  };
+}
+
+/**
+ * 아티클 구조화 데이터 (`NFR-S-05` · ADR-0010).
+ *
+ * `Recipe` 가 아니라 `BlogPosting` 이다 — 아티클 안에 레시피가 적혀 있어도 정본
+ * 레시피는 칵테일 상세이고, 같은 내용이 두 타입으로 색인되면 서로를 깎는다.
+ * 별점을 만들지 않는 규칙(`PRIN-P04`)은 여기도 같다.
+ */
+export function articleJsonLd(a: Article) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: a.title,
+    description: a.dek,
+    datePublished: a.publishedAt,
+    image: [`${SITE_URL}${a.hero}`],
+    url: `${SITE_URL}/articles/${a.slug}`,
+    author: { "@type": "Person", name: "Shaking Like Bartender" },
+    isBasedOn: a.sourceUrl,
   };
 }
 

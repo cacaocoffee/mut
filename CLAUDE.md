@@ -50,7 +50,7 @@ PRD 전문(841줄)을 통째로 읽지 말 것. `docs/prd/README.md`의 표가 �
 | 도메인 규칙 · 불변식 | `docs/spec/SPEC-02_도메인모델.md` |
 | 분류 3축 (기주 · 스타일 · 메이킹) | `packages/domain/src/types.ts` <br> *API 연동 후에는 Kotlin + OpenAPI 생성물 (`PRIN-T02`)* |
 | 칵테일 데이터 | `packages/domain/src/data.ts` *(→ Postgres 시드로 이관 예정)* |
-| 그 외 제품 요구사항 | `docs/prd/MUT_PRD_v1.md` (v1.1) |
+| 그 외 제품 요구사항 | `docs/prd/MUT_PRD_v1.md` (v1.3) |
 
 어긋난 걸 발견하면 코드를 몰래 맞추지 말고 `GAPS.md`에 올린다.
 **PRD 부록 A.1 · A.2 · A.6은 폐기됐다** — 구현 근거로 인용하지 않는다 (ADR-0001).

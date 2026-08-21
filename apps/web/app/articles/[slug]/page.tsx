@@ -1,0 +1,148 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import {
+  ARTICLES,
+  ARTICLE_CATEGORY_KO,
+  articleBySlug,
+  getCocktail,
+  type ArticleBlock,
+} from "@mut/domain";
+import { ARTICLES_PATH } from "@/lib/routes";
+import { openGraph, SITE_URL } from "@/lib/site";
+import { articleJsonLd } from "@/lib/structured-data";
+
+/**
+ * 아티클 상세 (`FR-CONTENT-001` 앞당김 · ADR-0010).
+ *
+ * 렌더링 규약은 칵테일 상세와 같다 (SPEC-05 §4 · `PRIN-T04`) — SSG 에
+ * `dynamicParams = false`. 이유는 그쪽 파일에 적혀 있다: `loading.tsx` 가 셸을
+ * 먼저 내보내 200 이 굳으면 없는 슬러그가 soft 404 가 된다.
+ */
+export const revalidate = 3600;
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return ARTICLES.map((a) => ({ slug: a.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: PageProps<"/articles/[slug]">): Promise<Metadata> {
+  const { slug } = await params;
+  const a = articleBySlug(slug);
+  if (!a) return {};
+
+  return {
+    title: a.title,
+    description: a.dek,
+    alternates: { canonical: `${ARTICLES_PATH}/${a.slug}` },
+    openGraph: {
+      ...openGraph({
+        title: a.title,
+        description: a.dek,
+        url: `${ARTICLES_PATH}/${a.slug}`,
+        type: "article",
+      }),
+      // 칵테일 상세와 달리 파일 규약(opengraph-image)이 없다 — 대표 사진이 실물로 있다
+      images: [{ url: `${SITE_URL}${a.hero}` }],
+    },
+  };
+}
+
+function Block({ b }: { b: ArticleBlock }) {
+  switch (b.kind) {
+    case "heading":
+      return <h2>{b.text}</h2>;
+    case "quote":
+      return <blockquote>{b.text}</blockquote>;
+    case "figure":
+      return (
+        <figure>
+          <img src={b.src} alt={b.caption ?? "본문 사진"} loading="lazy" width={b.width} height={b.height} />
+          {b.caption ? <figcaption>{b.caption}</figcaption> : null}
+        </figure>
+      );
+    default:
+      return <p>{b.text}</p>;
+  }
+}
+
+export default async function ArticleDetailPage({ params }: PageProps<"/articles/[slug]">) {
+  const { slug } = await params;
+  const a = articleBySlug(slug);
+  if (!a) notFound();
+
+  // 첫 블록이 대표 사진과 같은 파일이면 건너뛴다 — 히어로가 이미 그 사진을 그렸다
+  const first = a.blocks[0];
+  const blocks = first?.kind === "figure" && first.src === a.hero ? a.blocks.slice(1) : a.blocks;
+  const heroDims = first?.kind === "figure" && first.src === a.hero ? first : null;
+
+  const related = a.relatedCocktailSlugs
+    .map((s) => getCocktail(s))
+    .filter((c) => c != null);
+
+  return (
+    <main className="shell">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd(a)) }}
+      />
+
+      <header className="page-head">
+        <div>
+          <Link
+            href={ARTICLES_PATH}
+            className="btn btn-ghost"
+            style={{ fontSize: 11, paddingLeft: 0, marginBottom: 14 }}
+          >
+            ← 아티클
+          </Link>
+          <span className="article-card__kicker">{ARTICLE_CATEGORY_KO[a.category]}</span>
+          <h1>{a.title}</h1>
+        </div>
+        <p className="lede">{a.dek}</p>
+      </header>
+
+      <article className="article-body">
+        {/* 대표 사진이 첫 화면(LCP)이다 — lazy 를 붙이지 않는다.
+            `__img--hero` 가 image-guard 의 EAGER_ALLOWED 표식이다. 컬러 — ADR-0008 */}
+        <figure>
+          <img
+            className="article-body__img--hero"
+            src={a.hero}
+            alt={`${a.title} 대표 사진`}
+            width={heroDims?.width ?? 966}
+            height={heroDims?.height ?? 725}
+          />
+        </figure>
+
+        {blocks.map((b, i) => (
+          <Block key={i} b={b} />
+        ))}
+
+        <p className="article-source">
+          {a.publishedAt.slice(0, 4)}년에 블로그에 쓴 글을 옮겼습니다 ·{" "}
+          <a href={a.sourceUrl} rel="noopener noreferrer">
+            원문 보기
+          </a>
+        </p>
+      </article>
+
+      {related.length > 0 && (
+        <section>
+          <h4 className="section-head">이 글의 칵테일</h4>
+          {related.map((c) => (
+            <Link key={c.id} href={`/cocktails/${c.id}`} className="btn related-link">
+              <span className="name">
+                {c.ko}
+                <span>{c.en}</span>
+              </span>
+              <span className="meta">레시피 보기</span>
+            </Link>
+          ))}
+        </section>
+      )}
+    </main>
+  );
+}
