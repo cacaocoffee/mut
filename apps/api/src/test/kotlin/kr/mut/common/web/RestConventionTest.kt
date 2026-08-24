@@ -275,7 +275,7 @@ class RestConventionTest {
      */
     @Test
     fun `RED25 - 어드민 API 에는 공개 캐시 헤더가 붙지 않는다`() {
-        val response = mvc.get("${ApiPaths.ADMIN}/cocktails").andReturn().response
+        val response = mvc.get("${ApiPaths.ADMIN}/cache-probe").andReturn().response
 
         assertThat(response.getHeader(HttpHeaders.CACHE_CONTROL))
             .isNotEqualTo(CacheControlFilter.PUBLIC_CACHE)

@@ -77,7 +77,8 @@ class AdminCocktailApiTest {
         assertAll(
             { assertThat(allIds).contains(draftId, publishedId) },
             { assertThat(draftIds).`as`("발행분은 draft 필터에 없다").doesNotContain(publishedId) },
-            { assertThat(mvc.get(ADMIN) { session = session("member")!! }.andReturn().response.status).isEqualTo(403) },
+            // VIEW_DRAFT 거부는 404 다 — 403 이면 "존재한다"가 새어 나간다 (Action.kt)
+            { assertThat(mvc.get(ADMIN) { session = session("member")!! }.andReturn().response.status).isEqualTo(404) },
             { assertThat(mvc.get(ADMIN).andReturn().response.status).isEqualTo(401) },
         )
     }

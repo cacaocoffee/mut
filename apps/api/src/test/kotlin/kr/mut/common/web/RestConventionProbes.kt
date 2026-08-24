@@ -106,8 +106,10 @@ class PublicProbe {
 @RestController
 @RequestMapping(ApiPaths.ADMIN)
 class AdminProbe {
-    /** RED 25 — 어드민에는 캐시 헤더가 붙지 않는다. */
-    @GetMapping("/cocktails")
+    /** RED 25 — 어드민에는 캐시 헤더가 붙지 않는다.
+     * 경로가 `/cocktails` 였다가 실제 목록 경로(#152)가 생기며 `Ambiguous mapping` 으로
+     * 컨텍스트가 죽었다 — 아래 EventProbe 주석의 규칙 그대로, 하위 경로로 비켜선다. */
+    @GetMapping("/cache-probe")
     fun list(): Map<String, Any> = mapOf("items" to emptyList<Any>())
 }
 
