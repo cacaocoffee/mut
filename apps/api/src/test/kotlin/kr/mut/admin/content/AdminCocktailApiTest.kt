@@ -51,6 +51,37 @@ class AdminCocktailApiTest {
         jdbc.execute("""TRUNCATE user_role, "user" CASCADE""")
     }
 
+    // ── 목록 (FR-ADMIN-002) ───────────────────────────────────────────────
+
+    /**
+     * 웹 어드민 목록 화면(ISSUE-047)이 이 경로를 읽는다. 화면이 먼저 만들어지고 경로가
+     * 없어서 실배포(2026-08-24)에서 목록이 통째로 비었다 — 이 테스트가 그 공백을 지킨다.
+     */
+    @Test
+    fun `목록은 draft 를 포함하고 상태로 걸러진다`() {
+        val editor = session("editor")
+        val draftId = idOf(create(editor))
+        val publishedId = publishable(editor)
+        publish(publishedId, editor)
+
+        val allBody: JsonNode = json.readTree(
+            mvc.get(ADMIN) { session = editor!! }.andReturn().response.getContentAsString(Charsets.UTF_8),
+        )
+        val draftBody: JsonNode = json.readTree(
+            mvc.get("$ADMIN?status=draft") { session = editor!! }
+                .andReturn().response.getContentAsString(Charsets.UTF_8),
+        )
+        val allIds = idsOf(allBody)
+        val draftIds = idsOf(draftBody)
+
+        assertAll(
+            { assertThat(allIds).contains(draftId, publishedId) },
+            { assertThat(draftIds).`as`("발행분은 draft 필터에 없다").doesNotContain(publishedId) },
+            { assertThat(mvc.get(ADMIN) { session = session("member")!! }.andReturn().response.status).isEqualTo(403) },
+            { assertThat(mvc.get(ADMIN).andReturn().response.status).isEqualTo(401) },
+        )
+    }
+
     // ── RED 1~6 : 권한 (SPEC-08 §2) ───────────────────────────────────────
 
     @ParameterizedTest
@@ -400,6 +431,13 @@ class AdminCocktailApiTest {
             setAttribute(SessionPolicy.ISSUED_AT, Instant.now())
             setAttribute(SessionPolicy.ISSUED_ROLES, setOf(role))
         }
+    }
+
+    /** 목록 봉투의 `items` 에서 id 만 뽑는다. */
+    private fun idsOf(body: JsonNode): List<Long> {
+        val out = mutableListOf<Long>()
+        for (node in body.path("items")) out.add(node.path("id").asLong())
+        return out
     }
 
     private fun idOf(result: org.springframework.test.web.servlet.MvcResult): Long {

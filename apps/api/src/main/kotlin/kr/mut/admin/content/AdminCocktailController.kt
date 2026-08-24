@@ -1,11 +1,13 @@
 package kr.mut.admin.content
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
+import kr.mut.cocktail.api.AdminCocktailListResponse
 import kr.mut.cocktail.api.AdminCocktailResponse
 import kr.mut.cocktail.api.CocktailAdminFacade
 import kr.mut.cocktail.api.CreateCocktailRequest
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
@@ -91,6 +94,24 @@ class AdminCocktailController(
     fun find(@PathVariable id: Long, http: HttpServletRequest): AdminCocktailResponse {
         actor.require(http, Action.VIEW_DRAFT)
         return cocktails.find(id)
+    }
+
+    /**
+     * 목록 (`FR-ADMIN-002`). 웹 어드민 목록 화면(ISSUE-047)이 이 경로를 읽는데,
+     * 화면이 먼저 만들어지고 경로가 없었다 — 실배포에서야 드러난 공백이다 (2026-08-24).
+     */
+    @GetMapping
+    @Operation(
+        summary = "칵테일 목록 (draft 포함)",
+        description = "editor 이상. 최근에 손댄 것부터. status 로 거른다 (draft·published·archived).",
+    )
+    fun list(
+        @Parameter(description = "상태 슬러그. 없으면 전부") @RequestParam(required = false) status: String?,
+        @RequestParam(defaultValue = "100") size: Int,
+        http: HttpServletRequest,
+    ): AdminCocktailListResponse {
+        actor.require(http, Action.VIEW_DRAFT)
+        return cocktails.list(status, size)
     }
 
     @PostMapping("/{id}/publish")

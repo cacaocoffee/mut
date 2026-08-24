@@ -21,6 +21,13 @@ interface CocktailAdminFacade {
     /** `draft` 포함. 어드민만 쓴다 — 공개 조회는 여전히 발행분만 본다 (SPEC-07 §5). */
     fun find(id: Long): AdminCocktailResponse
 
+    /**
+     * 목록 (`FR-ADMIN-002`). `draft` 포함이 이 경로의 존재 이유다 — 초안이 몇 건
+     * 밀려 있는지가 에디터의 오늘 할 일이다. 웹 어드민 목록(ISSUE-047)이 읽는다.
+     * 공개 목록(발행분만)과 헷갈리지 않게 상태 필터는 슬러그 그대로 받는다.
+     */
+    fun list(status: String?, limit: Int): AdminCocktailListResponse
+
     /** 게이트 6종을 전부 검사한다. 실패는 `violations` 를 전부 담아 던진다. */
     fun publish(id: Long): AdminCocktailResponse
 
@@ -136,6 +143,11 @@ data class AdminCocktailResponse(
     val story: String?,
     val isClassic: Boolean,
     val prepTimeMin: Short?,
+)
+
+/** 목록 봉투. 공개 목록과 같은 모양(`items`)이라 화면 코드가 같은 방식으로 읽는다. */
+data class AdminCocktailListResponse(
+    val items: List<AdminCocktailResponse>,
 )
 
 /** 발행 성공 응답 (SPEC-07 §3.4). */
