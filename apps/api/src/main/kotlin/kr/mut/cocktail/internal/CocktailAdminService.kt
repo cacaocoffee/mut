@@ -1,10 +1,12 @@
 package kr.mut.cocktail.internal
 
+import kr.mut.cocktail.api.AdminCocktailListResponse
 import kr.mut.cocktail.api.AdminCocktailResponse
 import kr.mut.cocktail.api.CocktailAdminFacade
 import kr.mut.cocktail.api.CreateCocktailRequest
 import kr.mut.cocktail.api.UpdateCocktailRequest
 import kr.mut.cocktail.domain.Cocktail
+import org.springframework.data.domain.Sort
 import kr.mut.cocktail.publish.PublishService
 import kr.mut.cocktail.repository.CocktailRepository
 import kr.mut.common.taxonomy.BaseSpirit
@@ -116,6 +118,23 @@ class CocktailAdminService(
      */
     @Transactional(readOnly = true)
     override fun find(id: Long): AdminCocktailResponse = load(id).toResponse()
+
+    /**
+     * 목록 (`FR-ADMIN-002`). 최근에 손댄 것부터 — 에디터가 찾는 것은 대개 방금 만지던 초안이다.
+     *
+     * 메모리에서 거르고 자르는 이유: 코퍼스가 수십 건 규모라(SPEC-02 §3 이 재료조차 300으로
+     * 묶는다) 페이징 쿼리를 늘리는 것보다 전부 읽는 쪽이 단순하다. 커지면 그때 쿼리로 옮긴다.
+     */
+    @Transactional(readOnly = true)
+    override fun list(status: String?, limit: Int): AdminCocktailListResponse {
+        val items = cocktails.findAll(Sort.by(Sort.Direction.DESC, "updatedAt"))
+            .asSequence()
+            .filter { status == null || it.status.slug == status }
+            .take(limit.coerceIn(1, 500))
+            .map { it.toResponse() }
+            .toList()
+        return AdminCocktailListResponse(items)
+    }
 
     /**
      * 상태 전이는 **전부 `PublishService` 에 넘긴다** (이슈 013·014).

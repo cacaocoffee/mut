@@ -26,7 +26,7 @@ export interface paths {
          * 감사 로그 조회
          * @description admin 만 가능하다 (SPEC-08 §2.2 — 감시받는 사람이 감시 기록을 보면 안 된다). 필터는 AND 로 묶이고 정렬은 최신순 고정이다.
          */
-        get: operations["list_4"];
+        get: operations["list_5"];
         put?: never;
         post?: never;
         delete?: never;
@@ -42,7 +42,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * 칵테일 목록 (draft 포함)
+         * @description editor 이상. 최근에 손댄 것부터. status 로 거른다 (draft·published·archived).
+         */
+        get: operations["list_4"];
         put?: never;
         /**
          * 칵테일 생성
@@ -729,6 +733,9 @@ export interface components {
             /** @description cocktail · bar · article. Phase 1a 에 실재하는 것은 cocktail 뿐이다 */
             targetType: string;
         };
+        AdminCocktailListResponse: {
+            items: components["schemas"]["AdminCocktailResponse"][];
+        };
         AdminCocktailResponse: {
             abvCalculated?: number;
             abvOverride?: number;
@@ -1312,7 +1319,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    list_4: {
+    list_5: {
         parameters: {
             query: {
                 /** @description cocktail · ingredient 같은 테이블 이름 */
@@ -1341,6 +1348,30 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PageResponseAuditLogItem"];
+                };
+            };
+        };
+    };
+    list_4: {
+        parameters: {
+            query?: {
+                /** @description 상태 슬러그. 없으면 전부 */
+                status?: string;
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdminCocktailListResponse"];
                 };
             };
         };
