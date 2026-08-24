@@ -36,7 +36,11 @@ export async function middleware(request: NextRequest) {
 
   try {
     // 가장 가벼운 어드민 조회로 두드린다. 목록을 쓰는 것이 아니라 **답만** 본다.
-    const res = await fetch(`${BASE}/api/v1/admin/cocktails?size=1`, {
+    //
+    // 재료 목록인 이유 — **계약에 있는 GET 중 editor·admin 이 다 읽는 것**이라서다.
+    // 처음엔 /admin/cocktails 를 두드렸는데 그 경로는 계약에 POST 뿐이라
+    // (openapi.json), 실서버가 405 를 냈고 어드민 전체가 404 로 위장됐다.
+    const res = await fetch(`${BASE}/api/v1/admin/ingredients?size=1`, {
       headers: { cookie },
       cache: "no-store",
     });
