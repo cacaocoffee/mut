@@ -1,5 +1,6 @@
 "use client";
 
+import { adminWrite } from "@/lib/admin-csrf";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { AdminRecipe, AdminIngredient } from "@/lib/admin-api";
@@ -101,7 +102,7 @@ export function RecipeEditor({ cocktailId, recipe }: { cocktailId: number; recip
     setBusy(true);
     setMessage(null);
     try {
-      const res = await fetch(`/api/admin/cocktails/${cocktailId}/recipe`, {
+      const res = await adminWrite(`/api/admin/cocktails/${cocktailId}/recipe`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

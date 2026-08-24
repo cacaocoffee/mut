@@ -1,5 +1,6 @@
 "use client";
 
+import { adminWrite } from "@/lib/admin-csrf";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -51,7 +52,7 @@ export function IngredientForm() {
     setBusy(true);
     setMessage(null);
     try {
-      const res = await fetch("/api/admin/ingredients", {
+      const res = await adminWrite("/api/admin/ingredients", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

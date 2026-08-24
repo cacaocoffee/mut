@@ -1,5 +1,6 @@
 "use client";
 
+import { adminWrite } from "@/lib/admin-csrf";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -22,7 +23,7 @@ export function IngredientApprove({ id, name }: { id: number; name: string }) {
     setBusy(true);
     setMessage(null);
     try {
-      const res = await fetch(`/api/admin/ingredients/${id}/approve`, { method: "POST" });
+      const res = await adminWrite(`/api/admin/ingredients/${id}/approve`, { method: "POST" });
 
       if (res.ok) {
         // 승인하면 대기 큐에서 빠진다 (RED 4). 목록을 손으로 지우지 않고 다시 받는다 —
