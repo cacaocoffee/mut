@@ -3,8 +3,9 @@
 # 리전이 sin(싱가포르)인 이유 — DB(Neon)가 ap-southeast-1 이다. 요청 하나가
 # 쿼리를 여러 번 치므로 API 는 사용자보다 DB 옆에 두는 쪽이 전체 지연이 짧다.
 #
-# min_machines_running = 0 — 요청이 없으면 기계를 멈춘다. 값이 $0 에 수렴하는 대신
-# 잠든 뒤 첫 요청이 JVM 기동(~20초)을 기다린다. 트래픽이 생기면 1 로 올린다.
+# min_machines_running = 1 — 상시 1대 (월 ~$3.19, ADR-0007 이 예산에 넣어 둔 값).
+# 0으로 두었더니 어드민 첫 클릭이 JVM 기동 20~40초를 기다렸다 (2026-08-24).
+# 어드민 사용이 시작되면서 트래픽이 생겨 1 로 바꿨다.
 
 app = "mut-api"
 primary_region = "sin"
@@ -20,7 +21,7 @@ primary_region = "sin"
   force_https = true
   auto_stop_machines = "stop"
   auto_start_machines = true
-  min_machines_running = 0
+  min_machines_running = 1
 
   [[http_service.checks]]
     path = "/actuator/health"
