@@ -37,10 +37,11 @@ test("G-35 - 계량 단위 5종이 다 있다", () => {
   expect(editor, "top_up 에 수량을 딸려 보낸다").toMatch(/NO_AMOUNT\.has\(r\.unit\)/);
 });
 
-/** 통째로 덮는다. 줄 단위 저장이면 순서를 다시 매기는 규칙이 화면과 서버 두 벌이 된다. */
+/** 통째로 덮는다. 줄 단위 저장이면 순서를 다시 매기는 규칙이 화면과 서버 두 벌이 된다.
+ * `adminWrite` 는 CSRF 토큰을 실어 주는 감싸개일 뿐(#158), 저장 자체는 여전히 PUT 한 번이다. */
 test("저장은 PUT 한 번이다", () => {
   expect(editor, "레시피를 PUT 으로 저장하지 않는다").toMatch(
-    /fetch\(`\/api\/admin\/cocktails\/\$\{cocktailId\}\/recipe`, \{\s*method: "PUT"/,
+    /adminWrite\(`\/api\/admin\/cocktails\/\$\{cocktailId\}\/recipe`, \{\s*method: "PUT"/,
   );
 });
 
