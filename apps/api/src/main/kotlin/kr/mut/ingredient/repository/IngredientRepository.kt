@@ -83,12 +83,14 @@ interface IngredientRepository : JpaRepository<Ingredient, Long> {
         """
         SELECT i FROM Ingredient i
          WHERE :q IS NULL
-            OR lower(i.nameKo) LIKE lower(concat('%', :q, '%'))
-            OR lower(i.nameEn) LIKE lower(concat('%', :q, '%'))
-            OR lower(i.slug)   LIKE lower(concat('%', :q, '%'))
+            OR lower(i.nameKo) LIKE lower(concat('%', cast(:q as string), '%'))
+            OR lower(i.nameEn) LIKE lower(concat('%', cast(:q as string), '%'))
+            OR lower(i.slug)   LIKE lower(concat('%', cast(:q as string), '%'))
          ORDER BY i.nameKo
         """,
     )
+    // cast 가 없으면 :q 가 null 일 때 Postgres 가 파라미터 타입을 bytea 로 추론해서
+    // "function lower(bytea) does not exist" 로 실서버가 500 을 냈다 (2026-08-24).
     fun searchForAdmin(@Param("q") q: String?, pageable: Pageable): List<Ingredient>
 }
 

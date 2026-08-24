@@ -231,6 +231,25 @@ class AdminIngredientApiTest {
         )
     }
 
+    /**
+     * 검색어 없이 전체 목록을 본다 — 어드민 진입 판정(웹 미들웨어)이 이 모양으로 두드린다.
+     *
+     * 회귀 고정: `:q` 가 null 이면 Postgres 가 파라미터 타입을 bytea 로 추론해서
+     * `lower(bytea)` 오류로 500 이 났다. 기존 테스트가 전부 검색어를 넣고 불러서
+     * 실서버(2026-08-24)에서야 드러났다 — cast 로 고쳤고 이 테스트가 지킨다.
+     */
+    @Test
+    fun `검색어 없이도 목록이 나온다`() {
+        val editor = session("editor")
+        create(editor)
+
+        val res = mvc.get(ADMIN) { session = editor!! }.andReturn().response
+        assertAll(
+            { assertThat(res.status).isEqualTo(200) },
+            { assertThat(json.readTree(res.getContentAsString(Charsets.UTF_8)).size()).isGreaterThan(0) },
+        )
+    }
+
     // ── RED 12~13 : 공개 노출 (이슈 008 RED 16 · 023 RED 2·17) ────────────
 
     /**
