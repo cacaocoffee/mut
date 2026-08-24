@@ -1,5 +1,6 @@
 "use client";
 
+import { adminWrite } from "@/lib/admin-csrf";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -24,7 +25,7 @@ export function TaskResolve({ id }: { id: number }) {
     setBusy(true);
     setMessage(null);
     try {
-      const res = await fetch(`/api/admin/tasks/${id}/resolve`, {
+      const res = await adminWrite(`/api/admin/tasks/${id}/resolve`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ dismiss, reason: reason.trim() || undefined }),

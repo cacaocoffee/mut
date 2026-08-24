@@ -1,5 +1,6 @@
 "use client";
 
+import { adminWrite } from "@/lib/admin-csrf";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -58,7 +59,7 @@ export function CocktailForm({ cocktail }: { cocktail: AdminCocktail | null }) {
     setBusy(true);
     setMessage(null);
     try {
-      return await fetch(`/api/admin/${path}`, {
+      return await adminWrite(`/api/admin/${path}`, {
         headers: { "Content-Type": "application/json" },
         ...init,
       });
