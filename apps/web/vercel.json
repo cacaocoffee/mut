@@ -1,0 +1,5 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "_comment": "함수 리전을 API·DB(싱가포르) 옆에 둔다. 기본값 iad1(미국 동부)이면 어드민 클릭 하나가 미국↔싱가포르를 서너 번 왕복해 1~2초씩 걸렸다 (2026-08-24). 정적 페이지는 CDN 이 그대로 전 세계에 낸다.",
+  "regions": ["sin1"]
+}
