@@ -65,7 +65,8 @@ export const adminAccess = cache(async (): Promise<AdminAccess> => {
   if (audit !== 403 && audit !== 404) return { kind: "unavailable", reason: `HTTP ${audit}` };
 
   // 감사가 막혔다고 `editor` 인 것은 아니다 — `member` 도 여기로 온다. 한 번 더 두드린다.
-  const admin = await probe("/cocktails?size=1", cookie);
+  // 재료 목록인 이유는 middleware.ts 와 같다 — 계약에 있는 GET 중 editor 도 읽는 것.
+  const admin = await probe("/ingredients?size=1", cookie);
   if (typeof admin === "string") return { kind: "unavailable", reason: admin };
   if (admin === 200) return { kind: "allowed", role: "editor" };
   if (admin === 401) return { kind: "unauthenticated" };

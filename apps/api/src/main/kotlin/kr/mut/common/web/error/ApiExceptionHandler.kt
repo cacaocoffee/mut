@@ -10,6 +10,7 @@ import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.security.access.AccessDeniedException
+import org.springframework.web.HttpRequestMethodNotSupportedException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.MissingServletRequestParameterException
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -144,6 +145,22 @@ class ApiExceptionHandler(
         typeSlug = "conflict",
         title = "현재 상태에서는 처리할 수 없습니다",
         detail = e.message,
+        req = req,
+    )
+
+    // ── 405 ────────────────────────────────────────────────────────────────
+
+    /**
+     * 경로는 있는데 메서드가 없다. 매핑이 없으면 500 이 나가서, 클라이언트가
+     * 계약에 없는 메서드를 부른 것(호출자 잘못)이 서버 장애처럼 보였다 —
+     * 어드민 판정이 `GET /admin/cocktails` 를 두드리다 실제로 겪은 일이다.
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException::class)
+    fun onMethodNotSupported(e: HttpRequestMethodNotSupportedException, req: HttpServletRequest) = problem(
+        status = HttpStatus.METHOD_NOT_ALLOWED,
+        typeSlug = "method-not-allowed",
+        title = "지원하지 않는 메서드입니다",
+        detail = "이 경로는 ${e.supportedHttpMethods?.joinToString(" · ") ?: "다른"} 메서드만 받습니다",
         req = req,
     )
 
