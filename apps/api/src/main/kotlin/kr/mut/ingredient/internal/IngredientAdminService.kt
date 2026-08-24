@@ -75,7 +75,7 @@ class IngredientAdminService(
 
     @Transactional(readOnly = true)
     override fun pending(): List<AdminIngredientResponse> =
-        ingredients.findByIsApprovedFalseOrderByNameKo().map { it.toAdminResponse() }
+        ingredients.findByIsApprovedFalseOrderByNameKoAscSlugAsc().map { it.toAdminResponse() }
 
     /** 이름·영문명·슬러그를 한 번에 본다. **미승인도 준다** — 레시피 편집이 쓴다 (이슈 051). */
     @Transactional(readOnly = true)

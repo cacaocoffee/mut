@@ -36,9 +36,10 @@ interface IngredientRepository : JpaRepository<Ingredient, Long> {
          WHERE i.isApproved = true
            AND (:category IS NULL OR i.categorySlug = :category)
            AND (:availability IS NULL OR i.availabilitySlug = :availability)
-         ORDER BY i.nameKo
+         ORDER BY i.nameKo, i.slug
         """,
     )
+    // slug 보조 정렬 — 이름이 같으면 순서가 실행마다 달라져 페이지가 겹치거나 빠졌다 (#146)
     fun findDictionary(
         @Param("category") category: String?,
         @Param("availability") availability: String?,
@@ -68,7 +69,7 @@ interface IngredientRepository : JpaRepository<Ingredient, Long> {
      * 새로고침마다 순서가 달라지면 어디까지 봤는지 잃는다. `created_at` 이 아닌 이유는
      * 오래된 것부터 처리해야 할 이유가 없어서다. 승인은 선착순이 아니라 판단이다.
      */
-    fun findByIsApprovedFalseOrderByNameKo(): List<Ingredient>
+    fun findByIsApprovedFalseOrderByNameKoAscSlugAsc(): List<Ingredient>
 
     /**
      * 어드민 재료 고르기 (이슈 051).
@@ -86,7 +87,7 @@ interface IngredientRepository : JpaRepository<Ingredient, Long> {
             OR lower(i.nameKo) LIKE lower(concat('%', cast(:q as string), '%'))
             OR lower(i.nameEn) LIKE lower(concat('%', cast(:q as string), '%'))
             OR lower(i.slug)   LIKE lower(concat('%', cast(:q as string), '%'))
-         ORDER BY i.nameKo
+         ORDER BY i.nameKo, i.slug
         """,
     )
     // cast 가 없으면 :q 가 null 일 때 Postgres 가 파라미터 타입을 bytea 로 추론해서
