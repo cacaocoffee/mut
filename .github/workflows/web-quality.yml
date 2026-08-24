@@ -80,29 +80,15 @@ jobs:
           PW_SKIP_BUILD: "1"
         run: npm run e2e
 
-      # 상세·카테고리는 2.0s, 나머지는 2.5s (SPEC-04 §1.1) — 기준은 lighthouserc.js 에 있다.
-      #
-      # **경고다.** 원래 차단이었는데 내렸다 (G-48). 두 가지 이유다.
-      #
-      # 하나 — 값이 기계 사정에 크게 흔들린다. 같은 빌드가 놀고 있는 기계에서는 1.4초,
-      # e2e 를 함께 돌리는 중에는 3.9초로 나왔다. 그 폭이면 통과 여부가 코드가 아니라
-      # 그날 러너 사정으로 갈린다.
-      #
-      # 둘 — SPEC-04 §9 자신이 "전부를 차단으로 만들면 아무것도 못 나간다" 고 적었다.
-      # 위의 번들 예산이 같은 이유로 이미 경고다.
-      #
-      # **숫자는 계속 찍힌다.** 나빠지는 것을 안 보겠다는 뜻이 아니라, 머지를 막는 자리에서
-      # 빼겠다는 뜻이다. 실사용자 기준 측정은 배포 뒤에 따로 붙인다 (G-48).
-      - name: Lighthouse (경고)
-        continue-on-error: true
-        run: npm run lhci
+      # Lighthouse 는 CI 에서 뺐다 (2026-08-24). G-48 로 이미 경고로 내렸는데,
+      # 경고인 채로도 PR 마다 6분을 차지했다 — 막지도 못하면서 가장 느린 단계였다.
+      # 기준과 설정은 lighthouserc.js 에 그대로 있다: 성능이 궁금할 때
+      # `npm run lhci` 로 손으로 잰다. 실사용자 기준 측정(RUM)은 배포 뒤에 붙인다 (G-48).
 
       - name: 실패 리포트 보존
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: web-quality-reports
-          path: |
-            apps/web/playwright-report/
-            apps/web/.lighthouseci/
+          path: apps/web/playwright-report/
           retention-days: 7
