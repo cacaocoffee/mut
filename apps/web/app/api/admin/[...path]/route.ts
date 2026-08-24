@@ -57,3 +57,8 @@ export async function POST(request: Request, ctx: Ctx) {
 export async function PATCH(request: Request, ctx: Ctx) {
   return proxy(request, (await ctx.params).path);
 }
+// 레시피 저장이 PUT 이다 (계약 `PUT /admin/cocktails/{id}/recipe`). 이 내보내기가 없으면
+// 상류까지 가지도 못하고 Next 가 405 를 낸다 — 실서버에서 저장이 막혔던 원인 (2026-08-24).
+export async function PUT(request: Request, ctx: Ctx) {
+  return proxy(request, (await ctx.params).path);
+}
