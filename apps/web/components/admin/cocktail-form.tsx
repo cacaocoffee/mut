@@ -96,11 +96,26 @@ export function CocktailForm({ cocktail }: { cocktail: AdminCocktail | null }) {
 
     if (res.ok) {
       setViolations([]);
+      // 삭제(=보관)는 목록에서 사라지므로 이 편집 화면에 남을 이유가 없다 — 목록으로 보낸다.
+      if (action === "archive") {
+        router.push("/admin/cocktails");
+        return;
+      }
       setMessage(action === "publish" ? "발행했습니다" : "상태를 바꿨습니다");
       router.refresh();
       return;
     }
     await showFailure(res);
+  }
+
+  /** 발행은 손님에게 공개하는 되돌리기 어려운 행동이라 한 번 묻는다. */
+  function publishWithConfirm() {
+    if (window.confirm("이 칵테일을 공개합니다. 발행할까요?")) transition("publish");
+  }
+
+  /** 삭제는 목록에서 치운다. 발행된 적 없는 초안이라 링크가 깨질 것이 없다. */
+  function deleteWithConfirm() {
+    if (window.confirm("이 칵테일을 삭제합니다. 목록에서 사라집니다. 삭제할까요?")) transition("archive");
   }
 
   /** 게이트 실패(422)는 `violations` 를 전부 받아 그린다. 나머지는 한 줄로 알린다. */
@@ -294,39 +309,51 @@ export function CocktailForm({ cocktail }: { cocktail: AdminCocktail | null }) {
         />
       </Field>
 
+      {/* 저장은 기본 정보만 담는다. 발행·삭제는 아래 별도 구역이다 — 저장과 한 줄에 두면
+          "저장하면 공개되나?" 를 헷갈린다. */}
       <div className="admin-form__actions">
         <button type="button" className="btn btn-primary" disabled={!canSave || busy} onClick={save}>
-          저장 SAVE
+          기본 정보 저장
         </button>
-
-        {/* `FR-ADMIN-002` · DECISIONS §1.4 — 현재 상태에서 갈 수 있는 곳만 보인다.
-            draft 에서 archived 로 바로 가는 버튼은 없다. */}
-        {!isNew && status === "draft" && (
-          <button type="button" className="btn" disabled={busy} onClick={() => transition("publish")}>
-            발행 PUBLISH
-          </button>
-        )}
-        {!isNew && status === "published" && (
-          <>
-            <button
-              type="button"
-              className="btn"
-              disabled={busy}
-              onClick={() => transition("unpublish")}
-            >
-              발행 취소
-            </button>
-            <button
-              type="button"
-              className="btn"
-              disabled={busy}
-              onClick={() => transition("archive")}
-            >
-              보관 ARCHIVE
-            </button>
-          </>
-        )}
+        {!isNew && <span className="admin-form__hint">레시피는 아래에서 따로 저장합니다.</span>}
       </div>
+
+      {/* 발행·삭제 구역. 되돌리기 어려운 행동이라 저장과 떼어 놓고 확인을 받는다.
+          현재 상태에서 갈 수 있는 곳만 보인다 (`FR-ADMIN-002` · DECISIONS §1.4). */}
+      {!isNew && (
+        <div className="admin-publish">
+          <div className="admin-publish__state">
+            상태 · {status === "draft" ? "초안" : status === "published" ? "발행됨" : "보관됨"}
+          </div>
+          <div className="admin-publish__actions">
+            {status === "draft" && (
+              <>
+                <button type="button" className="btn btn-primary" disabled={busy} onClick={publishWithConfirm}>
+                  발행하기
+                </button>
+                <button type="button" className="btn btn-danger" disabled={busy} onClick={deleteWithConfirm}>
+                  삭제
+                </button>
+              </>
+            )}
+            {status === "published" && (
+              <>
+                <button type="button" className="btn" disabled={busy} onClick={() => transition("unpublish")}>
+                  발행 취소
+                </button>
+                <button type="button" className="btn btn-danger" disabled={busy} onClick={deleteWithConfirm}>
+                  삭제
+                </button>
+              </>
+            )}
+            {status === "archived" && (
+              <button type="button" className="btn" disabled={busy} onClick={() => transition("unpublish")}>
+                초안으로 되돌리기
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 

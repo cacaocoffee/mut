@@ -59,8 +59,8 @@ class AuditLogTest {
                 Triple(CocktailStatus.PUBLISHED, CocktailStatus.DRAFT, true),
                 Triple(CocktailStatus.PUBLISHED, CocktailStatus.ARCHIVED, true),
                 Triple(CocktailStatus.ARCHIVED, CocktailStatus.DRAFT, true),
-                // RED 9 — 도식에 없다. 보수적으로 거부한다.
-                Triple(CocktailStatus.DRAFT, CocktailStatus.ARCHIVED, false),
+                // 초안 버리기 (2026-08-25) — 발행된 적 없어 URL·색인이 안 걸려 있다.
+                Triple(CocktailStatus.DRAFT, CocktailStatus.ARCHIVED, true),
                 Triple(CocktailStatus.ARCHIVED, CocktailStatus.PUBLISHED, false),
                 Triple(CocktailStatus.DRAFT, CocktailStatus.DRAFT, false),
             ).map<Triple<CocktailStatus, CocktailStatus, Boolean>, () -> Unit> { (from, to, ok) ->
@@ -73,15 +73,14 @@ class AuditLogTest {
         )
     }
 
-    /** RED 9 — `draft → archived` 직행은 서비스에서도 막힌다. 표만 맞고 경로가 열려 있으면 소용없다. */
+    /** 초안 버리기 — draft 를 archive 하면 목록·공개에서 사라진다 (2026-08-25). */
     @Test
-    fun `RED9 - draft 에서 archived 로 직행할 수 없다`() {
+    fun `초안을 버리면 archived 가 된다`() {
         val id = fixture.cocktail()
 
-        assertThatThrownBy { publish.archive(id) }
-            .hasMessageContaining("허용되지 않는 상태 전이")
+        publish.archive(id)
 
-        assertThat(status(id)).isEqualTo("draft")
+        assertThat(status(id)).isEqualTo("archived")
     }
 
     // ── RED 10~14 : 전이가 전부 감사에 남는다 ──────────────────────────────
