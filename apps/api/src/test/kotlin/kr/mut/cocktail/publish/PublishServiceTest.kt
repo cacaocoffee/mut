@@ -128,7 +128,8 @@ class PublishServiceTest {
                 Triple(CocktailStatus.PUBLISHED, CocktailStatus.DRAFT, true),
                 Triple(CocktailStatus.PUBLISHED, CocktailStatus.ARCHIVED, true),
                 Triple(CocktailStatus.ARCHIVED, CocktailStatus.DRAFT, true),
-                Triple(CocktailStatus.DRAFT, CocktailStatus.ARCHIVED, false),
+                // 초안 버리기 (2026-08-25) — 발행된 적 없어 URL·색인이 안 걸려 있다.
+                Triple(CocktailStatus.DRAFT, CocktailStatus.ARCHIVED, true),
                 Triple(CocktailStatus.ARCHIVED, CocktailStatus.PUBLISHED, false),
             ).map<Triple<CocktailStatus, CocktailStatus, Boolean>, () -> Unit> { (from, to, allowed) ->
                 {

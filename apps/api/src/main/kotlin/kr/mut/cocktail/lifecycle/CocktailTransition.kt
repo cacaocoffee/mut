@@ -11,8 +11,9 @@ import kr.mut.cocktail.domain.CocktailStatus.PUBLISHED
  *
  * ```
  *    draft ──발행 게이트 통과──▶ published ──▶ archived
- *      ▲                            │            │
- *      └────────────────────────────┴────────────┘
+ *      │  ▲                         │            │
+ *      │  └─────────────────────────┴────────────┘
+ *      └──── 초안 버리기 ────────────────────────▶ (archived)
  * ```
  *
  * | 전이 | 허용 | 왜 |
@@ -21,7 +22,7 @@ import kr.mut.cocktail.domain.CocktailStatus.PUBLISHED
  * | `published → draft` | ✅ | 되돌리기 (SPEC-02 §8.1) |
  * | `published → archived` | ✅ | 내리기 |
  * | `archived → draft` | ✅ | 다시 손보기 |
- * | `draft → archived` | ❌ | 도식에 없다 |
+ * | `draft → archived` | ✅ | **초안 버리기** (2026-08-25). 발행된 적 없어 URL·색인이 안 걸려 있다 — 물리 삭제(`PRIN-D05` 로 금지)를 대신하는 "치우기"다 |
  * | **`archived → published`** | ❌ | `archived → draft → published` 만 |
  *
  * 마지막이 보수적인 선택이다 — 내렸던 것을 바로 올리면 **왜 내렸는지 다시 보지 않는다.**
@@ -35,7 +36,7 @@ import kr.mut.cocktail.domain.CocktailStatus.PUBLISHED
 object CocktailTransition {
 
     private val ALLOWED: Map<CocktailStatus, Set<CocktailStatus>> = mapOf(
-        DRAFT to setOf(PUBLISHED),
+        DRAFT to setOf(PUBLISHED, ARCHIVED),
         PUBLISHED to setOf(DRAFT, ARCHIVED),
         ARCHIVED to setOf(DRAFT),
     )
@@ -59,6 +60,7 @@ object CocktailTransition {
     fun auditAction(from: CocktailStatus, to: CocktailStatus): AuditAction =
         when (from to to) {
             DRAFT to PUBLISHED -> AuditAction.PUBLISH
+            DRAFT to ARCHIVED -> AuditAction.ARCHIVE
             PUBLISHED to DRAFT -> AuditAction.UNPUBLISH
             PUBLISHED to ARCHIVED -> AuditAction.ARCHIVE
             ARCHIVED to DRAFT -> AuditAction.RESTORE
