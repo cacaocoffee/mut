@@ -1872,6 +1872,69 @@ figcaption {
   color: var(--color-bg);
 }
 
+/* ┌─ 아티클 블록 편집기 (ADR-0011) ─────────────────────────────────────────┐
+   문단·소제목·인용·사진을 줄 단위로. 각 줄은 종류 라벨 + 위/아래/삭제 + 입력칸. */
+.block-editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.block-editor__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.block-editor__row {
+  border: 1px solid var(--color-divider);
+  padding: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.block-editor__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.block-editor__kind {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--color-neutral-700);
+}
+.block-editor__moves {
+  display: flex;
+  gap: var(--space-1);
+}
+.block-editor__text {
+  width: 100%;
+  resize: vertical;
+}
+.block-editor__figure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.block-editor__empty {
+  font-size: 13px;
+  color: var(--color-neutral-700);
+}
+.block-editor__add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  border-top: 1px solid var(--color-divider);
+  padding-top: var(--space-3);
+}
+.admin-field--wide {
+  grid-column: 1 / -1;
+}
+.admin-checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 /* ┌─ 토스트 — 행동 결과 알림 (디자인 시스템 컴포넌트) ──────────────────────┐
    화면 오른쪽 아래에 쌓인다. 성공은 브랜드 와인색 표식(매거진 팔레트에 초록이
    없다 — 없는 색을 지어내지 않는다), 오류는 accent-2. 성공은 4초 뒤 스스로,
