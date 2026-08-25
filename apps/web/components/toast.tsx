@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 /**
  * 토스트 알림 (디자인 시스템 컴포넌트).
@@ -46,13 +46,17 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     }
   }, [remove]);
 
-  const api = useRef<ToastApi>({
-    success: (m) => push("success", m),
-    error: (m) => push("error", m),
-  });
+  // useMemo 로 한 번만 만든다. useRef 를 렌더에서 읽으면 React Compiler 가 막는다.
+  const api = useMemo<ToastApi>(
+    () => ({
+      success: (m) => push("success", m),
+      error: (m) => push("error", m),
+    }),
+    [push],
+  );
 
   return (
-    <ToastContext.Provider value={api.current}>
+    <ToastContext.Provider value={api}>
       {children}
       <div className="toast-stack" role="region" aria-live="polite" aria-label="알림">
         {toasts.map((t) => (
