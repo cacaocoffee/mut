@@ -1,37 +1,32 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import {
-  ARTICLES,
-  ARTICLE_CATEGORY_KO,
-  articleBySlug,
-  getCocktail,
-  type ArticleBlock,
-} from "@mut/domain";
+import { ARTICLE_CATEGORY_KO, getCocktail, type ArticleBlock } from "@mut/domain";
+import { getArticle, articleSlugs } from "@/lib/article-api";
 import { ARTICLES_PATH } from "@/lib/routes";
 import { openGraph, SITE_URL } from "@/lib/site";
 import { articleJsonLd } from "@/lib/structured-data";
 import { TrackArticleView } from "@/components/analytics/article-view";
 
 /**
- * 아티클 상세 (`FR-CONTENT-001` 앞당김 · ADR-0010).
+ * 아티클 상세 (ADR-0010 · DB 이관 ADR-0011).
  *
- * 렌더링 규약은 칵테일 상세와 같다 (SPEC-05 §4 · `PRIN-T04`) — SSG 에
- * `dynamicParams = false`. 이유는 그쪽 파일에 적혀 있다: `loading.tsx` 가 셸을
- * 먼저 내보내 200 이 굳으면 없는 슬러그가 soft 404 가 된다.
+ * `dynamicParams = true` — 어드민에서 새 글을 발행하면 다시 빌드하지 않아도 첫 요청에
+ * 그려진다(그다음 캐시). 칵테일 상세와 다른 점이다: 아티클엔 `loading.tsx` 가 없어
+ * soft-404 문제가 없고, 발행분만 API 가 주므로 미발행 slug 는 아래에서 notFound() 로 간다.
  */
 export const revalidate = 3600;
-export const dynamicParams = false;
+export const dynamicParams = true;
 
-export function generateStaticParams() {
-  return ARTICLES.map((a) => ({ slug: a.slug }));
+export async function generateStaticParams() {
+  return (await articleSlugs()).map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
   params,
 }: PageProps<"/articles/[slug]">): Promise<Metadata> {
   const { slug } = await params;
-  const a = articleBySlug(slug);
+  const a = await getArticle(slug);
   if (!a) return {};
 
   return {
@@ -71,7 +66,7 @@ function Block({ b, dropcap }: { b: ArticleBlock; dropcap?: boolean }) {
 
 export default async function ArticleDetailPage({ params }: PageProps<"/articles/[slug]">) {
   const { slug } = await params;
-  const a = articleBySlug(slug);
+  const a = await getArticle(slug);
   if (!a) notFound();
 
   // 첫 블록이 대표 사진과 같은 파일이면 건너뛴다 — 히어로가 이미 그 사진을 그렸다
