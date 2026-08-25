@@ -24,6 +24,7 @@ import type { AdminRole } from "@/lib/admin-session";
 const SECTIONS = [
   { href: "/admin", ko: "대시보드", en: "OVERVIEW", adminOnly: false },
   { href: "/admin/cocktails", ko: "칵테일", en: "COCKTAILS", adminOnly: false },
+  { href: "/admin/articles", ko: "아티클", en: "ARTICLES", adminOnly: false },
   // 목록은 `editor` 도 본다 — 승인 버튼만 `admin` 이다 (SPEC-08 §2).
   { href: "/admin/ingredients", ko: "재료", en: "INGREDIENTS", adminOnly: false },
   { href: "/admin/tasks", ko: "검증 태스크", en: "TASKS", adminOnly: false },

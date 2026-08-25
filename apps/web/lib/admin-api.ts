@@ -9,6 +9,20 @@ import type { components } from "@mut/domain/generated/api";
  */
 export type AdminCocktail = components["schemas"]["AdminCocktailResponse"];
 
+export type AdminArticleSummary = components["schemas"]["ArticleSummary"];
+export type AdminArticleDetail = components["schemas"]["ArticleDetail"];
+
+/** 어드민 아티클 목록 (draft 포함). */
+export async function adminArticles(status?: string): Promise<AdminArticleSummary[]> {
+  const query = status ? `?status=${encodeURIComponent(status)}` : "";
+  return (await get<AdminArticleSummary[]>(`/articles${query}`)) ?? [];
+}
+
+/** 어드민 아티클 상세 (draft 포함). */
+export async function adminArticle(id: string): Promise<AdminArticleDetail | null> {
+  return get<AdminArticleDetail>(`/articles/${encodeURIComponent(id)}`);
+}
+
 /**
  * 발행 게이트 실패 한 건 (SPEC-07 §1.4).
  *
