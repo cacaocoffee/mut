@@ -400,10 +400,11 @@ class EventApiTest {
             },
             {
                 assertThat(EventType.entries.filter { it.isPhase1a }.map { it.code })
-                    .`as`("SPEC-10 §4 의 1a 이벤트 7종")
+                    .`as`("SPEC-10 §4 의 1a 이벤트 + article_view (ADR-0010 으로 앞당김)")
                     .containsExactlyInAnyOrder(
                         "cocktail_view", "filter_apply", "search_miss",
                         "finder_step", "recipe_interact", "bookmark_add", "share_click",
+                        "article_view",
                     )
             },
         )

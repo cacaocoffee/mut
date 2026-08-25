@@ -11,6 +11,7 @@ import {
 import { ARTICLES_PATH } from "@/lib/routes";
 import { openGraph, SITE_URL } from "@/lib/site";
 import { articleJsonLd } from "@/lib/structured-data";
+import { TrackArticleView } from "@/components/analytics/article-view";
 
 /**
  * 아티클 상세 (`FR-CONTENT-001` 앞당김 · ADR-0010).
@@ -88,6 +89,7 @@ export default async function ArticleDetailPage({ params }: PageProps<"/articles
 
   return (
     <main className="shell">
+      <TrackArticleView slug={a.slug} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd(a)) }}

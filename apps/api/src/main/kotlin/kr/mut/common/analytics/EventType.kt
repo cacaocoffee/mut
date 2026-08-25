@@ -48,6 +48,12 @@ enum class EventType(
     /** 상세에서 실제로 뭘 만지나. 아무도 안 쓰는 컨트롤은 화면을 복잡하게만 한다. */
     RECIPE_INTERACT("recipe_interact", Phase.P1A, setOf("cocktailSlug", "action", "detail")),
 
+    /**
+     * 어떤 아티클이 실제로 읽히나 (ADR-0010 으로 CONTENT 를 앞당겼다).
+     * `entryPoint = external` 비율이 콘텐츠·SEO 가설의 성과다 — cocktail_view 와 같은 눈금.
+     */
+    ARTICLE_VIEW("article_view", Phase.P1A, setOf("articleSlug", "entryPoint")),
+
     BOOKMARK_ADD("bookmark_add", Phase.P1A, setOf("targetType", "targetSlug")),
 
     SHARE_CLICK("share_click", Phase.P1A, setOf("targetType", "targetSlug", "channel")),

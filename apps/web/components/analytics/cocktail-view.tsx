@@ -28,7 +28,7 @@ export function TrackCocktailView({ slug }: { slug: string }) {
 }
 
 /** SPEC-10 §4.1 의 다섯 갈래. 서버가 이 다섯 밖의 값을 버린다. */
-function entryPoint(slug: string): "search" | "category" | "related" | "finder" | "external" {
+function entryPoint(slug: string): "search" | "category" | "related" | "finder" | "article" | "external" {
   // 화면 안에서 옮겨 왔으면 그 경로가 답이다. `document.referrer` 는 문서를 처음 열 때
   // 값에서 멈춰 있어, 링크를 눌러 다닌 것을 전부 "밖에서 왔다" 로 만든다 (`navigation.ts`).
   const inDocument = previousPath(`/cocktails/${slug}`);
@@ -48,10 +48,12 @@ function entryPoint(slug: string): "search" | "category" | "related" | "finder" 
   return fromPath(url.pathname);
 }
 
-function fromPath(path: string): "search" | "category" | "related" | "finder" | "external" {
+function fromPath(path: string): "search" | "category" | "related" | "finder" | "article" | "external" {
   if (path === SEARCH_PATH || path === UNIFIED_SEARCH_PATH) return "search";
   if (/^\/cocktails\/(base|style|method)\//.test(path)) return "category";
   if (path === FINDER_PATH) return "finder";
+  // 아티클에서 넘어왔다 — 콘텐츠 → 칵테일 전환이 콘텐츠 가설의 성과다 (GAPS G-50)
+  if (path.startsWith("/articles/")) return "article";
   // 다른 상세에서 왔다면 배리에이션 목록을 타고 온 것이다
   if (path.startsWith("/cocktails/")) return "related";
 
