@@ -364,10 +364,15 @@ CONSTRAINT ck_menu_source CHECK (
 
 ### 3.6 CONTENT
 
-#### `article`
+#### `article` (2026-08-25 개정 · ADR-0011 · V028 로 실재)
 
-`slug`, `type`(CHECK `interview`·`guide`·`trend`·`photo_essay`), `title`, `body`,
-`cover_media_id`, **`is_sponsored`**, `sponsor_bar_id`, `status`, `published_at`.
+`slug`, `category`(CHECK `cocktail`·`bar`·`spirits`), `title`, `dek`, `hero`,
+`source_url`, **`is_sponsored`**, `body`(JSONB 블록), `status`, `published_at`.
+
+원래 이 표는 `type`(interview·guide…)·`cover_media_id`·`sponsor_bar_id` 를 적었으나,
+ADR-0010 으로 먼저 운영에 들어간 구조를 정본으로 삼아 바꿨다 (G-49 해소, ADR-0011):
+형식 축(type)은 접고 주제 축(category)을 쓰며, 미디어 테이블·바(Phase 1b)가 없어
+`hero`(경로)·`is_sponsored`(불리언)로 둔다. 그것들이 생기면 FK 로 되돌린다.
 
 `is_sponsored = true`면 라벨 렌더링을 끌 수 없다 (`INV-CONTENT-02`) — 앱 레벨 강제.
 
