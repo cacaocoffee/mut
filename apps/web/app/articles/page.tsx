@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { ARTICLES } from "@mut/domain";
 import { ArticleList } from "@/components/article-list";
+import { listArticles } from "@/lib/article-api";
 import { ARTICLES_PATH } from "@/lib/routes";
 import { openGraph } from "@/lib/site";
 
@@ -37,8 +37,9 @@ function formatDate(iso: string): string {
   return `${y}. ${Number(m)}. ${Number(d)}`;
 }
 
-export default function ArticlesPage() {
-  const cards = ARTICLES.map((a) => ({
+export default async function ArticlesPage() {
+  const articles = await listArticles();
+  const cards = articles.map((a) => ({
     slug: a.slug,
     title: a.title,
     dek: a.dek,
@@ -56,7 +57,7 @@ export default function ArticlesPage() {
         <div>
           <h1>
             아티클
-            <span className="sub">{ARTICLES.length} articles</span>
+            <span className="sub">{cards.length} articles</span>
           </h1>
         </div>
       </header>
