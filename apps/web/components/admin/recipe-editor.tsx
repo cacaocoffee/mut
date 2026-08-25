@@ -1,5 +1,6 @@
 "use client";
 
+import { useToast } from "@/components/toast";
 import { adminWrite } from "@/lib/admin-csrf";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -80,7 +81,7 @@ export function RecipeEditor({ cocktailId, recipe }: { cocktailId: number; recip
   );
   const [servings, setServings] = useState(String(recipe.servingCount || 1));
   const [note, setNote] = useState(recipe.note ?? "");
-  const [message, setMessage] = useState<string | null>(null);
+  const toast = useToast();
   const [busy, setBusy] = useState(false);
 
   function setRow(index: number, patch: Partial<Row>) {
@@ -100,7 +101,6 @@ export function RecipeEditor({ cocktailId, recipe }: { cocktailId: number; recip
 
   async function save() {
     setBusy(true);
-    setMessage(null);
     try {
       const res = await adminWrite(`/api/admin/cocktails/${cocktailId}/recipe`, {
         method: "PUT",
@@ -124,7 +124,7 @@ export function RecipeEditor({ cocktailId, recipe }: { cocktailId: number; recip
 
       if (res.ok) {
         const saved = (await res.json()) as AdminRecipe;
-        setMessage(
+        toast.success(
           saved.abvCalculated == null
             ? "저장했습니다"
             : `저장했습니다 — 도수 ${saved.abvCalculated}%`,
@@ -134,7 +134,7 @@ export function RecipeEditor({ cocktailId, recipe }: { cocktailId: number; recip
       }
 
       const body = await res.text();
-      setMessage(
+      toast.error(
         res.status === 400
           ? `저장할 수 없습니다 — ${body.slice(0, 200)}`
           : res.status === 404
@@ -142,7 +142,7 @@ export function RecipeEditor({ cocktailId, recipe }: { cocktailId: number; recip
             : `저장하지 못했습니다 (HTTP ${res.status})`,
       );
     } catch {
-      setMessage("서버를 부르지 못했습니다");
+      toast.error("서버를 부르지 못했습니다");
     } finally {
       setBusy(false);
     }
@@ -327,12 +327,6 @@ export function RecipeEditor({ cocktailId, recipe }: { cocktailId: number; recip
           {busy ? "저장 중…" : "레시피 저장"}
         </button>
       </div>
-
-      {message ? (
-        <p className="admin-form__message" role="status">
-          {message}
-        </p>
-      ) : null}
     </section>
   );
 }

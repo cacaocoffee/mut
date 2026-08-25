@@ -1,6 +1,7 @@
 "use client";
 
 import { adminWrite } from "@/lib/admin-csrf";
+import { useToast } from "@/components/toast";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -36,8 +37,8 @@ export function CocktailForm({ cocktail }: { cocktail: AdminCocktail | null }) {
 
   const [form, setForm] = useState(() => initial(cocktail));
   const [violations, setViolations] = useState<Violation[]>([]);
-  const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const toast = useToast();
 
   const status = (cocktail?.status ?? "draft") as Status;
   // `FR-COCKTAIL-014` — 발행된 뒤에는 주소가 굳는다. 바꾸면 링크가 끊긴다.
@@ -57,14 +58,13 @@ export function CocktailForm({ cocktail }: { cocktail: AdminCocktail | null }) {
 
   async function call(path: string, init: RequestInit): Promise<Response | null> {
     setBusy(true);
-    setMessage(null);
     try {
       return await adminWrite(`/api/admin/${path}`, {
         headers: { "Content-Type": "application/json" },
         ...init,
       });
     } catch {
-      setMessage("서버를 부르지 못했습니다");
+      toast.error("서버를 부르지 못했습니다");
       return null;
     } finally {
       setBusy(false);
@@ -81,7 +81,7 @@ export function CocktailForm({ cocktail }: { cocktail: AdminCocktail | null }) {
     if (res.ok) {
       const saved = (await res.json()) as AdminCocktail;
       setViolations([]);
-      setMessage("저장했습니다");
+      toast.success("저장했습니다");
       if (isNew) router.replace(`/admin/cocktails/${saved.id}`);
       else router.refresh();
       return;
@@ -98,10 +98,11 @@ export function CocktailForm({ cocktail }: { cocktail: AdminCocktail | null }) {
       setViolations([]);
       // 삭제(=보관)는 목록에서 사라지므로 이 편집 화면에 남을 이유가 없다 — 목록으로 보낸다.
       if (action === "archive") {
+        toast.success("삭제했습니다");
         router.push("/admin/cocktails");
         return;
       }
-      setMessage(action === "publish" ? "발행했습니다" : "상태를 바꿨습니다");
+      toast.success(action === "publish" ? "발행했습니다" : "상태를 바꿨습니다");
       router.refresh();
       return;
     }
@@ -123,11 +124,11 @@ export function CocktailForm({ cocktail }: { cocktail: AdminCocktail | null }) {
     if (res.status === 422) {
       const body = (await res.json()) as Partial<ValidationProblem>;
       setViolations(body.violations ?? []);
-      setMessage("아직 발행할 수 없습니다 — 아래를 모두 채워 주세요");
+      toast.error("아직 발행할 수 없습니다 — 아래 조건을 확인하세요");
       return;
     }
     setViolations([]);
-    setMessage(
+    toast.error(
       res.status === 409
         ? "이미 그 상태입니다"
         : res.status === 404
@@ -158,12 +159,6 @@ export function CocktailForm({ cocktail }: { cocktail: AdminCocktail | null }) {
             ))}
           </ul>
         </section>
-      )}
-
-      {message && (
-        <p className="admin-form__message" role="status">
-          {message}
-        </p>
       )}
 
       <div className="admin-form__grid">

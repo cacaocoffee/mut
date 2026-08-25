@@ -1871,6 +1871,75 @@ figcaption {
   background: var(--color-accent-2-700);
   color: var(--color-bg);
 }
+
+/* ┌─ 토스트 — 행동 결과 알림 (디자인 시스템 컴포넌트) ──────────────────────┐
+   화면 오른쪽 아래에 쌓인다. 성공은 브랜드 와인색 표식(매거진 팔레트에 초록이
+   없다 — 없는 색을 지어내지 않는다), 오류는 accent-2. 성공은 4초 뒤 스스로,
+   오류는 손으로 닫는다. 들어올 때 아래에서 살짝 올라온다. └──────────────────┘ */
+.toast-stack {
+  position: fixed;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: min(360px, calc(100% - var(--space-4) * 2));
+}
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-divider);
+  border-left: 3px solid var(--color-accent-700);
+  box-shadow: var(--shadow-lg);
+  /* 들어오기 전 상태 — --in 이 붙으면 제자리로 */
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.toast--in {
+  opacity: 1;
+  transform: none;
+}
+.toast--error {
+  border-left-color: var(--color-accent-2-700);
+}
+.toast__mark {
+  flex: none;
+  font-weight: 800;
+  line-height: 1.4;
+  color: var(--color-accent-700);
+}
+.toast--error .toast__mark {
+  color: var(--color-accent-2-700);
+}
+.toast__body {
+  flex: 1;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text);
+}
+.toast__close {
+  flex: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: 12px;
+  color: var(--color-neutral-700);
+  cursor: pointer;
+}
+.toast__close:hover {
+  color: var(--color-text);
+}
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    transition: opacity var(--dur) var(--ease);
+    transform: none;
+  }
+}
 .admin-status {
   font-size: 11px;
   font-weight: 800;

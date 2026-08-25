@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AdminNav } from "@/components/admin/admin-nav";
+import { ToastProvider } from "@/components/toast";
 import { adminAccess } from "@/lib/admin-session";
 
 /**
@@ -37,19 +38,21 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const role = access.kind === "allowed" ? access.role : "editor";
 
   return (
-    <main className="shell admin">
-      <header className="admin__head">
-        <h1>어드민 ADMIN</h1>
-        <p className="lede">
-          발행은 에디터가 한다. 개발자를 거치지 않는 것이 이 화면의 목적이다
-          (<code>FR-ADMIN-001</code>).
-        </p>
-      </header>
+    <ToastProvider>
+      <main className="shell admin">
+        <header className="admin__head">
+          <h1>어드민 ADMIN</h1>
+          <p className="lede">
+            발행은 에디터가 한다. 개발자를 거치지 않는 것이 이 화면의 목적이다
+            (<code>FR-ADMIN-001</code>).
+          </p>
+        </header>
 
-      <div className="admin__body">
-        <AdminNav role={role} />
-        <section className="admin__content">{children}</section>
-      </div>
-    </main>
+        <div className="admin__body">
+          <AdminNav role={role} />
+          <section className="admin__content">{children}</section>
+        </div>
+      </main>
+    </ToastProvider>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { useToast } from "@/components/toast";
 import { adminWrite } from "@/lib/admin-csrf";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -17,22 +18,22 @@ import { useRouter } from "next/navigation";
 export function IngredientApprove({ id, name }: { id: number; name: string }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+  const toast = useToast();
 
   async function approve() {
     setBusy(true);
-    setMessage(null);
     try {
       const res = await adminWrite(`/api/admin/ingredients/${id}/approve`, { method: "POST" });
 
       if (res.ok) {
         // 승인하면 대기 큐에서 빠진다 (RED 4). 목록을 손으로 지우지 않고 다시 받는다 —
         // 서버가 뺀 것과 화면이 뺀 것이 다르면 새로고침에서 되살아난다.
+        toast.success("승인했습니다");
         router.refresh();
         return;
       }
 
-      setMessage(
+      toast.error(
         res.status === 409
           ? "이미 승인된 재료입니다"
           : res.status === 403 || res.status === 404
@@ -40,7 +41,7 @@ export function IngredientApprove({ id, name }: { id: number; name: string }) {
             : `승인하지 못했습니다 (HTTP ${res.status})`,
       );
     } catch {
-      setMessage("서버를 부르지 못했습니다");
+      toast.error("서버를 부르지 못했습니다");
     } finally {
       setBusy(false);
     }
@@ -52,11 +53,6 @@ export function IngredientApprove({ id, name }: { id: number; name: string }) {
         {busy ? "승인 중…" : `승인`}
         <span className="visually-hidden"> — {name}</span>
       </button>
-      {message ? (
-        <span className="admin-form__message" role="status">
-          {message}
-        </span>
-      ) : null}
     </span>
   );
 }
