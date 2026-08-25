@@ -85,45 +85,49 @@ export function ArticleForm({ article }: Props) {
       body: JSON.stringify(payload),
     });
     if (!res) return;
-    if (res.ok) {
-      const saved = (await res.json()) as AdminArticleDetail;
-      toast.success("저장했습니다");
-      if (isNew) router.replace(`/admin/articles/${saved.id}`);
-      else router.refresh();
+    if (!res.ok) {
+      toast.error(
+        res.status === 409
+          ? "이미 있는 slug 입니다"
+          : res.status === 404
+            ? "권한이 없거나 없는 항목입니다"
+            : `저장하지 못했습니다 (HTTP ${res.status})`,
+      );
       return;
     }
-    toast.error(
-      res.status === 409
-        ? "이미 있는 slug 입니다"
-        : res.status === 404
-          ? "권한이 없거나 없는 항목입니다"
-          : `저장하지 못했습니다 (HTTP ${res.status})`,
-    );
-  }
+    const saved = (await res.json()) as AdminArticleDetail;
 
-  async function transition(action: "publish" | "unpublish" | "archive", label: string) {
-    const res = await call(`articles/${article!.id}/${action}`, { method: "POST" });
-    if (!res) return;
-    if (res.ok) {
-      if (action === "archive") {
-        toast.success("삭제했습니다");
-        router.push("/admin/articles");
+    // 저장 = 저장하고 바로 공개. 초안 개념을 두지 않는다 — 아직 발행 전이면 발행까지 한다.
+    // (서버는 상태 전이를 별도 경로로 두지만, 화면은 "저장" 하나로 합쳐 보여 준다.)
+    if (saved.status !== "published") {
+      const pub = await call(`articles/${saved.id}/publish`, { method: "POST" });
+      if (pub && !pub.ok) {
+        toast.error(`공개하지 못했습니다 (HTTP ${pub.status})`);
         return;
       }
-      toast.success(label);
-      router.refresh();
+    }
+
+    toast.success("저장했습니다");
+    if (isNew) router.replace(`/admin/articles/${saved.id}`);
+    else router.refresh();
+  }
+
+  async function remove() {
+    if (!window.confirm("이 아티클을 삭제합니다. 목록에서 사라집니다.")) return;
+    const res = await call(`articles/${article!.id}/archive`, { method: "POST" });
+    if (!res) return;
+    if (res.ok) {
+      toast.success("삭제했습니다");
+      router.push("/admin/articles");
       return;
     }
-    toast.error(`처리하지 못했습니다 (HTTP ${res.status})`);
+    toast.error(`삭제하지 못했습니다 (HTTP ${res.status})`);
   }
 
   return (
     <div className="admin-form">
       <div className="admin-form__head">
         <h2>{isNew ? "새 아티클" : article!.title}</h2>
-        <span className={`admin-status admin-status--${status}`}>
-          {status === "draft" ? "초안" : status === "published" ? "발행됨" : "보관됨"}
-        </span>
       </div>
 
       <div className="admin-form__grid">
@@ -175,61 +179,17 @@ export function ArticleForm({ article }: Props) {
       <h3 className="section-head">본문</h3>
       <ArticleBlockEditor blocks={blocks} onChange={setBlocks} />
 
+      {/* 저장 = 저장하고 바로 공개. 초안·발행을 나누지 않는다 (사장님 결정 2026-08-25). */}
       <div className="admin-form__actions">
         <button type="button" className="btn btn-primary" disabled={!canSave || busy} onClick={save}>
           저장
         </button>
+        {!isNew && (
+          <button type="button" className="btn btn-danger" disabled={busy} onClick={remove}>
+            삭제
+          </button>
+        )}
       </div>
-
-      {!isNew && (
-        <div className="admin-publish">
-          <div className="admin-publish__state">
-            상태 · {status === "draft" ? "초안" : status === "published" ? "발행됨" : "보관됨"}
-          </div>
-          <div className="admin-publish__actions">
-            {status === "draft" && (
-              <>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  disabled={busy}
-                  onClick={() => window.confirm("이 아티클을 공개합니다. 발행할까요?") && transition("publish", "발행했습니다")}
-                >
-                  발행하기
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                  disabled={busy}
-                  onClick={() => window.confirm("이 아티클을 삭제합니다. 목록에서 사라집니다.") && transition("archive", "")}
-                >
-                  삭제
-                </button>
-              </>
-            )}
-            {status === "published" && (
-              <>
-                <button type="button" className="btn" disabled={busy} onClick={() => transition("unpublish", "발행을 내렸습니다")}>
-                  발행 취소
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                  disabled={busy}
-                  onClick={() => window.confirm("이 아티클을 삭제합니다. 목록에서 사라집니다.") && transition("archive", "")}
-                >
-                  삭제
-                </button>
-              </>
-            )}
-            {status === "archived" && (
-              <button type="button" className="btn" disabled={busy} onClick={() => transition("unpublish", "초안으로 되돌렸습니다")}>
-                초안으로 되돌리기
-              </button>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
