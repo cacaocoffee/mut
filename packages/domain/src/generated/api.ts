@@ -15,6 +15,111 @@
  */
 
 export interface paths {
+    "/api/v1/admin/articles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 아티클 목록 (draft 포함)
+         * @description editor 이상. status 로 거른다.
+         */
+        get: operations["list_7"];
+        put?: never;
+        /**
+         * 아티클 생성
+         * @description editor 이상. 생성 시점은 항상 draft.
+         */
+        post: operations["create_2"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/articles/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 아티클 조회 (draft 포함) */
+        get: operations["find_4"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * 아티클 수정
+         * @description status 는 요청에 없다 — 발행은 전용 경로만 (PRIN-T05).
+         */
+        patch: operations["update_1"];
+        trace?: never;
+    };
+    "/api/v1/admin/articles/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 삭제 (보관)
+         * @description draft·published → archived. 목록에서 사라진다.
+         */
+        post: operations["archive_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/articles/{id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 발행
+         * @description draft → published. 아티클은 발행 게이트가 없다.
+         */
+        post: operations["publish_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/articles/{id}/unpublish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 회수 · 되돌리기
+         * @description published·archived → draft.
+         */
+        post: operations["unpublish_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/audit-logs": {
         parameters: {
             query?: never;
@@ -26,7 +131,7 @@ export interface paths {
          * 감사 로그 조회
          * @description admin 만 가능하다 (SPEC-08 §2.2 — 감시받는 사람이 감시 기록을 보면 안 된다). 필터는 AND 로 묶이고 정렬은 최신순 고정이다.
          */
-        get: operations["list_5"];
+        get: operations["list_6"];
         put?: never;
         post?: never;
         delete?: never;
@@ -46,7 +151,7 @@ export interface paths {
          * 칵테일 목록 (draft 포함)
          * @description editor 이상. 최근에 손댄 것부터. status 로 거른다 (draft·published·archived).
          */
-        get: operations["list_4"];
+        get: operations["list_5"];
         put?: never;
         /**
          * 칵테일 생성
@@ -276,7 +381,7 @@ export interface paths {
          * 검증 태스크 큐
          * @description 기본은 open 만. 정렬은 최근 탐지순 고정이다 (인덱스가 그 순서다).
          */
-        get: operations["list_3"];
+        get: operations["list_4"];
         put?: never;
         post?: never;
         delete?: never;
@@ -316,6 +421,43 @@ export interface paths {
          * @description dismiss=true 는 사유 필수. 이미 처리된 태스크는 409. 감사에는 남기지 않는다 (테이블 자체가 이력).
          */
         post: operations["resolve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/articles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 아티클 목록 (발행분)
+         * @description category 로 거른다 (cocktail·bar·spirits).
+         */
+        get: operations["list_3"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/articles/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 아티클 상세 (발행분) */
+        get: operations["detail_2"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -812,6 +954,50 @@ export interface components {
             techniqueRef?: string;
             text: string;
         };
+        ArticleDetail: {
+            body: {
+                [key: string]: Record<string, never>;
+            }[];
+            category: string;
+            dek: string;
+            hero: string;
+            /** Format: int64 */
+            id: number;
+            isSponsored: boolean;
+            /** Format: date-time */
+            publishedAt?: string;
+            relatedCocktails: components["schemas"]["RelatedCocktail"][];
+            slug: string;
+            sourceUrl?: string;
+            status: string;
+            title: string;
+        };
+        ArticleSummary: {
+            category: string;
+            dek: string;
+            hero: string;
+            /** Format: int64 */
+            id: number;
+            isSponsored: boolean;
+            /** Format: date-time */
+            publishedAt?: string;
+            slug: string;
+            status: string;
+            title: string;
+        };
+        ArticleWrite: {
+            body: {
+                [key: string]: Record<string, never>;
+            }[];
+            category: string;
+            dek: string;
+            hero: string;
+            isSponsored: boolean;
+            relatedCocktailSlugs: string[];
+            slug: string;
+            sourceUrl?: string;
+            title: string;
+        };
         AuditLogItem: {
             action: string;
             actor?: components["schemas"]["ActorRef"];
@@ -1138,6 +1324,11 @@ export interface components {
         RecipeVersions: {
             items: components["schemas"]["RecipeVersion"][];
         };
+        RelatedCocktail: {
+            nameEn: string;
+            nameKo: string;
+            slug: string;
+        };
         RelatedItem: {
             matchedOn: string;
             nameEn: string;
@@ -1319,7 +1510,168 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    list_5: {
+    list_7: {
+        parameters: {
+            query?: {
+                /** @description 상태 슬러그. 없으면 전부 */
+                status?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ArticleSummary"][];
+                };
+            };
+        };
+    };
+    create_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ArticleWrite"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ArticleDetail"];
+                };
+            };
+        };
+    };
+    find_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ArticleDetail"];
+                };
+            };
+        };
+    };
+    update_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ArticleWrite"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ArticleDetail"];
+                };
+            };
+        };
+    };
+    archive_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ArticleDetail"];
+                };
+            };
+        };
+    };
+    publish_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ArticleDetail"];
+                };
+            };
+        };
+    };
+    unpublish_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ArticleDetail"];
+                };
+            };
+        };
+    };
+    list_6: {
         parameters: {
             query: {
                 /** @description cocktail · ingredient 같은 테이블 이름 */
@@ -1352,7 +1704,7 @@ export interface operations {
             };
         };
     };
-    list_4: {
+    list_5: {
         parameters: {
             query?: {
                 /** @description 상태 슬러그. 없으면 전부 */
@@ -1694,7 +2046,7 @@ export interface operations {
             };
         };
     };
-    list_3: {
+    list_4: {
         parameters: {
             query: {
                 /** @description open · resolved · dismissed. 기본 open */
@@ -1766,6 +2118,51 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["VerificationTaskItem"];
+                };
+            };
+        };
+    };
+    list_3: {
+        parameters: {
+            query?: {
+                /** @description 카테고리 슬러그. 없으면 전부 */
+                category?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ArticleSummary"][];
+                };
+            };
+        };
+    };
+    detail_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ArticleDetail"];
                 };
             };
         };
