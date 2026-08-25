@@ -1,5 +1,6 @@
 "use client";
 
+import { useToast } from "@/components/toast";
 import { adminWrite } from "@/lib/admin-csrf";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -19,11 +20,10 @@ export function TaskResolve({ id }: { id: number }) {
   const router = useRouter();
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+  const toast = useToast();
 
   async function resolve(dismiss: boolean) {
     setBusy(true);
-    setMessage(null);
     try {
       const res = await adminWrite(`/api/admin/tasks/${id}/resolve`, {
         method: "POST",
@@ -32,11 +32,12 @@ export function TaskResolve({ id }: { id: number }) {
       });
 
       if (res.ok) {
+        toast.success("처리했습니다");
         router.refresh();
         return;
       }
 
-      setMessage(
+      toast.error(
         res.status === 409
           ? "이미 처리된 태스크입니다"
           : res.status === 400 || res.status === 422
@@ -44,7 +45,7 @@ export function TaskResolve({ id }: { id: number }) {
             : `처리하지 못했습니다 (HTTP ${res.status})`,
       );
     } catch {
-      setMessage("서버를 부르지 못했습니다");
+      toast.error("서버를 부르지 못했습니다");
     } finally {
       setBusy(false);
     }
@@ -75,12 +76,6 @@ export function TaskResolve({ id }: { id: number }) {
           넘김
         </button>
       </div>
-
-      {message ? (
-        <p className="admin-form__message" role="status">
-          {message}
-        </p>
-      ) : null}
     </div>
   );
 }

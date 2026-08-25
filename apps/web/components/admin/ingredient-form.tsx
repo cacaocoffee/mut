@@ -1,5 +1,6 @@
 "use client";
 
+import { useToast } from "@/components/toast";
 import { adminWrite } from "@/lib/admin-csrf";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -38,7 +39,7 @@ const EMPTY = {
 export function IngredientForm() {
   const router = useRouter();
   const [form, setForm] = useState(EMPTY);
-  const [message, setMessage] = useState<string | null>(null);
+  const toast = useToast();
   const [busy, setBusy] = useState(false);
 
   const set = (key: keyof typeof form, value: string) =>
@@ -50,7 +51,6 @@ export function IngredientForm() {
 
   async function save() {
     setBusy(true);
-    setMessage(null);
     try {
       const res = await adminWrite("/api/admin/ingredients", {
         method: "POST",
@@ -75,12 +75,13 @@ export function IngredientForm() {
 
       if (res.ok) {
         // 승인 대기 큐로 돌아간다 — 방금 만든 것이 거기 있다는 사실이 다음 할 일이다.
+        toast.success("재료를 등록했습니다");
         router.push("/admin/ingredients");
         router.refresh();
         return;
       }
 
-      setMessage(
+      toast.error(
         res.status === 409
           ? "같은 슬러그의 재료가 이미 있습니다"
           : res.status === 400 || res.status === 422
@@ -88,7 +89,7 @@ export function IngredientForm() {
             : `저장하지 못했습니다 (HTTP ${res.status})`,
       );
     } catch {
-      setMessage("서버를 부르지 못했습니다");
+      toast.error("서버를 부르지 못했습니다");
     } finally {
       setBusy(false);
     }
@@ -174,12 +175,6 @@ export function IngredientForm() {
           {busy ? "저장 중…" : "저장"}
         </button>
       </div>
-
-      {message ? (
-        <p className="admin-form__message" role="status">
-          {message}
-        </p>
-      ) : null}
     </div>
   );
 }
