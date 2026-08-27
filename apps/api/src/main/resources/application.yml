@@ -27,6 +27,12 @@ spring:
   batch:
     job:
       enabled: false             # SPEC-05 §8 — 기동 시 자동 실행하지 않는다
+  servlet:
+    multipart:
+      # 사진 업로드(ADR-0011). 기본 1MB 는 휴대폰 사진에 모자란다. 원본을 그대로 받되
+      # 상한을 둬 대용량 업로드로 메모리를 소진시키는 것을 막는다. 넘으면 413 을 준다.
+      max-file-size: 12MB
+      max-request-size: 12MB
 
 server:
   port: ${PORT:8080}
@@ -73,6 +79,12 @@ mut:
   # 경고 하나 조정하자고 배포하지 않는다 (이슈 026 RED 20).
   ingredient:
     approved-cap: ${MUT_INGREDIENT_APPROVED_CAP:300}
+  # ADR-0011 이미지 업로드 — GCS 버킷은 `MUT_MEDIA_BUCKET` 환경변수로만 준다.
+  # 여기에 기본값(빈 문자열)을 두면 안 된다 — @ConditionalOnProperty 는 값이 있고
+  # "false" 가 아니면 매치하므로, 빈 문자열이어도 컨트롤러가 켜진다. 그러면 테스트·CI
+  # 에서 /admin/media 가 openapi 스펙에 섞여 드리프트가 난다. 키를 아예 두지 않으면
+  # 로컬·테스트·CI 에는 프로퍼티가 없어(matchIfMissing=false) 꺼지고, 운영은 env 가
+  # relaxed-binding 으로 `mut.media.bucket` 을 채워 켠다.
   revalidate:
     enabled: ${MUT_REVALIDATE_ENABLED:false}
     url: ${MUT_FRONTEND_URL:}

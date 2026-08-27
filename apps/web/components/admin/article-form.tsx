@@ -65,6 +65,30 @@ export function ArticleForm({ article }: Props) {
     }
   }
 
+  /**
+   * 사진을 GCS 에 올리고 공개 주소를 돌려준다 (ADR-0011 이미지 업로드).
+   * multipart 라 Content-Type 을 직접 넣지 않는다 — 브라우저가 boundary 를 붙인다.
+   * slug 를 함께 보내 글 폴더 아래에 담기게 한다.
+   */
+  async function uploadImage(file: File): Promise<string | null> {
+    const data = new FormData();
+    data.append("file", file);
+    if (form.slug.trim()) data.append("slug", form.slug.trim());
+    try {
+      const res = await adminWrite("/api/admin/media", { method: "POST", body: data });
+      if (!res.ok) {
+        toast.error(res.status === 413 ? "사진이 너무 큽니다" : `사진을 올리지 못했습니다 (HTTP ${res.status})`);
+        return null;
+      }
+      const { url } = (await res.json()) as { url: string };
+      toast.success("사진을 올렸습니다");
+      return url;
+    } catch {
+      toast.error("사진을 올리지 못했습니다");
+      return null;
+    }
+  }
+
   async function save() {
     const payload = {
       slug: form.slug.trim(),
@@ -150,8 +174,29 @@ export function ArticleForm({ article }: Props) {
           </select>
         </label>
         <label className="admin-field">
-          <span>대표 사진 주소</span>
-          <input className="input" value={form.hero} onChange={(e) => set("hero", e.target.value)} />
+          <span>대표 사진</span>
+          {form.hero ? (
+            // eslint-disable-next-line @next/next/no-img-element -- 편집기 미리보기라 next/image 를 쓰지 않는다
+            <img className="block-editor__preview" src={form.hero} alt="" width={320} height={240} loading="lazy" />
+          ) : null}
+          <div className="admin-field__row">
+            <input className="input" value={form.hero} onChange={(e) => set("hero", e.target.value)} placeholder="올리거나 주소를 붙여넣기" />
+            <label className="btn">
+              사진 올리기
+              <input
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  e.target.value = "";
+                  if (!file) return;
+                  const url = await uploadImage(file);
+                  if (url) set("hero", url);
+                }}
+              />
+            </label>
+          </div>
         </label>
         <label className="admin-field admin-field--wide">
           <span>요약 (dek) — 카드·검색에 쓰는 한두 문장</span>
@@ -177,7 +222,7 @@ export function ArticleForm({ article }: Props) {
       </div>
 
       <h3 className="section-head">본문</h3>
-      <ArticleBlockEditor blocks={blocks} onChange={setBlocks} />
+      <ArticleBlockEditor blocks={blocks} onChange={setBlocks} uploadImage={uploadImage} />
 
       {/* 저장 = 저장하고 바로 공개. 초안·발행을 나누지 않는다 (사장님 결정 2026-08-25). */}
       <div className="admin-form__actions">

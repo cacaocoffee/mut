@@ -49,6 +49,11 @@ dependencies {
     implementation("org.flywaydb:flyway-database-postgresql")
     runtimeOnly("org.postgresql:postgresql")
 
+    // ADR-0011 이미지 업로드 — Google Cloud Storage (ADR-0007 의 R2 대신 같은 GCP 프로젝트를
+    // 쓴다. 계정을 하나 더 만들지 않는다 — Cloud Run 서비스 계정이 ADC 로 붙는다).
+    implementation(platform("com.google.cloud:libraries-bom:26.50.0"))
+    implementation("com.google.cloud:google-cloud-storage")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation(kotlin("test"))
