@@ -30,3 +30,11 @@ export const ARTICLES_PATH = "/articles";
 
 /** 재료 사전 (`FR-INGREDIENT-002` · SCREENS-01 01-D). 이쪽은 색인한다. */
 export const INGREDIENTS_PATH = "/ingredients";
+
+/**
+ * 내 저장 (`FR-USER-003` · SPEC-07 §2.5).
+ *
+ * 로그인한 사람이 저장(북마크)한 칵테일·아티클을 모아 본다. 본인만 보는 화면이라
+ * **색인하지 않는다**(`noindex`) — 사람마다 내용이 다르고, 로그인 세션이 있어야 뜬다.
+ */
+export const SAVED_PATH = "/saved";

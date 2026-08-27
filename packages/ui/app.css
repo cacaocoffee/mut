@@ -144,6 +144,37 @@
   font-weight: var(--font-heading-weight);
 }
 
+/* 내비 로그인 영역 — 로그인/내 저장/로그아웃. 자식이 탭 행에 그대로 흐르도록
+   래퍼는 자리를 차지하지 않는다(display:contents).
+
+   **탭이 아니다.** 세 콘텐츠 탭(탐색·파인더·아티클)과 달리 계정 액션이라 `.tab` 을
+   쓰지 않는다 — 그래야 "탭 3개" 불변식(layout.spec)이 흔들리지 않는다. 생김새만 탭을
+   닮게 둔다. */
+.auth-menu {
+  display: contents;
+}
+.auth-link {
+  padding: var(--space-3) var(--space-3);
+  min-height: 44px;
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: 14px;
+  white-space: nowrap;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--color-neutral-700); /* 5.83:1 — .tab 과 같은 잉크 */
+  cursor: pointer;
+}
+.site-nav .auth-link:hover {
+  background: transparent;
+  color: var(--color-text);
+}
+/* 로그아웃은 한 단 더 물러선다 — 자주 누르는 것이 아니다. */
+.auth-link--muted {
+  font-size: 12px;
+}
+
 /* — 페이지 머리 — */
 .page-head {
   display: grid;
@@ -590,6 +621,56 @@
   font-size: 13px;
   color: var(--color-neutral-700);
   margin: 0;
+}
+/* 로그인 유도 버튼은 안내 문구와 한 칸 띄운다. */
+.empty-state .btn {
+  margin-top: var(--space-4);
+}
+
+/* — 내 저장 목록 (FR-USER-003) — */
+.saved-status {
+  padding: 48px 0;
+  font-size: 13px;
+  color: var(--color-neutral-700);
+}
+.saved-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.saved-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--color-divider);
+}
+.saved-item__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.saved-item__kind {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--color-accent-700);
+}
+.saved-item__title {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  color: var(--color-text);
+}
+a.saved-item__title:hover {
+  color: var(--color-accent-700);
+}
+.saved-item__sub {
+  font-size: 12px;
+  color: var(--color-neutral-700);
+}
+.saved-item__remove {
+  flex: none;
 }
 
 /* ─────────────────────────  02 상세  ───────────────────────── */

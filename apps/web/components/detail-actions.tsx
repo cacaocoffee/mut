@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { bookmarkAdd, shareClick } from "@/lib/analytics/events";
+import { adminWrite } from "@/lib/admin-csrf";
 
 /**
  * 액션 블록 (`FR-COCKTAIL-027` — `FR-COCKTAIL-017` 의 여덟째 블록).
@@ -33,7 +34,8 @@ export function DetailActions({
   async function save() {
     setMessage(null);
     try {
-      const res = await fetch("/api/v1/me/bookmarks", {
+      // 쓰기라 세션 CSRF 토큰이 필요하다 — adminWrite 가 붙인다(어드민 전용이 아니라 범용).
+      const res = await adminWrite("/api/v1/me/bookmarks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ targetType, targetSlug }),

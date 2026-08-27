@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Wordmark } from "@/components/wordmark";
+import { AuthMenu } from "@/components/auth-menu";
 import { ARTICLES_PATH, FINDER_PATH, SEARCH_PATH } from "@/lib/routes";
 
 export function SiteNav() {
@@ -50,6 +51,7 @@ export function SiteNav() {
             {t.ko}
           </Link>
         ))}
+        <AuthMenu />
       </div>
     </nav>
   );
