@@ -1915,6 +1915,33 @@ figcaption {
   flex-direction: column;
   gap: var(--space-1);
 }
+/* 편집기 안 사진 미리보기 — 실제 배치가 아니라 확인용이라 폭을 묶는다. */
+.block-editor__preview {
+  max-width: 220px;
+  max-height: 160px;
+  width: auto;
+  height: auto;
+  border-radius: var(--radius-2);
+  border: 1px solid var(--color-divider);
+  object-fit: cover;
+}
+.block-editor__upload {
+  align-self: flex-start;
+  cursor: pointer;
+}
+/* 주소 입력과 「사진 올리기」를 한 줄에 둔다. 좁아지면 접힌다. */
+.admin-field__row {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  align-items: center;
+}
+.admin-field__row .input {
+  flex: 1 1 12rem;
+}
+.admin-field__row .btn {
+  cursor: pointer;
+}
 .block-editor__empty {
   font-size: 13px;
   color: var(--color-neutral-700);

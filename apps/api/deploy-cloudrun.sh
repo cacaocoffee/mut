@@ -60,7 +60,7 @@ echo "▶ Cloud Run 배포 (소스에서 빌드 — Dockerfile 사용)"
   --min-instances 0 \
   --max-instances 2 \
   --timeout 60 \
-  --set-env-vars "DB_USER=mut_web,DB_MIGRATE_USER=neondb_owner,MUT_OAUTH_REDIRECT_BASE=https://mut-web.vercel.app,MUT_OAUTH_ALLOWED_RETURNS=https://mut-web.vercel.app,MUT_OAUTH_KAKAO_SCOPES=profile_nickname,MUT_REVALIDATE_ENABLED=true,MUT_FRONTEND_URL=https://mut-web.vercel.app" \
+  --set-env-vars "DB_USER=mut_web,DB_MIGRATE_USER=neondb_owner,MUT_OAUTH_REDIRECT_BASE=https://mut-web.vercel.app,MUT_OAUTH_ALLOWED_RETURNS=https://mut-web.vercel.app,MUT_OAUTH_KAKAO_SCOPES=profile_nickname,MUT_REVALIDATE_ENABLED=true,MUT_FRONTEND_URL=https://mut-web.vercel.app,MUT_MEDIA_BUCKET=mut-media-project-9400c8f3-9760-4e8f-8d8" \
   --set-secrets "DB_URL=DB_URL:latest,DB_PASSWORD=DB_PASSWORD:latest,DB_MIGRATE_PASSWORD=DB_MIGRATE_PASSWORD:latest,KAKAO_CLIENT_ID=KAKAO_CLIENT_ID:latest,KAKAO_CLIENT_SECRET=KAKAO_CLIENT_SECRET:latest,MUT_REVALIDATE_SECRET=MUT_REVALIDATE_SECRET:latest"
 
 echo "▶ 완료. 서비스 URL:"

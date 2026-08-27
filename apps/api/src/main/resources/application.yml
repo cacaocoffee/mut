@@ -27,6 +27,12 @@ spring:
   batch:
     job:
       enabled: false             # SPEC-05 §8 — 기동 시 자동 실행하지 않는다
+  servlet:
+    multipart:
+      # 사진 업로드(ADR-0011). 기본 1MB 는 휴대폰 사진에 모자란다. 원본을 그대로 받되
+      # 상한을 둬 대용량 업로드로 메모리를 소진시키는 것을 막는다. 넘으면 413 을 준다.
+      max-file-size: 12MB
+      max-request-size: 12MB
 
 server:
   port: ${PORT:8080}
@@ -73,6 +79,11 @@ mut:
   # 경고 하나 조정하자고 배포하지 않는다 (이슈 026 RED 20).
   ingredient:
     approved-cap: ${MUT_INGREDIENT_APPROVED_CAP:300}
+  # ADR-0011 이미지 업로드 — GCS 버킷 이름. 비우면 업로드 엔드포인트가 뜨지 않는다
+  # (StorageConfig·MediaUploadController 가 @ConditionalOnProperty 로 걸려 있다).
+  # 로컬·테스트·CI 에는 버킷이 없어 GCS 를 아예 부르지 않는다. 운영만 채운다.
+  media:
+    bucket: ${MUT_MEDIA_BUCKET:}
   revalidate:
     enabled: ${MUT_REVALIDATE_ENABLED:false}
     url: ${MUT_FRONTEND_URL:}

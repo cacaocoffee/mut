@@ -26,7 +26,10 @@ async function proxy(request: Request, path: string[]): Promise<Response> {
     if (value) forward[name] = value;
   }
 
-  const body = request.method === "GET" || request.method === "HEAD" ? undefined : await request.text();
+  // 본문을 텍스트로 읽지 않는다 — 사진 업로드(multipart)는 바이너리라 문자열로 옮기면 깨진다.
+  // 바이트 그대로 넘긴다. JSON 도 바이트로 넘어가므로 손상되지 않는다.
+  const body =
+    request.method === "GET" || request.method === "HEAD" ? undefined : await request.arrayBuffer();
 
   try {
     const res = await fetch(target, { method: request.method, headers: forward, body, cache: "no-store" });
