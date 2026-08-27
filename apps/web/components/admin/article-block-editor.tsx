@@ -94,7 +94,7 @@ export function ArticleBlockEditor({
               <div className="block-editor__figure">
                 {b.src ? (
                   // eslint-disable-next-line @next/next/no-img-element -- 편집기 미리보기라 next/image 를 쓰지 않는다
-                  <img className="block-editor__preview" src={b.src} alt="" />
+                  <img className="block-editor__preview" src={b.src} alt="" width={320} height={240} loading="lazy" />
                 ) : null}
                 <label className="btn block-editor__upload">
                   {uploadingAt === i ? "올리는 중…" : b.src ? "사진 바꾸기" : "사진 올리기"}

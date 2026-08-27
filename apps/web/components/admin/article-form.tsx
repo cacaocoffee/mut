@@ -177,7 +177,7 @@ export function ArticleForm({ article }: Props) {
           <span>대표 사진</span>
           {form.hero ? (
             // eslint-disable-next-line @next/next/no-img-element -- 편집기 미리보기라 next/image 를 쓰지 않는다
-            <img className="block-editor__preview" src={form.hero} alt="" />
+            <img className="block-editor__preview" src={form.hero} alt="" width={320} height={240} loading="lazy" />
           ) : null}
           <div className="admin-field__row">
             <input className="input" value={form.hero} onChange={(e) => set("hero", e.target.value)} placeholder="올리거나 주소를 붙여넣기" />

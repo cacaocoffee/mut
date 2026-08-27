@@ -1921,7 +1921,7 @@ figcaption {
   max-height: 160px;
   width: auto;
   height: auto;
-  border-radius: var(--radius-2);
+  border-radius: var(--radius-md);
   border: 1px solid var(--color-divider);
   object-fit: cover;
 }
