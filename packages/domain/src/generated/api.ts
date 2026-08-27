@@ -810,6 +810,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 내 프로필
+         * @description 로그인 상태·표시명·역할. 비로그인은 401.
+         */
+        get: operations["me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/search": {
         parameters: {
             query?: never;
@@ -1237,6 +1257,10 @@ export interface components {
             unit?: string;
         };
         JsonNode: Record<string, never>;
+        MyProfile: {
+            displayName: string;
+            roles: string[];
+        };
         Origin: {
             creator?: string;
             place?: string;
@@ -2631,6 +2655,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["CollectionItem"];
+                };
+            };
+        };
+    };
+    me: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["MyProfile"];
                 };
             };
         };

@@ -1140,6 +1140,21 @@
       "JsonNode" : {
         "type" : "object"
       },
+      "MyProfile" : {
+        "properties" : {
+          "displayName" : {
+            "type" : "string"
+          },
+          "roles" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          }
+        },
+        "required" : [ "displayName", "roles" ],
+        "type" : "object"
+      },
       "Origin" : {
         "properties" : {
           "creator" : {
@@ -3475,6 +3490,26 @@
         },
         "summary" : "컬렉션 생성",
         "tags" : [ "bookmark-controller" ]
+      }
+    },
+    "/api/v1/me/profile" : {
+      "get" : {
+        "description" : "로그인 상태·표시명·역할. 비로그인은 401.",
+        "operationId" : "me",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MyProfile"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "내 프로필",
+        "tags" : [ "profile-controller" ]
       }
     },
     "/api/v1/search" : {
