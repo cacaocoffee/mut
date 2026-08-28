@@ -557,14 +557,24 @@ test("RED38 - 과음 경고가 하단에 있다", async ({ page }) => {
 
 // ── 라우트 ────────────────────────────────────────────────────────────────
 
-/** SPEC-05 §4 가 정한 자리다. 홈(`/`)은 색인 대상이라 필터 화면을 둘 수 없다. */
+/**
+ * SPEC-05 §4 가 정한 자리다. 홈(`/`)은 색인 대상이라 **필터 화면**을 둘 수 없다.
+ *
+ * 예전에는 `/` 가 탐색으로 리다이렉트했는데, 이제 `/` 는 랜딩이다 (ADR-0012).
+ * 불변식은 그대로다 — 필터 화면(탐색)은 `/cocktails/search` 에 있고 `/` 에는 없다.
+ */
 test("탐색 화면이 /cocktails/search 에 있다", async ({ page }) => {
   expect(existsSync(join(process.cwd(), "app/cocktails/search/page.tsx"))).toBe(true);
 
+  // 탐색(필터 화면)은 /cocktails/search 에 있다.
+  await page.goto(SEARCH);
+  await expect(page.locator(".filter-panel")).toBeVisible();
+
+  // 홈(`/`)은 랜딩이라 리다이렉트하지 않고 필터 화면을 두지 않는다.
   const res = await page.goto("/");
   expect(res?.status()).toBe(200);
-  // 이동이 응답으로 오는지 화면에서 일어나는지는 프레임워크의 사정이다. 도착지만 본다.
-  await expect(page, "`/` 가 탐색으로 보내지 않는다").toHaveURL(new RegExp(`${SEARCH}$`));
+  await expect(page, "`/` 가 탐색으로 보낸다 — 이제 랜딩이어야 한다").toHaveURL(/\/$/);
+  await expect(page.locator(".filter-panel")).toHaveCount(0);
 });
 
 // ── 검색이 탐색 안으로 들어왔다 ───────────────────────────────────────────

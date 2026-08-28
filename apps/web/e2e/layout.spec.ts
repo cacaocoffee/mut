@@ -161,17 +161,20 @@ test.describe("카드 그리드 (ISSUE-051)", () => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    const grid = page.locator(".card-grid");
-    await expect(grid).toBeVisible();
+    // 홈(`/`)에는 카드 그리드가 둘이다(최신 아티클 · 추천 칵테일, ADR-0012). 둘 다 본다.
+    const grids = page.locator(".card-grid");
+    await expect(grids.first()).toBeVisible();
 
     // 맨 `1fr` 이면 min-content 바닥 때문에 카드가 그리드보다 넓어진다.
-    const spill = await grid.evaluate((g) => {
-      const gr = g.getBoundingClientRect();
-      return [...g.children]
-        .map((c) => Math.round(c.getBoundingClientRect().right - gr.right))
-        .filter((d) => d > 1);
-    });
-    expect(spill, `카드 ${spill.length}장이 그리드 밖으로 ${spill.join("·")}px 나갔다`).toEqual([]);
+    for (const grid of await grids.all()) {
+      const spill = await grid.evaluate((g) => {
+        const gr = g.getBoundingClientRect();
+        return [...g.children]
+          .map((c) => Math.round(c.getBoundingClientRect().right - gr.right))
+          .filter((d) => d > 1);
+      });
+      expect(spill, `카드 ${spill.length}장이 그리드 밖으로 ${spill.join("·")}px 나갔다`).toEqual([]);
+    }
   });
 });
 
