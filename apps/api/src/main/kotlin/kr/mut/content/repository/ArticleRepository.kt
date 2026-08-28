@@ -25,6 +25,9 @@ interface ArticleRepository : JpaRepository<Article, Long> {
     /** 공개 상세 — 발행분만. draft·archived 는 공개 경로에서 404 다 (SPEC-07 §5). */
     fun findBySlugAndStatus(slug: String, status: String): Article?
 
+    /** 북마크 목록이 저장한 아티클을 id 로 한 번에 되읽는다 — 발행분만 (BookmarkService). */
+    fun findByIdInAndStatus(ids: Collection<Long>, status: String): List<Article>
+
     /** 어드민 목록 — draft 포함. 최근에 손댄 것부터. */
     @Query(
         """

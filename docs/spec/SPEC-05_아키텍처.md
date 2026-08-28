@@ -48,7 +48,7 @@ BAR ◀──extends── PARTNER │
                          │
 CONTENT ──references──▶ BAR · COCKTAIL
 USER ──owns──▶ STOCK · Bookmark
-USER ──reads──▶ COCKTAIL
+USER ──reads──▶ COCKTAIL · CONTENT
 SEARCH ──reads──▶ COCKTAIL · BAR · INGREDIENT · CONTENT
 ADMIN ──governs──▶ 전부 (발행 상태 · 감사)
 ```
@@ -73,6 +73,16 @@ ADMIN ──governs──▶ 전부 (발행 상태 · 감사)
 > 순환은 생기지 않는다 — `COCKTAIL`은 `USER`를 참조하지 않는다. 근거는
 > [`GAPS.md` G-30](../prd/GAPS.md#g-30). 이슈 023이 같은 함정을 밟았고([G-28](../prd/GAPS.md#g-28)),
 > 그때 배운 것이 **"Facade를 거쳐도 모듈 화살표는 그대로"** 다.
+
+> **개정 (2026-08-28)** — `USER ──reads──▶ CONTENT` 를 추가했다.
+>
+> 2026-08-13 개정과 같은 이유다. 아티클이 DB 로 옮겨오며(ADR-0011) 실재하는 콘텐츠가 됐고,
+> 북마크는 칵테일뿐 아니라 아티클도 가리킨다(다형 참조, SPEC-06 §3.5). 저장할 때 발행됐는지
+> 확인하고 목록에서 제목을 보여주려면 `USER`가 `CONTENT`의 Facade(`ArticleFacade`)를 읽어야 한다.
+>
+> **팬아웃 상한(2)은 넘지 않는다.** `USER`가 실제로 읽는 것은 `COCKTAIL` 하나였고(내 술장이
+> Phase 2 로 회귀해 `STOCK`은 코드에 없다), 여기에 `CONTENT`를 더해 둘이다 — 상한과 같다.
+> `SEARCH`처럼 예외로 둘 필요가 없다. 순환도 없다 — `CONTENT`는 `USER`를 참조하지 않는다.
 
 ## 4. 프론트엔드 렌더링 전략
 

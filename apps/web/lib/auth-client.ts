@@ -34,8 +34,9 @@ export async function fetchProfile(): Promise<MyProfile | null> {
  */
 export function startLogin(): void {
   const returnTo = encodeURIComponent(window.location.href);
-  // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- Next 페이지가 아니라
-  // 서버가 카카오로 302 시키는 프록시 경로다. router.push 는 클라이언트 이동이라 302 를 따라가지 못한다.
+  // Next 페이지가 아니라 서버가 카카오로 302 시키는 프록시 경로다 — router.push 는 클라이언트
+  // 이동이라 302 를 따라가지 못한다. 그래서 브라우저 주소를 통째로 옮긴다.
+  // eslint-disable-next-line @next/next/no-location-assign-relative-destination
   window.location.href = `/api/v1/auth/kakao/authorize?returnTo=${returnTo}`;
 }
 
@@ -46,14 +47,4 @@ export async function logout(): Promise<void> {
   } finally {
     window.location.reload();
   }
-}
-
-/**
- * 저장 목록 항목이 가리키는 화면 주소. 다형 참조라(칵테일·아티클) 종류로 가른다.
- * 모르는 종류는 null — 링크를 만들지 않는다(바는 Phase 1b).
- */
-export function bookmarkHref(targetType: string, targetSlug: string): string | null {
-  if (targetType === "cocktail") return `/cocktails/${targetSlug}`;
-  if (targetType === "article") return `/articles/${targetSlug}`;
-  return null;
 }
