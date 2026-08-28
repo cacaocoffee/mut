@@ -123,7 +123,9 @@ test.describe("내비 탭 (ISSUE-051 · ISSUE-055)", () => {
   });
 
   test("선택된 탭의 대비가 4.5:1 이상이다", async ({ page }) => {
-    await page.goto("/");
+    // 홈(`/`)에는 선택된 탭이 없다 — 홈은 어느 탭도 아니다 (ADR-0012). 탭이 선택되는
+    // 화면에서 대비를 잰다. 탐색 화면에서 `01 탐색` 이 aria-current 다.
+    await page.goto("/cocktails/search");
     await page.waitForLoadState("networkidle");
 
     const current = page.locator('.tab[aria-current="page"]');
@@ -159,17 +161,20 @@ test.describe("카드 그리드 (ISSUE-051)", () => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    const grid = page.locator(".card-grid");
-    await expect(grid).toBeVisible();
+    // 홈(`/`)에는 카드 그리드가 둘이다(최신 아티클 · 추천 칵테일, ADR-0012). 둘 다 본다.
+    const grids = page.locator(".card-grid");
+    await expect(grids.first()).toBeVisible();
 
     // 맨 `1fr` 이면 min-content 바닥 때문에 카드가 그리드보다 넓어진다.
-    const spill = await grid.evaluate((g) => {
-      const gr = g.getBoundingClientRect();
-      return [...g.children]
-        .map((c) => Math.round(c.getBoundingClientRect().right - gr.right))
-        .filter((d) => d > 1);
-    });
-    expect(spill, `카드 ${spill.length}장이 그리드 밖으로 ${spill.join("·")}px 나갔다`).toEqual([]);
+    for (const grid of await grids.all()) {
+      const spill = await grid.evaluate((g) => {
+        const gr = g.getBoundingClientRect();
+        return [...g.children]
+          .map((c) => Math.round(c.getBoundingClientRect().right - gr.right))
+          .filter((d) => d > 1);
+      });
+      expect(spill, `카드 ${spill.length}장이 그리드 밖으로 ${spill.join("·")}px 나갔다`).toEqual([]);
+    }
   });
 });
 

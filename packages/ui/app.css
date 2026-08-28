@@ -673,6 +673,62 @@ a.saved-item__title:hover {
   flex: none;
 }
 
+/* — 홈 · 랜딩 (ADR-0012) — */
+.home-hero {
+  text-align: center;
+  padding: 72px 0 40px;
+  border-bottom: 3px solid var(--color-text); /* page-head 와 같은 잉크 경계 */
+}
+.home-hero__mark {
+  /* 제호를 크게 — 첫 화면의 얼굴이다. wordmark 는 svg 라 폭으로 키운다. */
+  width: min(420px, 78vw);
+  height: auto;
+}
+.home-hero__tagline {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  margin: var(--space-4) 0 0;
+}
+.home-hero__intro {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-neutral-700);
+  max-width: 44ch;
+  margin: var(--space-3) auto 0;
+}
+.home-hero__enter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  justify-content: center;
+  margin-top: var(--space-6);
+}
+.home-section {
+  margin-top: var(--space-8);
+}
+.home-section__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-bottom: var(--space-3);
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-divider);
+}
+.home-section__head h2 {
+  font-family: var(--font-heading);
+  font-size: 30px;
+  margin: 0;
+}
+.home-section__more {
+  font-size: 13px;
+  white-space: nowrap;
+  color: var(--color-accent-700);
+}
+.home-section__more:hover {
+  color: var(--color-text);
+}
+
 /* ─────────────────────────  02 상세  ───────────────────────── */
 
 .detail-hero {
