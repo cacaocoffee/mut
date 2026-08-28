@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { adminWrite } from "@/lib/admin-csrf";
-import { startLogin, bookmarkHref } from "@/lib/auth-client";
+import { startLogin } from "@/lib/auth-client";
+import { bookmarkHref, bookmarkLabel } from "@/lib/bookmark-targets";
 
 /**
  * 내 저장 목록 (`FR-USER-003` · SPEC-07 §2.5).
@@ -101,7 +102,7 @@ export function SavedList() {
         return (
           <li key={b.id} className="saved-item">
             <div className="saved-item__body">
-              <span className="saved-item__kind">{kindLabel(b.targetType)}</span>
+              <span className="saved-item__kind">{bookmarkLabel(b.targetType)}</span>
               {href ? (
                 <Link href={href} className="saved-item__title">
                   {b.nameKo}
@@ -124,12 +125,4 @@ export function SavedList() {
       })}
     </ul>
   );
-}
-
-/** 다형 참조라 종류를 한 낱말로 붙인다. 모르는 종류는 그대로 코드를 보여 준다. */
-function kindLabel(targetType: string): string {
-  if (targetType === "cocktail") return "칵테일";
-  if (targetType === "article") return "아티클";
-  if (targetType === "bar") return "바";
-  return targetType;
 }

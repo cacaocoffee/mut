@@ -281,7 +281,9 @@ private val ALLOWED_TARGETS: Map<String, Set<String>> = mapOf(
     // `reads──▶ COCKTAIL` 은 2026-08-13 개정분이다 (이슈 031 · GAPS G-30).
     // 북마크가 가리키는 대상을 못 읽으면 저장 시 발행 여부를 확인할 수도, 목록에 무엇을
     // 저장했는지 보여 줄 수도 없다. 코드가 아니라 SPEC-05 §3 을 먼저 고쳤다.
-    "user" to setOf("stock", "cocktail"),
+    // `content` 는 2026-08-28 개정분이다 — 아티클이 DB 로 오며(ADR-0011) 북마크 대상이 됐다.
+    // 팬아웃은 여전히 2다(cocktail·content) — stock 은 코드에 없다(내 술장 Phase 2 회귀).
+    "user" to setOf("stock", "cocktail", "content"),
     "stock" to emptySet(),
     "search" to setOf("cocktail", "bar", "ingredient", "content"), // 조회 전용 (§3)
     "admin" to DOMAIN_MODULES,                                     // governs 전부

@@ -7,6 +7,7 @@ import { ARTICLES_PATH } from "@/lib/routes";
 import { openGraph, SITE_URL } from "@/lib/site";
 import { articleJsonLd } from "@/lib/structured-data";
 import { TrackArticleView } from "@/components/analytics/article-view";
+import { DetailActions } from "@/components/detail-actions";
 
 /**
  * 아티클 상세 (ADR-0010 · DB 이관 ADR-0011).
@@ -108,6 +109,10 @@ export default async function ArticleDetailPage({ params }: PageProps<"/articles
         </div>
         <p className="lede">{a.dek}</p>
       </header>
+
+      {/* 저장·공유. 아티클도 북마크한다 (ADR-0011 · FR-USER-003). 저장은 /me/bookmarks 로
+          가고 비로그인은 로그인 유도로 끝난다. */}
+      <DetailActions targetType="article" targetSlug={a.slug} sharePath={`${ARTICLES_PATH}/${a.slug}`} nameKo={a.title} />
 
       <article className="article-body">
         {/* 대표 사진이 첫 화면(LCP)이다 — lazy 를 붙이지 않는다.

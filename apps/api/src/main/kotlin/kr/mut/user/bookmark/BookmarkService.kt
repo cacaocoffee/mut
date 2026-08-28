@@ -1,7 +1,7 @@
 package kr.mut.user.bookmark
 
 import kr.mut.cocktail.api.CocktailFacade
-import kr.mut.cocktail.api.CocktailSummary
+import kr.mut.content.api.ArticleFacade
 import kr.mut.common.web.error.BadRequestException
 import kr.mut.common.web.error.ResourceNotFoundException
 import org.springframework.stereotype.Service
@@ -28,10 +28,11 @@ import org.springframework.transaction.annotation.Transactional
  * SPEC-08 §2 의 `◐` — 자기 것만이다. 403 으로 답하면 **"그 id 는 존재한다"** 가 새어 나가고,
  * 순차 id 를 훑어 누가 무엇을 저장했는지 셀 수 있다 (`Action.OWN_BOOKMARK` 가 `HIDE` 인 이유).
  *
- * ## `cocktail` 모듈을 Facade 로만 본다
+ * ## `cocktail`·`content` 모듈을 Facade 로만 본다
  *
- * `PRIN-T03`. 방향표에 `USER ──reads──▶ COCKTAIL` 을 추가하고 왔다 (2026-08-13 개정 · GAPS G-30) —
- * 이슈 023 이 Facade 만 거치면 되는 줄 알고 밟은 함정이 [G-28] 이다.
+ * `PRIN-T03`. 방향표에 `USER ──reads──▶ COCKTAIL`(2026-08-13 개정 · GAPS G-30)과
+ * `USER ──reads──▶ CONTENT`(2026-08-28 개정 — 아티클이 DB 로 오며 북마크 대상이 됐다)를
+ * 추가하고 왔다. 이슈 023 이 Facade 만 거치면 되는 줄 알고 밟은 함정이 [G-28] 이다 —
  * **Facade 를 거쳐도 모듈 화살표는 그대로다.**
  */
 @Service
@@ -39,6 +40,7 @@ class BookmarkService(
     private val bookmarks: BookmarkRepository,
     private val collections: BookmarkCollectionRepository,
     private val cocktails: CocktailFacade,
+    private val articles: ArticleFacade,
 ) {
 
     /**
@@ -56,8 +58,8 @@ class BookmarkService(
                     "(가능: ${BookmarkTarget.entries.joinToString(", ") { it.code }})",
             )
 
-        // RED 5·8·28 — 발행된 대상만 저장한다. bar·article 은 Phase 1a 에 도메인이 없어
-        // 여기서 404 로 끝난다. "아직 지원 안 함" 이 아니라 "그런 것이 없다" 가 맞다.
+        // RED 5·28 — 발행된 대상만 저장한다. cocktail·article 은 실재한다. bar 는 Phase 1b 라
+        // 도메인이 없어 404 로 끝난다 — "아직 지원 안 함" 이 아니라 "그런 것이 없다" 가 맞다.
         val target = resolve(type, request.targetSlug) ?: throw ResourceNotFoundException()
 
         val collectionId = request.collectionId?.also { requireOwnCollection(userId, it) }
@@ -136,10 +138,14 @@ class BookmarkService(
     // ── 대상 해석 ────────────────────────────────────────────────────────
 
     /** 저장 시점 검증. 발행된 것만 실재한다 (SPEC-07 §5). */
-    private fun resolve(type: BookmarkTarget, slug: String): CocktailSummary? = when (type) {
+    private fun resolve(type: BookmarkTarget, slug: String): ResolvedTarget? = when (type) {
         BookmarkTarget.COCKTAIL -> cocktails.findPublished(slug)
-        // Phase 1a 에 도메인이 없다. 열거에는 있고 대상이 없는 상태다 (RED 8).
-        BookmarkTarget.BAR, BookmarkTarget.ARTICLE -> null
+            ?.let { ResolvedTarget(it.id, it.slug, it.nameKo, it.nameEn) }
+        BookmarkTarget.ARTICLE -> articles.findPublishedSummary(slug)
+            // 아티클은 영문명이 없다 — 제목이 곧 이름이다. nameEn 은 비운다.
+            ?.let { ResolvedTarget(it.id, it.slug, it.title, "") }
+        // bar 는 Phase 1b 라 도메인이 없다. 열거에는 있고 대상이 없는 상태다 (RED 8).
+        BookmarkTarget.BAR -> null
     }
 
     /**
@@ -150,13 +156,19 @@ class BookmarkService(
      */
     private fun resolveAll(rows: List<Bookmark>): List<BookmarkItem> {
         val cocktailIds = rows.filter { it.targetType == BookmarkTarget.COCKTAIL }.map { it.targetId }
-        val byId = if (cocktailIds.isEmpty()) emptyMap()
+        val articleIds = rows.filter { it.targetType == BookmarkTarget.ARTICLE }.map { it.targetId }
+        // 빈 목록에 IN () 을 던지지 않는다 — cocktail 쪽은 밖에서 거른다(article 은 Facade 가 거른다).
+        val cocktailById = if (cocktailIds.isEmpty()) emptyMap()
         else cocktails.findPublishedByIds(cocktailIds).associateBy { it.id }
+        val articleById = articles.findPublishedSummariesByIds(articleIds).associateBy { it.id }
 
         return rows.mapNotNull { row ->
             when (row.targetType) {
-                BookmarkTarget.COCKTAIL -> byId[row.targetId]?.let { row.toItem(it) }
-                else -> null
+                BookmarkTarget.COCKTAIL -> cocktailById[row.targetId]
+                    ?.let { row.toItem(ResolvedTarget(it.id, it.slug, it.nameKo, it.nameEn)) }
+                BookmarkTarget.ARTICLE -> articleById[row.targetId]
+                    ?.let { row.toItem(ResolvedTarget(it.id, it.slug, it.title, "")) }
+                BookmarkTarget.BAR -> null
             }
         }
     }
@@ -167,7 +179,7 @@ class BookmarkService(
         if (collection.userId != userId) throw ResourceNotFoundException()
     }
 
-    private fun Bookmark.toItem(target: CocktailSummary) = BookmarkItem(
+    private fun Bookmark.toItem(target: ResolvedTarget) = BookmarkItem(
         id = id,
         targetType = targetType.code,
         targetSlug = target.slug,
@@ -195,3 +207,15 @@ class BookmarkService(
         const val DEFAULT_COLLECTION = 0L
     }
 }
+
+/**
+ * 북마크가 가리키는 대상을 한 모양으로 맞춘 것. 칵테일·아티클이 서로 다른 요약을 주므로
+ * (칵테일은 국문·영문 이름, 아티클은 제목 하나) 저장·조회가 공통으로 쓸 최소 필드만 담는다.
+ * 아티클엔 영문명이 없어 nameEn 은 빈 문자열이다 — 화면이 비었을 때 표기를 접는다.
+ */
+private data class ResolvedTarget(
+    val id: Long,
+    val slug: String,
+    val nameKo: String,
+    val nameEn: String,
+)

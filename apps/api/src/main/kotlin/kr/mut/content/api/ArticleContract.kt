@@ -13,6 +13,22 @@ interface ArticleFacade {
     /** 공개 상세 — 발행분만. 없거나 미발행이면 null. */
     fun findPublished(slug: String): ArticleDetail?
 
+    /**
+     * 공개 요약 하나 — 발행분만. 없거나 미발행이면 null.
+     *
+     * 북마크가 저장할 때 이 요약을 읽어 발행 여부와 제목을 확인한다(USER ──reads──▶ CONTENT,
+     * SPEC-05 §3). 본문(body)을 안 싣는 요약이라 상세(findPublished)보다 가볍다.
+     */
+    fun findPublishedSummary(slug: String): ArticleSummary?
+
+    /**
+     * 공개 요약 여럿을 id 로 — 발행분만. 못 찾은 것은 빠진다.
+     *
+     * 북마크 목록이 저장한 아티클을 한 번에 되읽는다(N+1 회피). 저장 시점엔 있었는데
+     * 지금 미발행·삭제된 것은 목록에서 조용히 빠진다(BookmarkService.resolveAll 규약).
+     */
+    fun findPublishedSummariesByIds(ids: Collection<Long>): List<ArticleSummary>
+
     /** 어드민 목록 — draft 포함. */
     fun listForAdmin(status: String?): List<ArticleSummary>
 

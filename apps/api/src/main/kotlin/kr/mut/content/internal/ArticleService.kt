@@ -36,6 +36,13 @@ class ArticleService(
     override fun findPublished(slug: String): ArticleDetail? =
         articles.findBySlugAndStatus(slug, ArticleStatus.PUBLISHED.slug)?.let { detail(it) }
 
+    override fun findPublishedSummary(slug: String): ArticleSummary? =
+        articles.findBySlugAndStatus(slug, ArticleStatus.PUBLISHED.slug)?.toSummary()
+
+    override fun findPublishedSummariesByIds(ids: Collection<Long>): List<ArticleSummary> =
+        if (ids.isEmpty()) emptyList()
+        else articles.findByIdInAndStatus(ids, ArticleStatus.PUBLISHED.slug).map { it.toSummary() }
+
     @Transactional(readOnly = true)
     override fun listForAdmin(status: String?): List<ArticleSummary> =
         articles.findForAdmin(status).map { it.toSummary() }

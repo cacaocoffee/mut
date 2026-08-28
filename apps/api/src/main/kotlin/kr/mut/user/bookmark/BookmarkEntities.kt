@@ -52,9 +52,10 @@ class Bookmark(
 /**
  * 저장 대상 3종 (SPEC-06 §3.5 CHECK).
  *
- * **Phase 1a 에 실재하는 것은 `COCKTAIL` 뿐이다.** 그래도 셋 다 정의한다 —
- * 나중에 열거를 늘리면 이 목록을 읽는 쪽(클라이언트 필터 · 컬렉션 화면)이 그때 깨진다.
- * `BAR` · `ARTICLE` 로 저장을 시도하면 대상이 없어 404 다 (RED 8).
+ * **실재하는 것은 `COCKTAIL` 과 `ARTICLE` 이다** (아티클은 2026-08-28 에 DB 에 추가됐다,
+ * ADR-0011). `BAR` 는 Phase 1b 라 도메인이 없어, 저장을 시도하면 대상이 없어 404 로 끝난다 (RED 8).
+ * 셋 다 열거로 두는 이유는, 늘릴 때 이 목록을 읽는 쪽(클라이언트 필터 · 컬렉션 화면)이
+ * 그때 깨져 알아차리게 하기 위해서다.
  */
 enum class BookmarkTarget(val code: String) {
     COCKTAIL("cocktail"),
@@ -62,8 +63,8 @@ enum class BookmarkTarget(val code: String) {
     ARTICLE("article"),
     ;
 
-    /** Phase 1a 에 대상 도메인이 있는가. 없으면 저장할 수 있는 것이 없다. */
-    val isAvailable: Boolean get() = this == COCKTAIL
+    /** 대상 도메인이 실재하는가. 없으면(bar) 저장할 수 있는 것이 없다. */
+    val isAvailable: Boolean get() = this == COCKTAIL || this == ARTICLE
 
     companion object {
         fun find(code: String): BookmarkTarget? = entries.firstOrNull { it.code == code }

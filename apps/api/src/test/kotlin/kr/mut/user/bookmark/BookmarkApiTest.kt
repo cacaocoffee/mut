@@ -58,6 +58,7 @@ class BookmarkApiTest {
     fun clear() {
         jdbc.execute("TRUNCATE bookmark, bookmark_collection CASCADE")
         jdbc.execute("TRUNCATE cocktail, search_document CASCADE")
+        jdbc.execute("TRUNCATE article, article_related_cocktail CASCADE")
         jdbc.execute("""TRUNCATE user_role, "user" CASCADE""")
     }
 
@@ -147,17 +148,41 @@ class BookmarkApiTest {
     }
 
     /**
-     * RED 8 — **`bar` · `article` 은 열거에 있고 대상이 없다.**
+     * RED 8 — **`bar` 는 열거에 있고 대상이 없다.**
      *
      * 404 인 것이 맞다 — "아직 지원 안 함"(501)이 아니라 **그런 것이 없다**.
-     * 열거를 지금 정의해 두는 이유는 나중에 늘리면 클라이언트가 그때 깨져서다.
+     * `article` 은 2026-08-28 에 대상이 생겨(ADR-0011) 여기서 빠졌다 — 아래 저장 성공 케이스가 있다.
      */
     @ParameterizedTest
-    @ValueSource(strings = ["bar", "article"])
-    fun `RED8 - Phase 1a 에는 cocktail 만 실제로 추가된다`(type: String) {
+    @ValueSource(strings = ["bar"])
+    fun `RED8 - 도메인이 없는 타입은 404 다`(type: String) {
         publishedCocktail("negroni")
 
         assertThat(add(login(), type, "negroni").response.status).isEqualTo(404)
+    }
+
+    @Test
+    fun `아티클도 저장한다 — 목록에 제목이 나온다 (ADR-0011)`() {
+        publishedArticle("negroni-story", "네그로니 이야기")
+        val me = login()
+
+        val added = add(me, "article", "negroni-story")
+        val listed = bodyOf(list(me))
+
+        assertAll(
+            { assertThat(added.response.status).isEqualTo(200) },
+            { assertThat(bodyOf(added)["targetType"].asText()).isEqualTo("article") },
+            { assertThat(bodyOf(added)["nameKo"].asText()).isEqualTo("네그로니 이야기") },
+            { assertThat(listed.size()).isEqualTo(1) },
+            { assertThat(listed[0]["targetSlug"].asText()).isEqualTo("negroni-story") },
+        )
+    }
+
+    @Test
+    fun `미발행 아티클은 저장할 수 없다 — 404`() {
+        publishedArticle("draft-story", "초안", status = "draft")
+
+        assertThat(add(login(), "article", "draft-story").response.status).isEqualTo(404)
     }
 
     @Test
@@ -563,6 +588,15 @@ class BookmarkApiTest {
     private fun publishedCocktail(slug: String) = insertCocktail(slug, "published")
 
     private fun draftCocktail(slug: String) = insertCocktail(slug, "draft")
+
+    /** 아티클 한 편. 칵테일과 달리 유예 FK 가 없어 한 문장으로 넣는다 (V028). */
+    private fun publishedArticle(slug: String, title: String, status: String = "published") {
+        jdbc.update(
+            """INSERT INTO article (slug, category, title, dek, hero, is_sponsored, body, status, published_at)
+               VALUES (?, 'cocktail', ?, '요약', '/x.webp', false, '[]'::jsonb, ?, now())""",
+            slug, title, status,
+        )
+    }
 
     /**
      * 3축 중 스타일·향은 **별도 테이블**이다 (V009). 배열 컬럼이 아니다.
