@@ -6,6 +6,9 @@
  * (`PRIN-T04`) 주소는 계약에 가깝다.
  */
 
+/** 홈 · 랜딩 (ADR-0012). 제호(nav-brand)가 여기를 가리킨다. 색인한다. */
+export const HOME_PATH = "/";
+
 /** 탐색 · 필터. 필터는 쿼리스트링에만 붙고 색인하지 않는다 (`NFR-S-02`). */
 export const SEARCH_PATH = "/cocktails/search";
 

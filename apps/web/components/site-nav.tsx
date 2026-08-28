@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Wordmark } from "@/components/wordmark";
 import { AuthMenu } from "@/components/auth-menu";
-import { ARTICLES_PATH, FINDER_PATH, SEARCH_PATH } from "@/lib/routes";
+import { ARTICLES_PATH, FINDER_PATH, HOME_PATH, SEARCH_PATH } from "@/lib/routes";
 
 export function SiteNav() {
   const pathname = usePathname();
@@ -35,7 +35,7 @@ export function SiteNav() {
     <nav className="nav site-nav">
       {/* 워드마크가 곧 이름이다 — 글자로 한 번 더 적지 않는다. 마크업에 직접 두는
           이유는 `components/wordmark.tsx` 에 적었다. */}
-      <Link href={SEARCH_PATH} className="nav-brand" aria-label="MUT 홈으로">
+      <Link href={HOME_PATH} className="nav-brand" aria-label="MUT 홈으로">
         <Wordmark />
         <small>당신의 취향, 당신의 멋</small>
       </Link>

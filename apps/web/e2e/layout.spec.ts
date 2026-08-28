@@ -123,7 +123,9 @@ test.describe("내비 탭 (ISSUE-051 · ISSUE-055)", () => {
   });
 
   test("선택된 탭의 대비가 4.5:1 이상이다", async ({ page }) => {
-    await page.goto("/");
+    // 홈(`/`)에는 선택된 탭이 없다 — 홈은 어느 탭도 아니다 (ADR-0012). 탭이 선택되는
+    // 화면에서 대비를 잰다. 탐색 화면에서 `01 탐색` 이 aria-current 다.
+    await page.goto("/cocktails/search");
     await page.waitForLoadState("networkidle");
 
     const current = page.locator('.tab[aria-current="page"]');
