@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { bookmarkAdd, shareClick } from "@/lib/analytics/events";
+import { bookmarkAdd, shareClick, type BookmarkTargetType } from "@/lib/analytics/events";
 import { adminWrite } from "@/lib/admin-csrf";
 
 /**
@@ -23,7 +23,8 @@ export function DetailActions({
   sharePath,
   nameKo,
 }: {
-  targetType: string;
+  /** 칵테일·아티클. 문자열이 아니라 계측이 받는 종류로 좁힌다 — 모르는 값이 이벤트에 섞이지 않게. */
+  targetType: BookmarkTargetType;
   targetSlug: string;
   sharePath: string;
   nameKo: string;
@@ -51,9 +52,7 @@ export function DetailActions({
       setSaved(true);
       // 저장이 **된 뒤에만** 센다 (SPEC-10 §4.6). 누른 것을 세면 로그인 유도로 끝난 것까지
       // 저장으로 잡히고, 그러면 저장률이 실제보다 높게 나온다.
-      // 계측 이벤트는 아직 cocktail 만 받는다 — 아티클 저장은 되지만 이 이벤트는 건너뛴다
-      // (아티클 유입은 article_view 로 이미 측정한다). 넓히려면 이벤트 스키마부터 고친다.
-      if (targetType === "cocktail") bookmarkAdd({ targetType, targetSlug });
+      bookmarkAdd({ targetType, targetSlug });
     } catch {
       // 계측·저장 실패가 사용자 흐름을 막지 않는다 (`NFR-R-04` 의 정신).
       setMessage("지금은 저장할 수 없습니다");
@@ -68,8 +67,7 @@ export function DetailActions({
       try {
         await navigator.share({ title: nameKo, url });
         // 어느 앱으로 갔는지는 알 수 없다. 시트를 거친 것까지가 우리가 아는 것이다.
-        // 계측은 아직 cocktail 만 받는다 (save 와 같은 사정).
-        if (targetType === "cocktail") shareClick({ targetType, targetSlug, channel: "system" });
+        shareClick({ targetType, targetSlug, channel: "system" });
         return;
       } catch {
         // 사용자가 취소한 경우도 여기로 온다. 링크 복사로 넘어간다.
@@ -79,7 +77,7 @@ export function DetailActions({
     try {
       await navigator.clipboard.writeText(url);
       setMessage("링크를 복사했습니다");
-      if (targetType === "cocktail") shareClick({ targetType, targetSlug, channel: "link" });
+      shareClick({ targetType, targetSlug, channel: "link" });
     } catch {
       setMessage("링크를 복사하지 못했습니다");
     }

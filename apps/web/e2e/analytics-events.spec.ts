@@ -305,6 +305,22 @@ test("RED17,18 - 저장이 된 뒤에 bookmark_add 가 나간다", async ({ page
 });
 
 /**
+ * 아티클도 같은 이벤트로 센다 (ADR-0011 · SPEC-10 §4.6). 아티클 저장은 되는데 이벤트만
+ * 칵테일로 걸러 버리면 아티클 저장률이 0 으로 읽힌다.
+ */
+test("아티클을 저장해도 bookmark_add 가 article 로 나간다", async ({ page }) => {
+  const batches = await collect(page);
+  await page.route("**/api/v1/me/bookmarks", (route) => route.fulfill({ status: 201, json: {} }));
+
+  await page.goto("/articles/negroni");
+  await page.getByRole("button", { name: /저장/ }).click();
+  await expect(page.getByRole("button", { name: /저장됨/ })).toBeVisible();
+
+  const [event] = await flushed(page, batches, "bookmark_add");
+  expect(event.payload).toMatchObject({ targetType: "article", targetSlug: "negroni" });
+});
+
+/**
  * 저장이 **안 됐으면** 세지 않는다.
  *
  * 누른 것을 세면 로그인 유도로 끝난 것까지 저장으로 잡히고, 그러면 저장률이 실제보다 높다.

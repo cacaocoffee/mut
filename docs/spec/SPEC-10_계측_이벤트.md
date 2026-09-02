@@ -126,7 +126,7 @@
 
 | payload | |
 |---|---|
-| `targetType` | `cocktail` (1a) |
+| `targetType` | `cocktail` · `article` — 아티클은 2026-08-28 에 북마크 대상이 되며 추가됐다 (ADR-0011). `bar` 는 1b |
 | `targetSlug` | |
 | `channel` | `share_click`만 — `kakao` · `link` · `system` |
 

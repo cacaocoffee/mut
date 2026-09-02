@@ -188,9 +188,11 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
             </Link>
           </nav>
 
-          {/* `FR-COCKTAIL-017` 여덟째 블록 (`FR-COCKTAIL-027`). 대조는 P2 라 없다. */}
+          {/* `FR-COCKTAIL-017` 여덟째 블록 (`FR-COCKTAIL-027`). 대조는 P2 라 없다.
+              targetType 은 계약(Actions)이 string 으로 주지만 이 화면은 언제나 칵테일이다 —
+              계측이 받는 종류(BookmarkTargetType)로 여기서 못박는다. */}
           <DetailActions
-            targetType={c.actions.targetType}
+            targetType="cocktail"
             targetSlug={c.actions.targetSlug}
             sharePath={c.actions.sharePath}
             nameKo={c.nameKo}

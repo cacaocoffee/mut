@@ -71,9 +71,14 @@ export function recipeInteract(payload: RecipeInteractPayload) {
   track("recipe_interact", { ...payload });
 }
 
+/**
+ * 북마크가 가리키는 종류 (SPEC-10 §4.6). `article` 은 아티클이 DB 로 오며 북마크 대상이 된
+ * 2026-08-28 에 추가됐다 (ADR-0011). `bar` 는 Phase 1b 라 아직 없다 — 생기면 여기 한 줄이다.
+ */
+export type BookmarkTargetType = "cocktail" | "article";
+
 export interface BookmarkAddPayload {
-  /** Phase 1a 는 `cocktail` 뿐이다. 바는 1b 다 (SPEC-10 §5) */
-  targetType: "cocktail";
+  targetType: BookmarkTargetType;
   targetSlug: string;
 }
 
@@ -91,7 +96,7 @@ export function bookmarkAdd(payload: BookmarkAddPayload) {
 export type ShareChannel = "kakao" | "link" | "system";
 
 export interface ShareClickPayload {
-  targetType: "cocktail";
+  targetType: BookmarkTargetType;
   targetSlug: string;
   channel: ShareChannel;
 }
