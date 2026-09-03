@@ -190,6 +190,18 @@ test.describe("카드 그리드 (ISSUE-051)", () => {
  *
  * `aria-label` 은 이름 그 자체라 스크린리더가 읽을 것이 있는지도 함께 본다 (`NFR-A-01` 계열).
  */
+/** #179 — 통합 검색과 재료 사전은 탭이 아니라 아이콘·바닥글로 연다. 탭 셋은 그대로다. */
+test("통합 검색 아이콘과 재료 사전 링크가 있다 (#179)", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator(".tab")).toHaveCount(3);
+
+  await page.getByRole("link", { name: "통합 검색" }).click();
+  await expect(page).toHaveURL(/\/search$/);
+
+  await page.getByTestId("legal-notice").getByRole("link", { name: "재료 사전" }).click();
+  await expect(page).toHaveURL(/\/ingredients$/);
+});
+
 test("헤더에 워드마크가 뜬다", async ({ page }) => {
   await page.goto("/cocktails/search");
 
