@@ -52,7 +52,7 @@ export function SearchField({
           placeholder="네그로니 / Negroni"
           value={value}
           autoComplete="off"
-          aria-label="칵테일 이름 검색"
+          aria-label="칵테일 이름 · 기주 · 재료 검색"
           aria-describedby="cocktail-q-note"
           onChange={(e) => onChange(e.target.value)}
         />
@@ -69,7 +69,7 @@ export function SearchField({
       </div>
 
       <p id="cocktail-q-note" className="search-field__note" aria-live="polite">
-        {pending ? "찾는 중…" : "이름과 아래 필터가 함께 걸립니다."}
+        {pending ? "찾는 중…" : "이름 · 기주 · 재료 이름과 아래 필터가 함께 걸립니다."}
       </p>
     </div>
   );

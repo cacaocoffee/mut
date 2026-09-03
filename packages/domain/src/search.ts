@@ -9,6 +9,8 @@ import {
   abvBandOf,
 } from "./data";
 import { SWEET_LEVELS, sweetRank } from "./data";
+import { BASE_SPIRIT_LABELS } from "./generated/labels";
+import { INGREDIENTS, cocktailsUsing } from "./ingredients";
 import type { components } from "./generated/api";
 import type {
   AbvBand,
@@ -91,9 +93,32 @@ export const DEFAULT_FILTERS: Filters = {
   query: "",
 };
 
+/**
+ * 검색어가 걸리는 잔 (#178). 이름(한·영)만 보던 것을 **기주 이름과 재료 이름**까지 넓힌다 —
+ * "진" 을 치면 기주가 진인 잔이, "캄파리" 를 치면 캄파리를 쓰는 잔이 나와야 한다.
+ *
+ * 재료는 `SearchItem` 에 없다. 재료 마스터에서 이름이 맞는 재료를 먼저 고르고, 그 재료를
+ * 쓰는 잔(`cocktailsUsing`)의 슬러그 집합을 한 번 만들어 대조한다. 코드 레시피에만 있는
+ * 정보라 코퍼스에만 있는 잔은 재료로는 안 걸린다 — 이름·기주로는 걸린다.
+ */
+function queryMatcher(q: string): (x: SearchItem) => boolean {
+  if (!q) return () => true;
+  const byIngredient = new Set(
+    INGREDIENTS.filter(
+      (i) => i.nameKo.toLowerCase().includes(q) || i.nameEn.toLowerCase().includes(q)
+    ).flatMap((i) => cocktailsUsing(i.slug))
+  );
+  return (x) =>
+    x.nameKo.toLowerCase().includes(q) ||
+    x.nameEn.toLowerCase().includes(q) ||
+    BASE_SPIRIT_LABELS[x.base].toLowerCase().includes(q) ||
+    x.base.includes(q) ||
+    byIngredient.has(x.slug);
+}
+
 /** 모든 축을 AND로 교차한 뒤 도수 낮은 순으로 정렬한다. */
 export function filterCocktails(corpus: SearchItem[], f: Filters): SearchItem[] {
-  const q = f.query.trim().toLowerCase();
+  const matchesQuery = queryMatcher(f.query.trim().toLowerCase());
   return corpus
     .filter(
       (x) =>
@@ -103,7 +128,7 @@ export function filterCocktails(corpus: SearchItem[], f: Filters): SearchItem[] 
         (f.methods.length === 0 || f.methods.includes(x.method)) &&
         (f.flavors.length === 0 || f.flavors.every((k) => x.flavors.includes(k))) &&
         (f.abvBands.length === 0 || bandsOf(x).some((b) => f.abvBands.includes(b))) &&
-        (!q || x.nameKo.toLowerCase().includes(q) || x.nameEn.toLowerCase().includes(q))
+        matchesQuery(x)
     )
     .sort((a, b) => (a.abv ?? 0) - (b.abv ?? 0));
 }
