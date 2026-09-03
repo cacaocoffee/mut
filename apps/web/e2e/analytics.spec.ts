@@ -108,7 +108,7 @@ test("RED15,16 - entryPoint 가 들어온 곳을 구분한다", async ({ page })
 
   // 카테고리 → 상세
   await page.goto("/cocktails/base/gin");
-  await page.locator(".card").first().click();
+  await page.locator(".cocktail-card").first().click();
   events = await flushed(page, batches, "cocktail_view", 3);
   expect(events.at(-1)!.payload).toMatchObject({ entryPoint: "category" });
 });
@@ -275,7 +275,7 @@ test("RED9 - 내부 이동은 internal 이다", async ({ page }) => {
   const batches = await collect(page);
 
   await page.goto("/cocktails/base/gin");
-  await page.locator(".card").first().click();
+  await page.locator(".cocktail-card").first().click();
   const events = await flushed(page, batches, "cocktail_view");
 
   expect(events.at(-1)!.referrerType, "화면 안에서 옮겼는데 internal 이 아니다").toBe("internal");
