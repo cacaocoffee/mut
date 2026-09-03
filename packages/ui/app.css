@@ -738,6 +738,8 @@ a.saved-item__title:hover {
 }
 .detail-hero .photo-slot {
   min-height: 420px;
+  /* 오른쪽 열에 재료 표가 올라와 길어졌다 (#182). 사진은 위에 붙고 남는 높이는 비운다 */
+  align-self: start;
 }
 /* 사진 없는 잔 — 슬롯을 안 그리므로 한 단으로 접는다 (#174) */
 .detail-hero--no-photo {
@@ -1051,6 +1053,10 @@ a.saved-item__title:hover {
 @media (min-width: 1081px) {
   .article-card--lead {
     grid-column: span 2;
+  }
+  /* 홈은 3편뿐이다 — 2열로 두고 머리기사가 한 줄을 다 쓴다: 1 + 2 (#182) */
+  .home-articles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .article-card--lead .article-card__title {
     font-size: 31px;

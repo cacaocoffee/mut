@@ -79,7 +79,8 @@ export default async function HomePage() {
               전체 보기
             </Link>
           </div>
-          <div className="card-grid">
+          {/* 3편이라 1 + 2 로 놓는다 (#182). 3열에 머리기사 2칸이면 셋째가 혼자 남아 오른쪽이 빈다. */}
+          <div className="card-grid home-articles">
             {latest.map((a, i) => (
               <Link
                 key={a.slug}
