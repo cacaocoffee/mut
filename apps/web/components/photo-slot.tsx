@@ -1,6 +1,9 @@
 /**
  * 사진 자리. 시안이 사선 해칭 플레이스홀더로 잡아둔 블록이다.
  *
+ * 빈 자리엔 캡션(영문 이름)만 놓는다. `IMAGE 4:5` 같은 개발용 라벨은 사용자에게
+ * 그대로 보였던 것이라 뺐다 (#174).
+ *
  * `src` 가 오면 자리표시자 대신 사진을 꽉 채워 그린다 (ISSUE-060 #139) —
  * 사진이 있는 것은 #87 로 들어온 25종뿐이라 두 모습이 공존한다.
  *
@@ -12,13 +15,11 @@
 export function PhotoSlot({
   ratio,
   caption,
-  label,
   src,
   alt,
 }: {
   ratio: "4x5" | "4x3" | "3x2";
   caption?: string;
-  label?: string;
   /** 사진 경로 — 있으면 라벨·캡션 대신 사진을 그린다 */
   src?: string | null;
   /** 사진일 때만 쓴다. G-46 이 문구 주인을 정하기 전까지 칵테일 이름을 넣는다 */
@@ -40,7 +41,6 @@ export function PhotoSlot({
   }
   return (
     <div className={`photo-slot photo-slot--${ratio}`}>
-      {label ? <div className="photo-slot__label">{label}</div> : null}
       {caption ? <div className="photo-slot__caption">{caption}</div> : null}
     </div>
   );

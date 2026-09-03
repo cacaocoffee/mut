@@ -578,14 +578,6 @@
     color-mix(in srgb, var(--color-neutral-900) 7%, transparent) 11px 12px
   );
 }
-.photo-slot__label {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  font-size: 9px;
-  letter-spacing: 0.12em;
-  color: var(--color-neutral-700);
-}
 .photo-slot__caption {
   position: relative;
   font-family: var(--font-serif);
@@ -740,6 +732,10 @@ a.saved-item__title:hover {
 }
 .detail-hero .photo-slot {
   min-height: 420px;
+}
+/* 사진 없는 잔 — 슬롯을 안 그리므로 한 단으로 접는다 (#174) */
+.detail-hero--no-photo {
+  grid-template-columns: 1fr;
 }
 .detail-hero .photo-slot__caption {
   position: absolute;

@@ -18,10 +18,13 @@ test("RED1 - 사진이 있는 종의 상세 히어로에 사진이 나온다", a
   ).toBeVisible();
 });
 
-test("RED2 - 사진이 없는 종의 상세 히어로는 자리표시자다", async ({ page }) => {
+test("RED2 - 사진이 없는 종의 상세는 히어로 슬롯 없이 제목부터 온다 (#174)", async ({ page }) => {
   await page.goto(`/cocktails/${WITHOUT_PHOTO}`);
   await expect(page.locator(".detail-hero img")).toHaveCount(0);
-  await expect(page.locator(".detail-hero .photo-slot").first()).toBeVisible();
+  await expect(page.locator(".detail-hero .photo-slot")).toHaveCount(0);
+  await expect(page.locator(".detail-hero h1")).toBeInViewport();
+  // 개발용 자리표시 문구가 사용자에게 보이지 않는다
+  await expect(page.getByText(/PLACEHOLDER|IMAGE 4:5|자리입니다/)).toHaveCount(0);
 });
 
 test("RED3 - 탐색 카드에도 같은 규칙이 적용된다", async ({ page }) => {
