@@ -18,7 +18,7 @@ export const ARTICLE: Article = {
     { kind: "paragraph", text: "2018년에는 이 칵테일에 대한 영화 <YUKIGUNI>가 일본에서 만들어졌을 정도로 꽤나 인기 있는 칵테일이었지 않았을까 생각해봅니다." },
     { kind: "paragraph", text: "잔의 림에 장식된 설탕이 눈을 형상화하며, 녹색의 체리는 겨울의 눈 밑에서 봄을 힘차게 기다리고 있는 녹색(생명력?)을 형상화한 것이라 하며, 꽤나 직관적이면서도 이름이 걸맞는 칵테일입니다." },
     { kind: "figure", src: "/articles/yukiguni/01.webp", width: 966, height: 725 },
-    { kind: "heading", text: "Ingredients" },
+    { kind: "heading", text: "재료" },
     { kind: "paragraph", text: "40ml 보드카" },
     { kind: "paragraph", text: "10ml 화이트 큐라소" },
     { kind: "paragraph", text: "10ml 라임 코디얼" },

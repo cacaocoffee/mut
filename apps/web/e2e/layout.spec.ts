@@ -202,6 +202,18 @@ test("통합 검색 아이콘과 재료 사전 링크가 있다 (#179)", async (
   await expect(page).toHaveURL(/\/ingredients$/);
 });
 
+/** #183 — 로그인하면 내비엔 「내 저장」 하나, 로그아웃은 내 저장 화면 바닥에 있다. */
+test("로그아웃은 내비가 아니라 내 저장 화면에 있다 (#183)", async ({ page }) => {
+  await page.route("**/api/v1/me/profile", (route) =>
+    route.fulfill({ json: { displayName: "테스터", roles: ["member"] } })
+  );
+  await page.route("**/api/v1/me/bookmarks", (route) => route.fulfill({ json: [] }));
+  await page.goto("/saved");
+  await expect(page.locator(".site-nav").getByRole("link", { name: "내 저장" })).toBeVisible();
+  await expect(page.locator(".site-nav").getByRole("button", { name: "로그아웃" })).toHaveCount(0);
+  await expect(page.locator("main").getByRole("button", { name: "로그아웃" })).toBeVisible();
+});
+
 test("헤더에 워드마크가 뜬다", async ({ page }) => {
   await page.goto("/cocktails/search");
 

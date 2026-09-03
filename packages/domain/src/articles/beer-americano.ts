@@ -11,7 +11,7 @@ export const ARTICLE: Article = {
   relatedCocktailSlugs: ["beeramericano"],
   blocks: [
     { kind: "figure", src: "/articles/beer-americano/00.webp", width: 966, height: 966 },
-    { kind: "heading", text: "About The Cocktail" },
+    { kind: "heading", text: "칵테일 이야기" },
     { kind: "paragraph", text: "「비어 아메리카노」는 이름에서도 알 수 있듯이 클래식 칵테일 중 하나인 아메리카노에 맥주라는 요소를 더한 칵테일로, 약 10년 전에 밀라노의 Cafe Trussardi에서 토마소 세카(Tommaso Cecca)라는 바텐더에 의해 만들어졌다고 합니다." },
     { kind: "paragraph", text: "기본적으로 아메리카노에서 탄산수를 맥주로 바꾼 것인데, 사실 단순히 캄파리+버무스에 맥주를 넣는다던가, 맥주에 캄파리를 소량 넣어서 마시는 방식은 이전부터 꽤 있었어서 식상해 보일 수도 있습니다." },
     { kind: "paragraph", text: "다만, 토마소 세카는 하나의 변형을 주는데, 바로 맥주를 휘핑해서 실질적으로 거품을 넣는다는 것으로, 이 칵테일의 특별함이 여기에 있습니다." },
@@ -27,7 +27,7 @@ export const ARTICLE: Article = {
     { kind: "figure", src: "/articles/beer-americano/03.webp", width: 966, height: 966 },
     { kind: "figure", src: "/articles/beer-americano/04.webp", width: 966, height: 966 },
     { kind: "figure", src: "/articles/beer-americano/05.webp", width: 966, height: 966 },
-    { kind: "heading", text: "How to Mix" },
+    { kind: "heading", text: "만드는 법" },
     { kind: "paragraph", text: "1. 얼음을 채운 하이볼 잔에 맥주 외의 재료를 넣고, 스터한다." },
     { kind: "paragraph", text: "2. 맥주를 휘핑해서 거품을 만들어준다." },
     { kind: "paragraph", text: "3. 커품을 잔에 따라준다." },

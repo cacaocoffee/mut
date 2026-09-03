@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { SAVED_PATH } from "@/lib/routes";
-import { fetchProfile, startLogin, logout, type MyProfile } from "@/lib/auth-client";
+import { fetchProfile, startLogin, type MyProfile } from "@/lib/auth-client";
 
 /**
  * 내비 오른쪽 로그인 영역 (SPEC-07 §2.5).
@@ -41,14 +41,12 @@ export function AuthMenu() {
     );
   }
 
+  // 로그아웃은 내 저장 화면 안에 있다 (#183) — 내비에 글자 둘이 붙으면 탭이 다섯처럼 읽힌다.
   return (
     <div className="auth-menu">
       <Link href={SAVED_PATH} className="btn auth-link">
         내 저장
       </Link>
-      <button type="button" className="btn auth-link auth-link--muted" onClick={logout}>
-        로그아웃
-      </button>
     </div>
   );
 }

@@ -38,7 +38,9 @@ export function SearchBox({
   const [value, setValue] = useState(initialQuery);
   const [answered, setAnswered] = useState<{ q: string; hits: SearchHit[] }>({ q: "", hits: [] });
   const [active, setActive] = useState(-1);
-  const [closed, setClosed] = useState(false);
+  // 주소로 들어온 검색어(`?q=`)는 이미 검색한 것이다 — 결과 위에 자동완성을 펼치지 않는다 (#183).
+  // 사용자가 글자를 치면(onChange) 다시 연다.
+  const [closed, setClosed] = useState(initialQuery.length > 0);
   const listId = useId();
 
   // 주소로 들어온 질의가 바뀌면 입력도 따라간다 (뒤로가기·링크 진입).
@@ -47,6 +49,7 @@ export function SearchBox({
   if (lastFromUrl !== initialQuery) {
     setLastFromUrl(initialQuery);
     setValue(initialQuery);
+    setClosed(initialQuery.length > 0);
   }
 
   const term = value.trim();

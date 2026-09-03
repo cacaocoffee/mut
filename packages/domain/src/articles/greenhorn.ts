@@ -16,7 +16,7 @@ export const ARTICLE: Article = {
     { kind: "paragraph", text: "그는 자신이 가장 좋아하는 맛의 조합인 아가베 증류주와 멜론의 조합에서 영감을 얻어 이 칵테일을 만들었다고 하며, 그 결과 \"네그로니류에서 튀어나온 흥미로운(의역)\" 맛을 내게 되었다고 그는 말합니다." },
     { kind: "paragraph", text: "데킬라 + 미도리 + 수즈의 조합은 정말이지 어디서도 보기 힘든 조합이고, 특히 블랑코 데킬라와 미도리는 스터하는 칵테일에서는 더더욱 보기가 힘들죠. 여기에 수즈를 사용한 것을 보면 원작자는 어느정도 화이트 네그로니의 캐릭터에서 영감을 받았을지도 모르겠습니다." },
     { kind: "figure", src: "/articles/greenhorn/01.webp", width: 966, height: 966 },
-    { kind: "heading", text: "Ingredients" },
+    { kind: "heading", text: "재료" },
     { kind: "paragraph", text: "37.5ml 블랑코 데킬라 (Blanco Tequila)" },
     { kind: "paragraph", text: "30ml 미도리 (Midori)" },
     { kind: "paragraph", text: "22.5ml 수즈 (Suze)" },
