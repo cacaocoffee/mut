@@ -2,12 +2,42 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Wordmark } from "@/components/wordmark";
 import { AuthMenu } from "@/components/auth-menu";
 import { ARTICLES_PATH, FINDER_PATH, HOME_PATH, SEARCH_PATH } from "@/lib/routes";
 
+/**
+ * 스크롤하면 마스트헤드의 로고 줄을 접는다 (#180).
+ *
+ * 모바일 헤더가 137px 고정이라 844px 화면의 16% 를 늘 차지했다. 내려가면 탭 줄만 남기고,
+ * 맨 위로 돌아오면 로고를 다시 편다. 접는 것은 CSS(`.site-nav--compact`, 840px 이하에서만)
+ * 가 하고 여기서는 스크롤 위치만 본다. 두 문턱을 두는 이유는 문턱 하나에서 위아래로
+ * 흔들리면 로고가 깜빡이기 때문이다.
+ */
+function useCompactOnScroll(): boolean {
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const y = window.scrollY;
+        setCompact((was) => (was ? y > 40 : y > 120));
+        ticking = false;
+      });
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return compact;
+}
+
 export function SiteNav() {
   const pathname = usePathname();
+  const compact = useCompactOnScroll();
 
   // 레이블은 한국어 한 벌이다 — 영어 병기는 매거진판에서 걷어냈다 (ADR-0009 결과 항목).
   // 레이블을 두 줄로 접는 대신 짧게 쓴다 (ISSUE-051 #69). `01`·`02`·`03` 이 화면 순서를 드러낸다.
@@ -32,7 +62,7 @@ export function SiteNav() {
   ];
 
   return (
-    <nav className="nav site-nav">
+    <nav className={`nav site-nav${compact ? " site-nav--compact" : ""}`}>
       {/* 워드마크가 곧 이름이다 — 글자로 한 번 더 적지 않는다. 마크업에 직접 두는
           이유는 `components/wordmark.tsx` 에 적었다. */}
       <Link href={HOME_PATH} className="nav-brand" aria-label="MUT 홈으로">
