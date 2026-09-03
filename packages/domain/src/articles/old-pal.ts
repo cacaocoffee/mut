@@ -11,7 +11,7 @@ export const ARTICLE: Article = {
   relatedCocktailSlugs: ["oldpal"],
   blocks: [
     { kind: "figure", src: "/articles/old-pal/00.webp", width: 966, height: 966 },
-    { kind: "heading", text: "About The Cocktail" },
+    { kind: "heading", text: "칵테일 이야기" },
     { kind: "paragraph", text: "'올드 팔'은 수 많은 네그로니(Negroni)의 변형 중 하나로, 파리의 해리스 뉴욕 바(Harry's New York Bar)에서 해리 맥켈혼(Harry MacElhone)의 저서 'Barflies and Cocktails'에서 처음 등장합니다." },
     { kind: "paragraph", text: "이 저서의 마지막 부분에는 '아서 모스(Arthur Moss)'가 쓴 에세이 'Cocktails Round Town'가 있는데, 여기서 이 칵테일의 기원에 대해서 얘기하며, 이후 개정판에서는 누구의 레시피인지 자세하게 나오게 됩니다." },
     { kind: "paragraph", text: "이에 따르면 칵테일을 만든 것은 '윌리엄 로빈슨(William Sparrow Robinson)'이며, 오랜 친구인 '저자(Writer)'를 위해 칵테일의 이름을 '오랜 친구'라는 의미의 '올드팔(정확히는 My Old Pal)'이라 명명했다고 합니다." },
@@ -29,7 +29,7 @@ export const ARTICLE: Article = {
     { kind: "paragraph", text: "*저는 용량이 작은 잔을 써서 20ml를 기준으로 동량을 사용했으니, 잔의 용량에 따라 양을 조절해주시면 됩니다." },
     { kind: "paragraph", text: "**동률의 레시피가 기본이긴 하지만, 2:1:1의 레시피도 있습니다." },
     { kind: "figure", src: "/articles/old-pal/02.webp", width: 966, height: 966 },
-    { kind: "heading", text: "How to Mix" },
+    { kind: "heading", text: "만드는 법" },
     { kind: "paragraph", text: "1. 믹싱 글라스에 모든 재료를 넣어줍니다." },
     { kind: "paragraph", text: "2. 믹싱 글라스에 얼음을 채워주고, 스터해줍니다." },
     { kind: "paragraph", text: "3. 차게 해 둔 잔에 부어줍니다." },

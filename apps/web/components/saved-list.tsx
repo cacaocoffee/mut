@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { adminWrite } from "@/lib/admin-csrf";
-import { startLogin } from "@/lib/auth-client";
+import { logout, startLogin } from "@/lib/auth-client";
 import { bookmarkHref, bookmarkLabel } from "@/lib/bookmark-targets";
 
 /**
@@ -88,14 +88,18 @@ export function SavedList() {
 
   if (state.items.length === 0) {
     return (
-      <div className="empty-state">
-        <h3>아직 저장한 것이 없습니다</h3>
-        <p>칵테일이나 아티클에서 「저장」을 누르면 여기 모입니다.</p>
-      </div>
+      <>
+        <div className="empty-state">
+          <h3>아직 저장한 것이 없습니다</h3>
+          <p>칵테일이나 아티클에서 「저장」을 누르면 여기 모입니다.</p>
+        </div>
+        <LogoutFoot />
+      </>
     );
   }
 
   return (
+    <>
     <ul className="saved-list">
       {state.items.map((b) => {
         const href = bookmarkHref(b.targetType, b.targetSlug);
@@ -124,5 +128,18 @@ export function SavedList() {
         );
       })}
     </ul>
+    <LogoutFoot />
+    </>
+  );
+}
+
+/** 로그아웃은 여기 한 곳이다 (#183). 내비에서 뺐다 — 자주 누르는 것이 아니라 계정 자리에 둔다. */
+function LogoutFoot() {
+  return (
+    <p className="saved-foot">
+      <button type="button" className="btn btn-ghost" onClick={logout}>
+        로그아웃
+      </button>
+    </p>
   );
 }

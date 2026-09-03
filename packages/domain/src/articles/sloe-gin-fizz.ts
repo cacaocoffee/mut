@@ -11,7 +11,7 @@ export const ARTICLE: Article = {
   relatedCocktailSlugs: ["sloeginfizz"],
   blocks: [
     { kind: "figure", src: "/articles/sloe-gin-fizz/00.webp", width: 966, height: 966 },
-    { kind: "heading", text: "About The Cocktail" },
+    { kind: "heading", text: "칵테일 이야기" },
     { kind: "paragraph", text: "「슬로 진 피즈」는 일반적인 진 피즈(Gin Fizz)에서 기주를 진에서 슬로 진으로 변경한 아주 간단한 변형으로, 그 기원 자체는 명확하지 않지만 아무래도 슬로 진의 상업화와 칵테일 문화의 발전이 맞물리며 형성된 것으로 보입니다." },
     { kind: "paragraph", text: "슬로진은 이전부터 영국 가정에서 많이 만들어지던 리큐르로, 토지 경계를 구분하기 위한 울타리에서 흔히 볼 수 있는 블랙손(Blackthorn) 가지의 열매인 슬로베리를 진에 침출하는 방식으로 만들어집니다." },
     { kind: "paragraph", text: "이 슬로베리는 그대로 먹기에는 떫고 신맛이 강하기 때문에 진에 담가 설탕과 함께 침출하기 시작했고, 단순히 병에 담아 만들 수 있을 정도로 간단했기 때문에 자연스럽게 가정에서 편하게 만들어 마실 수 있게 되었습니다." },
@@ -26,7 +26,7 @@ export const ARTICLE: Article = {
     { kind: "paragraph", text: "10ml 심플 시럽(Simple Syrup)" },
     { kind: "paragraph", text: "탄산수 (Soda Water)" },
     { kind: "figure", src: "/articles/sloe-gin-fizz/02.webp", width: 966, height: 966 },
-    { kind: "heading", text: "How to Mix" },
+    { kind: "heading", text: "만드는 법" },
     { kind: "paragraph", text: "1. 탄산수 외의 재료를 셰이커에 넣는다" },
     { kind: "paragraph", text: "2. 셰이커에 얼음을 넣고 셰이킹한다" },
     { kind: "paragraph", text: "3. 얼음을 채운 하이볼 잔에 부어준다" },

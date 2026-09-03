@@ -87,6 +87,17 @@ async function search(page: Page, term: string) {
  * 어느 표기가 무엇에 매칭되는지는 서버가 정한다 (이슈 024 RED 7). 화면은 사용자가 친 것을
  * 손대지 않고 넘겨야 한다 — 여기서 공백을 지우거나 초성을 풀면 서버의 판정과 어긋난다.
  */
+/** #183 — 주소로 들어온 검색어는 이미 검색한 것이다. 결과 위에 자동완성을 펼치지 않는다. */
+test("주소의 q 로 들어오면 자동완성이 열리지 않는다 (#183)", async ({ page }) => {
+  await mockSearch(page, { suggest: [hit("cocktail", "negroni", "네그로니", "Negroni")] });
+  await page.goto("/search?q=네그로니");
+  await page.waitForTimeout(600); // 디바운스보다 길게 기다려도 열리지 않아야 한다
+  await expect(page.getByRole("listbox")).toHaveCount(0);
+
+  await page.getByRole("combobox").fill("네그");
+  await expect(page.getByRole("listbox")).toBeVisible();
+});
+
 test("RED1~7 - 한글·띄어쓰기·영문·별칭·초성을 그대로 넘긴다", async ({ page }) => {
   const calls = await mockSearch(page);
   await page.goto(PATH);

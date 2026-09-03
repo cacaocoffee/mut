@@ -208,19 +208,17 @@ export function FinderScreen({ corpus }: { corpus: SearchItem[] }) {
                 );
               })}
             </div>
-            <div className="quiz-foot">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                disabled={step === 0}
-                onClick={back}
-              >
-                ← 이전
-              </button>
-              <button type="button" className="btn btn-ghost" onClick={reset}>
-                처음부터 RESTART
-              </button>
-            </div>
+            {/* 1번 질문에는 돌아갈 곳도 되돌릴 것도 없다 — 비활성 버튼 둘을 보이지 않는다 (#183) */}
+            {step > 0 && (
+              <div className="quiz-foot">
+                <button type="button" className="btn btn-secondary" onClick={back}>
+                  ← 이전
+                </button>
+                <button type="button" className="btn btn-ghost" onClick={reset}>
+                  처음부터 RESTART
+                </button>
+              </div>
+            )}
           </section>
         </div>
       ) : (

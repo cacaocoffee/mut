@@ -18,7 +18,7 @@ export const ARTICLE: Article = {
     { kind: "paragraph", text: "본래 크러스타는 레몬즙이 조금 들어가는 반면에(제 레시피에는 많이 들어가기는 합니다만....), 사이드카에는 레몬즙이 비교적 많이 들어가고, 사이드카는 당을 오렌지 큐라소(또는 트리플섹)으로 대체했으며, 데이지 칵테일(진 + 큐라소 + 레몬즙 + 약간의 탄산수)의 변형에 좀 더 부합하다는 것입니다. 저는 이런 주장에 기본적으로 동의합니다만, 사이드카와 브랜디 크러스타가 비슷한 프로파일을 가진다는 것 자체는 부정할 수 없는 사실이긴 합니다." },
     { kind: "paragraph", text: "따라서 어느 쪽 주장이 꼭 맞냐 보다는 어떤 식으로 본인이 브랜디 크러스타와 사이드카에 접근하려는지에 좀 더 주안점을 주면 될 것 같습니다." },
     { kind: "figure", src: "/articles/brandy-crusta/01.webp", width: 966, height: 725 },
-    { kind: "heading", text: "Ingredients" },
+    { kind: "heading", text: "재료" },
     { kind: "paragraph", text: "50ml 꼬냑" },
     { kind: "paragraph", text: "10ml 오렌지 큐라소 / 트리플섹" },
     { kind: "paragraph", text: "10ml 마라스키노 리큐르" },

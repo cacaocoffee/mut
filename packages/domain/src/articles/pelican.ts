@@ -15,7 +15,7 @@ export const ARTICLE: Article = {
     { kind: "paragraph", text: "펠리컨은 2015년경에 뉴욕 Attaboy라는 바에서 Andrew Rice에 의해 만들어졌습니다. 이 Attaboy라는 바는 현대 칵테일에 아주 큰 영향을 준 바인 Milk & Honey가 처음 있던 자리에 오픈한 바입니다." },
     { kind: "paragraph", text: "Attaboy를 오픈한 건 Sam Ross인데, Milk & Honey의 창업자 Sasha Petraske의 제자 중 한 명으로 제자가 스승의 바를 이어 새로운 바를 오픈한 것입니다. Milk & Honey는 사라졌고, Sasha Petraske는 2015년 42세의 나이로 갑작스럽게 세상을 떠났지만, 그가 남긴 유산은 계속 이어지고 있습니다." },
     { kind: "figure", src: "/articles/pelican/01.webp", width: 966, height: 966 },
-    { kind: "heading", text: "Ingredients" },
+    { kind: "heading", text: "재료" },
     { kind: "paragraph", text: "30ml 퍼넷 브랑카(Fernet Branca)" },
     { kind: "paragraph", text: "30ml 브랑카 멘타(Branc Menta)" },
     { kind: "paragraph", text: "30ml 커피 리큐르(Coffee Liqueur)" },

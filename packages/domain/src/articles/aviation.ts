@@ -15,7 +15,7 @@ export const ARTICLE: Article = {
     { kind: "paragraph", text: "에비에이션은 1916년 뉴욕 Wallick 호텔의 헤드바텐더였던 Hugo Ensslin의 저서인 \"Recipes for Mixed Drinks\"에서 처음 등장했다고 합니다." },
     { kind: "paragraph", text: "에비에이션은 100년이 넘는 시간 동안 역사에서 잊혀지기도 했던, 참 다사다난한 칵테일인데 바로 그 주재료인 크렘 드 바이올렛(Creme de Violet / Violette)때문입니다." },
     { kind: "paragraph", text: "이 바이올렛 리큐르는 이름에서도 알 수 있듯이 제비꽃이 주재로인 리큐르로, 애초에 생산량이 많지도 않았는데 급기야 1960년대에는 거의 자취를 감추다시피 했습니다. 다행히도 이후 클래식, 크래프트 칵테일 바람이 불어 다양한 브랜드에서 생산하게 되었으나, 여전히 우리나라에서는 거의 구할 수 없는 리큐르 중 하나입니다." },
-    { kind: "heading", text: "Ingredients" },
+    { kind: "heading", text: "재료" },
     { kind: "figure", src: "/articles/aviation/01.webp", width: 966, height: 966 },
     { kind: "paragraph", text: "에비에이션은 진(60ml)이 베이스가 되는 칵테일로, 크렘 드 바이올렛(7.5ml), 마라스키노 리큐르(6ml), 레몬즙(22.5ml) 그리고 심플 시럽(5ml)이 들어갑니다. 참고로 개인적으로 마라스키노 리큐를를 별로 안좋아해서 비율을 좀 줄였습니다." },
     { kind: "paragraph", text: "How to Mix?" },

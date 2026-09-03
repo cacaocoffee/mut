@@ -46,6 +46,16 @@ function source(rel: string): string {
 
 // ── RED 1~5 : 도수 구간 공유 (FR-SEARCH-004 — 요체) ───────────────────────
 
+/** #183 — 1번 질문에는 돌아갈 곳이 없다. 비활성 「이전」과 「처음부터」를 보이지 않는다. */
+test("1번 질문에는 이전·처음부터 버튼이 없다 (#183)", async ({ page }) => {
+  await page.goto("/finder");
+  await expect(page.getByRole("button", { name: /이전/ })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /처음부터/ })).toHaveCount(0);
+  await page.locator(".quiz-option").first().click();
+  await expect(page.getByRole("button", { name: /이전/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: /처음부터/ })).toBeVisible();
+});
+
 test("RED1 - 도수 질문이 4구간이다", async ({ page }) => {
   await page.goto(FINDER);
 
