@@ -226,6 +226,34 @@ test("통합 검색 아이콘과 재료 사전 링크가 있다 (#179)", async (
 
   await page.getByTestId("legal-notice").getByRole("link", { name: "재료 사전" }).click();
   await expect(page).toHaveURL(/\/ingredients$/);
+/** #182 — 데스크톱 빈 공간. 홈 아티클 3편은 1 + 2, 상세는 재료 표가 히어로 옆 열에 있다. */
+test("데스크톱 홈의 아티클 3편이 1 + 2 로 놓인다 (#182)", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const cards = page.locator(".home-articles .article-card");
+  await expect(cards).toHaveCount(3);
+  const [a, b, c] = await Promise.all([0, 1, 2].map((i) => cards.nth(i).boundingBox()));
+  expect(a!.width).toBeGreaterThan(b!.width * 1.8); // 머리기사가 한 줄을 다 쓴다
+  expect(b!.y).toBe(c!.y); // 둘째·셋째가 같은 줄
+  expect(b!.width).toBeCloseTo(c!.width, 0);
+});
+
+test("상세의 재료 표가 히어로 옆 열에 있고 모바일 순서는 그대로다 (#182)", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/cocktails/vesper"); // 사진 있는 잔 — 두 열이 다 있다
+  await expect(page.locator(".detail-hero .recipe-controls")).toBeVisible();
+  const photo = (await page.locator(".detail-hero .photo-slot").boundingBox())!;
+  const recipe = (await page.locator(".detail-hero .recipe-controls").boundingBox())!;
+  expect(recipe.x).toBeGreaterThan(photo.x + photo.width); // 사진 옆 열
+  expect(recipe.y).toBeLessThan(photo.y + photo.height); // 사진 높이 안에서 시작
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  const order = await page.evaluate(() => {
+    const y = (sel: string) => document.querySelector(sel)!.getBoundingClientRect().top;
+    return [y(".detail-hero h1"), y(".recipe-controls"), y(".detail-body .section-head")];
+  });
+  expect(order[0]).toBeLessThan(order[1]);
+  expect(order[1]).toBeLessThan(order[2]);
 });
 
 test("헤더에 워드마크가 뜬다", async ({ page }) => {

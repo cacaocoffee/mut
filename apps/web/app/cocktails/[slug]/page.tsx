@@ -193,20 +193,22 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
             sharePath={c.actions.sharePath}
             nameKo={c.nameKo}
           />
-        </div>
-      </div>
 
-      <div className="detail-body">
-        <section>
-          {/* 잔 수 · 단위 · 대체재는 브라우저에서 만진다 (이슈 043). 서버가 그린 표를
+          {/* 재료 표는 히어로 오른쪽 열에 둔다 (#182) — 데스크톱에서 사진 옆 열이 절반에서
+              끝나 아래가 비었다. 모바일은 한 단이라 순서(제목 → 재료 → 제조 순서)가 같다.
+              잔 수 · 단위 · 대체재는 브라우저에서 만진다 (이슈 043). 서버가 그린 표를
               그대로 두고 그 위에 컨트롤만 얹으면 두 벌이 되므로 표째로 넘긴다. */}
           <RecipePanel slug={c.slug} ingredients={c.ingredients} />
 
           {/* SPEC-10 §4.1 — 어떤 칵테일이 실제로 읽히나. 서버에서는 알 수 없어(정적 생성)
               브라우저에서 한 번 보낸다 (이슈 035). */}
           <TrackCocktailView slug={c.slug} />
+        </div>
+      </div>
 
-          <h4 className="section-head">제조 순서</h4>
+      <div className="detail-body">
+        <section>
+          <h4 className="section-head section-head--flush">제조 순서</h4>
           <ol style={{ listStyle: "none", margin: 0, padding: 0 }}>
             {c.steps.map((text, i) => (
               <li className="step" key={text}>
