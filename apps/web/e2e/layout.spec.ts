@@ -190,6 +190,32 @@ test.describe("카드 그리드 (ISSUE-051)", () => {
  *
  * `aria-label` 은 이름 그 자체라 스크린리더가 읽을 것이 있는지도 함께 본다 (`NFR-A-01` 계열).
  */
+/** #180 — 모바일에서 내려가면 로고 줄이 접히고 탭 줄만 남는다. 맨 위로 오면 다시 편다. */
+test("모바일에서 스크롤하면 헤더가 탭 줄만 남긴다 (#180)", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/cocktails/search");
+  await page.waitForLoadState("networkidle");
+
+  const nav = page.locator(".site-nav");
+  const tall = (await nav.boundingBox())!.height;
+  expect(tall).toBeGreaterThan(100);
+
+  await page.evaluate(() => window.scrollTo(0, 600));
+  await expect.poll(async () => (await nav.boundingBox())!.height).toBeLessThan(90);
+  await expect(page.locator(".tab").first()).toBeVisible();
+
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect.poll(async () => (await nav.boundingBox())!.height).toBeGreaterThan(100);
+});
+
+test("데스크톱은 스크롤해도 헤더가 그대로다 (#180)", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/cocktails/search");
+  const nav = page.locator(".site-nav");
+  const before = (await nav.boundingBox())!.height;
+  await page.evaluate(() => window.scrollTo(0, 600));
+  await page.waitForTimeout(300);
+  expect((await nav.boundingBox())!.height).toBe(before);
 /** #179 — 통합 검색과 재료 사전은 탭이 아니라 아이콘·바닥글로 연다. 탭 셋은 그대로다. */
 test("통합 검색 아이콘과 재료 사전 링크가 있다 (#179)", async ({ page }) => {
   await page.goto("/");

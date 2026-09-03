@@ -1672,6 +1672,18 @@ a.saved-item__title:hover {
   /* 태그라인이 빠지면 마크만 남는다. 좁은 화면에서 마스트헤드가 본문을 밀지 않게
      줄이되, `ㅅ` 획이 읽히는 선(48px) 밑으로는 내리지 않는다. */
   .site-nav .nav-brand svg { height: 48px; }
+
+  /* 스크롤하면 로고 줄을 접고 탭 줄만 남긴다 (#180). height 는 auto 라 max-height 로 접는다.
+     데스크톱은 그대로다 — 이 블록이 840px 이하 안에 있다. */
+  .site-nav .nav-brand {
+    max-height: 80px;
+    transition: max-height 0.2s ease-out, padding-bottom 0.2s ease-out;
+    overflow: hidden;
+  }
+  .site-nav--compact .nav-brand {
+    max-height: 0;
+    padding-bottom: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
