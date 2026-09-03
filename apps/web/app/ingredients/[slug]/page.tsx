@@ -4,11 +4,11 @@ import { notFound } from "next/navigation";
 import {
   CATEGORY_LABELS,
   INGREDIENTS,
-  cocktailsUsing,
   getIngredient,
   countsForStock,
 } from "@mut/domain";
 import { searchCorpus } from "@/lib/api";
+import { cocktailsUsingInCorpus } from "@/lib/ingredient-uses";
 import { INGREDIENTS_PATH } from "@/lib/routes";
 import { CocktailCard } from "@/components/cocktail-card";
 
@@ -40,7 +40,7 @@ export async function generateMetadata({
   const ing = getIngredient(slug);
   if (!ing) return {};
 
-  const uses = cocktailsUsing(slug).length;
+  const uses = cocktailsUsingInCorpus(slug, await searchCorpus()).length;
   return {
     title: `${ing.nameKo} ${ing.nameEn}`,
     description: `${ing.nameKo}를 쓰는 칵테일 ${uses}종.`,
@@ -52,9 +52,7 @@ export default async function IngredientPage({ params }: PageProps<"/ingredients
   const ing = getIngredient(slug);
   if (!ing) notFound();
 
-  const corpus = await searchCorpus();
-  const using = new Set(cocktailsUsing(slug));
-  const items = corpus.filter((c) => using.has(c.slug));
+  const items = cocktailsUsingInCorpus(slug, await searchCorpus());
 
   return (
     <main className="shell">
