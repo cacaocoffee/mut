@@ -4,9 +4,11 @@ import {
   CATEGORY_LABELS,
   CATEGORY_ORDER,
   INGREDIENTS,
-  cocktailsUsing,
   type IngredientCategory,
+  type SearchItem,
 } from "@mut/domain";
+import { searchCorpus } from "@/lib/api";
+import { cocktailsUsingInCorpus } from "@/lib/ingredient-uses";
 import { INGREDIENTS_PATH } from "@/lib/routes";
 
 /**
@@ -31,7 +33,9 @@ export const metadata: Metadata = {
 /** 재료는 코퍼스가 바뀌어야 바뀐다. 탐색·상세와 같은 값이다. */
 export const revalidate = 600;
 
-export default function IngredientsPage() {
+export default async function IngredientsPage() {
+  // 잔 수는 상세와 같은 출처로 센다 (#181) — 코드 데이터가 아니라 화면이 그리는 코퍼스.
+  const corpus = await searchCorpus();
   const grouped = CATEGORY_ORDER.map(
     (category) =>
       [category, INGREDIENTS.filter((i) => i.category === category)] as const
@@ -50,7 +54,7 @@ export default function IngredientsPage() {
       </header>
 
       {grouped.map(([category, list]) => (
-        <IngredientGroup key={category} category={category} list={list} />
+        <IngredientGroup key={category} category={category} list={list} corpus={corpus} />
       ))}
     </main>
   );
@@ -59,9 +63,11 @@ export default function IngredientsPage() {
 function IngredientGroup({
   category,
   list,
+  corpus,
 }: {
   category: IngredientCategory;
   list: typeof INGREDIENTS;
+  corpus: SearchItem[];
 }) {
   return (
     <section className="ingredient-group">
@@ -74,7 +80,7 @@ function IngredientGroup({
       <ul className="ingredient-list">
         {list.map((ing) => {
           // 쓰임새 개수가 곧 "이걸 사면 몇 잔이 열리나" 다. 사전에서 제일 쓸모 있는 숫자다.
-          const uses = cocktailsUsing(ing.slug).length;
+          const uses = cocktailsUsingInCorpus(ing.slug, corpus).length;
           return (
             <li key={ing.slug} className="ingredient-list__item">
               <Link href={`${INGREDIENTS_PATH}/${ing.slug}`}>

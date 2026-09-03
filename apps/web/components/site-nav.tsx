@@ -5,7 +5,13 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Wordmark } from "@/components/wordmark";
 import { AuthMenu } from "@/components/auth-menu";
-import { ARTICLES_PATH, FINDER_PATH, HOME_PATH, SEARCH_PATH } from "@/lib/routes";
+import {
+  ARTICLES_PATH,
+  FINDER_PATH,
+  HOME_PATH,
+  SEARCH_PATH,
+  UNIFIED_SEARCH_PATH,
+} from "@/lib/routes";
 
 /**
  * 스크롤하면 마스트헤드의 로고 줄을 접는다 (#180).
@@ -52,7 +58,8 @@ export function SiteNav() {
   // 갈리지 않았다. 이제 이름 검색은 탐색 화면이 직접 한다 — 검색어와 필터를 한자리에서
   // 건다. `/search` 는 라우트로 남는다: 재료·바·아티클까지 타입별로 묶어 보여 주는 것은
   // (`R-F5-1`) 칵테일 그리드가 담을 수 없고, 그 화면에 걸린 요구사항이 따로 있다
-  // (`FR-SEARCH-006`·`007`·`008`). 갈 곳이 생기면 다시 내건다.
+  // (`FR-SEARCH-006`·`007`·`008`). 탭이 아니라 **아이콘**으로 연다 (#179) — 탭 셋은
+  // 그대로 두고, 로그인 영역 옆에 돋보기 하나를 둔다. 재료·바·아티클을 한 번에 찾는 입구다.
   const tabs = [
     { href: SEARCH_PATH, ko: "01 탐색", match: (p: string) => p === SEARCH_PATH },
     { href: FINDER_PATH, ko: "02 파인더", match: (p: string) => p === FINDER_PATH },
@@ -81,6 +88,17 @@ export function SiteNav() {
             {t.ko}
           </Link>
         ))}
+        <Link
+          href={UNIFIED_SEARCH_PATH}
+          className="btn auth-link nav-search"
+          aria-label="통합 검색"
+          title="통합 검색"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
+            <path d="M16.5 16.5L21 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        </Link>
         <AuthMenu />
       </div>
     </nav>

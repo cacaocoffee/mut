@@ -24,7 +24,6 @@ export function CocktailCard({ cocktail }: { cocktail: SearchItem }) {
       <PhotoSlot
         ratio="4x5"
         caption={cocktail.nameEn}
-        label="IMAGE 4:5"
         src={cocktailPhotoSrc(cocktail.slug)}
         alt={`${cocktail.nameKo} 칵테일 사진`}
       />

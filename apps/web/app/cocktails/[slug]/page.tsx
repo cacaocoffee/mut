@@ -13,7 +13,6 @@ import { DetailActions } from "@/components/detail-actions";
 import { FlavorRadar } from "@/components/flavor-radar";
 import { RecipePanel } from "@/components/recipe-panel";
 import { TrackCocktailView } from "@/components/analytics/cocktail-view";
-import { PhotoSlot } from "@/components/photo-slot";
 import { cocktailPhotoSrc } from "@/lib/cocktail-photos";
 import { cocktailDetail, publishedSlugs, relatedCocktails, usingApi, type RelatedItem } from "@/lib/api";
 import { fromApi, fromPrototype, prototypeSlugs, type CocktailView } from "@/lib/cocktail-view";
@@ -131,8 +130,10 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
         dangerouslySetInnerHTML={{ __html: JSON.stringify(recipeJsonLd(c)) }}
       />
 
-      <div className="detail-hero">
-        {/* 히어로는 `PhotoSlot` 과 달리 라벨 문구가 달라 직접 쓴다. 컬러 — ADR-0008.
+      {/* 사진 없는 잔은 히어로 슬롯을 그리지 않는다 — 빗금 박스 한 화면 뒤에 제목이 오면
+          첫 화면이 빈 자리다 (#174). 한 단으로 접는 클래스는 app.css 의 `--no-photo` 다. */}
+      <div className={`detail-hero${cocktailPhotoSrc(c.slug) ? "" : " detail-hero--no-photo"}`}>
+        {/* 히어로는 lazy 여부가 `PhotoSlot` 과 달라 직접 쓴다. 컬러 — ADR-0008.
             사진은 첫 화면(LCP)이라 lazy 를 붙이지 않는다 — `__img--hero` 가
             image-guard 의 EAGER_ALLOWED 표식이다 (ISSUE-060 #139) */}
         {cocktailPhotoSrc(c.slug) ? (
@@ -145,12 +146,7 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
               height={800}
             />
           </div>
-        ) : (
-          <div className="photo-slot photo-slot--4x5">
-            <div className="photo-slot__label">HERO IMAGE 4:5 — PLACEHOLDER</div>
-            <div className="photo-slot__caption">{c.nameEn}</div>
-          </div>
-        )}
+        ) : null}
         <div>
           <Link
             href={SEARCH_PATH}
@@ -303,12 +299,8 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
             ))}
           </div>
           <div>
-            <figure>
-              <PhotoSlot ratio="3x2" label="EDITORIAL IMAGE 3:2 — PLACEHOLDER" />
-              <figcaption>
-                에디토리얼 이미지 자리입니다.
-              </figcaption>
-            </figure>
+            {/* 3:2 에디토리얼 사진 자산이 아직 없다 — 자리표시자를 두지 않는다 (#174).
+                자산이 생기면 여기 <figure> 로 PhotoSlot ratio="3x2" 를 넣는다. */}
 
             {/* 배리에이션 (`FR-COCKTAIL-024` · 이슈 021). 상세 화면의 일부라 여기서 렌더한다 —
                 별도 화면을 만들면 "비슷한 것" 을 보러 한 번 더 이동해야 한다. */}
