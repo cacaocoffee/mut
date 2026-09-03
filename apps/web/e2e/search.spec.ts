@@ -606,7 +606,7 @@ test("검색 칸이 필터 패널 밖에 있다", async ({ page }) => {
 test("검색어와 필터가 함께 걸린다", async ({ page }) => {
   await page.goto(SEARCH);
 
-  const box = page.getByLabel("칵테일 이름 검색");
+  const box = page.getByLabel("칵테일 이름 · 기주 · 재료 검색");
   await box.fill("네그로니");
   // 네그로니 · 화이트 네그로니 · 킹스톤 네그로니
   await expectResults(page, 3);
@@ -617,11 +617,24 @@ test("검색어와 필터가 함께 걸린다", async ({ page }) => {
   await expect(page.locator(".cocktail-card").first()).toContainText("킹스톤");
 });
 
+/** #178 — 검색어가 이름만이 아니라 기주 · 재료 이름에도 걸린다. */
+test("기주·재료 이름으로도 걸린다 (#178)", async ({ page }) => {
+  await page.goto(SEARCH);
+  const box = page.getByLabel("칵테일 이름 · 기주 · 재료 검색");
+
+  await box.fill("진");
+  await expect(page.locator(".cocktail-card").filter({ hasText: "김렛" })).toBeVisible();
+  expect(await page.locator(".cocktail-card").count()).toBeGreaterThanOrEqual(8);
+
+  await box.fill("캄파리");
+  await expect(page.locator(".cocktail-card").filter({ hasText: "네그로니" }).first()).toBeVisible();
+});
+
 /** 검색어를 한 번에 비운다. 글자를 하나씩 지우면 그때마다 결과가 다시 계산된다. */
 test("검색어를 지우는 버튼이 있다", async ({ page }) => {
   await page.goto(SEARCH);
 
-  const box = page.getByLabel("칵테일 이름 검색");
+  const box = page.getByLabel("칵테일 이름 · 기주 · 재료 검색");
   // 값이 없을 때는 나오지 않는다 — 누를 것이 없는 버튼을 두지 않는다
   await expect(page.getByRole("button", { name: "검색어 지우기" })).toHaveCount(0);
 
