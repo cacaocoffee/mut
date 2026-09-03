@@ -10,11 +10,21 @@ import {
   TECHNIQUE_LABELS,
   type BaseSpirit,
   type FlavorKey,
+  type SearchItem,
   type StyleKey,
   type SweetLevel,
   type Technique,
 } from "@mut/domain";
-import { CATEGORY_AXES, categories, cocktailsByAxis, usingApi, type CategoryAxis } from "./api";
+import {
+  CATEGORY_AXES,
+  categories,
+  cocktailsByAxis,
+  searchCorpus,
+  toSearchItem,
+  usingApi,
+  type CategoryAxis,
+} from "./api";
+import { CocktailCard } from "@/components/cocktail-card";
 import { SEARCH_PATH } from "./routes";
 
 /**
@@ -62,7 +72,8 @@ export interface CategoryView {
   slug: string;
   labelKo: string;
   intro: string | null;
-  items: { slug: string; nameKo: string; nameEn: string; abv: number | null; summary: string }[];
+  /** 탐색 카드(`CocktailCard`)가 받는 모양 그대로다 — 카테고리만의 카드를 두지 않는다 (#175). */
+  items: SearchItem[];
 }
 
 /** 축의 슬러그 목록. `generateStaticParams` 가 쓴다. */
@@ -95,31 +106,21 @@ export async function categoryView(
       slug,
       labelKo: found.labelKo,
       intro: found.intro ?? null,
-      items: items.map((i) => ({
-        slug: i.slug,
-        nameKo: i.nameKo,
-        nameEn: i.nameEn,
-        abv: i.abv ?? null,
-        summary: i.summary,
-      })),
+      items: items.map(toSearchItem),
     };
   }
 
-  const matched = COCKTAILS.filter((c) => AXIS[axis].matches(c, slug));
-  if (matched.length === 0) return null; // RED 31 — 빈 카테고리는 만들지 않는다
+  const matched = new Set(COCKTAILS.filter((c) => AXIS[axis].matches(c, slug)).map((c) => c.id));
+  if (matched.size === 0) return null; // RED 31 — 빈 카테고리는 만들지 않는다
 
+  // 카드가 받는 모양은 코퍼스 한 줄이다. 어느 잔인지는 위에서 정했으니 코퍼스에서 그 잔만 고른다.
+  const corpus = await searchCorpus();
   return {
     slug,
     labelKo,
     // 소개 문구는 `category_intro` 에서 온다 (이슈 022). 프로토타입에는 없다.
     intro: null,
-    items: matched.map((c) => ({
-      slug: c.id,
-      nameKo: c.ko,
-      nameEn: c.en,
-      abv: c.abv,
-      summary: c.summary,
-    })),
+    items: corpus.filter((c) => matched.has(c.slug)),
   };
 }
 
@@ -138,32 +139,39 @@ export function categoryMetadata(axis: CategoryAxis, view: CategoryView): Metada
 export function CategoryPage({ axis, view }: { axis: CategoryAxis; view: CategoryView }) {
   const { ko, en } = AXIS[axis];
 
+  // 머리말은 재료 상세와 같은 구성(page-head), 목록은 탐색과 같은 카드(card-grid + CocktailCard).
+  // #135 디자인 교체 때 이 화면만 옛 카드로 남아 링크 밑줄 상자로 보였다 (#175).
   return (
-    <main className="shell category-page">
-      <Link href={SEARCH_PATH} className="btn btn-ghost" style={{ fontSize: 11, paddingLeft: 0 }}>
-        ← 탐색으로 BACK TO SEARCH
-      </Link>
-
-      <h1>
-        {view.labelKo} <span className="en">{en}</span>
-      </h1>
-
-      {/* `FR-COCKTAIL-031` · `NFR-S-07` — 카테고리마다 고유 문구.
-          없어도 페이지는 나온다 (이슈 022 RED 17 과 같은 판단) — P1 이라 발행을 막지 않는다. */}
-      {view.intro && <p className="summary category-page__intro">{view.intro}</p>}
-
-      <p className="category-page__count">
-        {ko} {view.labelKo} · {view.items.length}종
-      </p>
-
-      <div className="result-grid">
-        {view.items.map((item) => (
-          <Link key={item.slug} href={`/cocktails/${item.slug}`} className="card">
-            <h3>{item.nameKo}</h3>
-            <div className="en">{item.nameEn}</div>
-            <p className="summary">{item.summary}</p>
-            {item.abv != null && <div className="meta">{item.abv}%</div>}
+    <main className="shell">
+      <header className="page-head">
+        <div>
+          <Link
+            href={SEARCH_PATH}
+            className="btn btn-ghost"
+            style={{ fontSize: 11, paddingLeft: 0, marginBottom: 14 }}
+          >
+            ← 탐색으로 BACK TO SEARCH
           </Link>
+          <h1>
+            {view.labelKo}
+            <span className="sub">{en}</span>
+          </h1>
+        </div>
+        {/* `FR-COCKTAIL-031` · `NFR-S-07` — 카테고리마다 고유 문구.
+            없어도 페이지는 나온다 (이슈 022 RED 17 과 같은 판단) — P1 이라 발행을 막지 않는다. */}
+        <p className="lede category-page__intro">{view.intro ?? `${ko} ${view.labelKo}`}</p>
+      </header>
+
+      <section className="section-head">
+        <h4 style={{ margin: 0 }}>
+          {view.labelKo} {ko} 칵테일
+          <span className="ingredient-group__count">{view.items.length}</span>
+        </h4>
+      </section>
+
+      <div className="card-grid" style={{ marginTop: 20 }}>
+        {view.items.map((c) => (
+          <CocktailCard key={c.slug} cocktail={c} />
         ))}
       </div>
     </main>

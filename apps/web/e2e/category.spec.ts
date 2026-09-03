@@ -32,7 +32,7 @@ for (const { axis, slug, labelKo } of AXES) {
 
     expect(res?.status()).toBe(200);
     await expect(page.getByRole("heading", { level: 1 })).toContainText(labelKo);
-    await expect(page.locator(".card").first()).toBeVisible();
+    await expect(page.locator(".cocktail-card").first()).toBeVisible();
   });
 }
 
@@ -205,7 +205,7 @@ test("RED19,21,22 - 소개 문구 자리가 있고 없어도 페이지가 나온
 
   const source = readFileSync(join(process.cwd(), "lib/category-page.tsx"), "utf8");
   expect(source, "문구를 렌더하는 자리가 없다").toContain("category-page__intro");
-  expect(source, "문구가 없어도 렌더가 계속돼야 한다").toMatch(/view\.intro\s*&&/);
+  expect(source, "문구가 없어도 렌더가 계속돼야 한다").toMatch(/view\.intro\s*(&&|\?\?)/);
 });
 
 // ── RED 23~26 : 사이트맵 (NFR-S-04) ──────────────────────────────────────
@@ -231,9 +231,18 @@ test("RED23,24,25 - 사이트맵에 상세·카테고리가 있고 필터가 없
 test("RED28,30 - style 카테고리가 stylePrimary 기준이다", async ({ page }) => {
   await page.goto("/cocktails/style/spirit-forward");
 
-  const names = await page.locator(".card h3").allTextContents();
+  const names = await page.locator(".cocktail-card__ko").allTextContents();
   expect(names).toContain("네그로니"); // stylePrimary = spirit-forward
   expect(names.length).toBeGreaterThan(0);
+});
+
+/** #175 — 카드 전체가 링크라 제목·설명까지 밑줄로 보이던 것. 탐색 카드와 같은 모양이어야 한다. */
+test("카드가 탐색 카드와 같고 글자에 밑줄이 없다 (#175)", async ({ page }) => {
+  await page.goto("/cocktails/base/gin");
+  const title = page.locator(".cocktail-card__ko").first();
+  await expect(title).toBeVisible();
+  const decoration = await title.evaluate((el) => getComputedStyle(el).textDecorationLine);
+  expect(decoration).toBe("none");
 });
 
 /** RED 31 — 항목이 0건인 카테고리는 만들지 않는다. 목록만 있는 빈 페이지는 색인 가치가 없다. */
