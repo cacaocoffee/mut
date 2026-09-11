@@ -26,6 +26,7 @@ import {
 import { SEARCH_PATH } from "@/lib/routes";
 import { useNameIndex } from "@/lib/use-name-index";
 import { filterApply, type FilterAxis } from "@/lib/analytics/events";
+import { cocktailPhotoSrc } from "@/lib/cocktail-photos";
 import { CocktailCard } from "./cocktail-card";
 import { SearchField } from "./search-field";
 import { Pager, PAGE_SIZE } from "./pager";
@@ -149,7 +150,27 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
   );
   const axes = useMemo(() => (slugs ? { ...filters, query: "" } : filters), [filters, slugs]);
 
-  const results = useMemo(() => filterCocktails(scope, axes), [scope, axes]);
+  const filtered = useMemo(() => filterCocktails(scope, axes), [scope, axes]);
+
+  /**
+   * 보이는 순서 (#177). 도메인은 도수 낮은 순으로 주는데, 그러면 첫 카드가 사진 없는
+   * 무알콜 잔이었다. 기본은 **사진 있는 잔 먼저, 그 안에서 이름순**이고 도수순은 선택지로
+   * 남긴다. 사진 유무는 웹만 아는 정보라(`cocktail-photos`) 여기서 정렬한다 — 도메인
+   * `filterCocktails` 는 세는 데(칩 숫자·resultCount)에 그대로 쓴다.
+   */
+  const [sort, setSort] = useState<SortKey>("featured");
+  const results = useMemo(() => sortResults(filtered, sort), [filtered, sort]);
+
+  /**
+   * 모바일 필터 패널 (#177). 여섯 묶음이 결과 위에 1,100px 쌓여 첫 잔까지 세 화면이었다.
+   * 좁은 화면에선 접힌 채 시작하고, 요약 줄을 누르면 편다. 편 동안은 화면 바닥에
+   * 「N잔 보기」가 붙어 있다. 데스크톱은 CSS 가 토글을 숨기므로 언제나 펼쳐져 있다.
+   */
+  const [panelOpen, setPanelOpen] = useState(false);
+  const showResults = useCallback(() => {
+    setPanelOpen(false);
+    document.querySelector(".results-head")?.scrollIntoView({ block: "start" });
+  }, []);
 
   /**
    * 몇 쪽을 보고 있나.
@@ -255,8 +276,18 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
         onChange={(v) => apply({ query: v }, { axis: "query", value: v })}
       />
 
-      <div className="search-layout">
-        <aside className="filter-panel">
+      <div className={`search-layout${panelOpen ? " search-layout--panel-open" : ""}`}>
+        <button
+          type="button"
+          className="btn btn-secondary filter-toggle"
+          aria-expanded={panelOpen}
+          aria-controls="filter-panel"
+          onClick={() => setPanelOpen((v) => !v)}
+        >
+          <span>필터 · {summary}</span>
+          <span aria-hidden="true">{panelOpen ? "닫기" : "열기"}</span>
+        </button>
+        <aside className="filter-panel" id="filter-panel">
           <div className="rule-head">
             <h6 style={{ margin: 0 }}>필터</h6>
             <button
@@ -348,6 +379,11 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
             onToggle={(slug) => toggle("flavors", "flavor", slug as FlavorKey)}
           />
 
+          {panelOpen && (
+            <button type="button" className="btn btn-primary filter-apply" onClick={showResults}>
+              {results.length}잔 보기
+            </button>
+          )}
         </aside>
 
         <section>
@@ -356,9 +392,13 @@ export function SearchScreen({ corpus }: { corpus: SearchItem[] }) {
               <b>{results.length}</b>
               <span>개 결과 · {summary}</span>
             </div>
-            <span style={{ fontSize: 11, color: "var(--color-neutral-700)" }}>
-              정렬: 도수 낮은 순
-            </span>
+            <label className="results-sort">
+              정렬
+              <select value={sort} onChange={(e) => setSort(e.target.value as SortKey)}>
+                <option value="featured">사진 있는 잔 먼저</option>
+                <option value="abv">도수 낮은 순</option>
+              </select>
+            </label>
           </div>
 
           {results.length > 0 ? (
@@ -457,4 +497,16 @@ function FacetChips({
       </div>
     </div>
   );
+}
+
+type SortKey = "featured" | "abv";
+
+/** `abv` 는 도메인이 준 순서(도수 낮은 순) 그대로다. `featured` 는 사진 있는 잔 → 이름순. */
+function sortResults(items: SearchItem[], key: SortKey): SearchItem[] {
+  if (key === "abv") return items;
+  return [...items].sort((a, b) => {
+    const pa = cocktailPhotoSrc(a.slug) ? 0 : 1;
+    const pb = cocktailPhotoSrc(b.slug) ? 0 : 1;
+    return pa - pb || a.nameKo.localeCompare(b.nameKo, "ko");
+  });
 }

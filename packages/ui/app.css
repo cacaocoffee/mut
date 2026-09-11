@@ -419,6 +419,29 @@
   border-bottom: 2px solid var(--color-divider);
   margin-bottom: 20px;
 }
+/* 정렬 선택 (#177) — 글자 크기는 옆의 결과 요약과 같다 */
+.results-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--color-neutral-700);
+  white-space: nowrap;
+}
+.results-sort select {
+  font: inherit;
+  font-size: 12px;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-divider);
+  padding: 4px 6px;
+  min-height: 32px;
+}
+/* 모바일 필터 토글·「N잔 보기」 (#177) — 데스크톱에선 없다. 840px 이하 블록이 켠다 */
+.filter-toggle,
+.filter-apply {
+  display: none;
+}
 .results-count {
   display: flex;
   align-items: baseline;
@@ -1632,6 +1655,28 @@ a.saved-item__title:hover {
 
   /* 색인 띠 — 좁은 폭에서는 축 이름이 값 위로 올라간다 */
   .filter-group { grid-template-columns: 1fr; gap: 4px; }
+
+  /* 필터는 접힌 채 시작한다 (#177). 요약 줄이 토글이고, 편 동안 바닥에 「N잔 보기」 */
+  .filter-toggle {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 44px;
+    margin-bottom: 12px;
+    text-align: left;
+  }
+  .search-layout:not(.search-layout--panel-open) .filter-panel { display: none; }
+  .filter-apply {
+    display: flex;
+    justify-content: center;
+    position: fixed;
+    left: var(--space-4);
+    right: var(--space-4);
+    bottom: 16px;
+    z-index: 30;
+    min-height: 48px;
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--color-text) 25%, transparent);
+  }
 
   .detail-hero { grid-template-columns: 1fr; gap: var(--space-6); }
   .detail-hero .photo-slot { min-height: 0; }
