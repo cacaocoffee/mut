@@ -568,13 +568,13 @@ test("탐색 화면이 /cocktails/search 에 있다", async ({ page }) => {
 
   // 탐색(필터 화면)은 /cocktails/search 에 있다.
   await page.goto(SEARCH);
-  await expect(page.locator(".filter-panel")).toBeVisible();
+  await expect(page.locator("#filter-panel")).toBeVisible();
 
   // 홈(`/`)은 랜딩이라 리다이렉트하지 않고 필터 화면을 두지 않는다.
   const res = await page.goto("/");
   expect(res?.status()).toBe(200);
   await expect(page, "`/` 가 탐색으로 보낸다 — 이제 랜딩이어야 한다").toHaveURL(/\/$/);
-  await expect(page.locator(".filter-panel")).toHaveCount(0);
+  await expect(page.locator("#filter-panel")).toHaveCount(0);
 });
 
 // ── 검색이 탐색 안으로 들어왔다 ───────────────────────────────────────────
@@ -669,4 +669,44 @@ test("한 쪽에 다 들어가면 쪽 넘김이 없다", async ({ page }) => {
 test("범위를 넘는 쪽 번호는 마지막 쪽이 된다", async ({ page }) => {
   await page.goto(`${SEARCH}?page=99`);
   await expect(page.locator(".cocktail-card").first()).toBeVisible();
+});
+
+// ── #177 : 모바일 필터 접기 · 기본 정렬 ──────────────────────────────────
+// 로딩 골격(`skeleton.tsx`)도 `.filter-panel` 을 쓴다. 진짜 패널만 보도록 `#filter-panel` 로 가린다.
+
+/** 좁은 화면에선 필터가 접힌 채 시작한다. 요약 줄로 열고, 「N잔 보기」로 닫는다. */
+test("모바일에서 필터가 접혀 있고 N잔 보기로 닫힌다 (#177)", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(SEARCH);
+
+  await expect(page.locator("#filter-panel")).toBeHidden();
+  const firstCard = (await page.locator(".cocktail-card").first().boundingBox())!;
+  expect(firstCard.y).toBeLessThan(844 * 2); // 두 화면 안에 첫 잔
+
+  const toggle = page.getByRole("button", { name: /^필터 · / });
+  await toggle.click();
+  await expect(page.locator("#filter-panel")).toBeVisible();
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+
+  const apply = page.getByRole("button", { name: /잔 보기$/ });
+  await expect(apply).toBeVisible();
+  await apply.click();
+  await expect(page.locator("#filter-panel")).toBeHidden();
+});
+
+test("데스크톱에선 필터가 늘 펼쳐져 있고 토글이 없다 (#177)", async ({ page }) => {
+  await page.goto(SEARCH);
+  await expect(page.locator("#filter-panel")).toBeVisible();
+  await expect(page.getByRole("button", { name: /^필터 · / })).toBeHidden();
+});
+
+/** 기본은 사진 있는 잔 먼저다. 도수순은 선택지로 남는다. */
+test("기본 정렬은 사진 있는 잔이 먼저고 도수순을 고를 수 있다 (#177)", async ({ page }) => {
+  await page.goto(SEARCH);
+  await expect(page.locator(".cocktail-card").first().locator(".photo-slot--photo")).toBeVisible();
+
+  await page.getByLabel("정렬").selectOption("abv");
+  const abv = async (i: number) =>
+    Number(await page.locator(".cocktail-card").nth(i).locator(".cocktail-card__abv b").innerText());
+  expect(await abv(0)).toBeLessThanOrEqual(await abv(1));
 });
