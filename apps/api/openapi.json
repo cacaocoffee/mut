@@ -154,6 +154,12 @@
             },
             "type" : "array"
           },
+          "brandKeywords" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          },
           "category" : {
             "type" : "string"
           },
@@ -186,7 +192,7 @@
             "type" : "string"
           }
         },
-        "required" : [ "aliases", "category", "domesticAvailability", "id", "isApproved", "nameEn", "nameKo", "slug" ],
+        "required" : [ "aliases", "brandKeywords", "category", "domesticAvailability", "id", "isApproved", "nameEn", "nameKo", "slug" ],
         "type" : "object"
       },
       "AdminRecipeIngredient" : {
@@ -449,6 +455,30 @@
           }
         },
         "required" : [ "action", "at", "entityId", "entityType", "id" ],
+        "type" : "object"
+      },
+      "AvailabilityProposal" : {
+        "properties" : {
+          "approvedCount" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "availability" : {
+            "type" : "string"
+          },
+          "latestReportedOn" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "reason" : {
+            "type" : "string"
+          },
+          "recentApprovedCount" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        },
+        "required" : [ "approvedCount", "availability", "reason", "recentApprovedCount" ],
         "type" : "object"
       },
       "BaseSpirit" : {
@@ -816,6 +846,12 @@
             },
             "type" : "array"
           },
+          "brandKeywords" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          },
           "category" : {
             "type" : "string"
           },
@@ -847,7 +883,7 @@
             "type" : "string"
           }
         },
-        "required" : [ "aliases", "category", "domesticAvailability", "nameEn", "nameKo", "slug" ],
+        "required" : [ "aliases", "brandKeywords", "category", "domesticAvailability", "nameEn", "nameKo", "slug" ],
         "type" : "object"
       },
       "CsrfTokenResponse" : {
@@ -860,6 +896,41 @@
           }
         },
         "required" : [ "headerName", "token" ],
+        "type" : "object"
+      },
+      "DistributedProductSummary" : {
+        "properties" : {
+          "foodType" : {
+            "type" : "string"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "importerOrMaker" : {
+            "type" : "string"
+          },
+          "lastReportedOn" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "manufacturer" : {
+            "type" : "string"
+          },
+          "nameEn" : {
+            "type" : "string"
+          },
+          "nameKo" : {
+            "type" : "string"
+          },
+          "originCountry" : {
+            "type" : "string"
+          },
+          "source" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "foodType", "id", "nameKo", "source" ],
         "type" : "object"
       },
       "EventBatch" : {
@@ -1077,6 +1148,27 @@
         "required" : [ "aliases", "brands", "category", "domesticAvailability", "nameEn", "nameKo", "slug" ],
         "type" : "object"
       },
+      "IngredientDistributionRequest" : {
+        "properties" : {
+          "brandKeywords" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "domesticAvailability" : {
+            "type" : "string"
+          },
+          "priceBand" : {
+            "type" : "string"
+          },
+          "substituteNote" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "brandKeywords", "domesticAvailability" ],
+        "type" : "object"
+      },
       "IngredientItem" : {
         "properties" : {
           "abv" : {
@@ -1135,6 +1227,50 @@
           }
         },
         "required" : [ "isOptional", "isScalable", "nameEn", "nameKo", "slug" ],
+        "type" : "object"
+      },
+      "IngredientMatchesResponse" : {
+        "properties" : {
+          "ingredient" : {
+            "$ref" : "#/components/schemas/AdminIngredientResponse"
+          },
+          "matches" : {
+            "items" : {
+              "$ref" : "#/components/schemas/IngredientProductMatchResponse"
+            },
+            "type" : "array"
+          },
+          "proposal" : {
+            "$ref" : "#/components/schemas/AvailabilityProposal"
+          }
+        },
+        "required" : [ "ingredient", "matches", "proposal" ],
+        "type" : "object"
+      },
+      "IngredientProductMatchResponse" : {
+        "properties" : {
+          "confidence" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "matchedBy" : {
+            "type" : "string"
+          },
+          "matchedKeyword" : {
+            "type" : "string"
+          },
+          "product" : {
+            "$ref" : "#/components/schemas/DistributedProductSummary"
+          },
+          "status" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "confidence", "id", "matchedBy", "matchedKeyword", "product", "status" ],
         "type" : "object"
       },
       "JsonNode" : {
@@ -2650,6 +2786,176 @@
           }
         },
         "summary" : "재료 승인",
+        "tags" : [ "admin-ingredient-controller" ]
+      }
+    },
+    "/api/v1/admin/ingredients/{id}/distribution" : {
+      "patch" : {
+        "description" : "editor 이상. 유통 여부·대체재·브랜드 검색어·가격대. 미유통인데 대체재가 없으면 422 (INV-INGREDIENT-01).",
+        "operationId" : "updateDistribution",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/IngredientDistributionRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AdminIngredientResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "재료 유통 정보 수정",
+        "tags" : [ "admin-ingredient-controller" ]
+      }
+    },
+    "/api/v1/admin/ingredients/{id}/matches" : {
+      "get" : {
+        "operationId" : "matches",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/IngredientMatchesResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "재료의 유통 제품 매핑과 유통 여부 제안",
+        "tags" : [ "admin-ingredient-controller" ]
+      }
+    },
+    "/api/v1/admin/ingredients/{id}/matches/suggest" : {
+      "post" : {
+        "description" : "브랜드 검색어·별칭으로 제품명을 찾아 suggested 매핑을 만든다. 유통 여부는 바꾸지 않는다.",
+        "operationId" : "suggestMatches",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/IngredientMatchesResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "유통 제품 매핑 제안 만들기",
+        "tags" : [ "admin-ingredient-controller" ]
+      }
+    },
+    "/api/v1/admin/ingredients/{id}/matches/{matchId}/approve" : {
+      "post" : {
+        "description" : "재승인은 409.",
+        "operationId" : "approveMatch",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        }, {
+          "in" : "path",
+          "name" : "matchId",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/IngredientProductMatchResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "매핑 승인",
+        "tags" : [ "admin-ingredient-controller" ]
+      }
+    },
+    "/api/v1/admin/ingredients/{id}/matches/{matchId}/reject" : {
+      "post" : {
+        "description" : "재거절은 409.",
+        "operationId" : "rejectMatch",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        }, {
+          "in" : "path",
+          "name" : "matchId",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/IngredientProductMatchResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "매핑 거절",
         "tags" : [ "admin-ingredient-controller" ]
       }
     },

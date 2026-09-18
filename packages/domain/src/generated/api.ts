@@ -370,6 +370,103 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/ingredients/{id}/distribution": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * 재료 유통 정보 수정
+         * @description editor 이상. 유통 여부·대체재·브랜드 검색어·가격대. 미유통인데 대체재가 없으면 422 (INV-INGREDIENT-01).
+         */
+        patch: operations["updateDistribution"];
+        trace?: never;
+    };
+    "/api/v1/admin/ingredients/{id}/matches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 재료의 유통 제품 매핑과 유통 여부 제안 */
+        get: operations["matches"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ingredients/{id}/matches/suggest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 유통 제품 매핑 제안 만들기
+         * @description 브랜드 검색어·별칭으로 제품명을 찾아 suggested 매핑을 만든다. 유통 여부는 바꾸지 않는다.
+         */
+        post: operations["suggestMatches"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ingredients/{id}/matches/{matchId}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 매핑 승인
+         * @description 재승인은 409.
+         */
+        post: operations["approveMatch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ingredients/{id}/matches/{matchId}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 매핑 거절
+         * @description 재거절은 409.
+         */
+        post: operations["rejectMatch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/tasks": {
         parameters: {
             query?: never;
@@ -927,6 +1024,7 @@ export interface components {
         AdminIngredientResponse: {
             abv?: number;
             aliases: string[];
+            brandKeywords: string[];
             category: string;
             description?: string;
             domesticAvailability: string;
@@ -1030,6 +1128,16 @@ export interface components {
             entityType: string;
             /** Format: int64 */
             id: number;
+        };
+        AvailabilityProposal: {
+            /** Format: int32 */
+            approvedCount: number;
+            availability: string;
+            /** Format: date */
+            latestReportedOn?: string;
+            reason: string;
+            /** Format: int32 */
+            recentApprovedCount: number;
         };
         /**
          * @description 축 1 · 기주 (단일값 필수, R-C-1)
@@ -1141,6 +1249,7 @@ export interface components {
         CreateIngredientRequest: {
             abv?: number;
             aliases: string[];
+            brandKeywords: string[];
             category: string;
             description?: string;
             domesticAvailability: string;
@@ -1153,6 +1262,19 @@ export interface components {
         CsrfTokenResponse: {
             headerName: string;
             token: string;
+        };
+        DistributedProductSummary: {
+            foodType: string;
+            /** Format: int64 */
+            id: number;
+            importerOrMaker?: string;
+            /** Format: date */
+            lastReportedOn?: string;
+            manufacturer?: string;
+            nameEn?: string;
+            nameKo: string;
+            originCountry?: string;
+            source: string;
         };
         EventBatch: {
             /** @description 요청당 최대 50건 (SPEC-10 §7). 넘으면 400 이다 */
@@ -1236,6 +1358,12 @@ export interface components {
             slug: string;
             substituteNote?: string;
         };
+        IngredientDistributionRequest: {
+            brandKeywords: string[];
+            domesticAvailability: string;
+            priceBand?: string;
+            substituteNote?: string;
+        };
         IngredientItem: {
             abv?: number;
             category: string;
@@ -1255,6 +1383,21 @@ export interface components {
             slug: string;
             substitute?: components["schemas"]["Substitute"];
             unit?: string;
+        };
+        IngredientMatchesResponse: {
+            ingredient: components["schemas"]["AdminIngredientResponse"];
+            matches: components["schemas"]["IngredientProductMatchResponse"][];
+            proposal: components["schemas"]["AvailabilityProposal"];
+        };
+        IngredientProductMatchResponse: {
+            /** Format: int32 */
+            confidence: number;
+            /** Format: int64 */
+            id: number;
+            matchedBy: string;
+            matchedKeyword: string;
+            product: components["schemas"]["DistributedProductSummary"];
+            status: string;
         };
         JsonNode: Record<string, never>;
         MyProfile: {
@@ -2066,6 +2209,122 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["AdminIngredientResponse"];
+                };
+            };
+        };
+    };
+    updateDistribution: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IngredientDistributionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdminIngredientResponse"];
+                };
+            };
+        };
+    };
+    matches: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["IngredientMatchesResponse"];
+                };
+            };
+        };
+    };
+    suggestMatches: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["IngredientMatchesResponse"];
+                };
+            };
+        };
+    };
+    approveMatch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+                matchId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["IngredientProductMatchResponse"];
+                };
+            };
+        };
+    };
+    rejectMatch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+                matchId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["IngredientProductMatchResponse"];
                 };
             };
         };
