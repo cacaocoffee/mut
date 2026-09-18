@@ -898,6 +898,31 @@
         "required" : [ "headerName", "token" ],
         "type" : "object"
       },
+      "DistributedProductItem" : {
+        "properties" : {
+          "foodType" : {
+            "type" : "string"
+          },
+          "importerOrMaker" : {
+            "type" : "string"
+          },
+          "lastReportedOn" : {
+            "format" : "date",
+            "type" : "string"
+          },
+          "nameEn" : {
+            "type" : "string"
+          },
+          "nameKo" : {
+            "type" : "string"
+          },
+          "originCountry" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "foodType", "nameKo" ],
+        "type" : "object"
+      },
       "DistributedProductSummary" : {
         "properties" : {
           "foodType" : {
@@ -1129,6 +1154,10 @@
           "domesticAvailability" : {
             "type" : "string"
           },
+          "lastReportedOn" : {
+            "format" : "date",
+            "type" : "string"
+          },
           "nameEn" : {
             "type" : "string"
           },
@@ -1138,6 +1167,12 @@
           "priceBand" : {
             "type" : "string"
           },
+          "products" : {
+            "items" : {
+              "$ref" : "#/components/schemas/DistributedProductItem"
+            },
+            "type" : "array"
+          },
           "slug" : {
             "type" : "string"
           },
@@ -1145,7 +1180,7 @@
             "type" : "string"
           }
         },
-        "required" : [ "aliases", "brands", "category", "domesticAvailability", "nameEn", "nameKo", "slug" ],
+        "required" : [ "aliases", "brands", "category", "domesticAvailability", "nameEn", "nameKo", "products", "slug" ],
         "type" : "object"
       },
       "IngredientDistributionRequest" : {

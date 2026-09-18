@@ -1263,6 +1263,15 @@ export interface components {
             headerName: string;
             token: string;
         };
+        DistributedProductItem: {
+            foodType: string;
+            importerOrMaker?: string;
+            /** Format: date */
+            lastReportedOn?: string;
+            nameEn?: string;
+            nameKo: string;
+            originCountry?: string;
+        };
         DistributedProductSummary: {
             foodType: string;
             /** Format: int64 */
@@ -1352,9 +1361,12 @@ export interface components {
             category: string;
             description?: string;
             domesticAvailability: string;
+            /** Format: date */
+            lastReportedOn?: string;
             nameEn: string;
             nameKo: string;
             priceBand?: string;
+            products: components["schemas"]["DistributedProductItem"][];
             slug: string;
             substituteNote?: string;
         };
