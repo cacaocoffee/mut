@@ -17,3 +17,15 @@ test("목록의 잔 수와 상세의 잔 수가 같다 (#181)", async ({ page })
   expect(detailCount).toBe(listCount);
   await expect(page.locator(".cocktail-card")).toHaveCount(listCount);
 });
+
+/**
+ * #196 — 재료 상세의 신고 제품 목록엔 링크·가격이 없다 (`NFR-L-05` 자문 전).
+ * API 가 없는 날(프로토타입 폴백)엔 목록 자체가 없고, 있는 날엔 있어도 링크가 0 이어야 한다 —
+ * 어느 쪽이든 아래가 성립한다. 배지·대체재 카드 판정은 `lib/ingredient-distribution.test.ts` 가 고정한다.
+ */
+test("신고 제품 목록에 구매 링크가 없다 (#196 · NFR-L-05)", async ({ page }) => {
+  await page.goto("/ingredients/campari");
+  await expect(page.locator("h1")).toContainText("캄파리");
+  await expect(page.locator(".ingredient-products a")).toHaveCount(0);
+  await expect(page.locator(".ingredient-products").getByText(/원|₩|\$/)).toHaveCount(0);
+});
