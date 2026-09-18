@@ -1,5 +1,8 @@
 "use client";
 
+import Link from "next/link";
+import { INGREDIENTS_PATH } from "@/lib/routes";
+
 import { useEffect, useState } from "react";
 import { MAX_SERVINGS, formatQuantity, type DisplayUnit } from "@mut/domain";
 import type { CocktailView } from "@/lib/cocktail-view";
@@ -195,7 +198,18 @@ function RecipeRow({
           <td colSpan={3}>
             <dl className="substitute-note">
               <dt>SUBSTITUTE · {line.nameKo}</dt>
-              <dd>{line.substitute}</dd>
+              <dd>
+                {line.substitute}
+                {/* 재료 참조가 있으면 그 재료로 보낸다 — 유통 여부·쓰는 칵테일이 거기 있다 (#196 · R-F2.2-3) */}
+                {line.substituteSlug ? (
+                  <>
+                    {" "}
+                    <Link href={`${INGREDIENTS_PATH}/${line.substituteSlug}`} className="substitute-note__link">
+                      대체품 둘러보기 →
+                    </Link>
+                  </>
+                ) : null}
+              </dd>
             </dl>
           </td>
         </tr>

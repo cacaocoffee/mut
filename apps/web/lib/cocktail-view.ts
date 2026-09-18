@@ -56,6 +56,8 @@ export interface CocktailView {
     isScalable: boolean;
     isOptional: boolean;
     substitute: string | null;
+    /** 대체가 재료 참조면 그 슬러그. 화면이 「대체품 둘러보기」 링크를 건다 (#196 · G-42). */
+    substituteSlug: string | null;
   }[];
   steps: string[];
 
@@ -104,6 +106,7 @@ export function fromApi(detail: CocktailDetail): CocktailView {
       isOptional: line.isOptional,
       // 대체는 재료 참조일 수도 안내 문구일 수도 있다 (`GATE-COCKTAIL-06` 이 둘 중 하나를 요구한다).
       substitute: line.substitute?.note ?? line.substitute?.nameKo ?? null,
+      substituteSlug: line.substitute?.slug ?? null,
     })),
     steps: detail.steps.map((s) => s.text),
 
@@ -164,6 +167,8 @@ export function fromPrototype(slug: string): CocktailView | null {
       isScalable: i.amount == null && i.ml != null,
       isOptional: false,
       substitute: i.sub ?? null,
+      // 프로토타입의 대체는 문장뿐이다 — 재료 참조는 DB(`recipe_ingredient.substitute_ingredient_id`)에만 있다
+      substituteSlug: null,
     })),
     steps: c.steps,
 

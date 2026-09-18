@@ -100,6 +100,7 @@ ADMIN ──governs──▶ 전부 (발행 상태 · 감사)
 | `/articles` 목록 | SSG + ISR | 발행 시 | ✅ |
 | `/articles/[slug]` | SSG + ISR | 발행 시 | ✅ |
 | `/curations/[slug]` | SSG + ISR | 발행 시 | ✅ |
+| `/ingredients/[slug]` | SSG + ISR | 1시간 (유통·대체재·유통 제품은 API, #196) | ✅ |
 | `/my/*` | CSR (인증) | — | ❌ |
 | `/partner/*` | CSR (인증) | — | ❌ |
 | `/admin/*` | CSR (인증) | — | ❌ |

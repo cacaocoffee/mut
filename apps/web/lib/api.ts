@@ -22,6 +22,8 @@ export type CocktailListItem = components["schemas"]["CocktailListItem"];
 export type RelatedItem = components["schemas"]["RelatedItem"];
 export type CategoryItem = components["schemas"]["CategoryItem"];
 export type CategoriesResponse = components["schemas"]["CategoriesResponse"];
+export type IngredientDetail = components["schemas"]["IngredientDetail"];
+export type IngredientListItem = components["schemas"]["IngredientItem"];
 
 /** 카테고리 축 3종. **여기 없는 축은 카테고리가 아니다** (`PRIN-P06`). */
 export const CATEGORY_AXES = ["base", "style", "method"] as const;
@@ -215,5 +217,45 @@ export async function cocktailsByAxis(
   } catch (e) {
     console.warn(`[api] ${axis}=${slug} 목록 조회 실패 — 비운다: ${describe(e)}`);
     return [];
+  }
+}
+
+// ── 재료 사전 (#196 · G-41 · FR-INGREDIENT-002) ────────────────────────────
+
+/** 승인된 재료 슬러그 전부. 빌드 시점 조회라 캐시하지 않는다. */
+export async function ingredientSlugs(): Promise<string[]> {
+  if (!usingApi) return [];
+
+  try {
+    const res = await fetch(`${BASE}/api/v1/ingredients?size=1000`, { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const body = (await res.json()) as { items: IngredientListItem[] };
+    return body.items.map((item) => item.slug);
+  } catch (e) {
+    console.warn(`[api] 재료 목록 조회 실패 — 코드 마스터로 빌드한다: ${describe(e)}`);
+    return [];
+  }
+}
+
+/**
+ * 재료 상세. 유통 여부·대체재·승인된 유통 제품은 **여기서만** 온다 — 코드 마스터
+ * (`packages/domain/src/ingredients.ts`)는 이름·분류·별칭까지다. API 가 없으면 null 이고
+ * 화면은 이름·분류만 그린다.
+ */
+export async function ingredientDetail(slug: string): Promise<IngredientDetail | null> {
+  if (!usingApi) return null;
+
+  try {
+    const res = await fetch(`${BASE}/api/v1/ingredients/${encodeURIComponent(slug)}`, {
+      next: { revalidate: 3600 },
+    });
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    return (await res.json()) as IngredientDetail;
+  } catch (e) {
+    console.warn(`[api] 재료 상세 조회 실패 (${slug}) — 이름·분류만 그린다: ${describe(e)}`);
+    return null;
   }
 }
