@@ -80,3 +80,6 @@ apps/web/test-results/
 
 # Lighthouse CI 리포트 — 실행할 때마다 새로 나오는 산출물이다
 apps/web/.lighthouseci/
+
+# scripts/fetch-distributed-products.ts 가 받은 쪽을 남기는 곳 (#194)
+.cache/
