@@ -2,12 +2,18 @@ package kr.mut.ingredient.internal
 
 import kr.mut.ingredient.api.AdminIngredientResponse
 import kr.mut.ingredient.api.CreateIngredientRequest
+import kr.mut.ingredient.api.DistributedProductSummary
 import kr.mut.ingredient.api.IngredientAdminFacade
 import kr.mut.ingredient.api.IngredientCapacity
+import kr.mut.ingredient.api.IngredientDistributionRequest
+import kr.mut.ingredient.api.IngredientMatchesResponse
+import kr.mut.ingredient.api.IngredientProductMatchResponse
 import kr.mut.ingredient.api.IngredientProperties
 import kr.mut.ingredient.domain.DomesticAvailability
 import kr.mut.ingredient.domain.Ingredient
 import kr.mut.ingredient.domain.IngredientCategory
+import kr.mut.ingredient.domain.IngredientProductMatch
+import kr.mut.ingredient.repository.IngredientProductMatchRepository
 import kr.mut.ingredient.repository.IngredientRepository
 import kr.mut.common.web.error.BadRequestException
 import kr.mut.common.web.error.ConflictException
@@ -32,6 +38,8 @@ class IngredientAdminService(
     private val ingredients: IngredientRepository,
     private val service: IngredientService,
     private val properties: IngredientProperties,
+    private val matcher: IngredientProductMatcher,
+    private val matches: IngredientProductMatchRepository,
 ) : IngredientAdminFacade {
 
     /**
@@ -55,6 +63,7 @@ class IngredientAdminService(
             description = request.description,
             substituteNote = request.substituteNote,
             priceBand = request.priceBand,
+            brandKeywords = request.brandKeywords.cleaned(),
         )
 
         return try {
@@ -95,6 +104,62 @@ class IngredientAdminService(
         )
     }
 
+    // ── 유통 (#195) ─────────────────────────────────────────────────────────
+
+    /**
+     * `INV-INGREDIENT-01` 은 [IngredientService.save] 의 `validate()` 가 422 로 막는다 —
+     * 생성과 같은 길이라 규칙이 한 벌이다 (`PRIN-T05`).
+     */
+    @Transactional
+    override fun updateDistribution(id: Long, request: IngredientDistributionRequest): AdminIngredientResponse {
+        val ingredient = ingredients.findById(id).orElseThrow { ResourceNotFoundException() }
+        ingredient.domesticAvailability = availability(request.domesticAvailability)
+        ingredient.substituteNote = request.substituteNote?.takeIf { it.isNotBlank() }
+        ingredient.brandKeywords = request.brandKeywords.cleaned()
+        ingredient.priceBand = request.priceBand?.takeIf { it.isNotBlank() }
+        return try {
+            service.save(ingredient).toAdminResponse()
+        } catch (e: DataIntegrityViolationException) {
+            throw ConflictException("도메인 제약을 어겼습니다: ${e.mostSpecificCause.message}")
+        }
+    }
+
+    @Transactional(readOnly = true)
+    override fun matches(id: Long): IngredientMatchesResponse =
+        ingredients.findById(id).orElseThrow { ResourceNotFoundException() }.toMatchesResponse()
+
+    @Transactional
+    override fun suggestMatches(id: Long): IngredientMatchesResponse {
+        val ingredient = ingredients.findById(id).orElseThrow { ResourceNotFoundException() }
+        matcher.suggest(ingredient)
+        return ingredient.toMatchesResponse()
+    }
+
+    @Transactional
+    override fun approveMatch(id: Long, matchId: Long): IngredientProductMatchResponse =
+        match(id, matchId).apply { approve() }.toResponse()
+
+    @Transactional
+    override fun rejectMatch(id: Long, matchId: Long): IngredientProductMatchResponse =
+        match(id, matchId).apply { reject() }.toResponse()
+
+    /** 다른 재료의 매핑 id 를 넘기면 404 — 존재를 흘리지 않는다 (SPEC-07 §5). */
+    private fun match(ingredientId: Long, matchId: Long): IngredientProductMatch =
+        matches.findByIdAndIngredientId(matchId, ingredientId) ?: throw ResourceNotFoundException()
+
+    private fun Ingredient.toMatchesResponse(): IngredientMatchesResponse {
+        val all = matches.findAllForIngredient(id)
+        return IngredientMatchesResponse(
+            ingredient = toAdminResponse(),
+            matches = all.map { it.toResponse() },
+            proposal = matcher.propose(all),
+        )
+    }
+
+    /** 앞뒤 공백을 지우고 빈 것·중복을 버린다. 검색어는 그대로 LIKE 에 들어간다. */
+    private fun List<String>.cleaned(): Array<String> =
+        map { it.trim() }.filter { it.isNotEmpty() }.distinct().toTypedArray()
+
     private fun category(slug: String) = IngredientCategory.entries.firstOrNull { it.slug == slug }
         ?: throw BadRequestException(
             "알 수 없는 category 입니다: $slug " +
@@ -123,4 +188,25 @@ private fun Ingredient.toAdminResponse() = AdminIngredientResponse(
     description = description,
     substituteNote = substituteNote,
     priceBand = priceBand,
+    brandKeywords = brandKeywords.toList(),
+)
+
+/** **트랜잭션 안에서만 부른다** — `product` 가 지연 연관이다 (조회 쿼리가 fetch join 한다). */
+private fun IngredientProductMatch.toResponse() = IngredientProductMatchResponse(
+    id = id,
+    status = status.slug,
+    confidence = confidence.toInt(),
+    matchedKeyword = matchedKeyword,
+    matchedBy = matchedBy,
+    product = DistributedProductSummary(
+        id = product.id,
+        source = product.source,
+        nameKo = product.nameKo,
+        nameEn = product.nameEn,
+        importerOrMaker = product.importerOrMaker,
+        manufacturer = product.manufacturer,
+        originCountry = product.originCountry,
+        foodType = product.foodType,
+        lastReportedOn = product.lastReportedOn,
+    ),
 )

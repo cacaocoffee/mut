@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/admin-session";
-import { pendingIngredients, ingredientCapacity } from "@/lib/admin-api";
+import { pendingIngredients, ingredientCapacity, searchAdminIngredients } from "@/lib/admin-api";
 import { IngredientApprove } from "@/components/admin/ingredient-approve";
 import { CATEGORY_LABELS, AVAILABILITY_LABELS, label } from "@/lib/ingredient-labels";
 
@@ -21,10 +21,19 @@ import { CATEGORY_LABELS, AVAILABILITY_LABELS, label } from "@/lib/ingredient-la
  */
 export const dynamic = "force-dynamic";
 
-export default async function AdminIngredients() {
+export default async function AdminIngredients({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
   const role = await requireAdmin();
+  const q = (await searchParams).q?.trim() ?? "";
 
-  const [pending, capacity] = await Promise.all([pendingIngredients(), ingredientCapacity()]);
+  const [pending, capacity, found] = await Promise.all([
+    pendingIngredients(),
+    ingredientCapacity(),
+    q ? searchAdminIngredients(q) : Promise.resolve([]),
+  ]);
 
   return (
     <>
@@ -48,6 +57,37 @@ export default async function AdminIngredients() {
         </p>
       ) : null}
 
+      {/* 승인된 재료로 들어가는 입구 (#195). 승인 큐엔 대기분만 있어서 유통 정보를 고칠 길이 없었다. */}
+      <form className="admin-form__grid" action="/admin/ingredients" method="get">
+        <label className="admin-field">
+          <span className="admin-field__label">재료 찾기</span>
+          <input name="q" defaultValue={q} placeholder="이름 · 영문명 · 슬러그" />
+          <span className="admin-field__hint">유통 여부·대체재·유통 제품 매핑은 재료 이름을 눌러 고칩니다</span>
+        </label>
+      </form>
+      {q ? (
+        found.length === 0 ? (
+          <p className="admin__empty">&ldquo;{q}&rdquo; 에 맞는 재료가 없습니다.</p>
+        ) : (
+          <ul className="admin__list">
+            {found.map((ing) => (
+              <li key={ing.id}>
+                <b>
+                  <Link href={`/admin/ingredients/${ing.id}`}>
+                    {ing.nameKo} <span className="en">{ing.nameEn}</span>
+                  </Link>
+                </b>
+                <span>
+                  {ing.slug} · {label(CATEGORY_LABELS, ing.category)} ·{" "}
+                  {label(AVAILABILITY_LABELS, ing.domesticAvailability)}
+                  {ing.isApproved ? "" : " · 승인 대기"}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )
+      ) : null}
+
       {pending.length === 0 ? (
         <p className="admin__empty">
           승인을 기다리는 재료가 없습니다.{" "}
@@ -59,7 +99,9 @@ export default async function AdminIngredients() {
             <li key={ing.id}>
               <div className="admin__section-head--row">
                 <b>
-                  {ing.nameKo} <span className="en">{ing.nameEn}</span>
+                  <Link href={`/admin/ingredients/${ing.id}`}>
+                    {ing.nameKo} <span className="en">{ing.nameEn}</span>
+                  </Link>
                 </b>
                 {role === "admin" ? (
                   <IngredientApprove id={ing.id} name={ing.nameKo} />

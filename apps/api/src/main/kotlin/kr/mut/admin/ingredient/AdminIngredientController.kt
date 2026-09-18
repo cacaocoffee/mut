@@ -11,8 +11,12 @@ import kr.mut.ingredient.api.AdminIngredientResponse
 import kr.mut.ingredient.api.CreateIngredientRequest
 import kr.mut.ingredient.api.IngredientAdminFacade
 import kr.mut.ingredient.api.IngredientCapacity
+import kr.mut.ingredient.api.IngredientDistributionRequest
+import kr.mut.ingredient.api.IngredientMatchesResponse
+import kr.mut.ingredient.api.IngredientProductMatchResponse
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -143,6 +147,61 @@ class AdminIngredientController(
      * `warning` 이 `true` 여도 승인은 된다 — SPEC-02 §3 의 상한 근거가 "역검색 UX"이지
      * 데이터 무결성이 아니다 (DECISIONS §1.2). 어드민 UI(이슈 045)가 이 값을 띄운다.
      */
+    // ── 유통 (#195 · GAPS G-41) ─────────────────────────────────────────────
+
+    @PatchMapping("/{id}/distribution")
+    @Operation(
+        summary = "재료 유통 정보 수정",
+        description = "editor 이상. 유통 여부·대체재·브랜드 검색어·가격대. 미유통인데 대체재가 없으면 422 (INV-INGREDIENT-01).",
+    )
+    fun updateDistribution(
+        @PathVariable id: Long,
+        @Valid @RequestBody request: IngredientDistributionRequest,
+        http: HttpServletRequest,
+    ): AdminIngredientResponse {
+        actor.require(http, Action.WRITE_CONTENT)
+        return ingredients.updateDistribution(id, request)
+    }
+
+    @GetMapping("/{id}/matches")
+    @Operation(summary = "재료의 유통 제품 매핑과 유통 여부 제안")
+    fun matches(@PathVariable id: Long, http: HttpServletRequest): IngredientMatchesResponse {
+        actor.require(http, Action.WRITE_CONTENT)
+        return ingredients.matches(id)
+    }
+
+    @PostMapping("/{id}/matches/suggest")
+    @Operation(
+        summary = "유통 제품 매핑 제안 만들기",
+        description = "브랜드 검색어·별칭으로 제품명을 찾아 suggested 매핑을 만든다. 유통 여부는 바꾸지 않는다.",
+    )
+    fun suggestMatches(@PathVariable id: Long, http: HttpServletRequest): IngredientMatchesResponse {
+        actor.require(http, Action.WRITE_CONTENT)
+        return ingredients.suggestMatches(id)
+    }
+
+    @PostMapping("/{id}/matches/{matchId}/approve")
+    @Operation(summary = "매핑 승인", description = "재승인은 409.")
+    fun approveMatch(
+        @PathVariable id: Long,
+        @PathVariable matchId: Long,
+        http: HttpServletRequest,
+    ): IngredientProductMatchResponse {
+        actor.require(http, Action.WRITE_CONTENT)
+        return ingredients.approveMatch(id, matchId)
+    }
+
+    @PostMapping("/{id}/matches/{matchId}/reject")
+    @Operation(summary = "매핑 거절", description = "재거절은 409.")
+    fun rejectMatch(
+        @PathVariable id: Long,
+        @PathVariable matchId: Long,
+        http: HttpServletRequest,
+    ): IngredientProductMatchResponse {
+        actor.require(http, Action.WRITE_CONTENT)
+        return ingredients.rejectMatch(id, matchId)
+    }
+
     @GetMapping("/capacity")
     @Operation(summary = "승인 재료 수와 상한", description = "상한 초과는 경고다. 승인을 막지 않는다.")
     fun capacity(http: HttpServletRequest): IngredientCapacity {

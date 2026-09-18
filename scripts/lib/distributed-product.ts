@@ -185,8 +185,11 @@ function jsonb(value: unknown): string {
 }
 
 /**
- * repeatable 시드 본문. API 에서 받은 두 출처는 통째로 다시 채우고, `manual` 은 손대지 않는다 —
- * 어드민이 직접 넣은 행을 스크립트가 지우면 안 된다.
+ * repeatable 시드 본문. **지우지 않고 덧쓴다** (`ON CONFLICT DO UPDATE`).
+ *
+ * 지우고 다시 넣으면 id 가 바뀌어 `ingredient_product_match` 의 승인이 통째로 날아간다 (#195).
+ * 출처에서 사라진 제품도 남긴다 — 이 데이터가 말하는 건 "신고가 있었다" 이고, `last_reported_on` 이
+ * 얼마나 오래됐는지를 말한다. `manual` 은 어드민이 넣은 것이라 애초에 건드리지 않는다.
  */
 export function toSeedSql(rows: ProductRow[], fetchedOn: string): string {
   const lines: string[] = [
@@ -195,8 +198,7 @@ export function toSeedSql(rows: ProductRow[], fetchedOn: string): string {
     "-- ⚠️ 손으로 고치지 않는다. scripts/fetch-distributed-products.ts 를 돌려 다시 뽑는다.",
     `--    받은 날: ${fetchedOn} · ${rows.length}건`,
     "",
-    "-- API 출처만 다시 채운다. manual 은 어드민이 넣은 것이라 남긴다.",
-    "DELETE FROM distributed_product WHERE source IN ('mfds_import', 'mfds_domestic');",
+    "-- 지우지 않고 덧쓴다. 지우면 id 가 바뀌어 ingredient_product_match 의 승인이 날아간다 (#195).",
     "",
   ];
   // 동시 수집이라 받은 순서가 매번 다르다. 키로 정렬해 두 번 뽑아도 같은 파일이 나오게 한다.
@@ -219,7 +221,14 @@ export function toSeedSql(rows: ProductRow[], fetchedOn: string): string {
           (j < chunk.length - 1 ? "," : ""),
       );
     });
-    lines.push("ON CONFLICT (source, source_key) DO NOTHING;", "");
+    lines.push(
+      "ON CONFLICT (source, source_key) DO UPDATE SET",
+      "  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,",
+      "  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,",
+      "  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,",
+      "  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);",
+      "",
+    );
   }
   return lines.join("\n");
 }
