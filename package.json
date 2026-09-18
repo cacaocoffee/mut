@@ -12,11 +12,12 @@
     "start": "npm run start --workspace @mut/web",
     "lint": "npm run lint --workspace @mut/web",
     "typecheck": "tsc -p apps/web --noEmit",
-    "check": "npm run check --workspace @mut/domain && node scripts/taxonomy-parity.mjs && node scripts/css-guard.mjs && node scripts/color-parity.mjs && node scripts/contrast-check.mjs && node scripts/image-guard.mjs && node scripts/ingredient-guard.mjs",
+    "check": "npm run check --workspace @mut/domain && node scripts/taxonomy-parity.mjs && node scripts/css-guard.mjs && node scripts/color-parity.mjs && node scripts/contrast-check.mjs && node scripts/image-guard.mjs && node scripts/ingredient-guard.mjs && tsx --test scripts/distributed-product.test.ts",
     "verify": "npm run check && npm run contract:check && npm run lint && npm run build",
     "generate:types": "node scripts/generate-types.mjs",
     "contract:check": "node scripts/generate-types.mjs --check",
     "facet:parity": "tsx scripts/facet-parity.ts",
+    "distributed:fetch": "tsx scripts/fetch-distributed-products.ts",
     "e2e": "npm run e2e --workspace @mut/web",
     "lhci": "npm run lhci --workspace @mut/web",
     "bundle:budget": "node scripts/bundle-budget.mjs"
