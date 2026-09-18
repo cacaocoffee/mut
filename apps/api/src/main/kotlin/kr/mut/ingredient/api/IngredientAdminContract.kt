@@ -3,6 +3,7 @@ package kr.mut.ingredient.api
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import java.math.BigDecimal
+import java.time.LocalDate
 
 /**
  * 어드민이 재료를 다루는 **유일한 창구** (ISSUE-026 · `PRIN-T03`).
@@ -56,6 +57,29 @@ interface IngredientAdminFacade {
      * 레시피에 넣을 수가 없다. 여기는 **미승인도 준다** (DECISIONS §1.1).
      */
     fun search(query: String?, limit: Int): List<AdminIngredientResponse>
+
+    // ── 유통 (#195 · GAPS G-41) ─────────────────────────────────────────────
+
+    /**
+     * 유통 여부·대체재·브랜드 검색어·가격대를 고친다. `INV-INGREDIENT-01` 은 여기서도 막힌다 —
+     * 미유통으로 바꾸면서 대체재를 안 적으면 422 다 (생성과 같은 규칙, `FR-ADMIN-003`).
+     */
+    fun updateDistribution(id: Long, request: IngredientDistributionRequest): AdminIngredientResponse
+
+    /** 이 재료의 매핑 전부와, 승인된 매핑으로 계산한 유통 여부 **제안**. */
+    fun matches(id: Long): IngredientMatchesResponse
+
+    /**
+     * 브랜드 검색어·별칭으로 유통 제품을 찾아 `suggested` 매핑을 만든다. 이미 있는 쌍은 건너뛴다
+     * (`PRIN-T07`). **유통 여부는 바꾸지 않는다** — 제안까지만.
+     */
+    fun suggestMatches(id: Long): IngredientMatchesResponse
+
+    /** 재승인은 409. */
+    fun approveMatch(id: Long, matchId: Long): IngredientProductMatchResponse
+
+    /** 재거절은 409. */
+    fun rejectMatch(id: Long, matchId: Long): IngredientProductMatchResponse
 }
 
 /** `Size` 상한은 `V008__ingredient.sql` 의 컬럼 길이와 같다 — 어긋나면 DB 가 500 으로 막는다. */
@@ -70,6 +94,16 @@ data class CreateIngredientRequest(
     val description: String? = null,
     /** 미유통이면 필수다 (`INV-INGREDIENT-01`). DB CHECK 가 강제한다 */
     val substituteNote: String? = null,
+    val priceBand: String? = null,
+    /** 유통 제품명에서 이 재료를 찾는 검색어 (#195). 별칭보다 좁게. */
+    val brandKeywords: List<String> = emptyList(),
+)
+
+/** 유통 정보만 고친다 (#195). 이름·분류·슬러그는 여기서 안 바뀐다. */
+data class IngredientDistributionRequest(
+    @field:NotBlank val domesticAvailability: String,
+    val substituteNote: String? = null,
+    val brandKeywords: List<String> = emptyList(),
     val priceBand: String? = null,
 )
 
@@ -92,6 +126,51 @@ data class AdminIngredientResponse(
     val description: String?,
     val substituteNote: String?,
     val priceBand: String?,
+    val brandKeywords: List<String>,
+)
+
+/** 유통 제품 요약 — 제품명·수입사만. 구매 링크·가격은 `NFR-L-05` 자문 뒤다. */
+data class DistributedProductSummary(
+    val id: Long,
+    val source: String,
+    val nameKo: String,
+    val nameEn: String?,
+    val importerOrMaker: String?,
+    val manufacturer: String?,
+    val originCountry: String?,
+    val foodType: String,
+    val lastReportedOn: LocalDate?,
+)
+
+data class IngredientProductMatchResponse(
+    val id: Long,
+    val status: String,
+    val confidence: Int,
+    val matchedKeyword: String,
+    val matchedBy: String,
+    val product: DistributedProductSummary,
+)
+
+/**
+ * 승인된 매핑으로 계산한 유통 여부 **제안**. 배치가 `ingredient` 를 직접 바꾸지 않는다 —
+ * 어드민이 이것을 보고 [IngredientAdminFacade.updateDistribution] 으로 확정한다.
+ *
+ * 규칙(`IngredientProductMatcher.propose`): 최근 3년 안에 신고된 승인 매핑이
+ * 3건 이상이면 `common`, 1~2건이면 `specialty`, 없으면 `import_only`. `unavailable` 은 제안하지
+ * 않는다 — "신고가 없다" 와 "국내에 없다" 는 다르다.
+ */
+data class AvailabilityProposal(
+    val availability: String,
+    val approvedCount: Int,
+    val recentApprovedCount: Int,
+    val latestReportedOn: LocalDate?,
+    val reason: String,
+)
+
+data class IngredientMatchesResponse(
+    val ingredient: AdminIngredientResponse,
+    val matches: List<IngredientProductMatchResponse>,
+    val proposal: AvailabilityProposal,
 )
 
 /**

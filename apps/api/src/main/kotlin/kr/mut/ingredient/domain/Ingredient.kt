@@ -48,6 +48,14 @@ class Ingredient(
     @Column(name = "aliases", nullable = false)
     var aliases: Array<String> = emptyArray(),
 
+    /**
+     * 유통 제품명에서 이 재료를 찾는 검색어 (#195). 별칭과 다르다 — 별칭은 "럼"처럼 넓어서
+     * 제품명 검색에 쓰면 엉뚱한 것이 잡힌다. 여기는 캄파리 → {campari, 캄파리, 깜빠리} 처럼 좁게.
+     */
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(name = "brand_keywords", nullable = false)
+    var brandKeywords: Array<String> = emptyArray(),
+
     @Column(name = "abv", precision = 4, scale = 1)
     var abv: BigDecimal? = null,
 

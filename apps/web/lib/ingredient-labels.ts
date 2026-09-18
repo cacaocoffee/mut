@@ -36,3 +36,10 @@ export const NEEDS_SUBSTITUTE = new Set(["import_only", "unavailable"]);
 
 export const label = (table: Record<string, string>, slug: string): string =>
   table[slug] ?? slug;
+
+/** 재료 ↔ 유통 제품 매핑 상태 (#195). */
+export const MATCH_STATUS_LABELS: Record<string, string> = {
+  suggested: "제안",
+  approved: "승인",
+  rejected: "거절",
+};

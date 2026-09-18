@@ -88,6 +88,30 @@ export async function ingredientCapacity(): Promise<IngredientCapacity | null> {
   return get<IngredientCapacity>("/ingredients/capacity");
 }
 
+/** 재료 하나 (미승인 포함). 어드민 재료 상세가 쓴다 (#195). */
+export async function adminIngredient(id: string): Promise<AdminIngredient | null> {
+  return get<AdminIngredient>(`/ingredients/${encodeURIComponent(id)}`);
+}
+
+/** 이름·영문명·슬러그 부분일치. 승인된 재료로 들어가는 입구다 — 승인 큐엔 대기분만 있다. */
+export async function searchAdminIngredients(q: string): Promise<AdminIngredient[]> {
+  return (await get<AdminIngredient[]>(`/ingredients?q=${encodeURIComponent(q)}&limit=50`)) ?? [];
+}
+
+// ── 재료 ↔ 유통 제품 매핑 (#195 · GAPS G-41) ──────────────────────────────
+
+export type IngredientMatches = components["schemas"]["IngredientMatchesResponse"];
+export type IngredientProductMatch = components["schemas"]["IngredientProductMatchResponse"];
+export type AvailabilityProposal = components["schemas"]["AvailabilityProposal"];
+
+/**
+ * 재료의 매핑 전부와 유통 여부 **제안**. 제안은 승인된 매핑으로 서버가 계산한다 —
+ * 화면은 그 숫자를 보여 주고, 확정은 사람이 유통 정보 폼에서 한다.
+ */
+export async function ingredientMatches(id: string): Promise<IngredientMatches | null> {
+  return get<IngredientMatches>(`/ingredients/${encodeURIComponent(id)}/matches`);
+}
+
 // ── 검증 태스크 (ISSUE-048 · `FR-ADMIN-004`) ──────────────────────────────
 
 export type VerificationTask = components["schemas"]["VerificationTaskItem"];

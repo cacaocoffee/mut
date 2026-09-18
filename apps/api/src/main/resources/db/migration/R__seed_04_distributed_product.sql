@@ -3,8 +3,7 @@
 -- ⚠️ 손으로 고치지 않는다. scripts/fetch-distributed-products.ts 를 돌려 다시 뽑는다.
 --    받은 날: 2026-09-18 · 40454건
 
--- API 출처만 다시 채운다. manual 은 어드민이 넣은 것이라 남긴다.
-DELETE FROM distributed_product WHERE source IN ('mfds_import', 'mfds_domestic');
+-- 지우지 않고 덧쓴다. 지우면 id 가 바뀌어 ingredient_product_match 의 승인이 날아간다 (#195).
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -509,7 +508,11 @@ VALUES
 ('mfds_import', '(주)국순당 수입주류|샤또 깡뜨냑 브라운', '샤또 깡뜨냑 브라운', 'CHATEAU CANTENAC BROWN', '(주)국순당 수입주류', 'CHATEAU CANTENAC BROWN', '프랑스', '과실주', '2026-08-28', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)국순당 수입주류|샤또 깡뜨메를로', '샤또 깡뜨메를로', 'CHATEAU CANTEMERLE', '(주)국순당 수입주류', 'SOCIETE CIVILE DU CHATEAU CANTEMERLE', '프랑스', '과실주', '2026-08-21', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)국순당 수입주류|샤또 끌레르 밀롱', '샤또 끌레르 밀롱', 'CHATEAU CLERC MILON', '(주)국순당 수입주류', 'BARON PHILIPPE DE ROTHSCHILD SA', '프랑스', '과실주', '2026-08-27', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -1014,7 +1017,11 @@ VALUES
 ('mfds_import', '(주)금양인터내셔날|리카솔리 브롤리오 키안티 클라시코', '리카솔리 브롤리오 키안티 클라시코', 'RICASOLI BROLIO CHIANTI CLASSICO', '(주)금양인터내셔날', 'BARONE RICASOLI SPA AGRICOLA', '이탈리아', '과실주', '2026-08-03', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"이탈리아","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)금양인터내셔날|리카솔리 브롤리오 키안티 클라시코 리제르바', '리카솔리 브롤리오 키안티 클라시코 리제르바', 'RICASOLI BROLIO CHIANTI CLASSICO RISERVA', '(주)금양인터내셔날', 'BARONE RICASOLI SPA AGRICOLA', '이탈리아', '과실주', '2026-05-06', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"이탈리아","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)금양인터내셔날|리카솔리 안티코 페우도 토스카나', '리카솔리 안티코 페우도 토스카나', 'RICASOLI ANTICO FEUDO TOSCANA', '(주)금양인터내셔날', 'BARONE RICASOLI SPA AGRICOLA', '이탈리아', '과실주', '2026-08-03', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"이탈리아","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -1519,7 +1526,11 @@ VALUES
 ('mfds_import', '(주)금양인터내셔날|어클레임드 나파밸리 카베르네 소비뇽', '어클레임드 나파밸리 카베르네 소비뇽', 'ACCLAIMED NAPA VALLEY CABERNET SAUVIGNON', '(주)금양인터내셔날', 'PRECISION BRAND COLLECTION WINE & SPIRITS LLC', '미국', '과실주', '2026-06-17', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)금양인터내셔날|엄메이징 가든 오브 마세리아', '엄메이징 가든 오브 마세리아', 'UMAIZING GARDEN OF MASSERIA', '(주)금양인터내셔날', 'CANTINA E OLEIFICIO SOCIALE DI SAN MARZANO S.C.A', '이탈리아', '과실주', '2026-08-14', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"이탈리아","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)금양인터내셔날|엄메이징 선셋 오브 타란토', '엄메이징 선셋 오브 타란토', 'UMAIZING SUNSET OF TARANTO', '(주)금양인터내셔날', 'CANTINA E OLEIFICIO SOCIALE DI SAN MARZANO S.C.A', '이탈리아', '과실주', '2026-08-14', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"이탈리아","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -2024,7 +2035,11 @@ VALUES
 ('mfds_import', '(주)나루글로벌|베페 콜라 바롤로 부시아 리제르바', '베페 콜라 바롤로 부시아 리제르바', 'BAROLO BUSSIA RISERVA', '(주)나루글로벌', 'PODERI COLLA', '이탈리아', '과실주', '2026-07-09', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"이탈리아","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)나루글로벌|베페 콜라 바르바레스코 론칼리에 리제르바', '베페 콜라 바르바레스코 론칼리에 리제르바', 'BARBARESCO RONCAGLIE RISERVA', '(주)나루글로벌', 'PODERI COLLA', '이탈리아', '과실주', '2026-07-09', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"이탈리아","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)나루글로벌|벨레너 존넨우어 슈페트레제', '벨레너 존넨우어 슈페트레제', 'WEHLENER SONNENUHR SPATLESE', '(주)나루글로벌', 'WEINGUT JOH. JOS. PRUM GBR', '독일', '과실주', '2026-07-29', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -2529,7 +2544,11 @@ VALUES
 ('mfds_import', '(주)레드슈가|켈러 리즐링 RR', '켈러 리즐링 RR', 'KELLER RIESLING RR', '(주)레드슈가', 'WEINGUT KLAUS-PETER KELLER', '독일', '과실주', '2026-04-20', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"독일","EXPIRDE_BEGIN_DTM":"20230426","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)레드슈가|쿠비요 틴토 크리안자', '쿠비요 틴토 크리안자', 'VINA CUBILLO CRIANZA TINTO', '(주)레드슈가', 'R. LOPEZ DE HEREDIA VINA TONDONIA SOCIEDAD ANONIMA', '스페인', '과실주', '2025-12-11', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"스페인","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)레드슈가|토스카나 레 트라메', '토스카나 레 트라메', 'LE TRAME TOSCANA', '(주)레드슈가', 'LE BONCIE SOCIETA'' AGRICOLA SEMPLICE DI GIOVANNA MORGANTI E GIORGIO SERAO', '이탈리아', '과실주', '2026-04-27', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"이탈리아","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -3034,7 +3053,11 @@ VALUES
 ('mfds_import', '(주)모멘텀 와인컴퍼니|무랄랴스 드 몽상', '무랄랴스 드 몽상', 'MURALHAS DE MONCAO', '(주)모멘텀 와인컴퍼니', 'ADEGA COOPERATIVA REGIONAL DE MONCAO', '포르투갈', '과실주', '2026-05-04', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"포르투갈","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)모멘텀 와인컴퍼니|믈롱 아 끄 루즈 비에이 빈뉴', '믈롱 아 끄 루즈 비에이 빈뉴', 'MELON A QUEUE ROUGE VIEILLES VIGNES', '(주)모멘텀 와인컴퍼니', 'LES CHA CHATILLON', '프랑스', '과실주', '2026-01-28', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)모멘텀 와인컴퍼니|뱅 존', '뱅 존', 'VIN JAUNE', '(주)모멘텀 와인컴퍼니', 'LES CHA CHATILLON', '프랑스', '과실주', '2026-01-28', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -3539,7 +3562,11 @@ VALUES
 ('mfds_import', '(주)보라|부나하벤 12년 캐스크 스트랭스', '부나하벤 12년 캐스크 스트랭스', 'BUNNAHABHAIN 12YO CASK STRENGTH', '(주)보라', 'CVH SPIRITS LTD', '영국', '위스키', '2026-09-07', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)보라|부나하벤 토이티치', '부나하벤 토이티치', 'BUNNAHABHAIN TOITEACH', '(주)보라', 'CVH SPIRITS LTD', '영국', '위스키', '2026-07-22', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)보라|부쉬밀 16년', '부쉬밀 16년', 'BUSHMILLS 16YO', '(주)보라', 'THE OLD BUSHMILLS DISTILLERY COMPANY LTD', '영국', '위스키', '2026-06-02', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -4044,7 +4071,11 @@ VALUES
 ('mfds_import', '(주)비노쿠스|샤르또뉴 따이에 슈망 드 항스', '샤르또뉴 따이에 슈망 드 항스', 'CHARTOGNE TAILLET CHEMIN DE REIMS', '(주)비노쿠스', 'SOCIETE D''EXPLOITATION CHAMPAGNE-TAILLET', '프랑스', '과실주', '2026-07-03', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":"20220718","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)비노쿠스|샤르또뉴 따이에 쌩 안느', '샤르또뉴 따이에 쌩 안느', 'CHARTOGNE TAILLET SAINT ANNE', '(주)비노쿠스', 'SOCIETE D''EXPLOITATION CHAMPAGNE-TAILLET', '프랑스', '과실주', '2026-07-03', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":"20240703","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)비노쿠스|샤르또뉴 따이에 쌩뜨 안느 엑스트라 브뤼 (2021)', '샤르또뉴 따이에 쌩뜨 안느 엑스트라 브뤼 (2021)', 'CHARTOGNE TAILLET SAINTE ANNE EXTRA BRUT', '(주)비노쿠스', 'SOCIETE D''EXPLOITATION CHAMPAGNE-TAILLET', '프랑스', '과실주', '2025-10-29', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -4549,7 +4580,11 @@ VALUES
 ('mfds_import', '(주)비이엑스스피리츠코리아|벤치마크 스몰배치', '벤치마크 스몰배치', 'BENCHMARK SMALL BATCH', '(주)비이엑스스피리츠코리아', 'BUFFALO TRACE DISTILLERY, INC', '미국', '위스키', '2026-04-15', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)비이엑스스피리츠코리아|벤치마크 싱글 배럴', '벤치마크 싱글 배럴', 'BENCHMARK SINGLE BARREL', '(주)비이엑스스피리츠코리아', 'BUFFALO TRACE DISTILLERY, INC', '미국', '위스키', '2026-04-14', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)비이엑스스피리츠코리아|벤치마크 탑플로어', '벤치마크 탑플로어', 'BENCHMARK TOP FLOOR', '(주)비이엑스스피리츠코리아', 'BUFFALO TRACE DISTILLERY, INC', '미국', '위스키', '2026-04-15', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -5054,7 +5089,11 @@ VALUES
 ('mfds_import', '(주)비티스|몽떼리 라 꽁브 다네', '몽떼리 라 꽁브 다네', 'MONTHELIE LA COMBE DANAY', '(주)비티스', 'SOCIETE CIVILE D’EXPLOITATION AGRICOLE “DOMAINE DUJARDIN”', '프랑스', '과실주', '2026-09-15', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)비티스|몽떼리 프르미에 크뤼 레 샹 퓔리오', '몽떼리 프르미에 크뤼 레 샹 퓔리오', 'MONTHELIE PREMIER CRU LES CHAMPS FULLIOT', '(주)비티스', 'SOCIETE CIVILE D’EXPLOITATION AGRICOLE “DOMAINE DUJARDIN”', '프랑스', '과실주', '2026-09-15', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)비티스|몽떼리 프리미에 크뤼 레 샹 퓔리오', '몽떼리 프리미에 크뤼 레 샹 퓔리오', 'MONTHELIE 1ER CRU LES CHAMPS FULLIOT', '(주)비티스', 'SOCIETE CIVILE D’EXPLOITATION AGRICOLE “DOMAINE DUJARDIN”', '프랑스', '과실주', '2026-04-20', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":"20250226","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -5559,7 +5598,11 @@ VALUES
 ('mfds_import', '(주)비티스|샹베르땅 끌로 드 베즈 그랑 크뤼', '샹베르땅 끌로 드 베즈 그랑 크뤼', 'CHAMBERTIN CLOS DE BEZE GRAND CRU', '(주)비티스', 'L.M SAS', '프랑스', '과실주', '2026-05-26', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)비티스|샹볼 뮈지니', '샹볼 뮈지니', 'CHAMBOLLE MUSIGNY', '(주)비티스', 'DOMAINE FRANCOIS BERTHEAU', '프랑스', '과실주', '2026-08-21', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":"20250218","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)비티스|샹볼 뮈지니 레 에르뷔에', '샹볼 뮈지니 레 에르뷔에', 'CHAMBOLLE MUSIGNY LES HERBUES', '(주)비티스', 'FREDERIC COSSARD', '프랑스', '과실주', '2025-11-11', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":"20250127","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -6064,7 +6107,11 @@ VALUES
 ('mfds_import', '(주)비티알커머스|올 더 바닐라 (바닐라 0.42% 함유)', '올 더 바닐라 (바닐라 0.42% 함유)', 'ALL THE VANILLA', '(주)비티알커머스', 'DUGGES BRYGGERI AB', '스웨덴', '맥주', '2026-09-15', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"스웨덴","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":"20280221"}'::jsonb),
 ('mfds_import', '(주)비티알커머스|와일드 보스베센', '와일드 보스베센', 'WILDE BOSBESSEN', '(주)비티알커머스', 'DE OUDE CAM', '벨기에', '기타주류', '2018-11-09', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":"20180404","EXPIRDE_END_DTM":"20400701"}'::jsonb),
 ('mfds_import', '(주)비티알커머스|요나요나 에일 350ml', '요나요나 에일 350ml', 'YONA YONA ALE', '(주)비티알커머스', 'KIRIN BREWERY CO.,LTD SHIGA FACTORY', '일본', '맥주', '2026-06-25', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"일본","EXPIRDE_BEGIN_DTM":"20260430","EXPIRDE_END_DTM":"20261231"}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -6569,7 +6616,11 @@ VALUES
 ('mfds_import', '(주)아영에프비씨|돈 루치아노 모스카토 (7%) (L-D076DA)', '돈 루치아노 모스카토 (7%) (L-D076DA)', 'DON LUCIANO MOSCATO', '(주)아영에프비씨', 'GARCIA CARRION 1890, S.L.', '스페인', '과실주', '2026-07-01', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"스페인","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)아영에프비씨|돈 루치아노 모스카토 (7%) (L-F166DA)', '돈 루치아노 모스카토 (7%) (L-F166DA)', 'DON LUCIANO MOSCATO', '(주)아영에프비씨', 'GARCIA CARRION 1890, S.L.', '스페인', '과실주', '2026-09-07', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"스페인","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)아영에프비씨|돈 루치아노 브뤼 (11%) (L-D206DA)', '돈 루치아노 브뤼 (11%) (L-D206DA)', 'DON LUCIANO BRUT SPARKLING', '(주)아영에프비씨', 'GARCIA CARRION 1890, S.L.', '스페인', '과실주', '2026-06-30', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"스페인","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -7074,7 +7125,11 @@ VALUES
 ('mfds_import', '(주)아영에프비씨|샤또 라피트 로스칠드 (13%) (L19L211245)', '샤또 라피트 로스칠드 (13%) (L19L211245)', 'CHATEAU LAFITE ROTHSCHILD', '(주)아영에프비씨', 'SC DU CHATEAU LAFITE ROTHSCHILD', '프랑스', '과실주', '2026-01-12', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)아영에프비씨|샤또 라피트 로스칠드 (13.5%) (L22L261406)', '샤또 라피트 로스칠드 (13.5%) (L22L261406)', 'CHATEAU LAFITE ROTHSCHILD', '(주)아영에프비씨', 'SC DU CHATEAU LAFITE ROTHSCHILD', '프랑스', '과실주', '2026-03-12', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)아영에프비씨|샤또 레 아르크 세미 스윗 레드 (12%)(L2025-07-10)', '샤또 레 아르크 세미 스윗 레드 (12%)(L2025-07-10)', 'CHATEAU LES ARCS RED SEMISWEET', '(주)아영에프비씨', 'VINOS Y BODEGAS, S.A.', '스페인', '과실주', '2025-10-23', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"스페인","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -7579,7 +7634,11 @@ VALUES
 ('mfds_import', '(주)아영에프비씨|카롤린 모레 크리오 바타르 몽라쉐 그랑 크뤼 (13.5%) (LCRIO23)', '카롤린 모레 크리오 바타르 몽라쉐 그랑 크뤼 (13.5%) (LCRIO23)', 'CAROLINE MOREY CRIOTS BATARD MONTRACHET GRAND CRU', '(주)아영에프비씨', 'PIERRE-YVES COLIN-MOREY', '프랑스', '과실주', '2026-03-06', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)아영에프비씨|카르트 드 쿠어 (퀸) (750mL) (11%) (L5 219)', '카르트 드 쿠어 (퀸) (750mL) (11%) (L5 219)', 'CARTES DE COUR QUEEN', '(주)아영에프비씨', 'SLAUR SARDET', '프랑스', '과실주', '2026-03-04', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)아영에프비씨|카르트 드 쿠어 (킹) (11%) (L5 219)', '카르트 드 쿠어 (킹) (11%) (L5 219)', 'CARTES DE COUR KING', '(주)아영에프비씨', 'SLAUR SARDET', '프랑스', '과실주', '2026-03-04', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -8084,7 +8143,11 @@ VALUES
 ('mfds_import', '(주)에이엘엘리커|리골 나무딸기', '리골 나무딸기', 'ALFRED LEGOLL FRAMBOISE', '(주)에이엘엘리커', 'DISTILLERIE DU VAL DE VILLE SOCIETE D''EXPLOITATION F. MEYER', '프랑스', '일반증류주', '2026-06-29', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)에이엘엘리커|리큐르 드 바닐라', '리큐르 드 바닐라', 'LIQUEUR DE VANILLE', '(주)에이엘엘리커', 'ETS. GABRIEL BOUDIER', '프랑스', '리큐르', '2026-06-30', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)에이엘엘리커|리큐어 드 티', '리큐어 드 티', 'LIQUEUR DE THE', '(주)에이엘엘리커', 'ETS. GABRIEL BOUDIER', '프랑스', '리큐르', '2025-09-18', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -8589,7 +8652,11 @@ VALUES
 ('mfds_import', '(주)올빈와인|샤또 오 바이 (2019) (14%) [L 19 1]', '샤또 오 바이 (2019) (14%) [L 19 1]', 'CHATEAU HAUT BAILLY', '(주)올빈와인', 'CHATEAU HAUT BAILLY', '프랑스', '과실주', '2026-09-08', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)올빈와인|샤또 오브리옹', '샤또 오브리옹', 'CHATEAU HAUT BRION', '(주)올빈와인', 'DOMAINE CLARENCE DILLON SAS', '프랑스', '과실주', '2025-11-27', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)올빈와인|샤또 오브리옹 (13%) [LHBR13A]', '샤또 오브리옹 (13%) [LHBR13A]', 'CHATEAU HAUT BRION', '(주)올빈와인', 'DOMAINE CLARENCE DILLON SAS', '프랑스', '과실주', '2026-07-14', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -9094,7 +9161,11 @@ VALUES
 ('mfds_import', '(주)우리와인 평택점|조엘 고트 올드 바인 진판델 (14.5%) (L030516193)', '조엘 고트 올드 바인 진판델 (14.5%) (L030516193)', 'JOEL GOTT OLD VINE ZINFANDEL', '(주)우리와인 평택점', 'SUTTER HOME WINERY,INC.', '미국', '과실주', '2025-10-31', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)우리와인 평택점|조엘 고트 파소 로블스 카베르네 소비뇽 (13.9%) (L198410-13)', '조엘 고트 파소 로블스 카베르네 소비뇽 (13.9%) (L198410-13)', 'JOEL GOTT PASO ROBLES CABERNET SAUVIGNON', '(주)우리와인 평택점', 'SUTTER HOME WINERY,INC.', '미국', '과실주', '2026-02-11', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)우리와인 평택점|조엘 고트 파소 로블스 카베르네 소비뇽 (13.9%) (L198413-13)', '조엘 고트 파소 로블스 카베르네 소비뇽 (13.9%) (L198413-13)', 'JOEL GOTT PASO ROBLES CABERNET SAUVIGNON', '(주)우리와인 평택점', 'SUTTER HOME WINERY,INC.', '미국', '과실주', '2025-11-03', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -9599,7 +9670,11 @@ VALUES
 ('mfds_import', '(주)우진인터내셔날|장 마크 브아요 부르고뉴 블랑', '장 마크 브아요 부르고뉴 블랑', 'JEAN MARC BOILLOT BOURGOGNE (BLANC)', '(주)우진인터내셔날', 'DOMAINE JEAN MARC BOILLOT', '프랑스', '과실주', '2026-01-16', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)우진인터내셔날|장 마크 브아요 부르고뉴 알리고떼', '장 마크 브아요 부르고뉴 알리고떼', 'JEAN MARC BOILLOT BOURGOGNE ALIGOTE', '(주)우진인터내셔날', 'DOMAINE JEAN MARC BOILLOT', '프랑스', '과실주', '2025-10-15', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)우진인터내셔날|장 마크 브아요 뿔리니 몽라셰 가렌느', '장 마크 브아요 뿔리니 몽라셰 가렌느', 'JEAN MARC BOILLOT PULIGNY MONTRACHET LA GARENNE', '(주)우진인터내셔날', 'DOMAINE JEAN MARC BOILLOT', '프랑스', '과실주', '2026-01-16', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -10104,7 +10179,11 @@ VALUES
 ('mfds_import', '(주)윈비어|헤네뜨 에뚜알레 틸퀸', '헤네뜨 에뚜알레 틸퀸', 'REINETTE ETOILEE TILQUIN', '(주)윈비어', 'GUEUZERIE TILQUIN SA', '벨기에', '기타주류', '2023-10-18', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"벨기에","EXPIRDE_BEGIN_DTM":"20230106","EXPIRDE_END_DTM":"20330106"}'::jsonb),
 ('mfds_import', '(주)윈비어|흐나흐다파슈, 세흐동', '흐나흐다파슈, 세흐동', 'RENARDAT FACHE, CERDON', '(주)윈비어', 'RENARDAT FACHE', '프랑스', '과실주', '2026-08-14', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":"20260227","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)윈비어|흐나흐다파슈, 앙블랑오씨', '흐나흐다파슈, 앙블랑오씨', 'RENARDAT FACHE, EN BLANC AUSSI', '(주)윈비어', 'RENARDAT FACHE', '프랑스', '과실주', '2026-08-14', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":"20260115","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -10609,7 +10688,11 @@ VALUES
 ('mfds_import', '(주)일로사케|아후리 미즈모토 아이야마', '아후리 미즈모토 아이야마', 'AFURI MIZUMOTO AIYAMA', '(주)일로사케', 'KIKKAWA JOZO CO.,LTD.', '일본', '청주', '2026-01-12', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"일본","EXPIRDE_BEGIN_DTM":"20251208","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)일로사케|아후리 키모토', '아후리 키모토', 'AFURI KIMOTO', '(주)일로사케', 'KIKKAWA JOZO CO.,LTD.', '일본', '청주', '2026-05-13', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"일본","EXPIRDE_BEGIN_DTM":"20260410","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)일로사케|알파 카제노모리 타입 2', '알파 카제노모리 타입 2', 'ALPHA KAZENOMORI TYPE2', '(주)일로사케', 'YUCHO SHUZO CO., LTD.', '일본', '청주', '2026-08-07', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"일본","EXPIRDE_BEGIN_DTM":"20260629","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -11114,7 +11197,11 @@ VALUES
 ('mfds_import', '(주)젠니혼주류|아까기리시마 (25%) 900ML', '아까기리시마 (25%) 900ML', 'AKA KIRISHIMA', '(주)젠니혼주류', 'KIRISHIMA SHUZO CO., LTD.', '일본', '소주', '2026-07-13', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"일본","EXPIRDE_BEGIN_DTM":"20260518","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)젠니혼주류|아비이치 준마이긴죠 무로카나마 (300ml)', '아비이치 준마이긴죠 무로카나마 (300ml)', 'ABIICHI JUNMAIGINJO NAMASAKE', '(주)젠니혼주류', 'ECHIGO TSURUKAME CO., LTD.', '일본', '청주', '2026-05-19', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"일본","EXPIRDE_BEGIN_DTM":"20260401","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)젠니혼주류|아야히비키', '아야히비키', 'AYAHIBIKI', '(주)젠니혼주류', 'SATSUMA SHUZO CO.,LTD', '일본', '소주', '2026-04-29', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"일본","EXPIRDE_BEGIN_DTM":"20260213","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -11619,7 +11706,11 @@ VALUES
 ('mfds_import', '(주)크리스탈와인컬렉션|A.F 그로 알록스 꼬르통 1er 레 발로지에르', 'A.F 그로 알록스 꼬르통 1er 레 발로지에르', 'A.F.GROS ALOXE CORTON 1ER LES VALOZIERES', '(주)크리스탈와인컬렉션', 'DOMAINE A.F. GROS', '프랑스', '과실주', '2026-07-02', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)크리스탈와인컬렉션|A.F 그로 즈브레 샹베르탱', 'A.F 그로 즈브레 샹베르탱', 'A.F.GROS GEVREY CHAMBERTIN', '(주)크리스탈와인컬렉션', 'DOMAINE A.F. GROS', '프랑스', '과실주', '2025-12-04', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)크리스탈와인컬렉션|A.F 그로 즈브레 샹베르탱 1er 꼼브 오 모안', 'A.F 그로 즈브레 샹베르탱 1er 꼼브 오 모안', 'A.F.GROS GEVREY CHAMBERTIN 1ER COMBE AU MOIN', '(주)크리스탈와인컬렉션', 'DOMAINE A.F. GROS', '프랑스', '과실주', '2025-12-04', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -12124,7 +12215,11 @@ VALUES
 ('mfds_import', '(주)태산주류|세키하라 준마이', '세키하라 준마이', 'SEKIHARA JUNMAI', '(주)태산주류', 'SEKIHARA SAKE BREWERY CO.,LTD.', '일본', '청주', '2026-06-02', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"일본","EXPIRDE_BEGIN_DTM":"20260413","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)태산주류|스즈시이나 나마죠조', '스즈시이나 나마죠조', 'SUZUSHINA NAMACHOZO', '(주)태산주류', 'HOKUSHIKA SAKE CO., LTD.', '일본', '청주', '2026-06-01', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"일본","EXPIRDE_BEGIN_DTM":"20260421","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)태산주류|시메이 150', '시메이 150', 'CHIMAY PERES TRAPPISTES 150', '(주)태산주류', 'BIERES DE CHIMAY S.A', '벨기에', '맥주', '2026-03-24', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"벨기에","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":"20270501"}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -12629,7 +12724,11 @@ VALUES
 ('mfds_import', '(주)펭귄코리아|글렌드로낙 12년', '글렌드로낙 12년', 'GLENDRONACH 12YO', '(주)펭귄코리아', 'THE BENRIACH DISTILLERY COMPANY LIMITED', '영국', '위스키', '2026-03-12', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)펭귄코리아|글렌피딕 12년', '글렌피딕 12년', 'GLENFFIDICH 12YO', '(주)펭귄코리아', 'WILLIAM GRANT&SONS LTD', '영국', '위스키', '2026-01-22', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '(주)펭귄코리아|글렌피딕 12년 트리플 오크', '글렌피딕 12년 트리플 오크', 'GLENFFIDICH 12YO TRIPLE OAK', '(주)펭귄코리아', 'WILLIAM GRANT&SONS LTD', '영국', '위스키', '2026-03-12', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -13134,7 +13233,11 @@ VALUES
 ('mfds_import', '공덕농협농산물가공사업소|주정(에틸 알코올 95%)', '주정(에틸 알코올 95%)', '주정(UNDENATURED HYDROUS EXTRA NEUTRAL ALCOHOL 95%)', '공덕농협농산물가공사업소', 'GRAIN PROCESSING CORPORATION', '미국', '주정', '2026-06-16', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":"20260108","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '공주글로벌|글렌알라키 12년', '글렌알라키 12년', 'GLENALLACHIE 12YO', '공주글로벌', 'GLENALLACHIE DISTILLERY', '영국', '위스키', '2026-09-10', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '공주글로벌|글렌알라키 15년', '글렌알라키 15년', 'GLENALLACHIE 15YO', '공주글로벌', 'GLENALLACHIE DISTILLERY', '영국', '위스키', '2026-09-10', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -13639,7 +13742,11 @@ VALUES
 ('mfds_import', '극동와인(주)|죠르주 뮈네레 지부르 샹볼 뮤지니 프리미에 크뤼 레 푀슬로뜨', '죠르주 뮈네레 지부르 샹볼 뮤지니 프리미에 크뤼 레 푀슬로뜨', 'GEORGES MUGNERET GIBOURG CHAMBOLLE MUSIGNY 1ER CRU LES FEUSSELOTTES', '극동와인(주)', 'DOMAINE GEORGES MUGNERET GIBOURG', '프랑스', '과실주', '2026-01-22', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":"20151015","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '극동와인(주)|지아코모 콘테르노 몬포르티노', '지아코모 콘테르노 몬포르티노', 'GIACOMO CONTERNO MONFORTINO', '극동와인(주)', 'AZIENDA VITIVINICOLA CONTERNO GIACOMO DI CONTERNO GIOVANNI S.A.S.S', '이탈리아', '과실주', '2026-04-21', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":"20140410","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '극동와인(주)|지아코모 콘테르노 바르베라달바 프란치아', '지아코모 콘테르노 바르베라달바 프란치아', 'GIACOMO CONTERNO BARBERA D''ALBA FRANCIA', '극동와인(주)', 'AZIENDA VITIVINICOLA CONTERNO GIACOMO DI CONTERNO GIOVANNI S.A.S.S', '이탈리아', '과실주', '2026-06-11', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":"20230417","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -14144,7 +14251,11 @@ VALUES
 ('mfds_import', '나라셀라 주식회사|몬테스 테나스 에스 레드 블렌드', '몬테스 테나스 에스 레드 블렌드', 'MONTES TENAZES RED BLEND', '나라셀라 주식회사', 'MONTES S.A.', '칠레', '과실주', '2026-05-26', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"칠레","EXPIRDE_BEGIN_DTM":"20251128","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '나라셀라 주식회사|몬테스 퍼플 앤젤', '몬테스 퍼플 앤젤', 'PURPLE ANGEL', '나라셀라 주식회사', 'MONTES S.A.', '칠레', '과실주', '2026-06-17', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"칠레","EXPIRDE_BEGIN_DTM":"20221227","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '나라셀라 주식회사|몬테스 폴리', '몬테스 폴리', 'MONTES FOLLY', '나라셀라 주식회사', 'MONTES S.A.', '칠레', '과실주', '2026-05-19', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"칠레","EXPIRDE_BEGIN_DTM":"20230131","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -14649,7 +14760,11 @@ VALUES
 ('mfds_import', '나라셀라 주식회사|카스텔로 디 퀘르체토 끼안티 클라시코', '카스텔로 디 퀘르체토 끼안티 클라시코', 'CHIANTI CLASSICO', '나라셀라 주식회사', 'CASTELLO DI QUERCETO SOCIETA AGRICOLA S.P.A.', '이탈리아', '과실주', '2026-07-09', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"이탈리아","EXPIRDE_BEGIN_DTM":"20260318","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '나라셀라 주식회사|카스텔로 디 퀘르체토 끼안티 클라시코 리제르바', '카스텔로 디 퀘르체토 끼안티 클라시코 리제르바', 'CHIANTI CLASSICO RISERVA', '나라셀라 주식회사', 'CASTELLO DI QUERCETO SOCIETA AGRICOLA S.P.A.', '이탈리아', '과실주', '2026-07-09', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"이탈리아","EXPIRDE_BEGIN_DTM":"20250617","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '나라셀라 주식회사|카이켄 마이', '카이켄 마이', 'KAIKEN MAI', '나라셀라 주식회사', 'KAIKEN S.A.', '아르헨티나', '과실주', '2026-05-29', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"칠레","EXPIRDE_BEGIN_DTM":"20230531","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -15154,7 +15269,11 @@ VALUES
 ('mfds_import', '네츄럴라인|클라이넬리시 14년', '클라이넬리시 14년', 'CLYNELISH 14YO', '네츄럴라인', 'DIAGEO SCOTLAND LIMITED', '영국', '위스키', '2026-05-12', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '네츄럴라인|탐두 12년', '탐두 12년', 'TAMDHU 12YO', '네츄럴라인', 'BROXBURN BOTTLERS LTD', '영국', '위스키', '2025-12-23', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '네츄럴라인|탐두 15년', '탐두 15년', 'TAMDHU 15YO', '네츄럴라인', 'BROXBURN BOTTLERS LTD', '영국', '위스키', '2025-12-23', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -15659,7 +15778,11 @@ VALUES
 ('mfds_import', '더블유에스통상 주식회사|헤쿨라 (14%) (750 mL) [ L-9148 ]', '헤쿨라 (14%) (750 mL) [ L-9148 ]', 'HECULA', '더블유에스통상 주식회사', 'BODEGAS CASTANO, S.L.', '스페인', '과실주', '2026-07-08', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"스페인","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '더원|고량주', '고량주', 'GAO LIANG JIU', '더원', 'WEIHAI QINGLONG FACTORY', '중국', '일반증류주', '2026-08-18', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"중국","EXPIRDE_BEGIN_DTM":"20260723","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '더원|뉴연태스페셜', '뉴연태스페셜', 'YANTAI SPECIAL', '더원', 'WEIHAI QINGLONG FACTORY', '중국', '일반증류주', '2026-06-05', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"중국","EXPIRDE_BEGIN_DTM":"20260520","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -16164,7 +16287,11 @@ VALUES
 ('mfds_import', '레카바인즈 (Lekka Vines)|블랭크보틀 모먼트 오브 사일런스 2024', '블랭크보틀 모먼트 오브 사일런스 2024', 'BLANKBOTTLE MOMENT OF SILENCE', '레카바인즈 (Lekka Vines)', 'WALSER WINE PROJECTS (PTY) LTD', '남아프리카 공화국', '과실주', '2026-08-13', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"남아프리카 공화국","EXPIRDE_BEGIN_DTM":"20241129","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '레카바인즈 (Lekka Vines)|블랭크보틀 오비토프론탈 코텍스 2023', '블랭크보틀 오비토프론탈 코텍스 2023', 'BLANKBOTTLE ORBITOFRONTAL CORTEX', '레카바인즈 (Lekka Vines)', 'WALSER WINE PROJECTS (PTY) LTD', '남아프리카 공화국', '과실주', '2026-08-10', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"남아프리카 공화국","EXPIRDE_BEGIN_DTM":"20240112","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '레카바인즈 (Lekka Vines)|블랭크보틀 컨페션스 오브 어 화이트 글러브 체이서 2022', '블랭크보틀 컨페션스 오브 어 화이트 글러브 체이서 2022', 'BLANKBOTTLE CONFESSIONS OF A WHITE GLOVE CHASER', '레카바인즈 (Lekka Vines)', 'WALSER WINE PROJECTS (PTY) LTD', '남아프리카 공화국', '과실주', '2026-08-10', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"남아프리카 공화국","EXPIRDE_BEGIN_DTM":"20230821","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -16669,7 +16796,11 @@ VALUES
 ('mfds_import', '롯데칠성음료(주)|클루젤 로흐 레 베르제', '클루젤 로흐 레 베르제', 'CLUSEL ROCH CDR LES VERGERS', '롯데칠성음료(주)', 'CLUSEL-ROCH', '프랑스', '과실주', '2025-10-21', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":"20220106","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '롯데칠성음료(주)|클루젤 로흐 코트 로티 그랑 플라스', '클루젤 로흐 코트 로티 그랑 플라스', 'CLUSEL ROCH COTE ROTIE GRANDES PLACES', '롯데칠성음료(주)', 'CLUSEL-ROCH', '프랑스', '과실주', '2025-10-21', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":"20220622","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '롯데칠성음료(주)|클루젤 로흐 코트 로티 시스트', '클루젤 로흐 코트 로티 시스트', 'CLUSEL ROCH COTE ROTIE LES SCHISTES', '롯데칠성음료(주)', 'CLUSEL-ROCH', '프랑스', '과실주', '2025-10-21', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":"20220622","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -17174,7 +17305,11 @@ VALUES
 ('mfds_import', '메타베브코리아(주)|믹터스 캔터키 스트레이트 버번 위스키 10년', '믹터스 캔터키 스트레이트 버번 위스키 10년', 'MICHTER''S KENTUCKY STRAIGHT BOURBON WHISKEY 10YEARS', '메타베브코리아(주)', 'MICHTER’S DISTILLERY LLC', '미국', '위스키', '2026-09-08', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '메타베브코리아(주)|믹터스 캔터키 스트레이트 버번 위스키 20년', '믹터스 캔터키 스트레이트 버번 위스키 20년', 'MICHTER''S KENTUCKY STRAIGHT BOURBON WHISKEY 20YEARS', '메타베브코리아(주)', 'MICHTER’S DISTILLERY LLC', '미국', '위스키', '2026-09-08', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '메타베브코리아(주)|믹터스 캔터키 스트레이트 버번위키10년', '믹터스 캔터키 스트레이트 버번위키10년', 'MICHTER''S KENTUCKY STRAIGHT BOURBON WHISKEY 10YEARS', '메타베브코리아(주)', 'MICHTER’S DISTILLERY LLC', '미국', '위스키', '2026-01-23', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -17679,7 +17814,11 @@ VALUES
 ('mfds_import', '베터베버리지컴퍼니코리아 유한회사|씨볼드 샐러 에덴리프 피노 누아 / 750mL', '씨볼드 샐러 에덴리프 피노 누아 / 750mL', 'SEABOLD CELLARS EDEN RIFT PINOT NOIR', '베터베버리지컴퍼니코리아 유한회사', 'INTERVINE CAPITAL CIENEGA VALLEY LLC', '미국', '과실주', '2025-09-26', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":"20230217","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '베터베버리지컴퍼니코리아 유한회사|아이캔디 시에나가 밸리 피노누아', '아이캔디 시에나가 밸리 피노누아', 'EYE CANDY CIENEGA VALLEY PINOT NOIR', '베터베버리지컴퍼니코리아 유한회사', 'DAKOTA-SHY WINE CO, LLC', '미국', '과실주', '2025-09-23', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":"20250125","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '베터베버리지컴퍼니코리아 유한회사|아티스트시리즈 까베르네 쇼비뇽 김물길', '아티스트시리즈 까베르네 쇼비뇽 김물길', 'CABERNET SAUVIGNON MULGIL KIM', '베터베버리지컴퍼니코리아 유한회사', 'DAKOTA-SHY WINE CO, LLC', '미국', '과실주', '2026-08-31', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":"20260807","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -18184,7 +18323,11 @@ VALUES
 ('mfds_import', '비노이스타|르 혹 블랑', '르 혹 블랑', 'LE ROC BLANC', '비노이스타', 'FAMILLE RIBES', '프랑스', '과실주', '2026-01-14', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":"20250701","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '비노이스타|마무쓰', '마무쓰', 'MAMMOUTH', '비노이스타', 'FAMILLE RIBES', '프랑스', '과실주', '2026-01-13', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '비노이스타|막사네 레 꺄티에', '막사네 레 꺄티에', 'MARSANNAY LES QUARTIERS', '비노이스타', 'GAEC SIRUGUE PERE ET FILS', '프랑스', '과실주', '2026-09-07', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -18689,7 +18832,11 @@ VALUES
 ('mfds_import', '비노파라다이스|세라팡 쥐브리 샹베르탱 비에이유 비뉴', '세라팡 쥐브리 샹베르탱 비에이유 비뉴', 'GEVREY CHAMBERTIN VIEILLES VIGNES', '비노파라다이스', 'EARL SERAFIN PERE ET FILS', '프랑스', '과실주', '2026-01-08', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":"20250416","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '비노파라다이스|세라팡 쥐브리 샹베르탱 프르미에 크뤼 레 코르보', '세라팡 쥐브리 샹베르탱 프르미에 크뤼 레 코르보', 'GEVREY CHAMBERTIN 1ER CRU LES CORBEAUX', '비노파라다이스', 'EARL SERAFIN PERE ET FILS', '프랑스', '과실주', '2026-01-08', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":"20250415","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '비노파라다이스|슈발리에 드 글라낭 메를로', '슈발리에 드 글라낭 메를로', 'CHEVALIER DE GLANAN MERLOT', '비노파라다이스', 'LES GRANDS CHAIS DE FRANCE', '프랑스', '과실주', '2026-01-20', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -19194,7 +19341,11 @@ VALUES
 ('mfds_import', '비제이트레이드|조니워커 레드', '조니워커 레드', 'JOHNNIE WALKER RED', '비제이트레이드', 'DIAGEO SCOTLAND LIMITED', '영국', '위스키', '2026-07-29', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"싱가포르","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '비제이트레이드|조니워커 블랙', '조니워커 블랙', 'JOHNNIE WALKER BLACK', '비제이트레이드', 'DIAGEO SCOTLAND LIMITED', '영국', '위스키', '2026-09-16', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '비제이트레이드|조니워커 블루', '조니워커 블루', 'JOHNNIE WALKER BLUE', '비제이트레이드', 'DIAGEO SCOTLAND LIMITED', '영국', '위스키', '2026-07-29', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -19699,7 +19850,11 @@ VALUES
 ('mfds_import', '서울와인앤스피릿 유한회사|바르바레스코 마리아 애들레이드 (14.5%) [ L.331.15 ]', '바르바레스코 마리아 애들레이드 (14.5%) [ L.331.15 ]', 'BARBARESCO MARIA ADELAIDE', '서울와인앤스피릿 유한회사', 'AZ. AGR. RABAJA DI ROCCA BRUNO', '이탈리아', '과실주', '2025-12-19', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '서울와인앤스피릿 유한회사|바르베라 달바 (13.5%) (L5128)', '바르베라 달바 (13.5%) (L5128)', 'BARBERA D''ALBA', '서울와인앤스피릿 유한회사', 'FRATELLI GIACOSA S.N.C.', '이탈리아', '과실주', '2025-11-25', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"이탈리아","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '서울와인앤스피릿 유한회사|바르베라 달바 (13.5%) (L5303)', '바르베라 달바 (13.5%) (L5303)', 'BARBERA D''ALBA', '서울와인앤스피릿 유한회사', 'FRATELLI GIACOSA S.N.C.', '이탈리아', '과실주', '2026-04-06', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"이탈리아","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -20204,7 +20359,11 @@ VALUES
 ('mfds_import', '세영푸드|주정(에틸 알코올 95%)', '주정(에틸 알코올 95%)', '주정(UNDENATURED HYDROUS EXTRA NEUTRAL ALCOHOL 95%)', '세영푸드', 'GRAIN PROCESSING CORPORATION', '미국', '주정', '2026-03-13', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":"20250815","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '세이슌 인터네셔널|부장군 준마이', '부장군 준마이', 'BUJANGGUN JUNMAI', '세이슌 인터네셔널', 'MEIRI SHURUI CO.,LTD', '일본', '청주', '2026-04-20', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"일본","EXPIRDE_BEGIN_DTM":"20260218","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '세이슌 인터네셔널|세이슌', '세이슌', 'SEISHUN', '세이슌 인터네셔널', 'MEIRI SHURUI CO.,LTD', '일본', '청주', '2026-04-20', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"일본","EXPIRDE_BEGIN_DTM":"20260225","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -20709,7 +20868,11 @@ VALUES
 ('mfds_import', '신동와인(주)|살시요, 마티우스', '살시요, 마티우스', 'SALZILLO, MATIUS', '신동와인(주)', 'BODEGAS SALZILLO SL', '스페인', '과실주', '2026-09-10', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"스페인","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '신동와인(주)|살시요, 이스팔리스 레드 모나스트렐', '살시요, 이스팔리스 레드 모나스트렐', 'SALZILLO, HISPALIS TINTO MONASTRELL', '신동와인(주)', 'BODEGAS SALZILLO SL', '스페인', '과실주', '2026-09-10', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"스페인","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '신동와인(주)|살시요, 제니자테 시라', '살시요, 제니자테 시라', 'SALZILLO, ZENIZATE SYRAH', '신동와인(주)', 'BODEGAS SALZILLO SL', '스페인', '과실주', '2026-09-10', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"스페인","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -21214,7 +21377,11 @@ VALUES
 ('mfds_import', '씨에스알와인 주식회사|콩스가르드, 킹스 팜 화이트', '콩스가르드, 킹스 팜 화이트', 'KONGSGAARD, KINGS FARM WHITE', '씨에스알와인 주식회사', 'YAR LLC', '미국', '과실주', '2026-04-22', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":"20260117","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '씨에스알와인 주식회사|크레망 드 부르고뉴', '크레망 드 부르고뉴', 'CREMANT DE BOURGOGNE', '씨에스알와인 주식회사', 'VINS & VIGNOBLES DOMINIQUE PIRON', '프랑스', '과실주', '2026-03-27', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":"20251119","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '씨에스알와인 주식회사|크로프트, 리저브 토니 포트', '크로프트, 리저브 토니 포트', 'CROFT, RESERVE TAWNY PORT', '씨에스알와인 주식회사', 'QUINTA AND VINEYARDS BOTTLERS - VINHOS, S.A.', '포르투갈', '과실주', '2026-01-16', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"포르투갈","EXPIRDE_BEGIN_DTM":"20250910","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -21719,7 +21886,11 @@ VALUES
 ('mfds_import', '어메이징스플래시인터내셔널(주)|비티 비니 비치 넘버 7', '비티 비니 비치 넘버 7', 'VITI VINI VICI #7', '어메이징스플래시인터내셔널(주)', 'BRASSERIE DUNHAM', '캐나다', '맥주', '2021-05-20', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"캐나다","EXPIRDE_BEGIN_DTM":"20201026","EXPIRDE_END_DTM":"20301026"}'::jsonb),
 ('mfds_import', '어메이징스플래시인터내셔널(주)|비티 비니 비치 넘버 9', '비티 비니 비치 넘버 9', 'VITI VINI VICI #9', '어메이징스플래시인터내셔널(주)', 'BRASSERIE DUNHAM', '캐나다', '맥주', '2022-06-30', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"캐나다","EXPIRDE_BEGIN_DTM":"20200211","EXPIRDE_END_DTM":"20310211"}'::jsonb),
 ('mfds_import', '어메이징스플래시인터내셔널(주)|비티스 노블', '비티스 노블', 'VITIS NOBLE', '어메이징스플래시인터내셔널(주)', 'CASCADE BREWING COMPANY LLC', '미국', '맥주', '2022-06-03', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":"20170713","EXPIRDE_END_DTM":"20270712"}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -22224,7 +22395,11 @@ VALUES
 ('mfds_import', '에노테카코리아(주)|살리쿠띠 브루넬로 디 몬탈치노 솔젠테 (14.5%) (750 mL) [ L.3/24 ]', '살리쿠띠 브루넬로 디 몬탈치노 솔젠테 (14.5%) (750 mL) [ L.3/24 ]', 'SALICUTTI BRUNELLO DI MONTALCINO SORGENTE', '에노테카코리아(주)', 'PODERE SALICUTTI SOCIETA SEMPLICE AGRICOLA DI EICHBAUER FELIX E SABINE', '이탈리아', '과실주', '2026-01-28', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"이탈리아","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '에노테카코리아(주)|살리쿠띠 브루넬로 디 몬탈치노 피아지오네 (14.5%) (750 mL) [ L.1/24 ]', '살리쿠띠 브루넬로 디 몬탈치노 피아지오네 (14.5%) (750 mL) [ L.1/24 ]', 'SALICUTTI BRUNELLO DI MONTALCINO PIAGGIONE', '에노테카코리아(주)', 'PODERE SALICUTTI SOCIETA SEMPLICE AGRICOLA DI EICHBAUER FELIX E SABINE', '이탈리아', '과실주', '2026-01-28', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"이탈리아","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '에노테카코리아(주)|살바예 모나스트렐 (13%) (750 mL)  L-52185', '살바예 모나스트렐 (13%) (750 mL)  L-52185', 'SALVAJE MONASTRELL', '에노테카코리아(주)', 'BODEGAS ALCENO S.A.', '스페인', '과실주', '2025-10-22', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"스페인","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -22729,7 +22904,11 @@ VALUES
 ('mfds_import', '에노테카코리아(주)|프랑수아 프이예 샤름 샹베르탕 그랑 크뤼 (13%) (750 mL) [ L.23CHCO I ]', '프랑수아 프이예 샤름 샹베르탕 그랑 크뤼 (13%) (750 mL) [ L.23CHCO I ]', 'FRANCOIS FEUILLET CHARMES CHAMBERTIN GRAND CRU', '에노테카코리아(주)', 'SARL DOMAINE FRANCOIS FEUILLET', '프랑스', '과실주', '2026-02-26', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '에노테카코리아(주)|프랑수아 프이예 샹볼 뮈지니 (13%) (750 mL) [ L.23CHMO I ]', '프랑수아 프이예 샹볼 뮈지니 (13%) (750 mL) [ L.23CHMO I ]', 'FRANCOIS FEUILLET CHAMBOLLE MUSIGNY', '에노테카코리아(주)', 'SARL DOMAINE FRANCOIS FEUILLET', '프랑스', '과실주', '2026-02-26', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '에노테카코리아(주)|프랑수아 프이예 샹볼 뮈지니 프리미에 크뤼 레 센티에르 (13%) (750 mL) [ L.23SENO I ]', '프랑수아 프이예 샹볼 뮈지니 프리미에 크뤼 레 센티에르 (13%) (750 mL) [ L.23SENO I ]', 'FRANCOIS FEUILLET CHAMBOLLE MUSIGNY LES SENTIERS PREMIER CRU', '에노테카코리아(주)', 'SARL DOMAINE FRANCOIS FEUILLET', '프랑스', '과실주', '2026-02-26', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -23234,7 +23413,11 @@ VALUES
 ('mfds_import', '엠에이치샴페인즈앤드와인즈코리아(주)|미누티 엠 / 1111793, 2M4B2652', '미누티 엠 / 1111793, 2M4B2652', 'MINUTY M', '엠에이치샴페인즈앤드와인즈코리아(주)', 'MINUTY SAS', '프랑스', '기타주류', '2026-01-26', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"싱가포르","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '엠에이치샴페인즈앤드와인즈코리아(주)|미누티 엠 / 1115833, 2M5B0271', '미누티 엠 / 1115833, 2M5B0271', 'MINUTY M', '엠에이치샴페인즈앤드와인즈코리아(주)', 'MINUTY SAS', '프랑스', '과실주', '2026-07-01', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '엠에이치샴페인즈앤드와인즈코리아(주)|미누티 엠 / 1115833, 2M5B0372', '미누티 엠 / 1115833, 2M5B0372', 'MINUTY M', '엠에이치샴페인즈앤드와인즈코리아(주)', 'MINUTY SAS', '프랑스', '과실주', '2026-07-24', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -23739,7 +23922,11 @@ VALUES
 ('mfds_import', '영진무역|발베니 16년 트리플 미니어쳐', '발베니 16년 트리플 미니어쳐', 'BALVENE 16YEAR TRIPLE CASK', '영진무역', 'WILLIAM GRANT&SONS DISTILLERS LIMITED', '영국', '위스키', '2025-11-03', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"중국 홍콩","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '영진무역|발베니 16년 트리플 캐스크', '발베니 16년 트리플 캐스크', 'BALVENE 16YEAR TRIPLE CASK', '영진무역', 'WILLIAM GRANT&SONS LTD', '영국', '위스키', '2025-09-19', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"중국 홍콩","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '영진무역|발베니 17년 더블우드', '발베니 17년 더블우드', 'BALVENIE 17 YEAR OLD DOUBLEWOOD', '영진무역', 'WILLIAM GRANT&SONS LTD', '영국', '위스키', '2025-11-03', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"중국 홍콩","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -24244,7 +24431,11 @@ VALUES
 ('mfds_import', '와인바이레이저스미스|쥬드벙', '쥬드벙', 'JEU DE VENT', '와인바이레이저스미스', 'LA SAS DE L''ONCLE CHARLES', '프랑스', '과실주', '2026-09-04', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '와인아프리카 (WINEAFRICA)|보솔레이유데이집트 까베르네쇼비뇽 레드', '보솔레이유데이집트 까베르네쇼비뇽 레드', 'BEAUSOLEIL D''EGYPTE CABERNET SAUVIGNON RED', '와인아프리카 (WINEAFRICA)', 'EGYPTIAN INTERNATIONAL BEVERAGES COMPANY', '이집트', '과실주', '2025-10-23', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"이집트","EXPIRDE_BEGIN_DTM":"20250416","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '와인아프리카 (WINEAFRICA)|보솔레이유데이집트 메를로 로제', '보솔레이유데이집트 메를로 로제', 'BEAUSOLEIL D''EGYPTE MERLOT ROSE', '와인아프리카 (WINEAFRICA)', 'EGYPTIAN INTERNATIONAL BEVERAGES COMPANY', '이집트', '과실주', '2025-10-24', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"이집트","EXPIRDE_BEGIN_DTM":"20250303","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -24749,7 +24940,11 @@ VALUES
 ('mfds_import', '윌리엄그랜트앤선즈코리아(주)|몽키숄더-200ML(LOT NO. L 0113535 0207)', '몽키숄더-200ML(LOT NO. L 0113535 0207)', 'MONKEY SHOULDER(40%)', '윌리엄그랜트앤선즈코리아(주)', 'WILLIAM GRANT&SONS DISTILLERS LIMITED', '영국', '위스키', '2025-10-21', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"영국","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '윌리엄그랜트앤선즈코리아(주)|몽키숄더-200ML(LOT NO. L 0119728 2209)', '몽키숄더-200ML(LOT NO. L 0119728 2209)', 'MONKEY SHOULDER(40%)', '윌리엄그랜트앤선즈코리아(주)', 'WILLIAM GRANT&SONS DISTILLERS LIMITED', '영국', '위스키', '2026-08-26', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"영국","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '윌리엄그랜트앤선즈코리아(주)|몽키숄더-500ML(LOT NO. L 0133361 0904)', '몽키숄더-500ML(LOT NO. L 0133361 0904)', 'MONKEY SHOULDER(40%)', '윌리엄그랜트앤선즈코리아(주)', 'WILLIAM GRANT&SONS DISTILLERS LIMITED', '영국', '위스키', '2026-08-07', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"영국","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -25254,7 +25449,11 @@ VALUES
 ('mfds_import', '유한회사 화이트앤파트너스|페터캐른 19년', '페터캐른 19년', 'FETTERCAIRN 19 YEARS OLD', '유한회사 화이트앤파트너스', 'J. & A. MITCHELL AND COMPANY LIMITED', '영국', '위스키', '2026-09-07', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"영국","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '유한회사 화이트앤파트너스|헤이즐번 10년', '헤이즐번 10년', 'HAZELBURN 10 YEARS', '유한회사 화이트앤파트너스', 'J. & A. MITCHELL AND COMPANY LIMITED', '영국', '위스키', '2026-02-19', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"영국","EXPIRDE_BEGIN_DTM":"20250901","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '유한회사 화이트앤파트너스|헤이즐번 올로로소 캐스크', '헤이즐번 올로로소 캐스크', 'HAZELBURN OLOROSO CASK', '유한회사 화이트앤파트너스', 'J. & A. MITCHELL AND COMPANY LIMITED', '영국', '위스키', '2026-09-14', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"영국","EXPIRDE_BEGIN_DTM":"20260305","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -25759,7 +25958,11 @@ VALUES
 ('mfds_import', '제이티스피리츠|로얄 샬루트 21년 폴로 마이애미 에디션', '로얄 샬루트 21년 폴로 마이애미 에디션', 'ROYAL SALUTE MIAMI EDITION', '제이티스피리츠', 'CHIVAS BROTHERS LIMITED', '영국', '위스키', '2026-02-10', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '제이티스피리츠|로얄샬루트 21년', '로얄샬루트 21년', 'ROYAL SALUTE 21YEARS OLD', '제이티스피리츠', 'CHIVAS BROTHERS LIMITED', '영국', '위스키', '2026-03-13', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '제이티스피리츠|로얄샬루트 25년', '로얄샬루트 25년', 'ROYAL SALUTE 25YEARS OLD', '제이티스피리츠', 'CHIVAS BROTHERS LIMITED', '영국', '위스키', '2026-02-02', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -26264,7 +26467,11 @@ VALUES
 ('mfds_import', '주식회사 나우스피릿|뽐므 프리즈니에', '뽐므 프리즈니에', 'POMME PRISONNIERE', '주식회사 나우스피릿', 'CALVADOS CHRISTIAN DROUIN', '프랑스', '일반증류주', '2026-05-14', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 나우스피릿|아드리아티코 아마레토', '아드리아티코 아마레토', 'ADRIATICO AMARETTO', '주식회사 나우스피릿', 'BELTION', '이탈리아', '리큐르', '2026-09-11', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 나우스피릿|아드리아티코 아마레토 비앙코', '아드리아티코 아마레토 비앙코', 'ADRIATICO AMARETTO BIANCO', '주식회사 나우스피릿', 'BELTION', '이탈리아', '리큐르', '2026-06-10', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":"20280510"}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -26769,7 +26976,11 @@ VALUES
 ('mfds_import', '주식회사 동원와인플러스|로께 데이 만조니 랑게 네비올로 (14%) (750 mL) [ L0233 ]', '로께 데이 만조니 랑게 네비올로 (14%) (750 mL) [ L0233 ]', 'ROCCHE DEI MANZONI LANGHE NEBBIOLO', '주식회사 동원와인플러스', 'PODERE ROCCHE DEI MANZONI DI VALENTINO S.A.S.', '이탈리아', '과실주', '2025-10-27', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"이탈리아","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 동원와인플러스|로께 데이 만조니 바롤로 (14%) (750 mL) [ L0230 ]', '로께 데이 만조니 바롤로 (14%) (750 mL) [ L0230 ]', 'ROCCHE DEI MANZONI BAROLO', '주식회사 동원와인플러스', 'PODERE ROCCHE DEI MANZONI DI VALENTINO S.A.S.', '이탈리아', '과실주', '2025-10-27', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"이탈리아","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 동원와인플러스|로께 데이 만조니 바롤로 빅 드 빅 (14%) (750 mL) [ L0098 ]', '로께 데이 만조니 바롤로 빅 드 빅 (14%) (750 mL) [ L0098 ]', 'ROCCHE DEI MANZONI BAROLO BIG ''D BIG', '주식회사 동원와인플러스', 'PODERE ROCCHE DEI MANZONI DI VALENTINO S.A.S.', '이탈리아', '과실주', '2025-10-27', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"이탈리아","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -27274,7 +27485,11 @@ VALUES
 ('mfds_import', '주식회사 디씨인터네셔널|트렌타코스테 페코리노', '트렌타코스테 페코리노', 'TRENTACOSTE PECORINO', '주식회사 디씨인터네셔널', 'SOCIETA'' AGRICOLA NAE SRL', '이탈리아', '과실주', '2025-10-14', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"이탈리아","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 디씨인터네셔널|트렌타코스테 프리미티보 뿔리아', '트렌타코스테 프리미티보 뿔리아', 'TRENTACOSTE PRIMITIVO PUGLIA', '주식회사 디씨인터네셔널', 'SOCIETA'' AGRICOLA NAE SRL', '이탈리아', '과실주', '2025-10-14', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"이탈리아","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 디아비노|고메스 크루사도 블랑코', '고메스 크루사도 블랑코', 'GOMEZ CRUZADO BLANCO', '주식회사 디아비노', 'BVGC GOMEZ CRUZADO, S.L.U.', '스페인', '과실주', '2026-08-26', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"스페인","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -27779,7 +27994,11 @@ VALUES
 ('mfds_import', '주식회사 딜레땅뜨와인셀라|쌩뜨-호방 프헤미헤 크후 슈흐 가메 (후즈)', '쌩뜨-호방 프헤미헤 크후 슈흐 가메 (후즈)', 'SAINT-AUBIN 1ER CRU SUR GAMAY', '주식회사 딜레땅뜨와인셀라', 'DOMAINE MIOLANE PATRICK', '프랑스', '과실주', '2025-09-25', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":"20231101","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 딜레땅뜨와인셀라|쌩뜨-호방 프헤미헤 크후 슈흐 르 성띠에 뒤 끌루 (블랑)', '쌩뜨-호방 프헤미헤 크후 슈흐 르 성띠에 뒤 끌루 (블랑)', 'SAINT-AUBIN 1ER CRU SUR LE SENTIER DU CLOU', '주식회사 딜레땅뜨와인셀라', 'DOMAINE MIOLANE PATRICK', '프랑스', '과실주', '2025-09-25', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":"20241001","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 딜레땅뜨와인셀라|쌩뜨-호방 프헤미헤 크후 엉 헤밀리 (블랑)', '쌩뜨-호방 프헤미헤 크후 엉 헤밀리 (블랑)', 'SAINT-AUBIN 1ER CRU EN REMILLY', '주식회사 딜레땅뜨와인셀라', 'EARL DOMAINE BERTRAND BACHELET', '프랑스', '과실주', '2026-03-12', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":"20250513","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -28284,7 +28503,11 @@ VALUES
 ('mfds_import', '주식회사 로엔히|클럽 칭  티니닉 11년', '클럽 칭  티니닉 11년', 'CLUB QING TEANINICH 11Y', '주식회사 로엔히', 'WHISKYBROKER LIMITED', '영국', '위스키', '2025-11-20', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"영국","EXPIRDE_BEGIN_DTM":"20250908","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 로엔히|클럽 칭 글렌 기어리 15년', '클럽 칭 글렌 기어리 15년', 'CLUB QING GLEN GARIOCH 15Y', '주식회사 로엔히', 'WHISKYBROKER LIMITED', '영국', '위스키', '2026-06-08', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"영국","EXPIRDE_BEGIN_DTM":"20260216","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 로엔히|클럽 칭 글렌 엘긴 16년', '클럽 칭 글렌 엘긴 16년', 'CLUB QING GLEN ELGIN 16Y', '주식회사 로엔히', 'WHISKYBROKER LIMITED', '영국', '위스키', '2026-06-08', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"영국","EXPIRDE_BEGIN_DTM":"20260129","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -28789,7 +29012,11 @@ VALUES
 ('mfds_import', '주식회사 몰트컴퍼니|에드라두어 12년 CS 배치 7', '에드라두어 12년 CS 배치 7', 'EDRADOUR 12YO CS', '주식회사 몰트컴퍼니', 'SIGNATORY VINTAGE SCOTCH WHISKY CO.LTD', '영국', '위스키', '2026-07-29', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"독일","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 몰트컴퍼니|에드라두어 12년 캐스크 스트렝스', '에드라두어 12년 캐스크 스트렝스', 'EDRADOUR 12YO CASK STRENGTH', '주식회사 몰트컴퍼니', 'SIGNATORY VINTAGE SCOTCH WHISKY CO.LTD', '영국', '위스키', '2025-12-18', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"독일","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 몰트컴퍼니|에스브이 에드라두어 7년', '에스브이 에드라두어 7년', 'SV EDRADOUR 7YO', '주식회사 몰트컴퍼니', 'SIGNATORY VINTAGE SCOTCH WHISKY CO.LTD', '영국', '위스키', '2026-04-08', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"독일","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -29294,7 +29521,11 @@ VALUES
 ('mfds_import', '주식회사 베리타스트레이딩|벤 젤레스 앤 코 리저브 화이트 포트', '벤 젤레스 앤 코 리저브 화이트 포트', 'VAN ZELLERS & CO RESERVE WHITE PORTO', '주식회사 베리타스트레이딩', 'VAN ZELLERS & CO., LDA.', '포르투갈', '과실주', '2026-03-23', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"스페인","EXPIRDE_BEGIN_DTM":"20251028","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 베리타스트레이딩|블룸 바이 라우스, 로제', '블룸 바이 라우스, 로제', 'BLUM BY LAUS, ROSE', '주식회사 베리타스트레이딩', 'BODEGAS LAUS, S.L.', '스페인', '과실주', '2026-06-16', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"스페인","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 베리타스트레이딩|블룸 바이 라우스, 화이트', '블룸 바이 라우스, 화이트', 'BLUM BY LAUS, WHITE', '주식회사 베리타스트레이딩', 'BODEGAS LAUS, S.L.', '스페인', '과실주', '2026-06-19', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"스페인","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -29799,7 +30030,11 @@ VALUES
 ('mfds_import', '주식회사 비노갤러리아|피에르 지라르댕 퓔리니몽라쉐 2024', '피에르 지라르댕 퓔리니몽라쉐 2024', 'PIERRE GIRARDIN PULIGNY MONTRACHET', '주식회사 비노갤러리아', 'PIERRE GIRARDIN', '프랑스', '과실주', '2026-09-09', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 비노갤러리아|피에르 지라르댕 퓔리니몽라쉐 트레쟁 2024', '피에르 지라르댕 퓔리니몽라쉐 트레쟁 2024', 'PIERRE GIRARDIN PULIGNY MONTRACHET LE TREZIN', '주식회사 비노갤러리아', 'PIERRE GIRARDIN', '프랑스', '과실주', '2026-09-09', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 비노갤러리아|피에르 지라르댕 퓔리니몽라쉐 프리미에 크뤼 라 가렌느 2024', '피에르 지라르댕 퓔리니몽라쉐 프리미에 크뤼 라 가렌느 2024', 'PIERRE GIRARDIN PULIGNY MONTRACHET PREMIER CRU LA GARENNE', '주식회사 비노갤러리아', 'PIERRE GIRARDIN', '프랑스', '과실주', '2026-09-09', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -30304,7 +30539,11 @@ VALUES
 ('mfds_import', '주식회사 비어업|바인드', '바인드', 'BIND', '주식회사 비어업', 'ANCHORAGE BREWING COMPANY', '미국', '맥주', '2024-08-27', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":"20240409","EXPIRDE_END_DTM":"20440408"}'::jsonb),
 ('mfds_import', '주식회사 비어업|반타 블루', '반타 블루', 'BANTHA BLUE 355ML', '주식회사 비어업', 'STANDARD MEADERY, LLC', '미국', '과실주', '2025-11-12', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":"20250301","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 비어업|배럴 #22 : 세컨드 블렌드', '배럴 #22 : 세컨드 블렌드', 'BARREL #22 : SECOND BLEND', '주식회사 비어업', 'AFTERTHOUGHT BREWING COMPANY LLC', '미국', '맥주', '2022-08-24', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":"20200423","EXPIRDE_END_DTM":"20400422"}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -30809,7 +31048,11 @@ VALUES
 ('mfds_import', '주식회사 상미상사|제임슨', '제임슨', 'JAMESON', '주식회사 상미상사', 'IRISH DISTILLERS PERNOD RICARD', '아일랜드', '위스키', '2025-10-15', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 상미상사|조니워커 레드', '조니워커 레드', 'JOHNNIE WALKER RED', '주식회사 상미상사', 'DIAGEO SCOTLAND LIMITED', '영국', '위스키', '2025-10-31', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 상미상사|조니워커 블랙', '조니워커 블랙', 'JOHNNIE WALKER BLACK', '주식회사 상미상사', 'DIAGEO SCOTLAND LIMITED', '영국', '위스키', '2025-10-31', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -31314,7 +31557,11 @@ VALUES
 ('mfds_import', '주식회사 시바타야코리아|도버 와슈 포도', '도버 와슈 포도', 'DOVER WASHU GRAPE', '주식회사 시바타야코리아', 'DOVER DISTILLERIES CO.,LTD', '일본', '기타주류', '2026-01-20', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"일본","EXPIRDE_BEGIN_DTM":"20251001","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 시바타야코리아|마루키 루즈', '마루키 루즈', 'MARUKI ROUGE', '주식회사 시바타야코리아', 'MARUKI WINERY CO.,LTD', '일본', '과실주', '2025-11-04', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"일본","EXPIRDE_BEGIN_DTM":"20250612","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 시바타야코리아|마루키 블랑', '마루키 블랑', 'MARUKI BLANC', '주식회사 시바타야코리아', 'MARUKI WINERY CO.,LTD', '일본', '과실주', '2026-08-26', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"일본","EXPIRDE_BEGIN_DTM":"20260501","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -31819,7 +32066,11 @@ VALUES
 ('mfds_import', '주식회사 신세계엘앤비|루이자도 쥐브리 샹베르탱', '루이자도 쥐브리 샹베르탱', 'GEVREY CHAMBERTIN', '주식회사 신세계엘앤비', 'MAISON LOUIS JADOT', '프랑스', '과실주', '2026-01-27', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 신세계엘앤비|루이자도 쥬브레 샹베르땡', '루이자도 쥬브레 샹베르땡', 'GEVREY CHAMBERTIN', '주식회사 신세계엘앤비', 'MAISON LOUIS JADOT', '프랑스', '과실주', '2026-08-31', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 신세계엘앤비|루체', '루체', 'LUCE DELLA VITE', '주식회사 신세계엘앤비', 'TENUTE DI TOSCANA DISTRIBUZIONE S.R.L.', '이탈리아', '과실주', '2026-08-18', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -32324,7 +32575,11 @@ VALUES
 ('mfds_import', '주식회사 신세계엘앤비|쉐이퍼 원 포인트 파이브', '쉐이퍼 원 포인트 파이브', 'SHAFER ONE POINT FIVE', '주식회사 신세계엘앤비', 'SHAFER VINEYARDS', '미국', '과실주', '2026-04-30', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":"20250611","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 신세계엘앤비|쉐이퍼 티디 나인', '쉐이퍼 티디 나인', 'SHAFER TD-9', '주식회사 신세계엘앤비', 'SHAFER VINEYARDS', '미국', '과실주', '2026-04-30', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":"20250414","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 신세계엘앤비|쉐이퍼 힐사이드 셀렉트', '쉐이퍼 힐사이드 셀렉트', 'SHAFER HILLSIDE SELECT CABERNET SAUVIGNON', '주식회사 신세계엘앤비', 'SHAFER VINEYARDS', '미국', '과실주', '2026-03-19', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":"20250602","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -32829,7 +33084,11 @@ VALUES
 ('mfds_import', '주식회사 신세계엘앤비|트레져 피치니 프리미티보 디 만두리아', '트레져 피치니 프리미티보 디 만두리아', 'PICCINI TTREASURE PRIMITIVO DI MANDURIA', '주식회사 신세계엘앤비', 'TENUTE PICCINI SPA', '이탈리아', '과실주', '2026-09-09', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"이탈리아","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 신세계엘앤비|트롤브루 레몬(레몬주스농축액2.1%(고형분함량0.16%),레몬추출물 0.1%(고형분함량0.03%),천연향료(레몬향)', '트롤브루 레몬(레몬주스농축액2.1%(고형분함량0.16%),레몬추출물 0.1%(고형분함량0.03%),천연향료(레몬향)', 'TROLL BREW LEMON RADLER', '주식회사 신세계엘앤비', 'PRIVATBRAUEREI EICHBAUM GMBH&CO.KG', '독일', '기타주류', '2026-06-15', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"벨기에","EXPIRDE_BEGIN_DTM":"20260304","EXPIRDE_END_DTM":"20270904"}'::jsonb),
 ('mfds_import', '주식회사 신세계엘앤비|트롤브루 레몬(레몬주스농축액2.1%(고형분함량0.16%),레몬추출물 0.1%(고형분함량0.03%),천연향료(레몬향)0.01%)', '트롤브루 레몬(레몬주스농축액2.1%(고형분함량0.16%),레몬추출물 0.1%(고형분함량0.03%),천연향료(레몬향)0.01%)', 'TROLL BREW LEMON RADLER', '주식회사 신세계엘앤비', 'PRIVATBRAUEREI EICHBAUM GMBH&CO.KG', '독일', '기타주류', '2026-06-05', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"벨기에","EXPIRDE_BEGIN_DTM":"20260304","EXPIRDE_END_DTM":"20270904"}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -33334,7 +33593,11 @@ VALUES
 ('mfds_import', '주식회사 씨알트레이딩|타카지 준마이다이긴죠 아사히 무로카나마겐슈 720ml', '타카지 준마이다이긴죠 아사히 무로카나마겐슈 720ml', 'TAKAJI JUNMAIDAIGINJO ASAHI MUROKANAMAGENSHU', '주식회사 씨알트레이딩', 'JUHACHI ZAKARI SHUZO CO., LTD.', '일본', '청주', '2025-12-30', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"일본","EXPIRDE_BEGIN_DTM":"20251201","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 씨알트레이딩|토요카 준마이긴죠 히토고코치', '토요카 준마이긴죠 히토고코치', 'TOYOKA JUNMAIGINJO HITOGOKOCHI', '주식회사 씨알트레이딩', 'TAKASAWA SHUZO CO., LTD.', '일본', '청주', '2026-04-23', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"일본","EXPIRDE_BEGIN_DTM":"20260316","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 씨알트레이딩|토요카 준마이슈', '토요카 준마이슈', 'TOYOKA JUNMAISHU', '주식회사 씨알트레이딩', 'TAKASAWA SHUZO CO., LTD.', '일본', '청주', '2026-04-22', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"일본","EXPIRDE_BEGIN_DTM":"20260316","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -33839,7 +34102,11 @@ VALUES
 ('mfds_import', '주식회사 에프제이코리아|디카이퍼 트리플섹 / L34725, 700mL', '디카이퍼 트리플섹 / L34725, 700mL', 'TRIPLE SEC LIQUEUR', '주식회사 에프제이코리아', 'REFRESCO BENELUX B.V.', '네덜란드', '리큐르', '2026-05-11', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 에프제이코리아|디카이퍼 트리플섹 / L35025, 700mL', '디카이퍼 트리플섹 / L35025, 700mL', 'TRIPLE SEC LIQUEUR', '주식회사 에프제이코리아', 'REFRESCO BENELUX B.V.', '네덜란드', '리큐르', '2026-06-08', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 에프제이코리아|딜라이트풀 디벨롭먼트 / 005139GX0700611', '딜라이트풀 디벨롭먼트 / 005139GX0700611', 'DELIGHTFUL DEVELOPMENT', '주식회사 에프제이코리아', 'THE ARTISANAL SPIRITS COMPANY PLC', '영국', '위스키', '2026-03-05', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"영국","EXPIRDE_BEGIN_DTM":"20250917","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -34344,7 +34611,11 @@ VALUES
 ('mfds_import', '주식회사 이탈코 인터내셔널|자토 루시도', '자토 루시도', 'JATO LUCIDO', '주식회사 이탈코 인터내셔널', 'DON TOMASI SRL', '이탈리아', '과실주', '2025-12-24', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"이탈리아","EXPIRDE_BEGIN_DTM":"20250528","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 이탈코 인터내셔널|테누테 네이라노 가비 2024', '테누테 네이라노 가비 2024', 'TENUTE NEIRANO GAVI 2024', '주식회사 이탈코 인터내셔널', 'TENUTE NEIRANO-TE.NE. S.P.A.-TENUTE NEIRANO S.P.A.-TE.NE. S.P.A.-', '이탈리아', '과실주', '2025-12-31', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"이탈리아","EXPIRDE_BEGIN_DTM":"20250918","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 이탈코 인터내셔널|테누테 네이라노 띠르테오 바르베라 다스티 수페리오 2023', '테누테 네이라노 띠르테오 바르베라 다스티 수페리오 2023', 'TENUTE NEIRANO TIRTEO BARBERA D''ASTI SUPERIORE 2023', '주식회사 이탈코 인터내셔널', 'TENUTE NEIRANO-TE.NE. S.P.A.-TENUTE NEIRANO S.P.A.-TE.NE. S.P.A.-', '이탈리아', '과실주', '2025-12-26', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"이탈리아","EXPIRDE_BEGIN_DTM":"20250922","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -34849,7 +35120,11 @@ VALUES
 ('mfds_import', '주식회사 케이앤알리커|라이프 온 마스 (440ml)', '라이프 온 마스 (440ml)', 'LIFE ON MARS', '주식회사 케이앤알리커', 'ELMELEVEN AB', '스웨덴', '맥주', '2025-04-24', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"스웨덴","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":"20261201"}'::jsonb),
 ('mfds_import', '주식회사 케이앤알리커|레페 브룬', '레페 브룬', 'LEFFE BRUNE', '주식회사 케이앤알리커', 'INBEV BELGIUM BVBA/SPRL', '벨기에', '맥주', '2026-07-07', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"벨기에","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":"20270731"}'::jsonb),
 ('mfds_import', '주식회사 케이앤알리커|레페 블론드', '레페 블론드', 'LEFFE BLONDE', '주식회사 케이앤알리커', 'INBEV BELGIUM BVBA/SPRL', '벨기에', '맥주', '2026-07-07', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"벨기에","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":"20270822"}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -35354,7 +35629,11 @@ VALUES
 ('mfds_import', '주식회사 쿨쉽인터내셔널|싱글앤와일드 콜롱 엘레', '싱글앤와일드 콜롱 엘레', 'SINGLE&WILD COLON-ELLE', '주식회사 쿨쉽인터내셔널', 'LAMBIEK FABRIEK', '벨기에', '맥주', '2024-07-05', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"벨기에","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":"20280630"}'::jsonb),
 ('mfds_import', '주식회사 쿨쉽인터내셔널|써머 팰로우 (473ml)', '써머 팰로우 (473ml)', 'SUMMER FALLOW', '주식회사 쿨쉽인터내셔널', 'DWINELL COUNTRY ALES', '미국', '맥주', '2023-07-07', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":"20230424","EXPIRDE_END_DTM":"20280424"}'::jsonb),
 ('mfds_import', '주식회사 쿨쉽인터내셔널|썸머 블러쉬 473mL', '썸머 블러쉬 473mL', 'SUMMER BLUSH', '주식회사 쿨쉽인터내셔널', 'DWINELL COUNTRY ALES', '미국', '맥주', '2022-08-01', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":"20220418","EXPIRDE_END_DTM":"20270418"}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -35859,7 +36138,11 @@ VALUES
 ('mfds_import', '주식회사 파이이십일|이클립스 메스칼 배럴', '이클립스 메스칼 배럴', 'ECLIPSE MEZCAL BARREL', '주식회사 파이이십일', 'TRUCKEE CRAFT BREWING', '미국', '맥주', '2022-03-15', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":"20211117","EXPIRDE_END_DTM":"20261116"}'::jsonb),
 ('mfds_import', '주식회사 파이이십일|이클립스 버번 배럴 꾸베', '이클립스 버번 배럴 꾸베', 'ECLIPSE BOURBON BARREL CUVEE', '주식회사 파이이십일', 'TRUCKEE CRAFT BREWING', '미국', '맥주', '2022-03-11', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":"20211120","EXPIRDE_END_DTM":"20261119"}'::jsonb),
 ('mfds_import', '주식회사 파이이십일|이클립스 일레이저 크레이그', '이클립스 일레이저 크레이그', 'ECLIPSE ELIJAH CRAIG', '주식회사 파이이십일', 'TRUCKEE CRAFT BREWING', '미국', '맥주', '2024-02-21', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":"20231101","EXPIRDE_END_DTM":"20281101"}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -36364,7 +36647,11 @@ VALUES
 ('mfds_import', '주식회사 호수무역|코인트루', '코인트루', 'COINTREAU', '주식회사 호수무역', 'COINTREAU', '프랑스', '리큐르', '2026-09-16', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 호수무역|클라세 아줄 레포사도', '클라세 아줄 레포사도', 'CLASE AZUL REPOSADO', '주식회사 호수무역', 'CASA TRADICION, S.A. DE C.V.', '멕시코', '일반증류주', '2026-02-19', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사 호수무역|클라세 아줄 플라타', '클라세 아줄 플라타', 'CLASE AZUL PLATA', '주식회사 호수무역', 'CASA TRADICION, S.A. DE C.V.', '멕시코', '일반증류주', '2026-02-19', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -36869,7 +37156,11 @@ VALUES
 ('mfds_import', '주식회사사카야코리아|준마이 텐쥬(720ml)', '준마이 텐쥬(720ml)', 'JUNMAI TENJU', '주식회사사카야코리아', 'TENJU SHUZO CO LTD', '일본', '청주', '2025-09-23', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"일본","EXPIRDE_BEGIN_DTM":"20250901","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사사카야코리아|준마이긴죠 긴가테츠 도노 요루', '준마이긴죠 긴가테츠 도노 요루', 'SAKURAGAO SAKURAGAO JUNMAIGINJO GINGATETUDO NO YORU', '주식회사사카야코리아', 'SAKURAGAO SHUZO CO.,LTD', '일본', '청주', '2026-07-29', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"일본","EXPIRDE_BEGIN_DTM":"20260701","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '주식회사사카야코리아|준마이긴죠 다이다이노 에이쿤 무로카나마겐슈', '준마이긴죠 다이다이노 에이쿤 무로카나마겐슈', 'JUNMAI GINJO DAIDAINO EIKUN MUROKANAMAGENSHU', '주식회사사카야코리아', 'EIKUN SHUZO CO.,LTD', '일본', '청주', '2026-04-30', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"일본","EXPIRDE_BEGIN_DTM":"20260313","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -37374,7 +37665,11 @@ VALUES
 ('mfds_import', '지케이 인터내셔널|치츠카 촐리코우리', '치츠카 촐리코우리', 'TSITSKA TSOLIKOURI', '지케이 인터내셔널', 'LLC ROYAL KHVANCHKARA', '조지아', '과실주', '2025-10-16', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"조지아","EXPIRDE_BEGIN_DTM":"20240731","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '지케이 인터내셔널|킨즈마라울리', '킨즈마라울리', 'KINDZMARAULI', '지케이 인터내셔널', 'WINERY KEBURIA LLC', '조지아', '과실주', '2025-10-21', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"조지아","EXPIRDE_BEGIN_DTM":"20250110","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '지케이 인터내셔널|킨즈마라울리 세미스윗', '킨즈마라울리 세미스윗', 'KINDZMARAULI SEMI SWEET', '지케이 인터내셔널', 'KINDZMARAULI MARANI  LLC', '조지아', '과실주', '2026-04-29', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"조지아","EXPIRDE_BEGIN_DTM":"20251225","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -37879,7 +38174,11 @@ VALUES
 ('mfds_import', '케이비코리아(주)|크롬바커 둔켈[30L/케그]', '크롬바커 둔켈[30L/케그]', 'KROMBACHER DUNKEL', '케이비코리아(주)', 'KROMBACHER BRAUEREI BERNHARD SCHADEBERG GMBH & CO. KG', '독일', '맥주', '2026-07-03', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"독일","EXPIRDE_BEGIN_DTM":"20260128","EXPIRDE_END_DTM":"20261028"}'::jsonb),
 ('mfds_import', '케이비코리아(주)|크롬바커 바이젠(0.5L/병)', '크롬바커 바이젠(0.5L/병)', 'KROMBACHER WEIZEN', '케이비코리아(주)', 'KROMBACHER BRAUEREI BERNHARD SCHADEBERG GMBH & CO. KG', '독일', '맥주', '2026-07-22', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"독일","EXPIRDE_BEGIN_DTM":"20260428","EXPIRDE_END_DTM":"20270428"}'::jsonb),
 ('mfds_import', '케이비코리아(주)|크롬바커 바이젠(0.5L/캔)', '크롬바커 바이젠(0.5L/캔)', 'KROMBACHER WEIZEN', '케이비코리아(주)', 'KROMBACHER BRAUEREI BERNHARD SCHADEBERG GMBH & CO. KG', '독일', '맥주', '2026-09-16', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"독일","EXPIRDE_BEGIN_DTM":"20260608","EXPIRDE_END_DTM":"20270608"}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -38384,7 +38683,11 @@ VALUES
 ('mfds_import', '쿠마가이주류 주식회사|미무로스기 디오 아비타', '미무로스기 디오 아비타', 'MIMUROSUGI DIO ABITA', '쿠마가이주류 주식회사', 'IMANISHI SHUZO CO., LTD.', '일본', '청주', '2026-09-01', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"일본","EXPIRDE_BEGIN_DTM":"20260701","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '쿠마가이주류 주식회사|미무로스기 준마이긴죠 야마다니시키', '미무로스기 준마이긴죠 야마다니시키', 'MIMUROSUGI JUNMAI GINJO YAMADANISHIKI', '쿠마가이주류 주식회사', 'IMANISHI SHUZO CO., LTD.', '일본', '청주', '2026-02-24', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"일본","EXPIRDE_BEGIN_DTM":"20260105","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '쿠마가이주류 주식회사|미무로스기 준마이다이긴죠 35', '미무로스기 준마이다이긴죠 35', 'MIMUROSUGI, JUNMAI DAIGINJO 35, TAKAHASHIIKUHINOMIKOTONISASAGU', '쿠마가이주류 주식회사', 'IMANISHI SHUZO CO., LTD.', '일본', '청주', '2026-04-29', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"일본","EXPIRDE_BEGIN_DTM":"20260303","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -38889,7 +39192,11 @@ VALUES
 ('mfds_import', '텐토스|글렌피딕 15년', '글렌피딕 15년', 'GLENFFIDICH 15YO', '텐토스', 'WILLIAM GRANT&SONS LTD', '영국', '위스키', '2025-12-24', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '텐토스|글렌피딕 15년 퍼페츄어 컬렉션', '글렌피딕 15년 퍼페츄어 컬렉션', 'GLENFFIDICH PERPETUAL COLLECTION 15YO', '텐토스', 'WILLIAM GRANT&SONS LTD', '영국', '위스키', '2025-11-19', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '텐토스|글렌피딕 18년', '글렌피딕 18년', 'GLENFFIDICH 18YO', '텐토스', 'WILLIAM GRANT&SONS LTD', '영국', '위스키', '2026-02-09', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"네덜란드","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -39394,7 +39701,11 @@ VALUES
 ('mfds_import', '포도누아 인터내셔널|토마 드 마흔 퀴베 랄로흐', '토마 드 마흔 퀴베 랄로흐', 'THOMAS DE MARNE LALORE', '포도누아 인터내셔널', 'DES COTANNES', '프랑스', '과실주', '2025-09-22', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '포도누아 인터내셔널|토마 드 마흔 퀴베 올리스틱', '토마 드 마흔 퀴베 올리스틱', 'THOMAS DE MARNE HOLISTIQUE', '포도누아 인터내셔널', 'DES COTANNES', '프랑스', '과실주', '2025-09-22', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '포도누아 인터내셔널|피노', '피노', 'PINOT ALSACE', '포도누아 인터내셔널', 'SCEA DOMAINE OSTERTAG', '프랑스', '과실주', '2025-09-24', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -39899,7 +40210,11 @@ VALUES
 ('mfds_import', '하이트진로(주)|캐년 오크 까베르네 소비뇽(A260418)', '캐년 오크 까베르네 소비뇽(A260418)', 'CANYON OAKS CABERNET SAUVIGNON', '하이트진로(주)', 'ASV WINES INC.', '미국', '과실주', '2026-07-09', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '하이트진로(주)|캐년 오크 까베르네 소비뇽(A260419)', '캐년 오크 까베르네 소비뇽(A260419)', 'CANYON OAKS CABERNET SAUVIGNON', '하이트진로(주)', 'ASV WINES INC.', '미국', '과실주', '2026-07-30', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":null,"EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '하이트진로(주)|캐년 오크 샤르도네', '캐년 오크 샤르도네', 'CANYON OAKS CHARDONNAY', '하이트진로(주)', 'ASV WINES, INC.', '미국', '과실주', '2026-06-02', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":"20260121","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -40404,7 +40719,11 @@ VALUES
 ('mfds_import', '한독와인(주)|샤또 르쿠뉴(2009년)', '샤또 르쿠뉴(2009년)', 'CHATEAU RECOUGNE', '한독와인(주)', 'SCEA RECOUGNE', '프랑스', '과실주', '2026-03-20', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":"20110718","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '한독와인(주)|샤또 르쿠뉴(2010)', '샤또 르쿠뉴(2010)', 'CHATEAU RECOUGNE', '한독와인(주)', 'SCEA RECOUGNE', '프랑스', '과실주', '2026-03-20', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":"20120712","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '한독와인(주)|샤또 르쿠뉴(2014년)', '샤또 르쿠뉴(2014년)', 'CHATEAU RECOUGNE', '한독와인(주)', 'SCEA RECOUGNE', '프랑스', '과실주', '2026-03-20', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"프랑스","EXPIRDE_BEGIN_DTM":"20160324","EXPIRDE_END_DTM":null}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 
 INSERT INTO distributed_product
   (source, source_key, name_ko, name_en, importer_or_maker, manufacturer, origin_country, food_type, last_reported_on, raw)
@@ -40863,5 +41182,9 @@ VALUES
 ('mfds_import', '휴먼앤푸드|주정(에틸 알코올 95%)', '주정(에틸 알코올 95%)', '주정(UNDENATURED HYDROUS EXTRA NEUTRAL ALCOHOL 95%)', '휴먼앤푸드', 'GRAIN PROCESSING CORPORATION', '미국', '주정', '2026-08-06', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"미국","EXPIRDE_BEGIN_DTM":"20260425","EXPIRDE_END_DTM":null}'::jsonb),
 ('mfds_import', '희창물산|니시키아지-200', '니시키아지-200', 'NISHIKIAJI-200', '희창물산', 'MITSUBISHI CORPORATION LIFE SCIENCES LIMITED', '일본', '기타주류', '2026-09-07', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"일본","EXPIRDE_BEGIN_DTM":"20260702","EXPIRDE_END_DTM":"20270501"}'::jsonb),
 ('mfds_import', '희창물산|니시키아지-ST', '니시키아지-ST', 'NISHIKIAJI-ST', '희창물산', 'MITSUBISHI CORPORATION LIFE SCIENCES LIMITED', '일본', '기타주류', '2026-09-07', '{"DCL_PRDUCT_SE_CD_NM":"가공식품","XPORT_NTNCD_NM":"일본","EXPIRDE_BEGIN_DTM":"20260623","EXPIRDE_END_DTM":"20270422"}'::jsonb)
-ON CONFLICT (source, source_key) DO NOTHING;
+ON CONFLICT (source, source_key) DO UPDATE SET
+  name_en = EXCLUDED.name_en, importer_or_maker = EXCLUDED.importer_or_maker,
+  manufacturer = EXCLUDED.manufacturer, origin_country = EXCLUDED.origin_country,
+  food_type = EXCLUDED.food_type, raw = EXCLUDED.raw,
+  last_reported_on = GREATEST(distributed_product.last_reported_on, EXCLUDED.last_reported_on);
 

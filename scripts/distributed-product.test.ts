@@ -110,12 +110,12 @@ test("RED4 - 같은 건을 두 번 받아도 한 행이다. 신고일이 늦은 
   assert.equal(rows.find((r) => r.source === "mfds_domestic")?.lastReportedOn, "2025-01-01");
 });
 
-test("시드 SQL 은 API 출처만 지우고 manual 은 남긴다. 작은따옴표는 이스케이프한다", () => {
+test("시드 SQL 은 지우지 않고 덧쓴다 — 승인된 매핑이 살아남아야 한다. 작은따옴표는 이스케이프한다", () => {
   const row = fromLabelingRecord({ BSN_OFC_NAME: "k", PRDUCT_KOREAN_NM: "O'HARA'S", ITM_NM: "맥주" })!;
   const out = toSeedSql([row], "2026-09-18");
-  assert.match(out, /DELETE FROM distributed_product WHERE source IN \('mfds_import', 'mfds_domestic'\);/);
-  assert.doesNotMatch(out, /'manual'/);
+  assert.doesNotMatch(out, /DELETE FROM/);
   assert.match(out, /'O''HARA''S'/);
-  assert.match(out, /ON CONFLICT \(source, source_key\) DO NOTHING;/);
+  assert.match(out, /ON CONFLICT \(source, source_key\) DO UPDATE SET/);
+  assert.match(out, /GREATEST\(distributed_product\.last_reported_on, EXCLUDED\.last_reported_on\)/);
   assert.match(out, /손으로 고치지 않는다/);
 });
