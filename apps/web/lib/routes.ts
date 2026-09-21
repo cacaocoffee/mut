@@ -33,6 +33,8 @@ export const ARTICLES_PATH = "/articles";
 
 /** 재료 사전 (`FR-INGREDIENT-002` · SCREENS-01 01-D). 이쪽은 색인한다. */
 export const INGREDIENTS_PATH = "/ingredients";
+/** 공개 유통 제품 목록 (#205). */
+export const PRODUCTS_PATH = "/products";
 
 /**
  * 내 저장 (`FR-USER-003` · SPEC-07 §2.5).

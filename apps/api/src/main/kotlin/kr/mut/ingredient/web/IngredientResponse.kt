@@ -1,5 +1,6 @@
 package kr.mut.ingredient.web
 
+import kr.mut.common.web.page.PageMeta
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -95,3 +96,15 @@ data class BrandItem(
     val requiresAdLabel: Boolean,
 )
 
+/** 유형별 건수 — 공개 제품 목록의 유형 선택지 (#205). */
+data class ProductFoodType(val foodType: String, val count: Long)
+
+/**
+ * 공개 유통 제품 목록 (#205). 어드민 것과 같은 조회지만 `id`·`source` 가 없다 (SPEC-07 §1.1).
+ * 구매 링크·가격은 여기에도 없다 (`NFR-L-05`).
+ */
+data class ProductListResponse(
+    val items: List<DistributedProductItem>,
+    val page: PageMeta,
+    val foodTypes: List<ProductFoodType>,
+)

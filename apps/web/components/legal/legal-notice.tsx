@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { INGREDIENTS_PATH } from "@/lib/routes";
+import { INGREDIENTS_PATH, PRODUCTS_PATH } from "@/lib/routes";
 
 /**
  * 과음 경고 · 미성년자 판매 금지 (`NFR-L-01` · `FR-COCKTAIL-028` · `R-F1.1-8`).
@@ -33,6 +33,9 @@ export function LegalNotice() {
       <nav className="legal-links" aria-label="바닥글 링크">
         {/* 재료 사전은 내비 탭이 아니다 (탭 셋 불변식). 여기서 연다 (#179). */}
         <Link href={INGREDIENTS_PATH}>재료 사전</Link>
+        {/* 유통 제품도 탭이 아니다. 같은 자리에서 연다 (#205). */}
+        {" · "}
+        <Link href={PRODUCTS_PATH}>국내 유통 술</Link>
         {/* `NFR-L-04` — 두 페이지가 존재하고 **닿을 수 있어야** 한다.
             페이지만 만들고 링크를 안 걸면 없는 것과 같다. */}
         <a href="/privacy">개인정보 처리방침</a>

@@ -37,6 +37,7 @@ export const ALLOWED_PATTERNS = [
   /^\/cocktails\/(base|style|method)\/[a-z0-9-]+$/,
   /^\/ingredients$/,
   /^\/ingredients\/[a-z0-9-]+$/,
+  /^\/products$/,
   /^\/articles$/,
   /^\/articles\/[a-z0-9-]+$/,
 ] as const;
@@ -46,7 +47,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = SITE_URL;
   const now = new Date();
 
-  const paths: string[] = ["/", "/finder", "/privacy", "/terms", "/ingredients"];
+  const paths: string[] = ["/", "/finder", "/privacy", "/terms", "/ingredients", "/products"];
 
   // 발행분만. `draft` 는 공개 API 가 주지 않는다 (RED 26).
   const cocktails = usingApi ? await publishedSlugs() : COCKTAILS.map((c) => c.id);

@@ -24,6 +24,7 @@ export type CategoryItem = components["schemas"]["CategoryItem"];
 export type CategoriesResponse = components["schemas"]["CategoriesResponse"];
 export type IngredientDetail = components["schemas"]["IngredientDetail"];
 export type IngredientListItem = components["schemas"]["IngredientItem"];
+export type ProductList = components["schemas"]["ProductListResponse"];
 
 /** 카테고리 축 3종. **여기 없는 축은 카테고리가 아니다** (`PRIN-P06`). */
 export const CATEGORY_AXES = ["base", "style", "method"] as const;
@@ -256,6 +257,33 @@ export async function ingredientDetail(slug: string): Promise<IngredientDetail |
     return (await res.json()) as IngredientDetail;
   } catch (e) {
     console.warn(`[api] 재료 상세 조회 실패 (${slug}) — 이름·분류만 그린다: ${describe(e)}`);
+    return null;
+  }
+}
+
+// ── 유통 제품 목록 (#205 · G-41) ────────────────────────────────────────────
+
+/**
+ * 식약처 수입신고 제품. 제품명·수입사 부분일치 + 식품유형. 최근 신고순은 서버가 고정한다.
+ * "신고가 있었다" 까지만 아는 데이터다 — 화면이 그 말을 같이 낸다.
+ */
+export async function products(filter: {
+  q?: string;
+  foodType?: string;
+  page?: number;
+}): Promise<ProductList | null> {
+  if (!usingApi) return null;
+
+  const query = new URLSearchParams({ size: "50", page: String(filter.page ?? 0) });
+  if (filter.q) query.set("q", filter.q);
+  if (filter.foodType) query.set("foodType", filter.foodType);
+
+  try {
+    const res = await fetch(`${BASE}/api/v1/products?${query}`, { next: { revalidate: 600 } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return (await res.json()) as ProductList;
+  } catch (e) {
+    console.warn(`[api] 유통 제품 목록 조회 실패 — 비운다: ${describe(e)}`);
     return null;
   }
 }
