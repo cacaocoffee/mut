@@ -2,7 +2,13 @@ package kr.mut.ingredient.internal
 
 import kr.mut.ingredient.api.AdminIngredientResponse
 import kr.mut.ingredient.api.CreateIngredientRequest
+import kr.mut.common.web.page.PageQuery
+import kr.mut.common.web.page.PageResponse
+import kr.mut.ingredient.api.DistributedProductPage
 import kr.mut.ingredient.api.DistributedProductSummary
+import kr.mut.ingredient.api.FoodTypeCount
+import kr.mut.ingredient.domain.DistributedProduct
+import kr.mut.ingredient.repository.DistributedProductRepository
 import kr.mut.ingredient.api.IngredientAdminFacade
 import kr.mut.ingredient.api.IngredientCapacity
 import kr.mut.ingredient.api.IngredientDistributionRequest
@@ -40,6 +46,7 @@ class IngredientAdminService(
     private val properties: IngredientProperties,
     private val matcher: IngredientProductMatcher,
     private val matches: IngredientProductMatchRepository,
+    private val products: DistributedProductRepository,
 ) : IngredientAdminFacade {
 
     /**
@@ -143,6 +150,19 @@ class IngredientAdminService(
     override fun rejectMatch(id: Long, matchId: Long): IngredientProductMatchResponse =
         match(id, matchId).apply { reject() }.toResponse()
 
+    @Transactional(readOnly = true)
+    override fun browseProducts(q: String?, foodType: String?, page: PageQuery): DistributedProductPage {
+        val keyword = q?.trim()?.takeIf { it.isNotEmpty() }
+        val type = foodType?.trim()?.takeIf { it.isNotEmpty() }
+        val rows = products.browse(keyword, type, PageRequest.of(page.page, page.size))
+        val paged = PageResponse.of(rows.map { it.toSummary() }, page, products.countBrowse(keyword, type))
+        return DistributedProductPage(
+            items = paged.items,
+            page = paged.page,
+            foodTypes = products.countByFoodType().map { FoodTypeCount(it[0] as String, it[1] as Long) },
+        )
+    }
+
     /** 다른 재료의 매핑 id 를 넘기면 404 — 존재를 흘리지 않는다 (SPEC-07 §5). */
     private fun match(ingredientId: Long, matchId: Long): IngredientProductMatch =
         matches.findByIdAndIngredientId(matchId, ingredientId) ?: throw ResourceNotFoundException()
@@ -198,15 +218,17 @@ private fun IngredientProductMatch.toResponse() = IngredientProductMatchResponse
     confidence = confidence.toInt(),
     matchedKeyword = matchedKeyword,
     matchedBy = matchedBy,
-    product = DistributedProductSummary(
-        id = product.id,
-        source = product.source,
-        nameKo = product.nameKo,
-        nameEn = product.nameEn,
-        importerOrMaker = product.importerOrMaker,
-        manufacturer = product.manufacturer,
-        originCountry = product.originCountry,
-        foodType = product.foodType,
-        lastReportedOn = product.lastReportedOn,
-    ),
+    product = product.toSummary(),
+)
+
+private fun DistributedProduct.toSummary() = DistributedProductSummary(
+    id = id,
+    source = source,
+    nameKo = nameKo,
+    nameEn = nameEn,
+    importerOrMaker = importerOrMaker,
+    manufacturer = manufacturer,
+    originCountry = originCountry,
+    foodType = foodType,
+    lastReportedOn = lastReportedOn,
 )

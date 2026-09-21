@@ -2658,3 +2658,14 @@ figcaption {
   color: var(--color-neutral-700);
 }
 
+/* ── 어드민 유통 제품 목록 (#203) — 넓은 표는 제 칸 안에서만 가로 스크롤한다 ── */
+.admin-products {
+  overflow-x: auto;
+  margin-top: var(--space-4);
+}
+.admin-products .table td {
+  vertical-align: top;
+}
+.admin-products__pager {
+  margin-top: var(--space-3);
+}

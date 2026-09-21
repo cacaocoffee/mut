@@ -112,6 +112,20 @@ export async function ingredientMatches(id: string): Promise<IngredientMatches |
   return get<IngredientMatches>(`/ingredients/${encodeURIComponent(id)}/matches`);
 }
 
+export type DistributedProductPage = components["schemas"]["DistributedProductPage"];
+
+/** 유통 제품 목록 (#203). 제품명·수입사 부분일치 + 식품유형. 최근 신고순은 서버가 고정한다. */
+export async function adminProducts(filter: {
+  q?: string;
+  foodType?: string;
+  page?: number;
+}): Promise<DistributedProductPage | null> {
+  const query = new URLSearchParams({ size: "50", page: String(filter.page ?? 0) });
+  if (filter.q) query.set("q", filter.q);
+  if (filter.foodType) query.set("foodType", filter.foodType);
+  return get<DistributedProductPage>(`/products?${query}`);
+}
+
 // ── 검증 태스크 (ISSUE-048 · `FR-ADMIN-004`) ──────────────────────────────
 
 export type VerificationTask = components["schemas"]["VerificationTaskItem"];
