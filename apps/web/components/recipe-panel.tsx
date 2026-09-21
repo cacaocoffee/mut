@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { INGREDIENTS_PATH } from "@/lib/routes";
+import { INGREDIENTS_PATH, PRODUCTS_PATH } from "@/lib/routes";
 
 import { useEffect, useState } from "react";
 import { MAX_SERVINGS, formatQuantity, type DisplayUnit } from "@mut/domain";
@@ -35,6 +35,8 @@ export function RecipePanel({ slug, ingredients }: { slug: string; ingredients: 
   const [servings, setServings] = useState(1);
   const [unit, setUnit] = useState<DisplayUnit>("ml");
   const [openSub, setOpenSub] = useState<number | null>(null);
+  // 신고 제품 펼침도 한 줄만 — 대체재와 같은 규칙 (#209)
+  const [openProducts, setOpenProducts] = useState<number | null>(null);
 
   // 저장해 둔 단위를 되살린다. 첫 그림은 `ml` 이라 서버가 그린 것과 어긋나지 않는다.
   useEffect(() => {
@@ -129,9 +131,19 @@ export function RecipePanel({ slug, ingredients }: { slug: string; ingredients: 
               servings={servings}
               unit={unit}
               open={openSub === i}
+              productsOpen={openProducts === i}
+              onToggleProducts={() => {
+                const opening = openProducts !== i;
+                setOpenProducts(opening ? i : null);
+                if (opening) {
+                  setOpenSub(null);
+                  recipeInteract({ cocktailSlug: slug, action: "products_open", detail: line.nameKo });
+                }
+              }}
               onToggle={() => {
                 const opening = openSub !== i;
                 setOpenSub(opening ? i : null);
+                if (opening) setOpenProducts(null);
                 // 펼칠 때만 센다. 접는 것은 같은 관심의 뒷면이라 두 번 세면 부풀린다.
                 if (opening) {
                   recipeInteract({
@@ -161,18 +173,30 @@ function RecipeRow({
   unit,
   open,
   onToggle,
+  productsOpen,
+  onToggleProducts,
 }: {
   line: Line;
   servings: number;
   unit: DisplayUnit;
   open: boolean;
   onToggle: () => void;
+  productsOpen: boolean;
+  onToggleProducts: () => void;
 }) {
   return (
     <>
       <tr>
         <td style={{ fontWeight: 500 }}>
-          {line.nameKo}
+          {/* 이름을 누르면 국내 신고 제품이 그 줄 밑에 펼쳐진다 (#209 · R-F1.3-2) */}
+          <button
+            type="button"
+            className="ingredient-name"
+            aria-expanded={productsOpen}
+            onClick={onToggleProducts}
+          >
+            {line.nameKo}
+          </button>
           {line.isOptional && <span className="ingredient-optional">선택</span>}
           <div className="ingredient-en">{line.nameEn}</div>
         </td>
@@ -193,6 +217,13 @@ function RecipeRow({
           ) : null}
         </td>
       </tr>
+      {productsOpen ? (
+        <tr>
+          <td colSpan={3}>
+            <IngredientProducts nameKo={line.nameKo} slug={line.slug} />
+          </td>
+        </tr>
+      ) : null}
       {open && line.substitute ? (
         <tr>
           <td colSpan={3}>
@@ -215,5 +246,89 @@ function RecipeRow({
         </tr>
       ) : null}
     </>
+  );
+}
+
+type ProductItem = {
+  nameKo: string;
+  nameEn?: string;
+  importerOrMaker?: string;
+  originCountry?: string;
+  lastReportedOn?: string;
+};
+
+/**
+ * 재료 줄 밑의 신고 제품 (#209). 재료명으로 `/api/products` 를 찾아 다섯 건까지 보여 준다 —
+ * 승인된 매핑(재료 상세)이 아니라 이름 검색이라, 표기가 다른 제품은 빠질 수 있다.
+ * 제품명·수입사·신고 월뿐이다. 구매 링크·가격은 없다 (`NFR-L-05`).
+ */
+function IngredientProducts({ nameKo, slug: ingredientSlug }: { nameKo: string; slug: string | null }) {
+  const [state, setState] = useState<{ items: ProductItem[]; total: number } | "loading" | "error">("loading");
+
+  useEffect(() => {
+    let alive = true;
+    setState("loading");
+    fetch(`/api/products?q=${encodeURIComponent(nameKo)}&size=5`)
+      .then(async (r) => {
+        if (!r.ok) throw new Error(String(r.status));
+        const body = (await r.json()) as { items: ProductItem[]; page: { totalElements: number } };
+        if (alive) setState({ items: body.items, total: body.page.totalElements });
+      })
+      .catch(() => {
+        if (alive) setState("error");
+      });
+    return () => {
+      alive = false;
+    };
+  }, [nameKo]);
+
+  return (
+    <dl className="substitute-note ingredient-products-note">
+      <dt>
+        국내 신고 제품 · {nameKo}
+        {ingredientSlug ? (
+          <>
+            {" "}
+            <Link href={`${INGREDIENTS_PATH}/${ingredientSlug}`} className="substitute-note__link">
+              재료 상세 →
+            </Link>
+          </>
+        ) : null}
+      </dt>
+      <dd>
+        {state === "loading" ? (
+          "찾는 중…"
+        ) : state === "error" ? (
+          "지금은 조회할 수 없습니다."
+        ) : state.items.length === 0 ? (
+          <>
+            이 이름으로 신고된 제품이 없습니다.{" "}
+            <Link href={`${PRODUCTS_PATH}?q=${encodeURIComponent(nameKo)}`} className="substitute-note__link">
+              다른 표기로 찾기 →
+            </Link>
+          </>
+        ) : (
+          <>
+            <ul className="ingredient-products-note__list">
+              {state.items.map((p, i) => (
+                <li key={`${p.nameKo}-${p.importerOrMaker ?? ""}-${i}`}>
+                  <b>{p.nameKo}</b>
+                  {p.nameEn ? <span className="en"> {p.nameEn}</span> : null}
+                  <span className="ingredient-products-note__meta">
+                    {p.importerOrMaker ?? "수입사 미상"}
+                    {p.originCountry ? ` · ${p.originCountry}` : ""}
+                    {p.lastReportedOn ? ` · 신고 ${p.lastReportedOn.slice(0, 7)}` : ""}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <Link href={`${PRODUCTS_PATH}?q=${encodeURIComponent(nameKo)}`} className="substitute-note__link">
+              {state.total > state.items.length ? `전체 ${state.total}건 보기 →` : "유통 술 목록에서 보기 →"}
+            </Link>
+            <span className="ingredient-products-note__hint"> 식약처 수입신고 기준. 지금 팔리는지는 매장에서 확인하세요.</span>
+          </>
+        )}
+      </dd>
+    </dl>
   );
 }

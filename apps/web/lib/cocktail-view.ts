@@ -5,6 +5,7 @@ import {
   SWEETNESS,
   TECHNIQUE_LABELS,
   getCocktail,
+  resolveIngredient,
   type BaseSpirit,
   type Cocktail,
   type StyleKey,
@@ -58,6 +59,8 @@ export interface CocktailView {
     substitute: string | null;
     /** 대체가 재료 참조면 그 슬러그. 화면이 「대체품 둘러보기」 링크를 건다 (#196 · G-42). */
     substituteSlug: string | null;
+    /** 재료 사전 슬러그. 있으면 재료 줄에서 상세로 간다 (#209). 마스터에 없는 줄은 null. */
+    slug: string | null;
   }[];
   steps: string[];
 
@@ -107,6 +110,7 @@ export function fromApi(detail: CocktailDetail): CocktailView {
       // 대체는 재료 참조일 수도 안내 문구일 수도 있다 (`GATE-COCKTAIL-06` 이 둘 중 하나를 요구한다).
       substitute: line.substitute?.note ?? line.substitute?.nameKo ?? null,
       substituteSlug: line.substitute?.slug ?? null,
+      slug: line.slug ?? null,
     })),
     steps: detail.steps.map((s) => s.text),
 
@@ -169,6 +173,8 @@ export function fromPrototype(slug: string): CocktailView | null {
       substitute: i.sub ?? null,
       // 프로토타입의 대체는 문장뿐이다 — 재료 참조는 DB(`recipe_ingredient.substitute_ingredient_id`)에만 있다
       substituteSlug: null,
+      // 택일 줄("버번 또는 라이")은 슬러그가 둘이라 하나로 못 잇는다 — 첫 것을 쓴다
+      slug: resolveIngredient(i.ko)?.[0] ?? null,
     })),
     steps: c.steps,
 
