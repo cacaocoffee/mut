@@ -119,6 +119,8 @@ test("RED8 - 사이트맵의 모든 경로가 단일 축이다", async ({ reques
     // 아티클 — 콘텐츠 유입이 존재 이유라 목록·상세 다 색인한다 (ADR-0010).
     /^\/articles$/,
     /^\/articles\/[a-z0-9-]+$/,
+    // 국내 유통 술 — 첫 화면만 색인한다. 필터 조합은 noindex (#205).
+    /^\/products$/,
   ];
   const unexpected = paths.filter((p) => !patterns.some((re) => re.test(p)));
   expect(unexpected, "색인할 경로 모양이 늘었다 — sitemap.ts 의 ALLOWED_PATTERNS 를 함께 본다").toEqual([]);
