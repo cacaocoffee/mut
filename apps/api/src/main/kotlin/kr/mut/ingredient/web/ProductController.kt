@@ -30,6 +30,8 @@ class ProductController(private val service: IngredientDictionaryService) {
     fun list(
         @Parameter(description = "제품명 · 수입사의 일부") @RequestParam(required = false) q: String?,
         @Parameter(description = "식품유형 (위스키 · 리큐르 · 과실주 …)") @RequestParam(required = false) foodType: String?,
+        @Parameter(description = "name 이면 제품명만 본다 (수입사 제외). 기본은 제품명·수입사 둘 다")
+        @RequestParam(required = false) scope: String?,
         @SortableBy page: PageQuery,
-    ): ProductListResponse = service.products(q, foodType, page)
+    ): ProductListResponse = service.products(q, foodType, nameOnly = scope == "name", page)
 }

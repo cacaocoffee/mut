@@ -3043,6 +3043,8 @@ export interface operations {
                 q?: string;
                 /** @description 식품유형 (위스키 · 리큐르 · 과실주 …) */
                 foodType?: string;
+                /** @description name 이면 제품명만 본다 (수입사 제외). 기본은 제품명·수입사 둘 다 */
+                scope?: string;
                 page: components["schemas"]["PageQuery"];
             };
             header?: never;
