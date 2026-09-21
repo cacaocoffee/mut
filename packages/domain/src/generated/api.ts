@@ -26,7 +26,7 @@ export interface paths {
          * 아티클 목록 (draft 포함)
          * @description editor 이상. status 로 거른다.
          */
-        get: operations["list_7"];
+        get: operations["list_8"];
         put?: never;
         /**
          * 아티클 생성
@@ -131,7 +131,7 @@ export interface paths {
          * 감사 로그 조회
          * @description admin 만 가능하다 (SPEC-08 §2.2 — 감시받는 사람이 감시 기록을 보면 안 된다). 필터는 AND 로 묶이고 정렬은 최신순 고정이다.
          */
-        get: operations["list_6"];
+        get: operations["list_7"];
         put?: never;
         post?: never;
         delete?: never;
@@ -151,7 +151,7 @@ export interface paths {
          * 칵테일 목록 (draft 포함)
          * @description editor 이상. 최근에 손댄 것부터. status 로 거른다 (draft·published·archived).
          */
-        get: operations["list_5"];
+        get: operations["list_6"];
         put?: never;
         /**
          * 칵테일 생성
@@ -461,6 +461,26 @@ export interface paths {
          * @description 재거절은 409.
          */
         post: operations["rejectMatch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 유통 제품 목록
+         * @description editor 이상. 제품명(한/영)·수입사 부분일치와 식품유형으로 거른다. 최근 신고순 고정.
+         */
+        get: operations["list_5"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1272,6 +1292,11 @@ export interface components {
             nameKo: string;
             originCountry?: string;
         };
+        DistributedProductPage: {
+            foodTypes: components["schemas"]["FoodTypeCount"][];
+            items: components["schemas"]["DistributedProductSummary"][];
+            page: components["schemas"]["PageMeta"];
+        };
         DistributedProductSummary: {
             foodType: string;
             /** Format: int64 */
@@ -1334,6 +1359,11 @@ export interface components {
          * @enum {string}
          */
         FlavorKey: "citrus" | "sour" | "fruity" | "floral" | "herbal" | "spicy" | "smoky" | "bitter" | "nutty" | "creamy";
+        FoodTypeCount: {
+            /** Format: int64 */
+            count: number;
+            foodType: string;
+        };
         Hero: {
             imageUrl?: string;
             nameEn: string;
@@ -1689,7 +1719,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    list_7: {
+    list_8: {
         parameters: {
             query?: {
                 /** @description 상태 슬러그. 없으면 전부 */
@@ -1850,7 +1880,7 @@ export interface operations {
             };
         };
     };
-    list_6: {
+    list_7: {
         parameters: {
             query: {
                 /** @description cocktail · ingredient 같은 테이블 이름 */
@@ -1883,7 +1913,7 @@ export interface operations {
             };
         };
     };
-    list_5: {
+    list_6: {
         parameters: {
             query?: {
                 /** @description 상태 슬러그. 없으면 전부 */
@@ -2337,6 +2367,32 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["IngredientProductMatchResponse"];
+                };
+            };
+        };
+    };
+    list_5: {
+        parameters: {
+            query: {
+                /** @description 제품명 · 수입사의 일부 */
+                q?: string;
+                /** @description 식품유형 (위스키 · 리큐르 · 과실주 …) */
+                foodType?: string;
+                page: components["schemas"]["PageQuery"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["DistributedProductPage"];
                 };
             };
         };
