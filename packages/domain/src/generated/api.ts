@@ -26,7 +26,7 @@ export interface paths {
          * 아티클 목록 (draft 포함)
          * @description editor 이상. status 로 거른다.
          */
-        get: operations["list_8"];
+        get: operations["list_9"];
         put?: never;
         /**
          * 아티클 생성
@@ -131,7 +131,7 @@ export interface paths {
          * 감사 로그 조회
          * @description admin 만 가능하다 (SPEC-08 §2.2 — 감시받는 사람이 감시 기록을 보면 안 된다). 필터는 AND 로 묶이고 정렬은 최신순 고정이다.
          */
-        get: operations["list_7"];
+        get: operations["list_8"];
         put?: never;
         post?: never;
         delete?: never;
@@ -151,7 +151,7 @@ export interface paths {
          * 칵테일 목록 (draft 포함)
          * @description editor 이상. 최근에 손댄 것부터. status 로 거른다 (draft·published·archived).
          */
-        get: operations["list_6"];
+        get: operations["list_7"];
         put?: never;
         /**
          * 칵테일 생성
@@ -478,7 +478,7 @@ export interface paths {
          * 유통 제품 목록
          * @description editor 이상. 제품명(한/영)·수입사 부분일치와 식품유형으로 거른다. 최근 신고순 고정.
          */
-        get: operations["list_5"];
+        get: operations["list_6"];
         put?: never;
         post?: never;
         delete?: never;
@@ -498,7 +498,7 @@ export interface paths {
          * 검증 태스크 큐
          * @description 기본은 open 만. 정렬은 최근 탐지순 고정이다 (인덱스가 그 순서다).
          */
-        get: operations["list_4"];
+        get: operations["list_5"];
         put?: never;
         post?: never;
         delete?: never;
@@ -555,7 +555,7 @@ export interface paths {
          * 아티클 목록 (발행분)
          * @description category 로 거른다 (cocktail·bar·spirits).
          */
-        get: operations["list_3"];
+        get: operations["list_4"];
         put?: never;
         post?: never;
         delete?: never;
@@ -684,7 +684,7 @@ export interface paths {
          * 칵테일 목록 · 필터
          * @description 발행분만 반환한다. 필터 결과는 색인하지 않는다 (X-Robots-Tag: noindex).
          */
-        get: operations["list_2"];
+        get: operations["list_3"];
         put?: never;
         post?: never;
         delete?: never;
@@ -816,7 +816,7 @@ export interface paths {
          * 재료 사전 목록
          * @description **승인된 재료만** 반환한다 (FR-INGREDIENT-001).
          */
-        get: operations["list_1"];
+        get: operations["list_2"];
         put?: never;
         post?: never;
         delete?: never;
@@ -876,7 +876,7 @@ export interface paths {
          * 내 북마크 목록
          * @description 사라지거나 내려간 대상은 빠진다 (다형 참조라 앱이 무결성을 진다).
          */
-        get: operations["list"];
+        get: operations["list_1"];
         put?: never;
         /**
          * 북마크 추가
@@ -939,6 +939,26 @@ export interface paths {
          * @description 로그인 상태·표시명·역할. 비로그인은 401.
          */
         get: operations["me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 유통 제품 목록 (공개)
+         * @description 식약처 수입신고 제품. 제품명(한/영)·수입사 부분일치와 식품유형으로 거른다. 최근 신고순 고정.
+         */
+        get: operations["list"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1490,6 +1510,16 @@ export interface components {
             items: components["schemas"]["VerificationTaskItem"][];
             page: components["schemas"]["PageMeta"];
         };
+        ProductFoodType: {
+            /** Format: int64 */
+            count: number;
+            foodType: string;
+        };
+        ProductListResponse: {
+            foodTypes: components["schemas"]["ProductFoodType"][];
+            items: components["schemas"]["DistributedProductItem"][];
+            page: components["schemas"]["PageMeta"];
+        };
         PublishResponse: {
             /** Format: date-time */
             publishedAt?: string;
@@ -1719,7 +1749,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    list_8: {
+    list_9: {
         parameters: {
             query?: {
                 /** @description 상태 슬러그. 없으면 전부 */
@@ -1880,7 +1910,7 @@ export interface operations {
             };
         };
     };
-    list_7: {
+    list_8: {
         parameters: {
             query: {
                 /** @description cocktail · ingredient 같은 테이블 이름 */
@@ -1913,7 +1943,7 @@ export interface operations {
             };
         };
     };
-    list_6: {
+    list_7: {
         parameters: {
             query?: {
                 /** @description 상태 슬러그. 없으면 전부 */
@@ -2371,7 +2401,7 @@ export interface operations {
             };
         };
     };
-    list_5: {
+    list_6: {
         parameters: {
             query: {
                 /** @description 제품명 · 수입사의 일부 */
@@ -2397,7 +2427,7 @@ export interface operations {
             };
         };
     };
-    list_4: {
+    list_5: {
         parameters: {
             query: {
                 /** @description open · resolved · dismissed. 기본 open */
@@ -2473,7 +2503,7 @@ export interface operations {
             };
         };
     };
-    list_3: {
+    list_4: {
         parameters: {
             query?: {
                 /** @description 카테고리 슬러그. 없으면 전부 */
@@ -2626,7 +2656,7 @@ export interface operations {
             };
         };
     };
-    list_2: {
+    list_3: {
         parameters: {
             query: {
                 /** @description 기주 슬러그. 콤마로 여러 개 — **OR** */
@@ -2803,7 +2833,7 @@ export interface operations {
             };
         };
     };
-    list_1: {
+    list_2: {
         parameters: {
             query: {
                 /** @description 재료 카테고리 슬러그 (7종) */
@@ -2875,7 +2905,7 @@ export interface operations {
             };
         };
     };
-    list: {
+    list_1: {
         parameters: {
             query?: {
                 /** @description 생략하면 전체. 0 이면 기본 컬렉션(collection_id IS NULL) */
@@ -3002,6 +3032,32 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["MyProfile"];
+                };
+            };
+        };
+    };
+    list: {
+        parameters: {
+            query: {
+                /** @description 제품명 · 수입사의 일부 */
+                q?: string;
+                /** @description 식품유형 (위스키 · 리큐르 · 과실주 …) */
+                foodType?: string;
+                page: components["schemas"]["PageQuery"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProductListResponse"];
                 };
             };
         };

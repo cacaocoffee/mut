@@ -2669,3 +2669,43 @@ figcaption {
 .admin-products__pager {
   margin-top: var(--space-3);
 }
+
+/* ── 공개 유통 제품 목록 (이슈 205) ─────────────────────────────────────────── */
+.products-filter {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: var(--space-2);
+  align-items: end;
+  margin-top: var(--space-4);
+}
+.products-filter label {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--color-neutral-700);
+}
+.products-filter input,
+.products-filter select {
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--color-neutral-300);
+  background: var(--color-bg);
+  min-width: 0;
+}
+.products-table-wrap {
+  overflow-x: auto;
+  margin-top: var(--space-4);
+}
+.products-table-wrap .table td {
+  vertical-align: top;
+}
+.products-pager {
+  margin-top: var(--space-3);
+  font-size: 13px;
+  color: var(--color-neutral-700);
+}
+@media (max-width: 640px) {
+  .products-filter {
+    grid-template-columns: 1fr;
+  }
+}

@@ -5,7 +5,7 @@ import { CATEGORY_LABELS, INGREDIENTS, getIngredient, countsForStock } from "@mu
 import { ingredientDetail, ingredientSlugs, searchCorpus } from "@/lib/api";
 import { availabilityBadge, needsSubstituteCard } from "@/lib/ingredient-distribution";
 import { cocktailsUsingInCorpus } from "@/lib/ingredient-uses";
-import { INGREDIENTS_PATH } from "@/lib/routes";
+import { INGREDIENTS_PATH, PRODUCTS_PATH } from "@/lib/routes";
 import { CocktailCard } from "@/components/cocktail-card";
 
 /**
@@ -122,7 +122,8 @@ export default async function IngredientPage({ params }: PageProps<"/ingredients
             </h4>
           </div>
           <p className="lede" style={{ marginTop: 6 }}>
-            식약처 수입신고 기준입니다. 신고가 있었다는 뜻이고, 지금 팔리는지는 매장에서 확인하세요.
+            식약처 수입신고 기준입니다. 신고가 있었다는 뜻이고, 지금 팔리는지는 매장에서 확인하세요.{" "}
+            <Link href={`${PRODUCTS_PATH}?q=${encodeURIComponent(nameKo)}`}>전체 신고 제품에서 찾기 →</Link>
           </p>
           <ul className="ingredient-products__list">
             {detail.products.map((p) => (

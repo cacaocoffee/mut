@@ -6,12 +6,15 @@ import kr.mut.common.web.page.PageResponse
 import kr.mut.ingredient.domain.Ingredient
 import kr.mut.ingredient.domain.IngredientProductMatch
 import kr.mut.ingredient.domain.MatchStatus
+import kr.mut.ingredient.repository.DistributedProductRepository
 import kr.mut.ingredient.repository.IngredientProductMatchRepository
 import kr.mut.ingredient.repository.IngredientRepository
 import kr.mut.ingredient.web.BrandItem
 import kr.mut.ingredient.web.DistributedProductItem
 import kr.mut.ingredient.web.IngredientDetail
 import kr.mut.ingredient.web.IngredientItem
+import kr.mut.ingredient.web.ProductFoodType
+import kr.mut.ingredient.web.ProductListResponse
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -33,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional
 class IngredientDictionaryService(
     private val ingredients: IngredientRepository,
     private val matches: IngredientProductMatchRepository,
+    private val products: DistributedProductRepository,
 ) {
 
     /** 승인된 것만 나간다 (`FR-INGREDIENT-001` · DECISIONS §1.1). */
@@ -61,6 +65,33 @@ class IngredientDictionaryService(
         return ingredient.toDetail(approvedProducts)
     }
 
+
+    /** 공개 유통 제품 목록 (#205). 제품명·수입사 부분일치 + 식품유형, 최근 신고순. */
+    @Transactional(readOnly = true)
+    fun products(q: String?, foodType: String?, query: PageQuery): ProductListResponse {
+        val keyword = q?.trim()?.takeIf { it.isNotEmpty() }
+        val type = foodType?.trim()?.takeIf { it.isNotEmpty() }
+        val rows = products.browse(keyword, type, PageRequest.of(query.page, query.size))
+        val paged = PageResponse.of(
+            items = rows.map {
+                DistributedProductItem(
+                    nameKo = it.nameKo,
+                    nameEn = it.nameEn,
+                    importerOrMaker = it.importerOrMaker,
+                    originCountry = it.originCountry,
+                    foodType = it.foodType,
+                    lastReportedOn = it.lastReportedOn,
+                )
+            },
+            query = query,
+            totalElements = products.countBrowse(keyword, type),
+        )
+        return ProductListResponse(
+            items = paged.items,
+            page = paged.page,
+            foodTypes = products.countByFoodType().map { ProductFoodType(it[0] as String, it[1] as Long) },
+        )
+    }
 
     private fun approved(slug: String): Ingredient =
         ingredients.findBySlugAndIsApprovedTrue(slug) ?: throw ResourceNotFoundException()
