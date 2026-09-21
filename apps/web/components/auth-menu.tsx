@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { SAVED_PATH } from "@/lib/routes";
+import { ADMIN_PATH, SAVED_PATH } from "@/lib/routes";
 import { fetchProfile, startLogin, logout, type MyProfile } from "@/lib/auth-client";
 
 /**
@@ -41,8 +41,16 @@ export function AuthMenu() {
     );
   }
 
+  // 편집자·관리자에게만 어드민 입구 (#207). 판정은 서버가 한다 — 여기는 입구를 보여 줄지만 정한다 (SPEC-08 §2).
+  const isStaff = profile.roles.some((r) => r === "admin" || r === "editor");
+
   return (
     <div className="auth-menu">
+      {isStaff ? (
+        <Link href={ADMIN_PATH} className="btn auth-link auth-link--admin">
+          어드민
+        </Link>
+      ) : null}
       <Link href={SAVED_PATH} className="btn auth-link">
         내 저장
       </Link>

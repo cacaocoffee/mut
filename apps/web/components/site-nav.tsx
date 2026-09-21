@@ -9,6 +9,7 @@ import {
   ARTICLES_PATH,
   FINDER_PATH,
   HOME_PATH,
+  PRODUCTS_PATH,
   SEARCH_PATH,
   UNIFIED_SEARCH_PATH,
 } from "@/lib/routes";
@@ -61,11 +62,14 @@ export function SiteNav() {
   // (`FR-SEARCH-006`·`007`·`008`). 탭이 아니라 **아이콘**으로 연다 (#179) — 탭 셋은
   // 그대로 두고, 로그인 영역 옆에 돋보기 하나를 둔다. 재료·바·아티클을 한 번에 찾는 입구다.
   const tabs = [
-    { href: SEARCH_PATH, ko: "01 탐색", match: (p: string) => p === SEARCH_PATH },
-    { href: FINDER_PATH, ko: "02 파인더", match: (p: string) => p === FINDER_PATH },
+    { href: SEARCH_PATH, num: "01", ko: "탐색", match: (p: string) => p === SEARCH_PATH },
+    { href: FINDER_PATH, num: "02", ko: "파인더", match: (p: string) => p === FINDER_PATH },
     // 상세(`/articles/[slug]`)에서도 이 탭이 현재지다 — 목록의 잎사귀라서다. 칵테일 상세가
     // `01 탐색`에 불이 안 들어오는 것과 다른 이유: 저쪽은 카테고리·검색 여러 길로 들어온다.
-    { href: ARTICLES_PATH, ko: "03 아티클", match: (p: string) => p.startsWith(ARTICLES_PATH) },
+    { href: ARTICLES_PATH, num: "03", ko: "아티클", match: (p: string) => p.startsWith(ARTICLES_PATH) },
+    // 국내 유통 술 — 재료 사전과 달리 사용자가 직접 찾는 목적지라 탭이다 (#207). #179 의
+    // "탭 셋" 은 검색·재료를 탭으로 늘리지 않으려는 결정이었고 이 넷째는 그 뜻을 어기지 않는다.
+    { href: PRODUCTS_PATH, num: "04", ko: "유통 술", match: (p: string) => p === PRODUCTS_PATH },
   ];
 
   return (
@@ -85,6 +89,8 @@ export function SiteNav() {
             className="btn tab"
             aria-current={t.match(pathname) ? "page" : undefined}
           >
+            {/* 번호는 화면 순서다. 좁은 화면에선 CSS 가 접는다 — 넷이 한 줄에 들어가야 한다 (#207) */}
+            <span className="tab__num">{t.num} </span>
             {t.ko}
           </Link>
         ))}

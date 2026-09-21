@@ -118,7 +118,7 @@ export function IngredientDistributionForm({
         </Field>
         <Field
           label="브랜드 검색어"
-          hint="쉼표로 구분. 유통 제품명에서 이 재료를 찾을 때 씁니다 — 별명보다 좁게 (예: campari, 캄파리, 깜빠리)"
+          hint="쉼표로 구분. 유통 제품명에서 이 재료를 찾을 때 씁니다 — 별명보다 좁게 (예: 캄파리, campari)"
         >
           <input value={form.brandKeywords} onChange={(e) => set("brandKeywords", e.target.value)} />
         </Field>

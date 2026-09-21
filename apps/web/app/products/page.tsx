@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { PageLinks } from "@/components/page-links";
 import { products } from "@/lib/api";
 import { PRODUCTS_PATH } from "@/lib/routes";
 
@@ -71,7 +71,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       <form className="products-filter" action={PRODUCTS_PATH} method="get">
         <label>
           제품명 · 수입사
-          <input name="q" defaultValue={q} placeholder="깜빠리, Laphroaig, 트랜스베버리지 …" />
+          <input name="q" defaultValue={q} placeholder="캄파리, Laphroaig, 트랜스베버리지 …" />
         </label>
         <label>
           유형
@@ -96,7 +96,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       ) : items.length === 0 ? (
         <div className="empty-state">
           <h3>맞는 제품이 없습니다</h3>
-          <p>표기가 다를 수 있습니다 — 캄파리는 &ldquo;깜빠리&rdquo;로, 영문명으로도 찾아 보세요.</p>
+          <p>수입사마다 표기가 다릅니다 — 영문명으로도 찾아 보세요.</p>
         </div>
       ) : (
         <div className="products-table-wrap">
@@ -128,14 +128,14 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         </div>
       )}
 
-      {meta && meta.totalPages > 1 ? (
-        <p className="products-pager">
-          {page > 0 ? <Link href={href(page - 1)}>← 이전</Link> : <span>← 이전</span>}
-          {" · "}
-          {page + 1} / {meta.totalPages.toLocaleString()}
-          {" · "}
-          {page + 1 < meta.totalPages ? <Link href={href(page + 1)}>다음 →</Link> : <span>다음 →</span>}
-        </p>
+      {meta ? (
+        <PageLinks
+          page={page}
+          totalPages={meta.totalPages}
+          totalElements={meta.totalElements}
+          size={meta.size}
+          href={href}
+        />
       ) : null}
     </main>
   );
