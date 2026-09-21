@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { PageLinks } from "@/components/page-links";
 import { requireAdmin } from "@/lib/admin-session";
 import { adminProducts } from "@/lib/admin-api";
 
@@ -50,7 +50,7 @@ export default async function AdminProducts({
       <form className="admin-form__grid" action="/admin/products" method="get">
         <label className="admin-field">
           <span className="admin-field__label">제품명 · 수입사</span>
-          <input name="q" defaultValue={q} placeholder="깜빠리, CAMPARI, 트랜스베버리지 …" />
+          <input name="q" defaultValue={q} placeholder="캄파리, CAMPARI, 트랜스베버리지 …" />
         </label>
         <label className="admin-field">
           <span className="admin-field__label">식품유형</span>
@@ -107,14 +107,14 @@ export default async function AdminProducts({
         </div>
       )}
 
-      {meta && meta.totalPages > 1 ? (
-        <p className="admin-field__hint admin-products__pager">
-          {page > 0 ? <Link href={href(page - 1)}>← 이전</Link> : <span>← 이전</span>}
-          {" · "}
-          {page + 1} / {meta.totalPages}
-          {" · "}
-          {page + 1 < meta.totalPages ? <Link href={href(page + 1)}>다음 →</Link> : <span>다음 →</span>}
-        </p>
+      {meta ? (
+        <PageLinks
+          page={page}
+          totalPages={meta.totalPages}
+          totalElements={meta.totalElements}
+          size={meta.size}
+          href={href}
+        />
       ) : null}
     </>
   );

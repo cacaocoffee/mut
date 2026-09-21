@@ -170,6 +170,10 @@
   background: transparent;
   color: var(--color-text);
 }
+/* 어드민 입구는 편집자·관리자에게만 뜬다 — 다른 링크와 구분되게 액센트 (#207). */
+.auth-link--admin {
+  color: var(--color-accent-700);
+}
 /* 로그아웃은 한 단 더 물러선다 — 자주 누르는 것이 아니다. */
 .auth-link--muted {
   font-size: 12px;
@@ -2524,7 +2528,8 @@ figcaption {
   border-bottom-color: var(--color-accent);
   font-weight: var(--font-heading-weight);
 }
-.pager__step:disabled {
+.pager__step:disabled,
+.pager__step--off {
   opacity: 0.35;
   cursor: default;
 }
@@ -2666,9 +2671,6 @@ figcaption {
 .admin-products .table td {
   vertical-align: top;
 }
-.admin-products__pager {
-  margin-top: var(--space-3);
-}
 
 /* ── 공개 유통 제품 목록 (이슈 205) ─────────────────────────────────────────── */
 .products-filter {
@@ -2699,13 +2701,20 @@ figcaption {
 .products-table-wrap .table td {
   vertical-align: top;
 }
-.products-pager {
-  margin-top: var(--space-3);
-  font-size: 13px;
-  color: var(--color-neutral-700);
-}
 @media (max-width: 640px) {
   .products-filter {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ── 내비 탭 넷 (이슈 207) — 좁은 화면에서 번호를 접고 여백을 줄여 한 줄에 둔다 ──
+   #180 이 "내려가면 탭 줄만 남는다(90px 미만)" 를 지키려면 탭이 두 줄로 접히면 안 된다. */
+@media (max-width: 840px) {
+  .site-nav .tab {
+    padding-left: var(--space-2);
+    padding-right: var(--space-2);
+  }
+  .site-nav .tab__num {
+    display: none;
   }
 }

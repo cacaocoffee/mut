@@ -43,3 +43,6 @@ export const PRODUCTS_PATH = "/products";
  * **색인하지 않는다**(`noindex`) — 사람마다 내용이 다르고, 로그인 세션이 있어야 뜬다.
  */
 export const SAVED_PATH = "/saved";
+
+/** 어드민 입구. 편집자·관리자에게만 내비에 보인다 (#207). */
+export const ADMIN_PATH = "/admin";
