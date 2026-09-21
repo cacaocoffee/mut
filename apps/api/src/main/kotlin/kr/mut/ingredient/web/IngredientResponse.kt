@@ -1,6 +1,7 @@
 package kr.mut.ingredient.web
 
 import java.math.BigDecimal
+import java.time.LocalDate
 
 /**
  * 재료 사전 응답 (ISSUE-023 · `FR-INGREDIENT-002`·`005`).
@@ -46,6 +47,25 @@ data class IngredientDetail(
     val substituteNote: String?,
     val priceBand: String?,
     val brands: List<BrandItem>,
+
+    /**
+     * 승인된 유통 제품 가운데 가장 늦은 신고일 (#196 · G-41). 화면의 "국내 유통 · 최근 신고 YYYY-MM" 배지가 쓴다.
+     * "신고가 있었다" 까지만 말한다 — 재고 소진·판매 중단은 모른다.
+     */
+    val lastReportedOn: LocalDate?,
+
+    /** 승인된 유통 제품. 제품명·수입사만 — 구매 링크·가격은 `NFR-L-05` 자문 뒤다. */
+    val products: List<DistributedProductItem>,
+)
+
+/** 식약처 신고 제품 요약. 구매 링크와 가격 필드가 **없는 것이 의도**다 (`NFR-L-05`). */
+data class DistributedProductItem(
+    val nameKo: String,
+    val nameEn: String?,
+    val importerOrMaker: String?,
+    val originCountry: String?,
+    val foodType: String,
+    val lastReportedOn: LocalDate?,
 )
 
 /**
