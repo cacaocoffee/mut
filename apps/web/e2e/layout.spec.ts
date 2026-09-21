@@ -113,9 +113,9 @@ test.describe("내비 탭 (ISSUE-051 · ISSUE-055)", () => {
     // 탐색 · 파인더 · 아티클. 탭이 늘면 320px 에서 가장 먼저 무너지는 자리라 개수를
     // 여기 적어 둔다 — 늘릴 때 이 줄을 고치며 한 번 더 재게 된다.
     const tabs = page.locator(".tab");
-    await expect(tabs).toHaveCount(3);
+    await expect(tabs).toHaveCount(4);
 
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 4; i++) {
       const lines = await tabs.nth(i).evaluate((el) => el.getClientRects().length);
       const text = await tabs.nth(i).innerText();
       expect(lines, `"${text.replace(/\n/g, " ")}" 이 ${lines}줄이다`).toBe(1);
@@ -206,10 +206,13 @@ test("데스크톱은 스크롤해도 헤더가 그대로다 (#180)", async ({ p
   expect((await nav.boundingBox())!.height).toBe(before);
 });
 
-/** #179 — 통합 검색과 재료 사전은 탭이 아니라 아이콘·바닥글로 연다. 탭 셋은 그대로다. */
+/** #179 — 통합 검색과 재료 사전은 탭이 아니라 아이콘·바닥글로 연다. #207 이 국내 유통 술을 넷째 탭으로 더했다. */
 test("통합 검색 아이콘과 재료 사전 링크가 있다 (#179)", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(".tab")).toHaveCount(3);
+  await expect(page.locator(".tab")).toHaveCount(4);
+  await expect(page.locator(".tab").nth(3)).toHaveText("04 유통 술");
+  // 비로그인엔 어드민 입구가 없다 (#207)
+  await expect(page.getByRole("link", { name: "어드민" })).toHaveCount(0);
 
   await page.getByRole("link", { name: "통합 검색" }).click();
   await expect(page).toHaveURL(/\/search$/);
