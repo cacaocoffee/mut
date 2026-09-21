@@ -284,7 +284,7 @@ test("RED16 - 세 가지 밖의 액션이 없다", async ({ page }) => {
 
   const events = await flushed(page, batches, "recipe_interact", 2);
   for (const event of events) {
-    expect(["servings_change", "unit_toggle", "substitute_open"]).toContain(payloadOf(event).action);
+    expect(["servings_change", "unit_toggle", "substitute_open", "products_open"]).toContain(payloadOf(event).action);
   }
   // 접는 것은 세지 않는다 — 같은 관심의 뒷면이라 두 번 세면 부풀린다
   expect(events.filter((e) => payloadOf(e).action === "substitute_open").length).toBe(1);

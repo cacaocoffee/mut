@@ -58,7 +58,7 @@ export function finderStep(payload: FinderStepPayload) {
 }
 
 /** 상세에서 만질 수 있는 것 셋. 이 밖은 없다 (SPEC-10 §4.5). */
-export type RecipeAction = "servings_change" | "unit_toggle" | "substitute_open";
+export type RecipeAction = "servings_change" | "unit_toggle" | "substitute_open" | "products_open";
 
 export interface RecipeInteractPayload {
   cocktailSlug: string;
