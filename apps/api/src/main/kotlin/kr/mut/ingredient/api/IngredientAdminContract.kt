@@ -2,6 +2,8 @@ package kr.mut.ingredient.api
 
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
+import kr.mut.common.web.page.PageMeta
+import kr.mut.common.web.page.PageQuery
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -80,6 +82,9 @@ interface IngredientAdminFacade {
 
     /** 재거절은 409. */
     fun rejectMatch(id: Long, matchId: Long): IngredientProductMatchResponse
+
+    /** 유통 제품 목록 (#203). 제품명·수입사 부분일치와 식품유형으로 거른다. 최근 신고순. */
+    fun browseProducts(q: String?, foodType: String?, page: PageQuery): DistributedProductPage
 }
 
 /** `Size` 상한은 `V008__ingredient.sql` 의 컬럼 길이와 같다 — 어긋나면 DB 가 500 으로 막는다. */
@@ -140,6 +145,15 @@ data class DistributedProductSummary(
     val originCountry: String?,
     val foodType: String,
     val lastReportedOn: LocalDate?,
+)
+
+/** 유형별 건수 — 목록 화면의 select 선택지. */
+data class FoodTypeCount(val foodType: String, val count: Long)
+
+data class DistributedProductPage(
+    val items: List<DistributedProductSummary>,
+    val page: PageMeta,
+    val foodTypes: List<FoodTypeCount>,
 )
 
 data class IngredientProductMatchResponse(

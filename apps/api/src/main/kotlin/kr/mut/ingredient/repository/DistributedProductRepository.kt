@@ -22,4 +22,37 @@ interface DistributedProductRepository : JpaRepository<DistributedProduct, Long>
         """,
     )
     fun searchByName(@Param("keyword") keyword: String, pageable: Pageable): List<DistributedProduct>
+
+    /**
+     * 어드민 목록 (#203). 제품명(한/영)·수입사 부분일치 + 식품유형. 최근 신고순.
+     * `cast(:q as string)` — null 일 때 Postgres 가 bytea 로 추론하는 것을 막는다 (IngredientRepository 와 같은 이유).
+     */
+    @Query(
+        """
+        SELECT p FROM DistributedProduct p
+         WHERE (:q IS NULL
+                OR lower(p.nameKo) LIKE lower(concat('%', cast(:q as string), '%'))
+                OR lower(p.nameEn) LIKE lower(concat('%', cast(:q as string), '%'))
+                OR lower(p.importerOrMaker) LIKE lower(concat('%', cast(:q as string), '%')))
+           AND (:foodType IS NULL OR p.foodType = :foodType)
+         ORDER BY p.lastReportedOn DESC NULLS LAST, p.id DESC
+        """,
+    )
+    fun browse(@Param("q") q: String?, @Param("foodType") foodType: String?, pageable: Pageable): List<DistributedProduct>
+
+    @Query(
+        """
+        SELECT count(p) FROM DistributedProduct p
+         WHERE (:q IS NULL
+                OR lower(p.nameKo) LIKE lower(concat('%', cast(:q as string), '%'))
+                OR lower(p.nameEn) LIKE lower(concat('%', cast(:q as string), '%'))
+                OR lower(p.importerOrMaker) LIKE lower(concat('%', cast(:q as string), '%')))
+           AND (:foodType IS NULL OR p.foodType = :foodType)
+        """,
+    )
+    fun countBrowse(@Param("q") q: String?, @Param("foodType") foodType: String?): Long
+
+    /** 유형 select 의 선택지. 시드에 실제로 있는 유형과 건수. */
+    @Query("SELECT p.foodType, count(p) FROM DistributedProduct p GROUP BY p.foodType ORDER BY count(p) DESC")
+    fun countByFoodType(): List<Array<Any>>
 }
