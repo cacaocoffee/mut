@@ -52,6 +52,33 @@ interface DistributedProductRepository : JpaRepository<DistributedProduct, Long>
     )
     fun countBrowse(@Param("q") q: String?, @Param("foodType") foodType: String?): Long
 
+    /**
+     * 제품명(한/영)만 본다 — 수입사는 안 본다 (#209 후속). 레시피 줄에서 "캄파리" 를 찾을 때
+     * 수입사 "캄파리코리아" 가 들여온 와일드터키가 섞여 나왔다.
+     */
+    @Query(
+        """
+        SELECT p FROM DistributedProduct p
+         WHERE (:q IS NULL
+                OR lower(p.nameKo) LIKE lower(concat('%', cast(:q as string), '%'))
+                OR lower(p.nameEn) LIKE lower(concat('%', cast(:q as string), '%')))
+           AND (:foodType IS NULL OR p.foodType = :foodType)
+         ORDER BY p.lastReportedOn DESC NULLS LAST, p.id DESC
+        """,
+    )
+    fun browseByName(@Param("q") q: String?, @Param("foodType") foodType: String?, pageable: Pageable): List<DistributedProduct>
+
+    @Query(
+        """
+        SELECT count(p) FROM DistributedProduct p
+         WHERE (:q IS NULL
+                OR lower(p.nameKo) LIKE lower(concat('%', cast(:q as string), '%'))
+                OR lower(p.nameEn) LIKE lower(concat('%', cast(:q as string), '%')))
+           AND (:foodType IS NULL OR p.foodType = :foodType)
+        """,
+    )
+    fun countBrowseByName(@Param("q") q: String?, @Param("foodType") foodType: String?): Long
+
     /** 유형 select 의 선택지. 시드에 실제로 있는 유형과 건수. */
     @Query("SELECT p.foodType, count(p) FROM DistributedProduct p GROUP BY p.foodType ORDER BY count(p) DESC")
     fun countByFoodType(): List<Array<Any>>

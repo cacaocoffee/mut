@@ -26,6 +26,9 @@ class ProductListApiTest : IngredientApiSupport() {
                 .doesNotContain("id", "source", "purchaseUrl", "price", "priceBand")
 
             assertThat(itemsOf(mvc.get("$PRODUCTS?q=importer-a").andReturn())).hasSize(2)
+            // scope=name — 수입사는 안 본다. 레시피 줄의 "캄파리" 에 캄파리코리아의 와일드터키가 섞이지 않게 (#209)
+            assertThat(itemsOf(mvc.get("$PRODUCTS?q=importer-a&scope=name").andReturn())).isEmpty()
+            assertThat(itemsOf(mvc.get("$PRODUCTS?q=pubprod-test&scope=name").andReturn())).hasSize(3)
             assertThat(itemsOf(mvc.get("$PRODUCTS?q=pubprod-test&foodType=리큐르").andReturn()).map { it["nameKo"] })
                 .containsExactly("pubprod-test 리큐르")
 

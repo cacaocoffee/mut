@@ -14,7 +14,8 @@ export async function GET(request: Request): Promise<Response> {
   }
 
   try {
-    const res = await fetch(`${BASE}/api/v1/products?q=${encodeURIComponent(q)}&size=${size}`, {
+    // 제품명만 본다 — 수입사명까지 보면 "캄파리" 에 캄파리코리아의 다른 술이 섞인다
+    const res = await fetch(`${BASE}/api/v1/products?q=${encodeURIComponent(q)}&size=${size}&scope=name`, {
       next: { revalidate: 600 },
     });
     return new Response(await res.text(), {

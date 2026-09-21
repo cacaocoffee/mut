@@ -3986,6 +3986,14 @@
             "type" : "string"
           }
         }, {
+          "description" : "name 이면 제품명만 본다 (수입사 제외). 기본은 제품명·수입사 둘 다",
+          "in" : "query",
+          "name" : "scope",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
           "in" : "query",
           "name" : "page",
           "required" : true,
