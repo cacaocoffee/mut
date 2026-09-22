@@ -87,9 +87,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <SiteNav />
           {/* 지나온 화면을 적어 둔다 — `cocktail_view.entryPoint` 가 이것을 본다 (이슈 035) */}
           <PathRecorder />
-          <div id="main" tabIndex={-1}>
-            {children}
-          </div>
+          {/* 건너뛸 목적지. children 을 감싸면 DOM 층이 하나 늘어 화면 CSS 와
+              테스트의 선택자 문맥이 바뀌므로, 자리만 표시하는 빈 앵커를 둔다 */}
+          <div id="main" tabIndex={-1} />
+          {children}
           {/* NFR-L-01 — 모든 페이지 하단 고정. 배포 차단 조건이다.
               루트 레이아웃에 무조건 렌더한다: 페이지마다 붙이면 언젠가 빠뜨리고,
               빠뜨린 것을 알아채는 방법이 없다. 컴포넌트에 끌 수 있는 prop 도 없다. */}
