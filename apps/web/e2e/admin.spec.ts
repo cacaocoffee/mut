@@ -151,8 +151,10 @@ test("RED18,19 - packages/ui 토큰을 쓰고 시안을 고치지 않았다", ()
   const adminBlock = css.slice(css.indexOf("── 어드민 (ISSUE-045)"));
 
   expect(adminBlock.length, "어드민 스타일이 없다").toBeGreaterThan(100);
-  // 색을 직접 적지 않고 토큰으로만 쓴다
-  expect(adminBlock, "hex 를 직접 적었다").not.toMatch(/#[0-9a-fA-F]{3,6}\b/);
+  // 색을 직접 적지 않고 토큰으로만 쓴다. 주석은 뺀다 — `#180` 같은 이슈 번호가
+  // hex 로 잡혀 선언에는 색이 없는데도 걸렸다 (#207 에서 들어왔다)
+  const declarations = adminBlock.replace(/\/\*[\s\S]*?\*\//g, "");
+  expect(declarations, "hex 를 직접 적었다").not.toMatch(/#[0-9a-fA-F]{3,6}\b/);
 });
 
 // ── ISSUE-047 : 편집 화면 ─────────────────────────────────────────────────
