@@ -206,7 +206,7 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
               브라우저에서 한 번 보낸다 (이슈 035). */}
           <TrackCocktailView slug={c.slug} />
 
-          <h4 className="section-head">제조 순서</h4>
+          <h2 className="section-head">제조 순서</h2>
           <ol style={{ listStyle: "none", margin: 0, padding: 0 }}>
             {c.steps.map((text, i) => (
               <li className="step" key={text}>
@@ -221,7 +221,7 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
           {/* `GATE-COCKTAIL-01` 이 발행 필수로 만든 블록이다 — `PRIN-P03` 의 핵심. */}
           {c.tastingNote && (
             <>
-              <h4 className="section-head section-head--flush">향과 맛</h4>
+              <h2 className="section-head section-head--flush">향과 맛</h2>
               <p className="summary">{c.tastingNote}</p>
               <div className="tag-row">
                 {c.aromaTags.map((tag) => (
@@ -235,8 +235,8 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
 
           {c.profile && (
             <>
-              <h4 className="section-head">맛 프로필</h4>
-              <FlavorRadar profile={c.profile as [number, number, number, number, number]} title={c.nameKo} />
+              <h2 className="section-head">맛 프로필</h2>
+              <FlavorRadar profile={c.profile as [number, number, number, number, number]} />
               <div style={{ borderTop: "2px solid var(--color-divider)" }}>
                 {c.profile.map((v, i) => (
                   <div className="profile-row" key={AXES[i]}>
@@ -253,7 +253,7 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
 
           {c.origin && (
             <>
-              <h4 className="section-head">기록</h4>
+              <h2 className="section-head">기록</h2>
               <table className="table">
                 <tbody>
                   {[
@@ -308,7 +308,7 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
               <div
                 style={{ marginTop: 24, borderTop: "2px solid var(--color-divider)", paddingTop: 16 }}
               >
-                <h6 style={{ margin: "0 0 10px" }}>같은 기주</h6>
+                <h3 className="related-head">같은 기주</h3>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   {related.map((r) => (
                     <Link key={r.slug} href={`/cocktails/${r.slug}`} className="btn related-link">
@@ -330,7 +330,7 @@ export default async function CocktailDetailPage({ params }: PageProps<"/cocktai
           한쪽만 이어져 있으면 읽던 사람이 되돌아올 길이 없다. */}
       {stories.length > 0 && (
         <section>
-          <h4 className="section-head">이 칵테일의 아티클</h4>
+          <h2 className="section-head">이 칵테일의 아티클</h2>
           <div style={{ display: "flex", flexDirection: "column" }}>
             {stories.map((a) => (
               <Link key={a.slug} href={`/articles/${a.slug}`} className="btn related-link">

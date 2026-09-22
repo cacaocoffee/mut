@@ -173,14 +173,22 @@ export function ArticleForm({ article }: Props) {
             ))}
           </select>
         </label>
-        <label className="admin-field">
+        {/* label 이 아니라 div 다 — 안에 파일 고르기 label 이 또 있어, 라벨 하나가
+            입력 둘을 가리키면 눌렀을 때 어느 쪽이 잡힐지 브라우저마다 갈린다 */}
+        <div className="admin-field">
           <span>대표 사진</span>
           {form.hero ? (
             // eslint-disable-next-line @next/next/no-img-element -- 편집기 미리보기라 next/image 를 쓰지 않는다
             <img className="block-editor__preview" src={form.hero} alt="" width={320} height={240} loading="lazy" />
           ) : null}
           <div className="admin-field__row">
-            <input className="input" value={form.hero} onChange={(e) => set("hero", e.target.value)} placeholder="올리거나 주소를 붙여넣기" />
+            <input
+              className="input"
+              aria-label="대표 사진 주소"
+              value={form.hero}
+              onChange={(e) => set("hero", e.target.value)}
+              placeholder="올리거나 주소를 붙여넣기"
+            />
             <label className="btn">
               사진 올리기
               <input
@@ -197,7 +205,7 @@ export function ArticleForm({ article }: Props) {
               />
             </label>
           </div>
-        </label>
+        </div>
         <label className="admin-field admin-field--wide">
           <span>요약 (dek) — 카드·검색에 쓰는 한두 문장</span>
           <textarea className="input" rows={2} value={form.dek} onChange={(e) => set("dek", e.target.value)} />

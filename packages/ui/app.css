@@ -25,6 +25,28 @@
    줄바꿈은 배치 문제라 시안 토큰이 아니라 이 층에 둔다 (ADR-0001 결정 2). */
 body { overflow-wrap: anywhere; }
 
+/* 본문 바로가기. 화면 밖에 두고 Tab 으로 포커스가 닿을 때만 내려온다.
+   `display: none` 이나 `visibility: hidden` 은 포커스 자체를 막아 링크가 죽는다.
+   `#main` 은 tabIndex={-1} 이라 눌렀을 때 포커스가 본문으로 실제로 옮겨간다 */
+.skip-link {
+  position: absolute;
+  left: var(--space-4);
+  top: -60px;
+  z-index: 100;
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-bg);
+  border: 2px solid var(--color-accent);
+  color: var(--color-accent-700);
+  font-weight: 700;
+  text-decoration: none;
+}
+.skip-link:focus-visible {
+  top: var(--space-2);
+}
+#main:focus {
+  outline: none;
+}
+
 /* — 페이지 골격 — */
 .page {
   /* dvh — 모바일 주소창이 접히면 100vh 가 화면보다 커진다 */
@@ -224,6 +246,14 @@ body { overflow-wrap: anywhere; }
   margin: 34px 0 0;
   padding-bottom: 12px;
   border-bottom: 2px solid var(--color-divider);
+}
+/* 크기를 헤딩일 때만 박는다 — 상세의 섹션 머리가 h4 에서 h2 로 올라갔기 때문이다
+   (문서 구조를 h1→h2 로 이으려고). 20px 은 h4 가 갖던 값이라 보이는 것은 그대로다.
+   `.section-head` 를 껍데기 div·section 으로 쓰는 자리(재료 사전·분류 목록)는
+   안에 자기 h4 를 담고 있어 여기 걸리지 않는다 */
+h2.section-head,
+h3.section-head {
+  font-size: 20px;
 }
 /* 단 맨 위 칸은 위 여백이 없다 — 섹션이 이미 그리드 간격 뒤에 온다 */
 .section-head--flush {
@@ -834,6 +864,17 @@ a.saved-item__title:hover {
   padding: 0;
   font-size: 16px;
 }
+/* 레시피에서 제일 자주 눌리는 자리다. 손가락으로는 34×32 가 작아 터치 기기에서만 키운다 */
+@media (pointer: coarse) {
+  .stepper button {
+    width: 44px;
+    height: 44px;
+  }
+  .recipe-controls .seg-opt {
+    min-height: 44px;
+    padding-inline: 16px;
+  }
+}
 .stepper .value {
   min-width: 104px;
   text-align: center;
@@ -1035,6 +1076,17 @@ a.saved-item__title:hover {
   padding-right: 0.12em;
   color: var(--color-accent-700);
 }
+/* 원래 h6 였다 — 문서 구조를 h2(스토리) 아래로 잇느라 h3 으로 올렸다.
+   h6 이 갖던 13px 대문자 모양을 여기서 그대로 재현해 보이는 것은 그대로 둔다 */
+.related-head {
+  margin: 0 0 10px;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-weight: 700;
+}
+
 .related-link {
   justify-content: space-between;
   width: 100%;
@@ -1047,9 +1099,14 @@ a.saved-item__title:hover {
 .related-link:hover {
   color: var(--color-accent-700);
 }
+/* 칵테일 이름은 구별 정보라 단어 중간에서 끊지 않는다 — 전역 anywhere 를 여기서만
+   되돌린다 (`Corpse Reviver No.2` 가 `Corpse Revi / ver` 로 갈라졌다) */
 .related-link .name {
   font-weight: 800;
   font-size: 15px;
+  min-width: 0;
+  overflow-wrap: normal;
+  word-break: keep-all;
 }
 .related-link .name span {
   font-weight: 400;
@@ -1062,6 +1119,8 @@ a.saved-item__title:hover {
   font-size: 12px;
   font-variant-numeric: tabular-nums;
   color: var(--color-neutral-700);
+  flex: none;
+  white-space: nowrap;
 }
 
 /* ┌─ 아티클 — 목록 카드와 본문 (ADR-0010) ──────────────────────────────────┐
@@ -1079,6 +1138,21 @@ a.saved-item__title:hover {
   text-decoration: none;
   text-align: left;
 }
+/* 제휴 콘텐츠 고지 (`NFR-L-02` · 배포 차단). 분류 옆에 붙지만 분류가 아니다 —
+   테두리로 떼어 놓지 않으면 「칵테일 · 제휴 콘텐츠」가 한 덩어리로 읽힌다.
+   축소하거나 흐리게 하는 변경은 라벨을 끄는 것과 같다 (PRIN-P02). */
+.sponsored-label {
+  display: inline-block;
+  margin-left: var(--space-2);
+  padding: 1px 6px;
+  border: 1px solid currentColor;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  color: var(--color-accent-700);
+}
+
 .article-card__kicker {
   display: block;
   margin-top: 14px;
@@ -1181,6 +1255,20 @@ a.saved-item__title:hover {
   color: var(--color-neutral-700);
   border-bottom: 2px solid transparent;
   cursor: pointer;
+}
+
+/* 색인 띠·쪽 버튼이 22px·11px 이라 손가락으로는 옆 항목을 누르게 된다.
+   밑줄이 선택 표시라 높이를 늘리면 글자에서 멀어지므로, 터치 기기에서만
+   좌우 여백과 최소 높이를 준다 — 밑줄 위치는 그대로 둔다 */
+@media (pointer: coarse) {
+  .article-index__btn,
+  .article-pagenav__btn {
+    min-height: 44px;
+    padding-inline: var(--space-3);
+  }
+  .article-pagenav__btn {
+    min-width: 44px;
+  }
 }
 .article-pagenav__btn:disabled {
   opacity: 0.35;
@@ -2708,6 +2796,16 @@ figcaption {
   overflow-x: auto;
   margin-top: var(--space-4);
 }
+/* 제품명(한글+영문 두 줄)·수입사명이 길어 min-content 바닥이 컨테이너를 밀어낸다.
+   560px 이하에만 걸려 있던 fixed 를 이 표에는 폭과 무관하게 적용한다 —
+   태블릿 세로(561~840px)에서 같은 증상이 남아 있었다 */
+.products-table-wrap .table {
+  table-layout: fixed;
+}
+.products-table-wrap .table td,
+.products-table-wrap .table th {
+  overflow-wrap: anywhere;
+}
 .products-table-wrap .table td {
   vertical-align: top;
 }
@@ -2747,6 +2845,13 @@ figcaption {
   color: var(--color-accent-700);
   text-decoration-color: var(--color-accent);
 }
+/* 「찾는 중…」 한 줄에서 목록 다섯 줄로 부풀면 그 아래 재료 줄과 제조 순서가
+   통째로 밀려, 방금 누른 줄이 시야에서 사라진다. 기다리는 동안만 자리를 잡아 둔다 —
+   결과가 오면 실제 높이를 쓰므로 한 건일 때 빈 공간이 남지 않는다 */
+.ingredient-products-note dd[aria-busy="true"] {
+  min-height: 132px;
+}
+
 .ingredient-products-note__list {
   list-style: none;
   margin: 0 0 var(--space-2);

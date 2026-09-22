@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import type { ArticleCategory } from "@mut/domain";
 import { ARTICLE_CATEGORY_KO } from "@mut/domain";
 import { ARTICLES_PATH } from "@/lib/routes";
+import { SponsoredLabel } from "@/components/legal/sponsored-label";
 
 /**
  * 목록 카드가 쓰는 것만 받는다 — 본문(`blocks`)까지 클라이언트에 실을 이유가 없다.
@@ -36,21 +37,35 @@ const PAGE_SIZE = 14;
  * 필터는 칩이 아니라 잡지 색인 띠다 — 고른 항목에 밑줄이 남는다.
  */
 export function ArticleList({ articles }: { articles: ArticleCardData[] }) {
-  const [cat, setCat] = useState<ArticleCategory | "all">("all");
-  const [page, setPage] = useState(1);
+  // 분류·쪽을 주소에 적는다. useState 에만 두면 8쪽에서 글을 열고 뒤로 왔을 때
+  // 전체 1쪽으로 돌아간다 — 143편을 훑는 흐름이 매번 끊긴다. 공유도 안 됐다.
+  const router = useRouter();
+  const params = useSearchParams();
+  const cat = (params.get("cat") ?? "all") as ArticleCategory | "all";
+  const page = Number(params.get("page") ?? 1) || 1;
 
   const filtered = cat === "all" ? articles : articles.filter((a) => a.category === cat);
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const current = Math.min(page, pageCount);
   const shown = filtered.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
 
+  /** 기본값(전체·1쪽)은 주소에 적지 않는다 — `/articles` 가 그대로 남는다 */
+  function write(nextCat: ArticleCategory | "all", nextPage: number) {
+    const q = new URLSearchParams();
+    if (nextCat !== "all") q.set("cat", nextCat);
+    if (nextPage > 1) q.set("page", String(nextPage));
+    const qs = q.toString();
+    // replace 가 아니라 push 다 — 8쪽에서 글을 열고 뒤로 가면 8쪽이 나와야 하고,
+    // 그러려면 쪽을 넘긴 것이 브라우저 기록에 쌓여야 한다
+    router.push(qs ? `${ARTICLES_PATH}?${qs}` : ARTICLES_PATH, { scroll: false });
+  }
+
   function selectCategory(next: ArticleCategory | "all") {
-    setCat(next);
-    setPage(1);
+    write(next, 1);
   }
 
   function goTo(next: number) {
-    setPage(next);
+    write(cat, next);
     window.scrollTo({ top: 0 });
   }
 
@@ -98,10 +113,12 @@ export function ArticleList({ articles }: { articles: ArticleCardData[] }) {
                 height={600}
               />
             </div>
-            {/* 협찬 글 표기는 데이터 플래그로만 켜진다 — 끌 수 없다 (`NFR-L-02` · 배포 차단) */}
+            {/* 협찬 글 표기는 데이터 플래그로만 켜진다 — 끌 수 없다 (`NFR-L-02` · 배포 차단).
+                분류와 한 덩어리로 이어 붙이면 「칵테일 · 제휴 콘텐츠」가 분류 이름처럼 읽힌다.
+                고지는 분류가 아니므로 SponsoredLabel 로 떼어 놓는다 */}
             <span className="article-card__kicker">
               {ARTICLE_CATEGORY_KO[a.category]}
-              {a.isSponsored && " · 제휴 콘텐츠"}
+              <SponsoredLabel isSponsored={!!a.isSponsored} />
             </span>
             <h3 className="article-card__title">{a.title}</h3>
             <p className="article-card__dek">{a.dek}</p>

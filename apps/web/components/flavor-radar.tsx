@@ -17,17 +17,18 @@ function ring(step: number): string {
   ).join(" ");
 }
 
-export function FlavorRadar({ profile, title }: { profile: Profile; title: string }) {
+export function FlavorRadar({ profile }: { profile: Profile }) {
   const dots = profile.map((v, i) => {
     const [x, y] = point(i, v);
     return { x: Math.round(x), y: Math.round(y) };
   });
 
   return (
+    /* 화면에 읽히지 않는다 — 바로 아래 `.profile-row` 목록이 축 이름과 `n/5` 를
+       글자로 주므로, 차트까지 읽으면 같은 값을 두 번 듣게 된다 */
     <svg
       viewBox="0 0 260 250"
-      role="img"
-      aria-label={`${title} 맛 프로필 레이더 차트`}
+      aria-hidden="true"
       style={{ width: "100%", height: "auto", overflow: "visible", marginTop: 12 }}
     >
       {[1, 2, 3, 4, 5].map((k) => (

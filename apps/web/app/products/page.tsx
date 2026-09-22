@@ -105,15 +105,19 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           <p>수입사마다 표기가 다릅니다 — 영문명으로도 찾아 보세요.</p>
         </div>
       ) : (
-        <div className="products-table-wrap">
+        // 가로로 넘칠 때 마우스·터치로만 밀 수 있으면 키보드로는 오른쪽 열을 볼 방법이
+        // 없다. 스크롤 영역에 포커스를 주면 방향키로 밀 수 있다
+        <div className="products-table-wrap" tabIndex={0} role="region" aria-label="유통 제품 표">
           <table className="table">
             <thead>
+              {/* table-layout: fixed 라 이 폭이 그대로 열 폭이 된다 —
+                  제품명이 한글+영문 두 줄이라 가장 넓게 준다 */}
               <tr>
-                <th>제품명</th>
-                <th>수입사</th>
-                <th>제조국</th>
-                <th>유형</th>
-                <th>마지막 신고</th>
+                <th style={{ width: "32%" }}>제품명</th>
+                <th style={{ width: "24%" }}>수입사</th>
+                <th style={{ width: "12%" }}>제조국</th>
+                <th style={{ width: "16%" }}>유형</th>
+                <th style={{ width: "16%" }}>마지막 신고</th>
               </tr>
             </thead>
             <tbody>

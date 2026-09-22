@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { ArticleList } from "@/components/article-list";
 import { listArticles } from "@/lib/article-api";
 import { ARTICLES_PATH } from "@/lib/routes";
@@ -62,7 +63,11 @@ export default async function ArticlesPage() {
         </div>
       </header>
 
-      <ArticleList articles={cards} />
+      {/* useSearchParams 를 쓰므로 경계가 필요하다 — 없으면 이 정적 페이지가
+          통째로 클라이언트 렌더로 떨어진다 */}
+      <Suspense fallback={null}>
+        <ArticleList articles={cards} />
+      </Suspense>
     </main>
   );
 }
