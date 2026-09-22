@@ -50,14 +50,15 @@ class AdminIngredientMatchApiTest {
     // ── RED 1·2 : 제안 ────────────────────────────────────────────────────
 
     @Test
-    fun `RED1 - brand_keywords 로 제품명 부분일치하면 suggested 매치가 생긴다`() {
-        val id = ingredient(brandKeywords = listOf("테스트캄파리", "TESTCAMPARI"))
+    fun `RED1 - brand_keywords 일치는 approved, 별명 일치는 suggested 로 생긴다 (#213)`() {
+        val id = ingredient(brandKeywords = listOf("테스트캄파리", "TESTCAMPARI"), aliases = listOf("테스트별명"))
         product("테스트캄파리 비터 700ml", "TESTCAMPARI BITTER")
+        product("테스트별명 리큐르", null)
         product("깜빠리아닌것", "OTHER")
 
         val body = bodyOf(suggest(id, session("editor")))
 
-        assertThat(body["matches"].map { it["status"].asText() }).containsExactly("suggested")
+        assertThat(body["matches"].map { it["status"].asText() }).containsExactly("approved", "suggested")
         assertThat(body["matches"][0]["product"]["nameKo"].asText()).isEqualTo("테스트캄파리 비터 700ml")
         assertThat(body["matches"][0]["matchedKeyword"].asText()).isEqualTo("테스트캄파리")
         assertThat(body["matches"][0]["confidence"].asInt()).isEqualTo(80)
@@ -76,11 +77,12 @@ class AdminIngredientMatchApiTest {
 
     @Test
     fun `RED2 - SUGGESTED 는 domestic_availability 를 바꾸지 않는다`() {
-        val id = ingredient(brandKeywords = listOf("테스트캄파리"), availability = "specialty")
+        val id = ingredient(brandKeywords = emptyList(), aliases = listOf("테스트캄파리"), availability = "specialty")
         product("테스트캄파리 비터", null)
 
         val body = bodyOf(suggest(id, session("editor")))
 
+        assertThat(body["matches"].map { it["status"].asText() }).containsExactly("suggested")
         assertThat(body["ingredient"]["domesticAvailability"].asText()).isEqualTo("specialty")
         assertThat(availabilityOf(id)).isEqualTo("specialty")
     }
@@ -89,7 +91,7 @@ class AdminIngredientMatchApiTest {
 
     @Test
     fun `RED3 - 최근 3년 안 승인 매치가 3건이면 common 을, 1건이면 specialty 를 제안한다`() {
-        val id = ingredient(brandKeywords = listOf("테스트캄파리"))
+        val id = ingredient(brandKeywords = emptyList(), aliases = listOf("테스트캄파리"))
         val recent = LocalDate.now().minusMonths(6)
         repeat(3) { product("테스트캄파리 $it", null, reportedOn = recent) }
         val editor = session("editor")
@@ -109,7 +111,7 @@ class AdminIngredientMatchApiTest {
 
     @Test
     fun `RED4 - 매치 없는 재료는 import_only 를 제안하고, 오래된 승인만 있어도 import_only 다`() {
-        val id = ingredient(brandKeywords = listOf("테스트캄파리"))
+        val id = ingredient(brandKeywords = emptyList(), aliases = listOf("테스트캄파리"))
         val editor = session("editor")
         assertThat(proposalOf(id, editor)["availability"].asText()).isEqualTo("import_only")
 
@@ -125,7 +127,7 @@ class AdminIngredientMatchApiTest {
 
     @Test
     fun `매치 재승인은 409 다`() {
-        val id = ingredient(brandKeywords = listOf("테스트캄파리"))
+        val id = ingredient(brandKeywords = emptyList(), aliases = listOf("테스트캄파리"))
         product("테스트캄파리", null)
         val editor = session("editor")
         val matchId = bodyOf(suggest(id, editor))["matches"][0]["id"].asLong()
@@ -154,11 +156,70 @@ class AdminIngredientMatchApiTest {
         assertThat(bodyOf(ok)["brandKeywords"].map { it.asText() }).containsExactly("깜빠리", "campari")
     }
 
+    // ── #213 : 배치 — 거절 유지 · 상향만 · run 엔드포인트 ────────────────
+
+    @Test
+    fun `#213 - 사람이 거절한 쌍은 배치가 되살리지 않고, 유통 여부는 올리기만 한다`() {
+        val id = ingredient(brandKeywords = listOf("테스트캄파리"), availability = "import_only", substituteNote = "아페롤로")
+        val recent = LocalDate.now().minusMonths(2)
+        val rejectMe = product("테스트캄파리 거절할것", null, reportedOn = recent)
+        product("테스트캄파리 A", null, reportedOn = recent)
+        product("테스트캄파리 B", null, reportedOn = recent)
+        product("테스트캄파리 C", null, reportedOn = recent)
+        val editor = session("editor")
+
+        val first = bodyOf(run(editor))
+        assertThat(first["newMatches"].asInt()).isEqualTo(4)
+        assertThat(first["autoApproved"].asInt()).isEqualTo(4)
+        assertThat(first["availabilityChanged"].asInt()).isEqualTo(1)
+        assertThat(availabilityOf(id)).`as`("승인 4건 → common 으로 올라간다").isEqualTo("common")
+        assertThat(
+            jdbc.queryForObject(
+                "SELECT count(*) FROM audit_log WHERE entity_type = 'ingredient' AND entity_id = $id AND action = 'availability_change'",
+                Long::class.java,
+            ),
+        ).isEqualTo(1L)
+
+        val matchId = jdbc.queryForObject(
+            "SELECT id FROM ingredient_product_match WHERE ingredient_id = $id AND product_id = $rejectMe",
+            Long::class.java,
+        )!!
+        assertThat(mvc.post("$ADMIN/$id/matches/$matchId/reject") { with(csrf()); session = editor!! }.andReturn().response.status)
+            .isEqualTo(200)
+
+        val second = bodyOf(run(editor))
+        assertThat(second["newMatches"].asInt()).`as`("거절한 쌍을 다시 만들지 않는다").isEqualTo(0)
+        assertThat(
+            jdbc.queryForObject("SELECT status FROM ingredient_product_match WHERE id = $matchId", String::class.java),
+        ).isEqualTo("rejected")
+        // 승인 3건이 남아 common 그대로. 내려가는 일은 없다
+        assertThat(availabilityOf(id)).isEqualTo("common")
+    }
+
+    @Test
+    fun `#213 - 승인 매치가 1~2건이면 specialty 로만 올리고, common 인 재료를 specialty 로 내리지 않는다`() {
+        val recent = LocalDate.now().minusMonths(2)
+        val fromImportOnly = ingredient(brandKeywords = listOf("테스트캄파리하나"), availability = "import_only", substituteNote = "대체")
+        product("테스트캄파리하나 700ml", null, reportedOn = recent)
+        val alreadyCommon = ingredient(brandKeywords = listOf("테스트캄파리둘"), availability = "common")
+        product("테스트캄파리둘 700ml", null, reportedOn = recent)
+
+        run(session("editor"))
+
+        assertThat(availabilityOf(fromImportOnly)).isEqualTo("specialty")
+        assertThat(availabilityOf(alreadyCommon)).`as`("내리지 않는다").isEqualTo("common")
+    }
+
+    @Test
+    fun `#213 - run 은 member 에게 403 이다`() {
+        assertThat(run(session("member")).response.status).isEqualTo(403)
+    }
+
     // ── RED 6 : CSRF · 권한 ───────────────────────────────────────────────
 
     @Test
     fun `RED6 - 승인 요청은 CSRF 토큰이 없으면 403 이다`() {
-        val id = ingredient(brandKeywords = listOf("테스트캄파리"))
+        val id = ingredient(brandKeywords = emptyList(), aliases = listOf("테스트캄파리"))
         product("테스트캄파리", null)
         val editor = session("editor")
         val matchId = bodyOf(suggest(id, editor))["matches"][0]["id"].asLong()
@@ -177,6 +238,9 @@ class AdminIngredientMatchApiTest {
 
     // ── 헬퍼 ──────────────────────────────────────────────────────────────
 
+    private fun run(login: MockHttpSession?): MvcResult =
+        mvc.post("$ADMIN/matches/run") { with(csrf()); login?.let { session = it } }.andReturn()
+
     private fun suggest(id: Long, login: MockHttpSession?): MvcResult =
         mvc.post("$ADMIN/$id/matches/suggest") { with(csrf()); login?.let { session = it } }.andReturn()
 
@@ -194,12 +258,19 @@ class AdminIngredientMatchApiTest {
     private fun proposalOf(id: Long, login: MockHttpSession?): JsonNode =
         bodyOf(mvc.get("$ADMIN/$id/matches") { login?.let { session = it } }.andReturn())["proposal"]
 
-    private fun ingredient(brandKeywords: List<String>, availability: String = "common"): Long {
+    private fun ingredient(
+        brandKeywords: List<String>,
+        availability: String = "common",
+        aliases: List<String> = emptyList(),
+        substituteNote: String? = null,
+    ): Long {
         val kw = brandKeywords.joinToString(",") { "'${it.replace("'", "''")}'" }
+        val al = aliases.joinToString(",") { "'${it.replace("'", "''")}'" }
+        val note = substituteNote?.let { "'${it.replace("'", "''")}'" } ?: "NULL"
         return jdbc.queryForObject(
-            """INSERT INTO ingredient (slug, name_ko, name_en, category, domestic_availability, is_approved, brand_keywords)
+            """INSERT INTO ingredient (slug, name_ko, name_en, category, domestic_availability, is_approved, brand_keywords, aliases, substitute_note)
                VALUES ('test-campari-${seq++}', '테스트 캄파리', 'Test Campari', 'liqueur', '$availability', true,
-                       ARRAY[$kw]::TEXT[]) RETURNING id""",
+                       ARRAY[$kw]::TEXT[], ARRAY[$al]::TEXT[], $note) RETURNING id""",
             Long::class.java,
         )!!
     }

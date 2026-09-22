@@ -241,6 +241,8 @@ class AuditLogTest {
             "slug_change_attempt",
             // 이슈 026 — 재료 승인 (DECISIONS §1.3). 마스터 오염을 되짚으려면 필요하다
             "approve",
+            // #213 — 매칭 배치가 유통 여부를 올렸다. 배치가 바꾼 값은 이것 말고 되짚을 길이 없다
+            "availability_change",
         )
 
         val check = jdbc.queryForObject(
