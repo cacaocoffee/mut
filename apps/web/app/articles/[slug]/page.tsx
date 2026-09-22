@@ -8,6 +8,7 @@ import { openGraph, SITE_URL } from "@/lib/site";
 import { articleJsonLd } from "@/lib/structured-data";
 import { TrackArticleView } from "@/components/analytics/article-view";
 import { DetailActions } from "@/components/detail-actions";
+import { SponsoredLabel } from "@/components/legal/sponsored-label";
 
 /**
  * 아티클 상세 (ADR-0010 · DB 이관 ADR-0011).
@@ -103,7 +104,7 @@ export default async function ArticleDetailPage({ params }: PageProps<"/articles
           {/* 협찬 글 표기는 데이터 플래그로만 켜진다 — 끌 수 없다 (`NFR-L-02` · 배포 차단) */}
           <span className="article-card__kicker">
             {ARTICLE_CATEGORY_KO[a.category]}
-            {a.isSponsored && " · 제휴 콘텐츠"}
+            <SponsoredLabel isSponsored={!!a.isSponsored} />
           </span>
           <h1>{a.title}</h1>
         </div>
@@ -141,7 +142,7 @@ export default async function ArticleDetailPage({ params }: PageProps<"/articles
 
       {related.length > 0 && (
         <section>
-          <h4 className="section-head">이 글의 칵테일</h4>
+          <h2 className="section-head">이 글의 칵테일</h2>
           {related.map((c) => (
             <Link key={c.id} href={`/cocktails/${c.id}`} className="btn related-link">
               <span className="name">

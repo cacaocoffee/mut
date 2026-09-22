@@ -78,10 +78,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body>
         <div className="page">
+          {/* 탭 4개 + 검색 + 로그인을 매번 지나야 본문에 닿는다. 아티클을 연달아 읽는
+              키보드 사용자에게 그 반복이 곧 비용이다. 화면 밖에 두고 포커스에만 나온다.
+              페이지마다 붙이면 언젠가 빠뜨리므로 루트에 한 번만 둔다 (LegalNotice 와 같은 이유) */}
+          <a href="#main" className="skip-link">
+            본문 바로가기
+          </a>
           <SiteNav />
           {/* 지나온 화면을 적어 둔다 — `cocktail_view.entryPoint` 가 이것을 본다 (이슈 035) */}
           <PathRecorder />
-          {children}
+          <div id="main" tabIndex={-1}>
+            {children}
+          </div>
           {/* NFR-L-01 — 모든 페이지 하단 고정. 배포 차단 조건이다.
               루트 레이아웃에 무조건 렌더한다: 페이지마다 붙이면 언젠가 빠뜨리고,
               빠뜨린 것을 알아채는 방법이 없다. 컴포넌트에 끌 수 있는 prop 도 없다. */}

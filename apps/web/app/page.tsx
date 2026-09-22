@@ -8,6 +8,7 @@ import { listArticles } from "@/lib/article-api";
 import { cocktailPhotoSrc } from "@/lib/cocktail-photos";
 import { ARTICLES_PATH, FINDER_PATH, SEARCH_PATH } from "@/lib/routes";
 import { openGraph } from "@/lib/site";
+import { SponsoredLabel } from "@/components/legal/sponsored-label";
 
 /**
  * 홈 (ADR-0012).
@@ -54,7 +55,9 @@ export default async function HomePage() {
     <main className="shell home">
       <header className="home-hero">
         <Wordmark className="home-hero__mark" />
-        <p className="home-hero__tagline">당신의 취향, 당신의 멋</p>
+        {/* 제호는 SVG 라 글자로 읽히지 않는다. 이 줄이 홈의 h1 을 맡아야
+            문서가 h1 없이 h2 부터 시작하지 않는다 */}
+        <h1 className="home-hero__tagline">당신의 취향, 당신의 멋</h1>
         <p className="home-hero__intro">
           칵테일 한 잔부터 그 뒤의 이야기까지 — 마시는 것을 더 깊이 즐기는 법.
         </p>
@@ -99,7 +102,7 @@ export default async function HomePage() {
                 </div>
                 <span className="article-card__kicker">
                   {ARTICLE_CATEGORY_KO[a.category]}
-                  {a.isSponsored && " · 제휴 콘텐츠"}
+                  <SponsoredLabel isSponsored={!!a.isSponsored} />
                 </span>
                 <h3 className="article-card__title">{a.title}</h3>
                 <p className="article-card__dek">{a.dek}</p>

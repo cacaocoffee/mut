@@ -66,7 +66,9 @@ export function RecipePanel({ slug, ingredients }: { slug: string; ingredients: 
   return (
     <>
       <div className="rule-head">
-        <h4 style={{ margin: 0 }}>재료</h4>
+        {/* h2 다 — 상세의 다른 섹션 머리와 같은 층이라 h1 아래로 나란히 선다.
+            20px 은 h4 가 갖던 크기로, 보이는 것은 그대로다 */}
+        <h2 style={{ margin: 0, fontSize: 20 }}>재료</h2>
         <div className="recipe-controls">
           <div className="stepper">
             <button
@@ -296,7 +298,9 @@ function IngredientProducts({ nameKo, slug: ingredientSlug }: { nameKo: string; 
           </>
         ) : null}
       </dt>
-      <dd>
+      {/* 펼친 뒤 내용이 비동기로 채워진다. 고지가 없으면 스크린리더는 "찾는 중…" 에서
+          목록으로 바뀐 것을 모른다 — 잔 수·단위는 .recipe-live 가 같은 일을 한다 */}
+      <dd role="status" aria-atomic="true" aria-busy={state === "loading"}>
         {state === "loading" ? (
           "찾는 중…"
         ) : state === "error" ? (

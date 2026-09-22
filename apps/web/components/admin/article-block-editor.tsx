@@ -109,14 +109,18 @@ export function ArticleBlockEditor({
                     }}
                   />
                 </label>
+                {/* 블록이 반복돼 htmlFor 용 고유 id 를 줄 수 없다. 입력을 시작하면
+                    placeholder 가 사라져 무슨 칸인지 남지 않으므로 aria-label 을 단다 */}
                 <input
                   className="input"
+                  aria-label="사진 주소"
                   placeholder="사진 주소 (올리면 자동으로 채워진다)"
                   value={b.src}
                   onChange={(e) => replace(i, { ...b, src: e.target.value })}
                 />
                 <input
                   className="input"
+                  aria-label="사진 설명"
                   placeholder="사진 설명 (선택)"
                   value={b.caption ?? ""}
                   onChange={(e) => replace(i, { ...b, caption: e.target.value })}
@@ -126,6 +130,7 @@ export function ArticleBlockEditor({
               <textarea
                 className="input block-editor__text"
                 rows={b.kind === "paragraph" ? 4 : 2}
+                aria-label={KIND_LABEL[b.kind]}
                 placeholder={KIND_LABEL[b.kind]}
                 value={b.text}
                 onChange={(e) => replace(i, { ...b, text: e.target.value })}
