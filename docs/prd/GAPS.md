@@ -1405,10 +1405,11 @@ iOS Safari 는 폰트가 16px 미만인 입력창에 포커스가 가면 페이�
 `.search-box__input` 은 `app.css` 에 있어 이번에 16px 로 올렸다. 남은 것은 **`styles.css`
 의 `.input` 자체** — 어드민 폼·로그인 등 나머지 입력창 전부가 여기 걸린다.
 
-**고치려면 [ADR-0005](../decisions/ADR-0005-ui-package-scope.md) 3단(GAPS → ADR → 되돌리는 조건)을 밟아야 한다.**
-`.btn-primary` 대비가 [ADR-0006](../decisions/ADR-0006-btn-primary-contrast.md) 으로 간 것과 같은 경로다.
+**해결 (2026-09-22)** — [ADR-0013](../decisions/ADR-0013-input-font-size-touch.md) 으로 닫았다.
+`.btn-primary` 대비가 [ADR-0006](../decisions/ADR-0006-btn-primary-contrast.md) 으로 간 것과 같은 경로다 —
+시안을 고치지 않고 `app.css` 에서 덮는다 (ADR-0005 결정 1).
 
-제안하는 변경 — 토큰값을 바꾸지 않고 터치 기기에서만 재정의한다:
+적용한 변경 — 토큰값을 바꾸지 않고 터치 기기에서만 재정의한다:
 
 ```css
 @media (pointer: coarse) {
@@ -1420,3 +1421,4 @@ iOS Safari 는 폰트가 16px 미만인 입력창에 포커스가 가면 페이�
 나온 WCAG 2.5.5 터치 타깃 권고를 함께 만족시킨다.
 
 **되돌리는 조건** — 시안이 입력 폰트를 16px 로 올리면 이 미디어쿼리는 불필요해진다.
+iOS 가 확대 규칙을 없애면 `min-height` 만 남긴다. 자세한 것은 ADR-0013 에 있다.
