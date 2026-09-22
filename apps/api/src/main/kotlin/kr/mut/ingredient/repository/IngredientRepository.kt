@@ -21,6 +21,9 @@ interface IngredientRepository : JpaRepository<Ingredient, Long> {
     /** DECISIONS §1.2 — 300개 초과 시 **경고**다. 차단이 아니다. */
     fun countByIsApprovedTrue(): Long
 
+    /** 매칭 배치가 훑는 대상 — 승인된 재료 전부 (#213). */
+    fun findAllByIsApprovedTrueOrderBySlugAsc(): List<Ingredient>
+
     /**
      * 재료 사전 목록 (이슈 023).
      *

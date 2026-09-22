@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireAdmin } from "@/lib/admin-session";
 import { pendingIngredients, ingredientCapacity, searchAdminIngredients } from "@/lib/admin-api";
 import { IngredientApprove } from "@/components/admin/ingredient-approve";
+import { IngredientMatchRun } from "@/components/admin/ingredient-match-run";
 import { CATEGORY_LABELS, AVAILABILITY_LABELS, label } from "@/lib/ingredient-labels";
 
 /**
@@ -39,10 +40,14 @@ export default async function AdminIngredients({
     <>
       <div className="admin__section-head admin__section-head--row">
         <span>승인 대기 {pending.length}건</span>
-        {/* `editor` 도 만들 수 있다 (RED 6). 승인만 `admin` 이다. */}
-        <Link className="btn btn-primary" href="/admin/ingredients/new">
-          재료 새로 만들기
-        </Link>
+        <span className="admin-inline">
+          {/* 유통 제품 매칭 배치 — 매일 04:10 에도 돈다 (#213) */}
+          <IngredientMatchRun />
+          {/* `editor` 도 만들 수 있다 (RED 6). 승인만 `admin` 이다. */}
+          <Link className="btn btn-primary" href="/admin/ingredients/new">
+            재료 새로 만들기
+          </Link>
+        </span>
       </div>
 
       {capacity?.warning ? (

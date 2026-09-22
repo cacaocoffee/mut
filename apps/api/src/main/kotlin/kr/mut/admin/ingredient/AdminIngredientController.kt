@@ -14,6 +14,7 @@ import kr.mut.ingredient.api.IngredientCapacity
 import kr.mut.ingredient.api.IngredientDistributionRequest
 import kr.mut.ingredient.api.IngredientMatchesResponse
 import kr.mut.ingredient.api.IngredientProductMatchResponse
+import kr.mut.ingredient.api.MatchRunResult
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -168,6 +169,16 @@ class AdminIngredientController(
     fun matches(@PathVariable id: Long, http: HttpServletRequest): IngredientMatchesResponse {
         actor.require(http, Action.WRITE_CONTENT)
         return ingredients.matches(id)
+    }
+
+    @PostMapping("/matches/run")
+    @Operation(
+        summary = "매칭 배치 지금 돌리기",
+        description = "editor 이상. 승인된 재료 전부에 브랜드 검색어·별명으로 제품을 찾는다. 브랜드 일치는 승인, 별명은 제안. 유통 여부는 common·specialty 로 올리기만.",
+    )
+    fun runMatching(http: HttpServletRequest): MatchRunResult {
+        actor.require(http, Action.WRITE_CONTENT)
+        return ingredients.runMatching()
     }
 
     @PostMapping("/{id}/matches/suggest")
