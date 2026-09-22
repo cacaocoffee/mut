@@ -220,7 +220,9 @@ function RecipeRow({
       {productsOpen ? (
         <tr>
           <td colSpan={3}>
-            <IngredientProducts nameKo={line.nameKo} slug={line.slug} />
+            {/* key — 재료가 바뀌면 새로 마운트해 "찾는 중…" 부터 다시 시작한다.
+                이펙트 안에서 상태를 되돌리면 첫 렌더에 헛도는 재렌더가 생긴다 */}
+            <IngredientProducts key={line.nameKo} nameKo={line.nameKo} slug={line.slug} />
           </td>
         </tr>
       ) : null}
@@ -267,7 +269,6 @@ function IngredientProducts({ nameKo, slug: ingredientSlug }: { nameKo: string; 
 
   useEffect(() => {
     let alive = true;
-    setState("loading");
     fetch(`/api/products?q=${encodeURIComponent(nameKo)}&size=5`)
       .then(async (r) => {
         if (!r.ok) throw new Error(String(r.status));
