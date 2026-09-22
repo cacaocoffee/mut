@@ -8,36 +8,48 @@ import kr.mut.ingredient.domain.IngredientProductMatch
 import kr.mut.ingredient.domain.MatchStatus
 import kr.mut.ingredient.repository.DistributedProductRepository
 import kr.mut.ingredient.repository.IngredientProductMatchRepository
+import kr.mut.common.audit.AuditAction
+import kr.mut.common.audit.AuditRecorder
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Component
 import java.time.Clock
 import java.time.LocalDate
 
 /**
- * 재료 ↔ 유통 제품 매칭 (#195).
+ * 재료 ↔ 유통 제품 매칭 (#195 · #213).
  *
- * ## 제안까지만 한다
+ * ## 브랜드는 승인, 별명은 제안
  *
- * 제품명 표기가 제각각이라("캄파리"·"깜빠리"·"CAMPARI BITTER 25%") 자동 판정은 틀린다.
- * 여기서 만드는 매핑은 전부 `suggested` 다. 승인은 어드민이 하고, 유통 여부도 [propose] 가
- * **제안**할 뿐 `ingredient` 를 바꾸지 않는다.
+ * `brandKeywords`(상표 — "탱커레이") 가 제품명에 있으면 사람이 판단할 게 없다 → `approved`.
+ * `aliases`("럼"·"소다" 처럼 넓은 말) 는 엉뚱한 것도 잡으므로 `suggested` 까지만.
+ * 사람이 `rejected` 한 쌍은 유니크 제약이 다시 만들지 못하게 막는다 (`PRIN-T07`).
+ *
+ * ## 유통 여부는 올리기만 한다
+ *
+ * [apply] 는 승인 매핑으로 계산한 제안이 `common`·`specialty` 일 때만 재료를 바꾼다.
+ * `import_only`·`unavailable` 로 내리는 건 대체재가 필수라(`INV-INGREDIENT-01`) 사람만 한다.
  *
  * ## 무엇으로 찾나
  *
- * `brandKeywords`(신뢰도 80) 와 `aliases`(50). 재료 이름 자체는 쓰지 않는다 — "진" 으로 제품명을
- * 찾으면 "진로" 까지 잡힌다. 검색어와 제품명이 통째로 같으면 100.
+ * 재료 이름 자체는 쓰지 않는다 — "진" 으로 제품명을 찾으면 "진로" 까지 잡힌다.
+ * 검색어와 제품명이 통째로 같으면 신뢰도 100.
  */
 @Component
 class IngredientProductMatcher(
     private val products: DistributedProductRepository,
     private val matches: IngredientProductMatchRepository,
+    private val audit: AuditRecorder,
     private val clock: Clock = Clock.systemDefaultZone(),
 ) {
 
-    /** 새로 만든 매핑 수. 이미 있는 쌍은 건너뛴다 (`uq_ingredient_product_match__pair`). */
-    fun suggest(ingredient: Ingredient): Int {
+    /** 한 재료를 훑은 결과. */
+    data class Suggested(val created: Int, val autoApproved: Int)
+
+    /** 새 매핑을 만든다. 브랜드 일치는 승인 상태로, 별명 일치는 제안 상태로. 이미 있는 쌍은 건너뛴다. */
+    fun suggest(ingredient: Ingredient): Suggested {
         val known = matches.productIdsOf(ingredient.id).toMutableSet()
         var created = 0
+        var autoApproved = 0
 
         val keywords =
             ingredient.brandKeywords.map { it to BRAND_CONFIDENCE } +
@@ -49,18 +61,50 @@ class IngredientProductMatcher(
 
             for (product in products.searchByName(escapeLike(keyword), PageRequest.of(0, PER_KEYWORD_LIMIT))) {
                 if (!known.add(product.id)) continue
-                matches.save(
-                    IngredientProductMatch(
-                        ingredient = ingredient,
-                        product = product,
-                        matchedKeyword = keyword,
-                        confidence = confidence(keyword, product, baseConfidence).toShort(),
-                    ),
+                val match = IngredientProductMatch(
+                    ingredient = ingredient,
+                    product = product,
+                    matchedKeyword = keyword,
+                    confidence = confidence(keyword, product, baseConfidence).toShort(),
                 )
+                // 상표 일치는 사람 손을 안 거친다 (#213 · 사용자 결정 2026-09-22)
+                if (baseConfidence >= BRAND_CONFIDENCE) {
+                    match.approve()
+                    autoApproved += 1
+                }
+                matches.save(match)
                 created += 1
             }
         }
-        return created
+        return Suggested(created, autoApproved)
+    }
+
+    /**
+     * 승인 매핑으로 계산한 제안을 재료에 반영한다 — **올리는 방향만**. 바꿨으면 true.
+     * 감사에 남긴다: 배치가 바꾼 값은 "왜 갑자기 common 이 됐나" 에 답할 것이 이것뿐이다.
+     */
+    fun apply(ingredient: Ingredient): Boolean {
+        val proposal = propose(matches.findAllForIngredient(ingredient.id))
+        val proposed = DomesticAvailability.ofSlug(proposal.availability)
+        if (proposed != DomesticAvailability.COMMON && proposed != DomesticAvailability.SPECIALTY) return false
+        val before = ingredient.domesticAvailability
+        if (before == proposed) return false
+        // specialty → common 은 올리는 것, common → specialty 는 내리는 것이다. 내리지 않는다.
+        if (before == DomesticAvailability.COMMON) return false
+
+        ingredient.domesticAvailability = proposed
+        audit.record(
+            entityType = "ingredient",
+            entityId = ingredient.id,
+            action = AuditAction.AVAILABILITY_CHANGE,
+            before = mapOf("domesticAvailability" to before.slug),
+            after = mapOf(
+                "domesticAvailability" to proposed.slug,
+                "slug" to ingredient.slug,
+                "reason" to proposal.reason,
+            ),
+        )
+        return true
     }
 
     /**

@@ -1,0 +1,84 @@
+-- ISSUE-036 — 프로토타입 브랜드 검색어 77종 시드 (SPEC-01 §6 · SPEC-06 §6).
+--
+-- ⚠️ **손으로 고치지 않는다.** `packages/domain/src/data.ts` 를 고치고
+--    `npx tsx scripts/seed-from-prototype.ts` 로 다시 만든다.
+--    변환 규칙은 그 스크립트에 있고, 그것이 이관 근거다.
+
+-- 덮어쓴다 — 정본은 packages/domain/src/brand-keywords.ts 다 (#213). 어드민은 보여만 준다.
+UPDATE ingredient SET brand_keywords = ARRAY['압생트', 'absinthe', '페르노 압생트', 'pernod absinthe', '라 페', 'la fée', '생 조르주']::TEXT[] WHERE slug = 'absinthe';
+UPDATE ingredient SET brand_keywords = ARRAY['앙고스투라', 'angostura']::TEXT[] WHERE slug = 'angostura-bitters';
+UPDATE ingredient SET brand_keywords = ARRAY['바나나 리큐르', 'banana liqueur', '크렘 드 바난', 'creme de banane', 'crème de banane', '볼스 바나나', 'bols banana', '지파드 바나나', 'giffard banane']::TEXT[] WHERE slug = 'banana-liqueur';
+UPDATE ingredient SET brand_keywords = ARRAY['마운트 게이', 'mount gay', '플랜테이션 바베이도스', 'plantation barbados', '폴리 앤 마운트']::TEXT[] WHERE slug = 'barbados-rum';
+UPDATE ingredient SET brand_keywords = ARRAY['베네딕틴', 'benedictine', 'bénédictine', 'b&b']::TEXT[] WHERE slug = 'benedictine-dom';
+UPDATE ingredient SET brand_keywords = ARRAY['패트론 실버', 'patron silver', 'patrón silver', '돈 훌리오 블랑코', 'don julio blanco', '호세 쿠엘보', 'jose cuervo', '올메카', 'olmeca', '에스폴론', 'espolon', 'espolòn', '1800 실버', '1800 silver', '카사미고스', 'casamigos', '엘 히마도르', 'el jimador', '포르탈레자', 'fortaleza', '블랑코 데킬라', 'tequila blanco', 'blanco tequila']::TEXT[] WHERE slug = 'blanco-tequila';
+UPDATE ingredient SET brand_keywords = ARRAY['조니워커', '조니 워커', 'johnnie walker', '발렌타인', 'ballantine', '시바스 리갈', 'chivas regal', '듀어스', 'dewar', '몽키 숄더', 'monkey shoulder', '페이머스 그라우스', 'famous grouse', '블렌디드 스카치', 'blended scotch']::TEXT[] WHERE slug = 'blended-scotch';
+UPDATE ingredient SET brand_keywords = ARRAY['블루 큐라소', '블루큐라소', 'blue curacao', 'blue curaçao']::TEXT[] WHERE slug = 'blue-curacao';
+UPDATE ingredient SET brand_keywords = ARRAY['버번', 'bourbon', '짐빔', 'jim beam', '메이커스 마크', 'maker''s mark', 'makers mark', '와일드 터키', '와일드터키', 'wild turkey', '우드포드', 'woodford', '버팔로 트레이스', 'buffalo trace', '불렛', 'bulleit', '포로지스', 'four roses', '이글 레어', 'eagle rare', '노브 크릭', 'knob creek', '에반 윌리엄스', 'evan williams', '엘라이자 크레이그', 'elijah craig']::TEXT[] WHERE slug = 'bourbon';
+UPDATE ingredient SET brand_keywords = ARRAY['버번', 'bourbon', '라이 위스키', 'rye whiskey', '짐빔', 'jim beam', '불렛', 'bulleit', '리튼하우스', 'rittenhouse', '와일드 터키', 'wild turkey']::TEXT[] WHERE slug = 'bourbon-rye';
+UPDATE ingredient SET brand_keywords = ARRAY['버번', 'bourbon', '짐빔', 'jim beam', '메이커스 마크', 'maker''s mark', '와일드 터키', 'wild turkey', '우드포드', 'woodford', '버팔로 트레이스', 'buffalo trace', '불렛', 'bulleit']::TEXT[] WHERE slug = 'bourbon-whiskey';
+UPDATE ingredient SET brand_keywords = ARRAY['칼바도스', 'calvados', '페르 마글루아', 'pere magloire', 'père magloire', '불라르', 'boulard', '크리스티앙 드루앙', 'drouin']::TEXT[] WHERE slug = 'calvados';
+UPDATE ingredient SET brand_keywords = ARRAY['캄파리', '깜빠리', 'campari']::TEXT[] WHERE slug = 'campari';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'cherry';
+UPDATE ingredient SET brand_keywords = ARRAY['앱솔루트 시트론', 'absolut citron', '시트론 보드카', 'citron vodka']::TEXT[] WHERE slug = 'citron-vodka';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'citrus-shrub-syrup';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'coconut-cream';
+UPDATE ingredient SET brand_keywords = ARRAY['깔루아', '칼루아', 'kahlua', 'kahlúa', '티아 마리아', 'tia maria', '미스터 블랙', 'mr black', '커피 리큐르', 'coffee liqueur', '커피 리큐어']::TEXT[] WHERE slug = 'coffee-liqueur';
+UPDATE ingredient SET brand_keywords = ARRAY['쿠앵트로', '코앵트로', '꾸앵트로', 'cointreau']::TEXT[] WHERE slug = 'cointreau';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'cranberry-juice';
+UPDATE ingredient SET brand_keywords = ARRAY['크렘 드 카시스', '크림 드 카시스', 'creme de cassis', 'crème de cassis', '카시스', 'cassis', '르제 라그루트', 'lejay']::TEXT[] WHERE slug = 'creme-de-cassis';
+UPDATE ingredient SET brand_keywords = ARRAY['다크 럼', 'dark rum', '마이어스', 'myers', '고슬링 블랙', 'gosling black', '크라켄', 'kraken']::TEXT[] WHERE slug = 'dark-rum';
+UPDATE ingredient SET brand_keywords = ARRAY['화요', 'hwayo', '일품진로', '일품 진로', '안동소주', '안동 소주', '증류식 소주', '문배주', '고소리술', '토끼소주', 'tokki', '원소주', 'won soju']::TEXT[] WHERE slug = 'distilled-soju';
+UPDATE ingredient SET brand_keywords = ARRAY['탱커레이', 'tanqueray', '봄베이', 'bombay', '고든스', '고든', 'gordon', '헨드릭스', 'hendrick', '비피터', 'beefeater', '몽키 47', '몽키47', 'monkey 47', '플리머스', 'plymouth', '로쿠', 'roku gin', '시트러스 진', 'no.3 gin', '넘버쓰리', '에비에이션', 'aviation gin', '봄베이 사파이어', '더 보타니스트', 'botanist', '시프스미스', 'sipsmith', '말피', 'malfy', '포드 진', 'fords gin', '브로커스', 'broker''s', '핸드릭스']::TEXT[] WHERE slug = 'dry-gin';
+UPDATE ingredient SET brand_keywords = ARRAY['드라이 베르무트', 'dry vermouth', '베르무트 드라이', 'vermouth dry', '마티니 엑스트라 드라이', 'martini extra dry', '노일리 프랏', 'noilly prat', '돌린 드라이', 'dolin dry', '친자노 엑스트라 드라이', 'cinzano extra dry']::TEXT[] WHERE slug = 'dry-vermouth';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'egg-white';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'espresso';
+UPDATE ingredient SET brand_keywords = ARRAY['피노 셰리', 'fino sherry', '티오 페페', 'tio pepe', '만사니야', 'manzanilla', '라 이나', 'la ina']::TEXT[] WHERE slug = 'fino-sherry';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'ginger-beer';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'grapefruit-juice';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'grapefruit-slice';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'grapefruit-soda';
+UPDATE ingredient SET brand_keywords = ARRAY['녹차 리큐르', 'green tea liqueur', '젠 그린티', 'zen green tea', '마츠차 리큐르', 'matcha liqueur']::TEXT[] WHERE slug = 'green-tea-liqueur';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'honey-ginger-syrup';
+UPDATE ingredient SET brand_keywords = ARRAY['라프로익', 'laphroaig', '아드벡', 'ardbeg', '라가불린', 'lagavulin', '보모어', 'bowmore', '브룩라디', 'bruichladdich', '포트샬롯', 'port charlotte', '킬호만', 'kilchoman', '부나하벤', 'bunnahabhain', '쿨일라', 'caol ila', '아일라', 'islay']::TEXT[] WHERE slug = 'islay-single-malt';
+UPDATE ingredient SET brand_keywords = ARRAY['애플턴', 'appleton', '자메이카 럼', 'jamaica rum', 'jamaican rum', '레이 & 네퓨', 'wray & nephew', '스미스 앤 크로스', 'smith & cross']::TEXT[] WHERE slug = 'jamaican-rum';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'jocheong-syrup';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'lager-beer';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'lemon-juice';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'lemon-peel';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'lemon-wheel';
+UPDATE ingredient SET brand_keywords = ARRAY['릴레 블랑', '릴레', 'lillet']::TEXT[] WHERE slug = 'lillet-blanc';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'lime';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'lime-juice';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'lime-wedge';
+UPDATE ingredient SET brand_keywords = ARRAY['리치 리큐르', '리치 리큐어', 'lychee liqueur', '디타', '소호 리치', 'soho lychee', '볼스 리치', 'bols lychee']::TEXT[] WHERE slug = 'lychee-liqueur';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'makgeolli';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'milk';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'mint';
+UPDATE ingredient SET brand_keywords = ARRAY['문배주', 'munbaeju']::TEXT[] WHERE slug = 'munbaeju-40';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'oolong-tea';
+UPDATE ingredient SET brand_keywords = ARRAY['오렌지 비터', 'orange bitters', '리건스', 'regans', '피 브라더스 오렌지', 'fee brothers orange', '앙고스투라 오렌지', 'angostura orange']::TEXT[] WHERE slug = 'orange-bitters';
+UPDATE ingredient SET brand_keywords = ARRAY['오렌지 큐라소', 'orange curacao', 'orange curaçao', '드라이 큐라소', 'dry curacao', '그랑 마니에르', 'grand marnier', '트리플 섹', 'triple sec', '볼스 트리플섹', '피에르 페랑', 'pierre ferrand']::TEXT[] WHERE slug = 'orange-curacao';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'orange-peel';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'orange-wheel';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'orgeat';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'pear-peel';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'pineapple-juice';
+UPDATE ingredient SET brand_keywords = ARRAY['아그리콜', 'agricole', '클레망', 'clement', '라 파보리트', 'trois rivieres', '트루아 리비에르', '네이슨', 'neisson']::TEXT[] WHERE slug = 'rhum-agricole';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'rich-simple-syrup';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'rosemary';
+UPDATE ingredient SET brand_keywords = ARRAY['바카디', 'bacardi', '하바나 클럽', '하바나클럽', 'havana club', '캡틴 모건', 'captain morgan', '마운트 게이', 'mount gay', '플랜테이션', 'plantation rum', '디플로마티코', 'diplomatico', '아프렐턴', '애플턴', 'appleton', '마이어스', 'myers', '론 자카파', '자카파', 'zacapa', '엘 도라도', 'el dorado', '브루갈', 'brugal', '고슬링', 'gosling']::TEXT[] WHERE slug = 'rum';
+UPDATE ingredient SET brand_keywords = ARRAY['라이 위스키', '라이위스키', 'rye whiskey', 'rye whisky', '불렛 라이', 'bulleit rye', '리튼하우스', 'rittenhouse', '사제락 라이', 'sazerac rye', '템플턴', 'templeton', '와일드 터키 라이', 'wild turkey rye', '미크터스 라이', 'michter']::TEXT[] WHERE slug = 'rye-whiskey';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'salt';
+UPDATE ingredient SET brand_keywords = ARRAY['조니워커', '조니 워커', 'johnnie walker', '발렌타인', 'ballantine', '시바스 리갈', 'chivas regal', '시바스', '듀어스', 'dewar', '몽키 숄더', 'monkey shoulder', '페이머스 그라우스', 'famous grouse', '글렌피딕', 'glenfiddich', '글렌리벳', 'glenlivet', '맥캘란', 'macallan', '글렌모렌지', 'glenmorangie', '탈리스커', 'talisker', '스카치', 'scotch']::TEXT[] WHERE slug = 'scotch-whisky';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'simple-syrup';
+UPDATE ingredient SET brand_keywords = ARRAY['슬로 진', '슬로진', 'sloe gin']::TEXT[] WHERE slug = 'sloe-gin';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'soda-water';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'sugar';
+UPDATE ingredient SET brand_keywords = ARRAY['수즈', 'suze']::TEXT[] WHERE slug = 'suze';
+UPDATE ingredient SET brand_keywords = ARRAY['스위트 베르무트', 'sweet vermouth', '베르무트 로소', 'vermouth rosso', '마티니 로소', 'martini rosso', '친자노 로소', 'cinzano rosso', '카르파노 안티카', 'carpano antica', '코키 토리노', 'cocchi torino', '돌린 루즈', 'dolin rouge', '푼트 에 메스', 'punt e mes']::TEXT[] WHERE slug = 'sweet-vermouth';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'tomato-juice';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'tonic-water';
+UPDATE ingredient SET brand_keywords = ARRAY['앱솔루트', 'absolut', '스미노프', 'smirnoff', '그레이구스', '그레이 구스', 'grey goose', '벨루가', 'beluga', '케텔원', '케텔 원', 'ketel one', '티토스', 'tito''s', '시락', 'ciroc', 'cîroc', '스톨리치나야', 'stolichnaya', '스톨리', '핀란디아', 'finlandia', '벨베데레', 'belvedere', '러스키 스탄다드', 'russian standard', '하쿠 보드카', 'haku vodka']::TEXT[] WHERE slug = 'vodka';
+UPDATE ingredient SET brand_keywords = ARRAY['꼬냑', '코냑', 'cognac', '헤네시', 'hennessy', '레미 마틴', '레미마틴', 'remy martin', 'rémy martin', '마르텔', 'martell', '까뮈', 'camus', '쿠르부아지에', 'courvoisier']::TEXT[] WHERE slug = 'vsop-cognac';
+UPDATE ingredient SET brand_keywords = ARRAY['바카디 카르타 블랑카', 'bacardi superior', '하바나 클럽 3', 'havana club 3', '화이트 럼', 'white rum']::TEXT[] WHERE slug = 'white-rum';
+UPDATE ingredient SET brand_keywords = '{}' WHERE slug = 'worcestershire-tabasco';

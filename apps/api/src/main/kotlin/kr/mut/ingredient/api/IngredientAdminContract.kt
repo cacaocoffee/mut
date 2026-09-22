@@ -85,7 +85,19 @@ interface IngredientAdminFacade {
 
     /** 유통 제품 목록 (#203 · #212). q 는 제품명만, importer 는 수입사만, 유형. 최근 신고순. */
     fun browseProducts(q: String?, importer: String?, foodType: String?, page: PageQuery): DistributedProductPage
+
+    /** 승인된 재료 전부에 매칭 배치를 지금 돌린다 (#213). 매일 04:10 에도 돈다. */
+    fun runMatching(): MatchRunResult
 }
+
+/** 매칭 배치 한 번의 결과 (#213). */
+data class MatchRunResult(
+    val ingredients: Int,
+    val newMatches: Int,
+    val autoApproved: Int,
+    val availabilityChanged: Int,
+    val elapsedMs: Long,
+)
 
 /** `Size` 상한은 `V008__ingredient.sql` 의 컬럼 길이와 같다 — 어긋나면 DB 가 500 으로 막는다. */
 data class CreateIngredientRequest(

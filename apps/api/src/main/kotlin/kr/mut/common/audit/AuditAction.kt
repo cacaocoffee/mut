@@ -47,6 +47,9 @@ enum class AuditAction(val slug: String) {
      * **누가 이 재료를 통과시켰는지** 남지 않으면 오염을 되짚을 수 없다.
      */
     APPROVE("approve"),
+
+    /** #213 — 매칭 배치가 유통 여부를 common·specialty 로 올렸다. 내리는 건 사람만 한다. */
+    AVAILABILITY_CHANGE("availability_change"),
     ;
 
     companion object {

@@ -15,6 +15,7 @@ import kr.mut.ingredient.api.IngredientDistributionRequest
 import kr.mut.ingredient.api.IngredientMatchesResponse
 import kr.mut.ingredient.api.IngredientProductMatchResponse
 import kr.mut.ingredient.api.IngredientProperties
+import kr.mut.ingredient.api.MatchRunResult
 import kr.mut.ingredient.domain.DomesticAvailability
 import kr.mut.ingredient.domain.Ingredient
 import kr.mut.ingredient.domain.IngredientCategory
@@ -47,6 +48,7 @@ class IngredientAdminService(
     private val matcher: IngredientProductMatcher,
     private val matches: IngredientProductMatchRepository,
     private val products: DistributedProductRepository,
+    private val batch: IngredientMatchBatch,
 ) : IngredientAdminFacade {
 
     /**
@@ -134,6 +136,8 @@ class IngredientAdminService(
     @Transactional(readOnly = true)
     override fun matches(id: Long): IngredientMatchesResponse =
         ingredients.findById(id).orElseThrow { ResourceNotFoundException() }.toMatchesResponse()
+
+    override fun runMatching(): MatchRunResult = batch.run()
 
     @Transactional
     override fun suggestMatches(id: Long): IngredientMatchesResponse {

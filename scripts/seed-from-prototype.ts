@@ -29,7 +29,7 @@
  */
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { COCKTAILS, type Cocktail, type Ingredient } from "@mut/domain";
+import { BRAND_KEYWORDS, COCKTAILS, type Cocktail, type Ingredient } from "@mut/domain";
 
 /* ─────────────────  재료 마스터  ───────────────── */
 
@@ -326,6 +326,34 @@ ON CONFLICT (slug) DO NOTHING;
 `;
 }
 
+/**
+ * 브랜드 검색어 (#213). 정본은 `packages/domain/src/brand-keywords.ts` 다.
+ *
+ * `R__seed_01` 과 달리 **덮어쓴다** — 검색어는 에디터가 고치는 값이 아니라 코드가 정하는 값이다.
+ * 키가 마스터에 없으면 여기서 멈춘다: 오타 하나가 조용히 아무것도 안 잡는 상태를 막는다.
+ */
+function brandKeywordSeed(masters: Map<string, Master>): string {
+  // masters 의 키는 정규화된 영문명이다 — 슬러그는 값 쪽에 있다
+  const slugs = new Set([...masters.values()].map((m) => m.slug));
+  const unknown = Object.keys(BRAND_KEYWORDS).filter((slug) => !slugs.has(slug));
+  if (unknown.length > 0) {
+    throw new Error(`brand-keywords.ts 에 마스터에 없는 슬러그가 있다: ${unknown.join(", ")}`);
+  }
+  const missing = [...slugs].filter((slug) => !(slug in BRAND_KEYWORDS));
+  if (missing.length > 0) {
+    throw new Error(`brand-keywords.ts 에 빠진 재료가 있다 (빈 배열이라도 적는다): ${missing.join(", ")}`);
+  }
+
+  const rows = Object.entries(BRAND_KEYWORDS)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([slug, words]) => `UPDATE ingredient SET brand_keywords = ${sqlArray([...words])} WHERE slug = ${sql(slug)};`);
+
+  return `${header("브랜드 검색어", rows.length)}
+-- 덮어쓴다 — 정본은 packages/domain/src/brand-keywords.ts 다 (#213). 어드민은 보여만 준다.
+${rows.join("\n")}
+`;
+}
+
 function cocktailSeed(masters: Map<string, Master>): string {
   const blocks = COCKTAILS.map((c) => cocktailBlock(c, masters));
 
@@ -446,6 +474,7 @@ const outDir = join(import.meta.dirname, "../apps/api/src/main/resources/db/migr
 // 마이그레이션은 성공했다 — 그게 이 실패의 나쁜 점이다.
 writeFileSync(join(outDir, "R__seed_01_ingredient.sql"), ingredientSeed(masters));
 writeFileSync(join(outDir, "R__seed_02_cocktail.sql"), cocktailSeed(masters));
+writeFileSync(join(outDir, "R__seed_05_brand_keywords.sql"), brandKeywordSeed(masters));
 
 console.log(`재료 ${masters.size}종 · 칵테일 ${COCKTAILS.length}종 시드를 만들었다.`);
 

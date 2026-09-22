@@ -313,6 +313,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/ingredients/matches/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 매칭 배치 지금 돌리기
+         * @description editor 이상. 승인된 재료 전부에 브랜드 검색어·별명으로 제품을 찾는다. 브랜드 일치는 승인, 별명은 제안. 유통 여부는 common·specialty 로 올리기만.
+         */
+        post: operations["runMatching"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/ingredients/pending": {
         parameters: {
             query?: never;
@@ -1462,6 +1482,18 @@ export interface components {
             status: string;
         };
         JsonNode: Record<string, never>;
+        MatchRunResult: {
+            /** Format: int32 */
+            autoApproved: number;
+            /** Format: int32 */
+            availabilityChanged: number;
+            /** Format: int64 */
+            elapsedMs: number;
+            /** Format: int32 */
+            ingredients: number;
+            /** Format: int32 */
+            newMatches: number;
+        };
         MyProfile: {
             displayName: string;
             roles: string[];
@@ -2217,6 +2249,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["IngredientCapacity"];
+                };
+            };
+        };
+    };
+    runMatching: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["MatchRunResult"];
                 };
             };
         };

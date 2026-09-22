@@ -50,11 +50,8 @@ export function IngredientDistributionForm({
         body: JSON.stringify({
           domesticAvailability: form.domesticAvailability,
           substituteNote: form.substituteNote.trim() || undefined,
-          // 쉼표로 끊고 빈 조각은 버린다 — 서버도 한 번 더 다듬는다
-          brandKeywords: form.brandKeywords
-            .split(",")
-            .map((k) => k.trim())
-            .filter(Boolean),
+          // 브랜드 검색어는 보내지 않는다 — 정본이 코드다 (#213). 지금 값을 그대로 돌려보낸다
+          brandKeywords: ingredient.brandKeywords,
           priceBand: form.priceBand.trim() || undefined,
         }),
       });
@@ -118,9 +115,9 @@ export function IngredientDistributionForm({
         </Field>
         <Field
           label="브랜드 검색어"
-          hint="쉼표로 구분. 유통 제품명에서 이 재료를 찾을 때 씁니다 — 별명보다 좁게 (예: 캄파리, campari)"
+          hint="정본은 코드(packages/domain/src/brand-keywords.ts)입니다. 여기선 보기만 — 고치면 다음 배포에 되돌아갑니다 (#213)"
         >
-          <input value={form.brandKeywords} onChange={(e) => set("brandKeywords", e.target.value)} />
+          <input value={form.brandKeywords} readOnly />
         </Field>
       </div>
 
