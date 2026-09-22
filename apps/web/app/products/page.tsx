@@ -59,8 +59,10 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     <main className="shell">
       <header className="page-head">
         <div>
+          {/* SPIRITS(증류주)가 아니다 — 시드 40,454건 중 과실주가 26,607건(65%)이고
+              맥주·청주도 5,408건이다. 증류주는 다 합쳐 16% 다. LIQUOR 로 넓힌다 */}
           <h1>
-            국내 유통 술<span className="sub">IMPORTED SPIRITS</span>
+            국내 유통 술<span className="sub">IMPORTED LIQUOR</span>
           </h1>
         </div>
         <p className="lede">

@@ -2,7 +2,7 @@
 
 import { adminWrite } from "@/lib/admin-csrf";
 import { useToast } from "@/components/toast";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   BASE_SPIRIT_LABELS,
@@ -38,6 +38,9 @@ export function CocktailForm({ cocktail }: { cocktail: AdminCocktail | null }) {
   const [form, setForm] = useState(() => initial(cocktail));
   const [violations, setViolations] = useState<Violation[]>([]);
   const [busy, setBusy] = useState(false);
+  // 토스트가 "아래 조건을 확인하세요" 라고 하면 실제로 거기로 데려다줘야 한다 —
+  // role="alert" 는 읽어 주기만 하고 포커스는 누른 버튼에 남는다
+  const gateRef = useRef<HTMLElement>(null);
   const toast = useToast();
 
   const status = (cocktail?.status ?? "draft") as Status;
@@ -125,6 +128,8 @@ export function CocktailForm({ cocktail }: { cocktail: AdminCocktail | null }) {
       const body = (await res.json()) as Partial<ValidationProblem>;
       setViolations(body.violations ?? []);
       toast.error("아직 발행할 수 없습니다 — 아래 조건을 확인하세요");
+      // 그려진 뒤에 옮긴다
+      requestAnimationFrame(() => gateRef.current?.focus());
       return;
     }
     setViolations([]);
@@ -146,7 +151,7 @@ export function CocktailForm({ cocktail }: { cocktail: AdminCocktail | null }) {
 
       {/* 발행 조건 패널 — 실패를 **전부 한 번에** (FR-ADMIN-003) */}
       {violations.length > 0 && (
-        <section className="gate-panel" role="alert" aria-label="발행 조건">
+        <section className="gate-panel" role="alert" aria-label="발행 조건" ref={gateRef} tabIndex={-1}>
           <h3>발행 조건 {violations.length}건이 남았습니다</h3>
           <ul>
             {violations.map((v) => (

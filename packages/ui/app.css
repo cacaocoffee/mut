@@ -47,6 +47,18 @@ body { overflow-wrap: anywhere; }
   outline: none;
 }
 
+/* iOS Safari 는 16px 미만인 입력창을 누르면 페이지를 확대한다. 시안의 .input 은
+   14px 이라 검색·어드민 폼에서 화면이 튀었다. 시안을 고치지 않고 여기서 덮는다
+   (ADR-0013 · ADR-0005 결정 1). 폭이 아니라 입력 방식이 기준이다 — 좁은 창의
+   데스크톱 브라우저는 확대되지 않고, 거기서 16px·44px 은 폼 밀도를 해친다.
+   min-height 는 같은 검토에서 나온 WCAG 2.5.5 터치 타깃을 함께 만족시킨다 */
+@media (pointer: coarse) {
+  .input {
+    font-size: 16px;
+    min-height: 44px;
+  }
+}
+
 /* — 페이지 골격 — */
 .page {
   /* dvh — 모바일 주소창이 접히면 100vh 가 화면보다 커진다 */

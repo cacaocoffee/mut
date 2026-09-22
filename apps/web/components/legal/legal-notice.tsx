@@ -33,7 +33,7 @@ export function LegalNotice() {
       <nav className="legal-links" aria-label="바닥글 링크">
         {/* 재료 사전은 내비 탭이 아니다 (탭 셋 불변식). 여기서 연다 (#179). */}
         <Link href={INGREDIENTS_PATH}>재료 사전</Link>
-        {/* 유통 제품도 탭이 아니다. 같은 자리에서 연다 (#205). */}
+        {/* 유통 술은 #207 에서 `04` 탭이 생겼다. 이 링크는 탭을 못 본 사람을 위해 남긴다 */}
         {" · "}
         <Link href={PRODUCTS_PATH}>국내 유통 술</Link>
         {/* `NFR-L-04` — 두 페이지가 존재하고 **닿을 수 있어야** 한다.
