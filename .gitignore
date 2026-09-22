@@ -78,6 +78,9 @@ apps/web/test-results/
 # 에이전트 워크트리 — 로컬 작업 공간이다. 임베디드 리포로 커밋되면 안 된다
 .claude/worktrees/
 
+# 에이전트 스킬 — 각자 쓰는 도구다. uipro init 한 줄로 다시 깔린다
+.claude/skills/
+
 # Lighthouse CI 리포트 — 실행할 때마다 새로 나오는 산출물이다
 apps/web/.lighthouseci/
 
