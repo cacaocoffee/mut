@@ -1345,6 +1345,32 @@
       "JsonNode" : {
         "type" : "object"
       },
+      "MatchRunResult" : {
+        "properties" : {
+          "autoApproved" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "availabilityChanged" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "elapsedMs" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "ingredients" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "newMatches" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        },
+        "required" : [ "autoApproved", "availabilityChanged", "elapsedMs", "ingredients", "newMatches" ],
+        "type" : "object"
+      },
       "MyProfile" : {
         "properties" : {
           "displayName" : {
@@ -2809,6 +2835,26 @@
           }
         },
         "summary" : "승인 재료 수와 상한",
+        "tags" : [ "admin-ingredient-controller" ]
+      }
+    },
+    "/api/v1/admin/ingredients/matches/run" : {
+      "post" : {
+        "description" : "editor 이상. 승인된 재료 전부에 브랜드 검색어·별명으로 제품을 찾는다. 브랜드 일치는 승인, 별명은 제안. 유통 여부는 common·specialty 로 올리기만.",
+        "operationId" : "runMatching",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MatchRunResult"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "매칭 배치 지금 돌리기",
         "tags" : [ "admin-ingredient-controller" ]
       }
     },
