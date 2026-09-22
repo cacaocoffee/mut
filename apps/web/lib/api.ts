@@ -264,11 +264,12 @@ export async function ingredientDetail(slug: string): Promise<IngredientDetail |
 // ── 유통 제품 목록 (#205 · G-41) ────────────────────────────────────────────
 
 /**
- * 식약처 수입신고 제품. 제품명·수입사 부분일치 + 식품유형. 최근 신고순은 서버가 고정한다.
+ * 식약처 수입신고 제품. q 는 제품명만, importer 는 수입사만, foodType 은 식품유형. 최근 신고순은 서버가 고정한다.
  * "신고가 있었다" 까지만 아는 데이터다 — 화면이 그 말을 같이 낸다.
  */
 export async function products(filter: {
   q?: string;
+  importer?: string;
   foodType?: string;
   page?: number;
 }): Promise<ProductList | null> {
@@ -276,6 +277,7 @@ export async function products(filter: {
 
   const query = new URLSearchParams({ size: "50", page: String(filter.page ?? 0) });
   if (filter.q) query.set("q", filter.q);
+  if (filter.importer) query.set("importer", filter.importer);
   if (filter.foodType) query.set("foodType", filter.foodType);
 
   try {

@@ -16,21 +16,23 @@ export const dynamic = "force-dynamic";
 export default async function AdminProducts({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; foodType?: string; page?: string }>;
+  searchParams: Promise<{ q?: string; importer?: string; foodType?: string; page?: string }>;
 }) {
   await requireAdmin();
   const sp = await searchParams;
   const q = sp.q?.trim() ?? "";
+  const importer = sp.importer?.trim() ?? "";
   const foodType = sp.foodType?.trim() ?? "";
   const page = Math.max(0, Number(sp.page ?? 0) || 0);
 
-  const result = await adminProducts({ q, foodType, page });
+  const result = await adminProducts({ q, importer, foodType, page });
   const items = result?.items ?? [];
   const meta = result?.page;
 
   const href = (p: number) => {
     const query = new URLSearchParams();
     if (q) query.set("q", q);
+    if (importer) query.set("importer", importer);
     if (foodType) query.set("foodType", foodType);
     if (p > 0) query.set("page", String(p));
     const s = query.toString();
@@ -42,15 +44,19 @@ export default async function AdminProducts({
       <div className="admin__section-head admin__section-head--row">
         <span>
           유통 제품 {meta ? `${meta.totalElements.toLocaleString()}건` : ""}
-          {q || foodType ? " (걸러짐)" : ""}
+          {q || importer || foodType ? " (걸러짐)" : ""}
         </span>
         <span className="admin-field__hint">식약처 수입신고 기준 · 최근 신고순</span>
       </div>
 
       <form className="admin-form__grid" action="/admin/products" method="get">
         <label className="admin-field">
-          <span className="admin-field__label">제품명 · 수입사</span>
-          <input name="q" defaultValue={q} placeholder="캄파리, CAMPARI, 트랜스베버리지 …" />
+          <span className="admin-field__label">제품명</span>
+          <input name="q" defaultValue={q} placeholder="캄파리, CAMPARI …" />
+        </label>
+        <label className="admin-field">
+          <span className="admin-field__label">수입사</span>
+          <input name="importer" defaultValue={importer} placeholder="트랜스베버리지 …" />
         </label>
         <label className="admin-field">
           <span className="admin-field__label">식품유형</span>

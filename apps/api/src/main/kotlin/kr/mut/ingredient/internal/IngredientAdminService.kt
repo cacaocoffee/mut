@@ -151,11 +151,12 @@ class IngredientAdminService(
         match(id, matchId).apply { reject() }.toResponse()
 
     @Transactional(readOnly = true)
-    override fun browseProducts(q: String?, foodType: String?, page: PageQuery): DistributedProductPage {
+    override fun browseProducts(q: String?, importer: String?, foodType: String?, page: PageQuery): DistributedProductPage {
         val keyword = q?.trim()?.takeIf { it.isNotEmpty() }
+        val who = importer?.trim()?.takeIf { it.isNotEmpty() }
         val type = foodType?.trim()?.takeIf { it.isNotEmpty() }
-        val rows = products.browse(keyword, type, PageRequest.of(page.page, page.size))
-        val paged = PageResponse.of(rows.map { it.toSummary() }, page, products.countBrowse(keyword, type))
+        val rows = products.browse(keyword, who, type, PageRequest.of(page.page, page.size))
+        val paged = PageResponse.of(rows.map { it.toSummary() }, page, products.countBrowse(keyword, who, type))
         return DistributedProductPage(
             items = paged.items,
             page = paged.page,

@@ -117,11 +117,13 @@ export type DistributedProductPage = components["schemas"]["DistributedProductPa
 /** 유통 제품 목록 (#203). 제품명·수입사 부분일치 + 식품유형. 최근 신고순은 서버가 고정한다. */
 export async function adminProducts(filter: {
   q?: string;
+  importer?: string;
   foodType?: string;
   page?: number;
 }): Promise<DistributedProductPage | null> {
   const query = new URLSearchParams({ size: "50", page: String(filter.page ?? 0) });
   if (filter.q) query.set("q", filter.q);
+  if (filter.importer) query.set("importer", filter.importer);
   if (filter.foodType) query.set("foodType", filter.foodType);
   return get<DistributedProductPage>(`/products?${query}`);
 }

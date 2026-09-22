@@ -66,14 +66,13 @@ class IngredientDictionaryService(
     }
 
 
-    /** 공개 유통 제품 목록 (#205). 제품명·수입사 부분일치 + 식품유형, 최근 신고순. */
+    /** 공개 유통 제품 목록 (#205 · #212). q 는 제품명만, importer 는 수입사만. 최근 신고순. */
     @Transactional(readOnly = true)
-    fun products(q: String?, foodType: String?, nameOnly: Boolean, query: PageQuery): ProductListResponse {
+    fun products(q: String?, importer: String?, foodType: String?, query: PageQuery): ProductListResponse {
         val keyword = q?.trim()?.takeIf { it.isNotEmpty() }
+        val who = importer?.trim()?.takeIf { it.isNotEmpty() }
         val type = foodType?.trim()?.takeIf { it.isNotEmpty() }
-        val pageable = PageRequest.of(query.page, query.size)
-        val rows = if (nameOnly) products.browseByName(keyword, type, pageable) else products.browse(keyword, type, pageable)
-        val total = if (nameOnly) products.countBrowseByName(keyword, type) else products.countBrowse(keyword, type)
+        val rows = products.browse(keyword, who, type, PageRequest.of(query.page, query.size))
         val paged = PageResponse.of(
             items = rows.map {
                 DistributedProductItem(
@@ -86,7 +85,7 @@ class IngredientDictionaryService(
                 )
             },
             query = query,
-            totalElements = total,
+            totalElements = products.countBrowse(keyword, who, type),
         )
         return ProductListResponse(
             items = paged.items,
