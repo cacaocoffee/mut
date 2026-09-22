@@ -50,7 +50,8 @@ class AdminProductApiTest {
             .containsExactly("제품목록시험 위스키 B", "제품목록시험 리큐르", "제품목록시험 위스키 A")
         assertThat(byName["page"]["totalElements"].asLong()).isEqualTo(3)
 
-        val byImporter = list("q=수입사갑", editor)
+        assertThat(list("q=수입사갑", editor)["items"]).`as`("q 는 제품명만 본다 (#212)").isEmpty()
+        val byImporter = list("importer=수입사갑", editor)
         assertThat(byImporter["items"]).hasSize(2)
 
         val byType = list("q=제품목록시험&foodType=위스키", editor)

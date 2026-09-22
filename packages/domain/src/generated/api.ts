@@ -476,7 +476,7 @@ export interface paths {
         };
         /**
          * 유통 제품 목록
-         * @description editor 이상. 제품명(한/영)·수입사 부분일치와 식품유형으로 거른다. 최근 신고순 고정.
+         * @description editor 이상. q 는 제품명(한/영), importer 는 수입사, foodType 은 식품유형. 최근 신고순 고정.
          */
         get: operations["list_6"];
         put?: never;
@@ -956,7 +956,7 @@ export interface paths {
         };
         /**
          * 유통 제품 목록 (공개)
-         * @description 식약처 수입신고 제품. 제품명(한/영)·수입사 부분일치와 식품유형으로 거른다. 최근 신고순 고정.
+         * @description 식약처 수입신고 제품. q 는 제품명(한/영), importer 는 수입사, foodType 은 식품유형. 최근 신고순 고정.
          */
         get: operations["list"];
         put?: never;
@@ -2404,8 +2404,10 @@ export interface operations {
     list_6: {
         parameters: {
             query: {
-                /** @description 제품명 · 수입사의 일부 */
+                /** @description 제품명(한/영)의 일부 */
                 q?: string;
+                /** @description 수입사의 일부 */
+                importer?: string;
                 /** @description 식품유형 (위스키 · 리큐르 · 과실주 …) */
                 foodType?: string;
                 page: components["schemas"]["PageQuery"];
@@ -3039,12 +3041,12 @@ export interface operations {
     list: {
         parameters: {
             query: {
-                /** @description 제품명 · 수입사의 일부 */
+                /** @description 제품명(한/영)의 일부 */
                 q?: string;
+                /** @description 수입사의 일부 */
+                importer?: string;
                 /** @description 식품유형 (위스키 · 리큐르 · 과실주 …) */
                 foodType?: string;
-                /** @description name 이면 제품명만 본다 (수입사 제외). 기본은 제품명·수입사 둘 다 */
-                scope?: string;
                 page: components["schemas"]["PageQuery"];
             };
             header?: never;

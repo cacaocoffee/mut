@@ -21,11 +21,11 @@ import { PRODUCTS_PATH } from "@/lib/routes";
  */
 export const dynamic = "force-dynamic";
 
-type Params = { q?: string; foodType?: string; page?: string };
+type Params = { q?: string; importer?: string; foodType?: string; page?: string };
 
 export async function generateMetadata({ searchParams }: { searchParams: Promise<Params> }): Promise<Metadata> {
   const sp = await searchParams;
-  const filtered = Boolean(sp.q || sp.foodType || sp.page);
+  const filtered = Boolean(sp.q || sp.importer || sp.foodType || sp.page);
   return {
     title: "국내 유통 술",
     description: "식약처 수입신고 기준으로 국내에 들어온 술을 제품명·수입사·유형으로 찾습니다.",
@@ -37,16 +37,18 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
 export default async function ProductsPage({ searchParams }: { searchParams: Promise<Params> }) {
   const sp = await searchParams;
   const q = sp.q?.trim() ?? "";
+  const importer = sp.importer?.trim() ?? "";
   const foodType = sp.foodType?.trim() ?? "";
   const page = Math.max(0, Number(sp.page ?? 0) || 0);
 
-  const result = await products({ q, foodType, page });
+  const result = await products({ q, importer, foodType, page });
   const items = result?.items ?? [];
   const meta = result?.page;
 
   const href = (p: number) => {
     const query = new URLSearchParams();
     if (q) query.set("q", q);
+    if (importer) query.set("importer", importer);
     if (foodType) query.set("foodType", foodType);
     if (p > 0) query.set("page", String(p));
     const s = query.toString();
@@ -70,8 +72,12 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
 
       <form className="products-filter" action={PRODUCTS_PATH} method="get">
         <label>
-          제품명 · 수입사
-          <input name="q" defaultValue={q} placeholder="캄파리, Laphroaig, 트랜스베버리지 …" />
+          제품명
+          <input name="q" defaultValue={q} placeholder="캄파리, Laphroaig …" />
+        </label>
+        <label>
+          수입사
+          <input name="importer" defaultValue={importer} placeholder="트랜스베버리지 …" />
         </label>
         <label>
           유형

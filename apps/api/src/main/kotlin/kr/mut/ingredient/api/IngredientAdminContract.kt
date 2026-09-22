@@ -83,8 +83,8 @@ interface IngredientAdminFacade {
     /** 재거절은 409. */
     fun rejectMatch(id: Long, matchId: Long): IngredientProductMatchResponse
 
-    /** 유통 제품 목록 (#203). 제품명·수입사 부분일치와 식품유형으로 거른다. 최근 신고순. */
-    fun browseProducts(q: String?, foodType: String?, page: PageQuery): DistributedProductPage
+    /** 유통 제품 목록 (#203 · #212). q 는 제품명만, importer 는 수입사만, 유형. 최근 신고순. */
+    fun browseProducts(q: String?, importer: String?, foodType: String?, page: PageQuery): DistributedProductPage
 }
 
 /** `Size` 상한은 `V008__ingredient.sql` 의 컬럼 길이와 같다 — 어긋나면 DB 가 500 으로 막는다. */

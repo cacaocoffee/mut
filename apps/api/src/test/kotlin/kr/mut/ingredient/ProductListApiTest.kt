@@ -11,7 +11,7 @@ import org.springframework.test.web.servlet.get
 class ProductListApiTest : IngredientApiSupport() {
 
     @Test
-    fun `RED1,2 - 로그인 없이 200, id·링크·가격 없음, 제품명·수입사·유형으로 거르고 최근 신고순`() {
+    fun `RED1,2 - 로그인 없이 200, id·링크·가격 없음, 제품명·수입사·유형 각각으로 거르고 최근 신고순`() {
         val a = insertProduct("pubprod-test 위스키 A", "importer-a", "위스키", "2026-01-01")
         val b = insertProduct("pubprod-test 위스키 B", "importer-b", "위스키", "2026-06-01")
         val c = insertProduct("pubprod-test 리큐르", "importer-a", "리큐르", "2026-03-01")
@@ -25,10 +25,10 @@ class ProductListApiTest : IngredientApiSupport() {
                 .`as`("공개 응답엔 내부 id 가 없고(SPEC-07 §1.1), 링크·가격은 NFR-L-05 자문 뒤다")
                 .doesNotContain("id", "source", "purchaseUrl", "price", "priceBand")
 
-            assertThat(itemsOf(mvc.get("$PRODUCTS?q=importer-a").andReturn())).hasSize(2)
-            // scope=name — 수입사는 안 본다. 레시피 줄의 "캄파리" 에 캄파리코리아의 와일드터키가 섞이지 않게 (#209)
-            assertThat(itemsOf(mvc.get("$PRODUCTS?q=importer-a&scope=name").andReturn())).isEmpty()
-            assertThat(itemsOf(mvc.get("$PRODUCTS?q=pubprod-test&scope=name").andReturn())).hasSize(3)
+            // q 는 제품명만 본다 — 수입사명으로는 안 잡힌다 (#212). 수입사는 importer 로
+            assertThat(itemsOf(mvc.get("$PRODUCTS?q=importer-a").andReturn())).isEmpty()
+            assertThat(itemsOf(mvc.get("$PRODUCTS?importer=importer-a").andReturn())).hasSize(2)
+            assertThat(itemsOf(mvc.get("$PRODUCTS?q=pubprod-test&importer=importer-b").andReturn())).hasSize(1)
             assertThat(itemsOf(mvc.get("$PRODUCTS?q=pubprod-test&foodType=리큐르").andReturn()).map { it["nameKo"] })
                 .containsExactly("pubprod-test 리큐르")
 
