@@ -14,6 +14,9 @@
 html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* 마스트헤드가 sticky 라, Tab 으로 옮긴 요소가 화면 맨 위로 스크롤되면 내비에
+     덮여 포커스 링이 안 보인다. 브랜드 줄이 접힌 탭 줄 높이만큼 띄워 준다 */
+  scroll-padding-top: 76px;
 }
 /* `clip` 이지 `hidden` 이 아니다 — `hidden` 은 루트를 스크롤 컨테이너로 만들고,
    무엇보다 **넘침을 숨겨서** 레이아웃 결함이 테스트에 안 잡히게 한다.

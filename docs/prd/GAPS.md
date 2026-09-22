@@ -1394,3 +1394,29 @@ SPEC-02 §6 의 `Article.type` 은 발행 형식 축(`interview`·`guide`·`tren
 가입자 전환(25%)은 회원 기능이 아직 없어(북마크가 Phase 2) 지금 잴 수 없다 — 그때
 `bookmark_add` 로 잇는다. 그전까지는 위 두 눈금이 "콘텐츠가 유입을 만드는가"를 대신 답한다.
 목표 수치는 실데이터가 한 달 쌓인 뒤 정한다 — 지금 정하면 근거 없는 숫자다.
+
+### G-51
+**`styles.css` 의 `.input` 14px 이 모바일에서 iOS 확대를 부른다** (2026-09-22).
+
+iOS Safari 는 폰트가 16px 미만인 입력창에 포커스가 가면 페이지를 강제로 확대한다.
+`.input` 은 `font-size: 14px` 이고(`packages/ui/styles.css:152`), 검색이 이 사이트의
+핵심 동선이라 검색창을 누를 때마다 화면이 튄다. PRD 12장이 모바일 트래픽 80% 를 가정한다.
+
+`.search-box__input` 은 `app.css` 에 있어 이번에 16px 로 올렸다. 남은 것은 **`styles.css`
+의 `.input` 자체** — 어드민 폼·로그인 등 나머지 입력창 전부가 여기 걸린다.
+
+**고치려면 [ADR-0005](../decisions/ADR-0005-ui-package-scope.md) 3단(GAPS → ADR → 되돌리는 조건)을 밟아야 한다.**
+`.btn-primary` 대비가 [ADR-0006](../decisions/ADR-0006-btn-primary-contrast.md) 으로 간 것과 같은 경로다.
+
+제안하는 변경 — 토큰값을 바꾸지 않고 터치 기기에서만 재정의한다:
+
+```css
+@media (pointer: coarse) {
+  .input { font-size: 16px; min-height: 44px; }
+}
+```
+
+데스크톱 어드민 폼은 촘촘해야 하므로 14px 을 지킨다. `min-height: 44px` 은 같은 검토에서
+나온 WCAG 2.5.5 터치 타깃 권고를 함께 만족시킨다.
+
+**되돌리는 조건** — 시안이 입력 폰트를 16px 로 올리면 이 미디어쿼리는 불필요해진다.
